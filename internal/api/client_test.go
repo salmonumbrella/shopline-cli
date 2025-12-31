@@ -1,0 +1,549 @@
+package api
+
+import (
+	"context"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+	"time"
+)
+
+func TestClientGet(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Authorization") != "Bearer test-token" {
+			t.Error("Missing or incorrect Authorization header")
+		}
+		if r.Header.Get("Content-Type") != "application/json" {
+			t.Error("Missing Content-Type header")
+		}
+
+		_ = json.NewEncoder(w).Encode(map[string]string{"id": "123"})
+	}))
+	defer server.Close()
+
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	var result map[string]string
+	err := client.Get(context.Background(), "/test", &result)
+	if err != nil {
+		t.Fatalf("Get failed: %v", err)
+	}
+
+	if result["id"] != "123" {
+		t.Errorf("Unexpected result: %v", result)
+	}
+}
+
+func TestClientRateLimitRetry(t *testing.T) {
+	attempts := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		attempts++
+		if attempts < 3 {
+			w.Header().Set("Retry-After", "1")
+			w.WriteHeader(http.StatusTooManyRequests)
+			return
+		}
+		_ = json.NewEncoder(w).Encode(map[string]string{"success": "true"})
+	}))
+	defer server.Close()
+
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	var result map[string]string
+	err := client.Get(context.Background(), "/test", &result)
+	if err != nil {
+		t.Fatalf("Get failed after retries: %v", err)
+	}
+
+	if attempts != 3 {
+		t.Errorf("Expected 3 attempts, got %d", attempts)
+	}
+}
+
+func TestClientPostNoRetryOn429(t *testing.T) {
+	attempts := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		attempts++
+		w.Header().Set("Retry-After", "1")
+		w.WriteHeader(http.StatusTooManyRequests)
+	}))
+	defer server.Close()
+
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	err := client.Post(context.Background(), "/test", map[string]string{"key": "value"}, nil)
+	if err == nil {
+		t.Fatal("Expected error for rate-limited POST")
+	}
+
+	rateLimitErr, ok := err.(*RateLimitError)
+	if !ok {
+		t.Fatalf("Expected RateLimitError, got %T: %v", err, err)
+	}
+	if rateLimitErr.RetryAfter == 0 {
+		t.Error("Expected non-zero RetryAfter")
+	}
+
+	// POST should NOT retry on 429 - only one attempt expected
+	if attempts != 1 {
+		t.Errorf("POST should not retry on 429: expected 1 attempt, got %d", attempts)
+	}
+}
+
+func TestCircuitBreaker_OpensAfterThreshold(t *testing.T) {
+	failureCount := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		failureCount++
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	defer server.Close()
+
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	// Each GET request retries up to 3 times on 500 errors, and each retry
+	// increments the failure counter. So we need to make requests until
+	// we accumulate circuitThreshold (5) failures.
+	// With 3 retries per request, 2 requests = 6 failures, which exceeds threshold.
+
+	// First request: 3 retries = 3 failures
+	err := client.Get(context.Background(), "/test", nil)
+	if err == nil {
+		t.Fatal("Expected error on first request")
+	}
+	if _, ok := err.(*CircuitBreakerError); ok {
+		t.Fatal("Circuit opened too early after first request")
+	}
+
+	// Second request: 3 more retries = 6 total failures, exceeds threshold of 5
+	// This request should succeed in making server calls (circuit not yet checked as open)
+	// but will open the circuit during execution
+	err = client.Get(context.Background(), "/test", nil)
+	if err == nil {
+		t.Fatal("Expected error on second request")
+	}
+	// After 6 failures, circuit should be open now
+
+	// Third request should fail immediately with CircuitBreakerError
+	err = client.Get(context.Background(), "/test", nil)
+	if err == nil {
+		t.Fatal("Expected CircuitBreakerError")
+	}
+
+	cbErr, ok := err.(*CircuitBreakerError)
+	if !ok {
+		t.Fatalf("Expected CircuitBreakerError, got %T: %v", err, err)
+	}
+	if cbErr == nil {
+		t.Fatal("CircuitBreakerError should not be nil")
+	}
+
+	// Verify we made expected number of server calls (6 = 2 requests * 3 retries each)
+	if failureCount != 6 {
+		t.Errorf("Expected 6 server failures, got %d", failureCount)
+	}
+}
+
+func TestCircuitBreaker_ResetsOnSuccess(t *testing.T) {
+	failCount := 0
+	shouldFail := true
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if shouldFail {
+			failCount++
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		_ = json.NewEncoder(w).Encode(map[string]string{"success": "true"})
+	}))
+	defer server.Close()
+
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	// Make failures to open the circuit
+	for i := 0; i < circuitThreshold; i++ {
+		_ = client.Get(context.Background(), "/test", nil)
+	}
+
+	// Verify circuit is open
+	err := client.Get(context.Background(), "/test", nil)
+	if _, ok := err.(*CircuitBreakerError); !ok {
+		t.Fatalf("Expected circuit to be open, got %T: %v", err, err)
+	}
+
+	// Manually reset the circuit state to simulate timeout expiry
+	// (we can't wait 30 seconds in a test)
+	client.mu.Lock()
+	client.circuitOpenedAt = client.circuitOpenedAt.Add(-circuitTimeout - time.Second)
+	client.mu.Unlock()
+
+	// Now make a successful request
+	shouldFail = false
+	var result map[string]string
+	err = client.Get(context.Background(), "/test", &result)
+	if err != nil {
+		t.Fatalf("Expected success after circuit timeout, got: %v", err)
+	}
+
+	// Verify circuit is now closed by checking internal state
+	client.mu.RLock()
+	isOpen := client.circuitOpen
+	consecutiveFails := client.consecutiveFails
+	client.mu.RUnlock()
+
+	if isOpen {
+		t.Error("Circuit should be closed after successful request")
+	}
+	if consecutiveFails != 0 {
+		t.Errorf("Consecutive fails should be 0, got %d", consecutiveFails)
+	}
+}
+
+func TestCircuitBreaker_Timeout(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	defer server.Close()
+
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	// Open the circuit
+	for i := 0; i < circuitThreshold; i++ {
+		_ = client.Get(context.Background(), "/test", nil)
+	}
+
+	// Verify circuit is open
+	if !client.isCircuitOpen() {
+		t.Fatal("Circuit should be open")
+	}
+
+	// Verify circuit is still open before timeout
+	client.mu.Lock()
+	client.circuitOpenedAt = time.Now().Add(-circuitTimeout / 2) // halfway through timeout
+	client.mu.Unlock()
+
+	if !client.isCircuitOpen() {
+		t.Error("Circuit should still be open before timeout expires")
+	}
+
+	// Verify circuit is half-open (allows requests) after timeout
+	client.mu.Lock()
+	client.circuitOpenedAt = time.Now().Add(-circuitTimeout - time.Second) // past timeout
+	client.mu.Unlock()
+
+	if client.isCircuitOpen() {
+		t.Error("Circuit should be half-open (allow requests) after timeout expires")
+	}
+}
+
+func TestCircuitBreaker_PartialFailuresDoNotOpenCircuit(t *testing.T) {
+	requestCount := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestCount++
+		// Alternate: fail, succeed, fail, succeed...
+		if requestCount%2 == 1 {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		_ = json.NewEncoder(w).Encode(map[string]string{"success": "true"})
+	}))
+	defer server.Close()
+
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	// Make many alternating fail/success requests
+	// Since GET retries 3 times on 500, each "fail" request actually makes 3 server calls
+	// But then the success resets the counter
+	for i := 0; i < 10; i++ {
+		// This will fail (server returns 500 for odd requestCount)
+		_ = client.Get(context.Background(), "/test", nil)
+		// Reset requestCount to even so next succeeds
+		requestCount = 0
+		// This will succeed
+		_ = client.Get(context.Background(), "/test", nil)
+		requestCount = 0
+	}
+
+	// Circuit should not be open because successes reset the counter
+	if client.isCircuitOpen() {
+		t.Error("Circuit should not be open when successes reset the failure counter")
+	}
+}
+
+func TestParseRetryAfter(t *testing.T) {
+	testCases := []struct {
+		name     string
+		header   string
+		expected time.Duration
+	}{
+		{"empty header", "", time.Second},
+		{"numeric seconds", "30", 30 * time.Second},
+		{"invalid string", "invalid", time.Second},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result := parseRetryAfter(tc.header)
+			if result != tc.expected {
+				t.Errorf("Expected %v, got %v", tc.expected, result)
+			}
+		})
+	}
+}
+
+func TestParseRetryAfterRFC1123(t *testing.T) {
+	// Test RFC1123 date format
+	futureTime := time.Now().Add(60 * time.Second).UTC()
+	header := futureTime.Format(time.RFC1123)
+
+	result := parseRetryAfter(header)
+
+	// Allow some tolerance for timing
+	if result < 59*time.Second || result > 61*time.Second {
+		t.Errorf("Expected approximately 60s, got %v", result)
+	}
+}
+
+func TestClientPost(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("Expected POST, got %s", r.Method)
+		}
+		_ = json.NewEncoder(w).Encode(map[string]string{"created": "true"})
+	}))
+	defer server.Close()
+
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	var result map[string]string
+	err := client.Post(context.Background(), "/test", map[string]string{"name": "test"}, &result)
+	if err != nil {
+		t.Fatalf("Post failed: %v", err)
+	}
+
+	if result["created"] != "true" {
+		t.Errorf("Unexpected result: %v", result)
+	}
+}
+
+func TestClientPut(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
+		}
+		_ = json.NewEncoder(w).Encode(map[string]string{"updated": "true"})
+	}))
+	defer server.Close()
+
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	var result map[string]string
+	err := client.Put(context.Background(), "/test", map[string]string{"name": "updated"}, &result)
+	if err != nil {
+		t.Fatalf("Put failed: %v", err)
+	}
+
+	if result["updated"] != "true" {
+		t.Errorf("Unexpected result: %v", result)
+	}
+}
+
+func TestClientDelete(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("Expected DELETE, got %s", r.Method)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	defer server.Close()
+
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	err := client.Delete(context.Background(), "/test")
+	if err != nil {
+		t.Fatalf("Delete failed: %v", err)
+	}
+}
+
+func TestClient4xxError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+		_ = json.NewEncoder(w).Encode(map[string]string{
+			"code":    "NOT_FOUND",
+			"message": "Resource not found",
+		})
+	}))
+	defer server.Close()
+
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	err := client.Get(context.Background(), "/test", nil)
+	if err == nil {
+		t.Fatal("Expected error for 404, got nil")
+	}
+
+	apiErr, ok := err.(*APIError)
+	if !ok {
+		t.Fatalf("Expected APIError, got %T: %v", err, err)
+	}
+	if apiErr.Status != 404 {
+		t.Errorf("Expected status 404, got %d", apiErr.Status)
+	}
+	if apiErr.Code != "NOT_FOUND" {
+		t.Errorf("Expected code NOT_FOUND, got %s", apiErr.Code)
+	}
+}
+
+func TestClient4xxErrorDecodeFailure(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte("invalid json"))
+	}))
+	defer server.Close()
+
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	err := client.Get(context.Background(), "/test", nil)
+	if err == nil {
+		t.Fatal("Expected error for 400, got nil")
+	}
+
+	apiErr, ok := err.(*APIError)
+	if !ok {
+		t.Fatalf("Expected APIError, got %T: %v", err, err)
+	}
+	if apiErr.Code != "UNKNOWN_ERROR" {
+		t.Errorf("Expected code UNKNOWN_ERROR, got %s", apiErr.Code)
+	}
+}
+
+func TestClientServerError(t *testing.T) {
+	attempts := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		attempts++
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	defer server.Close()
+
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+	// Reset circuit breaker state
+	client.circuitOpen = false
+	client.consecutiveFails = 0
+
+	err := client.Get(context.Background(), "/test", nil)
+	if err == nil {
+		t.Fatal("Expected error for 500, got nil")
+	}
+
+	apiErr, ok := err.(*APIError)
+	if !ok {
+		t.Fatalf("Expected APIError, got %T: %v", err, err)
+	}
+	if apiErr.Code != "SERVER_ERROR" {
+		t.Errorf("Expected code SERVER_ERROR, got %s", apiErr.Code)
+	}
+
+	// GET should retry on 500
+	if attempts != 3 {
+		t.Errorf("Expected 3 attempts for GET on 500, got %d", attempts)
+	}
+}
+
+func TestClientMarshalError(t *testing.T) {
+	client := NewClient("test-handle", "test-token")
+
+	// Create an unmarshalable value (channel)
+	unmarshalable := make(chan int)
+
+	err := client.Post(context.Background(), "/test", unmarshalable, nil)
+	if err == nil {
+		t.Fatal("Expected marshal error, got nil")
+	}
+	if !strings.Contains(err.Error(), "failed to marshal request body") {
+		t.Errorf("Expected marshal error, got: %v", err)
+	}
+}
+
+func TestClientResponseDecodeError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("invalid json"))
+	}))
+	defer server.Close()
+
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	var result map[string]string
+	err := client.Get(context.Background(), "/test", &result)
+	if err == nil {
+		t.Fatal("Expected decode error, got nil")
+	}
+	if !strings.Contains(err.Error(), "failed to decode response") {
+		t.Errorf("Expected decode error, got: %v", err)
+	}
+}
+
+func TestClientNetworkError(t *testing.T) {
+	client := NewClient("test-handle", "test-token")
+	// Use an invalid URL to trigger network error
+	client.BaseURL = "http://localhost:1" // Port 1 should never be available
+
+	err := client.Get(context.Background(), "/test", nil)
+	if err == nil {
+		t.Fatal("Expected network error, got nil")
+	}
+}
+
+func TestClientPostServerErrorNoRetry(t *testing.T) {
+	attempts := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		attempts++
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	defer server.Close()
+
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+	client.circuitOpen = false
+	client.consecutiveFails = 0
+
+	err := client.Post(context.Background(), "/test", map[string]string{"key": "value"}, nil)
+	if err == nil {
+		t.Fatal("Expected error for 500, got nil")
+	}
+
+	// POST should NOT retry on 500 - only one attempt expected
+	if attempts != 1 {
+		t.Errorf("POST should not retry on 500: expected 1 attempt, got %d", attempts)
+	}
+}

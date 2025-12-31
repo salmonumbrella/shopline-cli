@@ -1,0 +1,362 @@
+package outfmt
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"errors"
+	"strings"
+	"testing"
+)
+
+// failWriter is a writer that always returns an error after writing n bytes.
+type failWriter struct {
+	written int
+	failAt  int
+}
+
+func (w *failWriter) Write(p []byte) (n int, err error) {
+	if w.written >= w.failAt {
+		return 0, errors.New("write failed")
+	}
+	w.written += len(p)
+	if w.written >= w.failAt {
+		return len(p), errors.New("write failed")
+	}
+	return len(p), nil
+}
+
+func TestNew(t *testing.T) {
+	tests := []struct {
+		name      string
+		colorMode string
+	}{
+		{"auto mode", "auto"},
+		{"never mode", "never"},
+		{"always mode", "always"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var buf bytes.Buffer
+			f := New(&buf, FormatText, tt.colorMode)
+			if f == nil {
+				t.Fatal("New returned nil")
+			}
+			if f.w != &buf {
+				t.Error("Writer not set correctly")
+			}
+			if f.format != FormatText {
+				t.Error("Format not set correctly")
+			}
+		})
+	}
+}
+
+func TestFormatterText(t *testing.T) {
+	var buf bytes.Buffer
+	f := New(&buf, FormatText, "auto")
+
+	headers := []string{"ID", "NAME", "STATUS"}
+	rows := [][]string{
+		{"1", "Order A", "pending"},
+		{"2", "Order B", "completed"},
+	}
+
+	f.Table(headers, rows)
+
+	output := buf.String()
+	if !strings.Contains(output, "ID") {
+		t.Error("Missing header in output")
+	}
+	if !strings.Contains(output, "Order A") {
+		t.Error("Missing row data in output")
+	}
+}
+
+func TestFormatterJSON(t *testing.T) {
+	var buf bytes.Buffer
+	f := New(&buf, FormatJSON, "never")
+
+	data := map[string]string{"id": "123", "name": "Test"}
+	if err := f.JSON(data); err != nil {
+		t.Fatalf("JSON() returned error: %v", err)
+	}
+
+	var result map[string]string
+	if err := json.Unmarshal(buf.Bytes(), &result); err != nil {
+		t.Fatalf("Failed to parse JSON output: %v", err)
+	}
+
+	if result["id"] != "123" {
+		t.Errorf("Unexpected id: %s", result["id"])
+	}
+}
+
+func TestWithQuery(t *testing.T) {
+	var buf bytes.Buffer
+	f := New(&buf, FormatJSON, "never")
+
+	result := f.WithQuery(".name")
+	if result != f {
+		t.Error("WithQuery should return the same formatter")
+	}
+	if f.query != ".name" {
+		t.Errorf("Query not set correctly: got %s, want .name", f.query)
+	}
+}
+
+func TestFilteredJSON(t *testing.T) {
+	tests := []struct {
+		name     string
+		data     interface{}
+		query    string
+		wantErr  bool
+		contains string
+	}{
+		{
+			name:     "valid query",
+			data:     map[string]interface{}{"name": "test", "id": 123},
+			query:    ".name",
+			wantErr:  false,
+			contains: "test",
+		},
+		{
+			name:     "array filter",
+			data:     []interface{}{map[string]interface{}{"id": 1}, map[string]interface{}{"id": 2}},
+			query:    ".[0].id",
+			wantErr:  false,
+			contains: "1",
+		},
+		{
+			name:    "invalid query syntax",
+			data:    map[string]interface{}{"name": "test"},
+			query:   ".invalid[",
+			wantErr: true,
+		},
+		{
+			name:    "query runtime error",
+			data:    map[string]interface{}{"name": "test"},
+			query:   ".name | .foo",
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var buf bytes.Buffer
+			f := New(&buf, FormatJSON, "never").WithQuery(tt.query)
+
+			err := f.JSON(tt.data)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("JSON() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			if !tt.wantErr && tt.contains != "" {
+				if !strings.Contains(buf.String(), tt.contains) {
+					t.Errorf("Output %q does not contain %q", buf.String(), tt.contains)
+				}
+			}
+		})
+	}
+}
+
+func TestOutput(t *testing.T) {
+	t.Run("JSON format", func(t *testing.T) {
+		var buf bytes.Buffer
+		f := New(&buf, FormatJSON, "never")
+
+		data := map[string]interface{}{"id": "123"}
+		headers := []string{"ID"}
+		rowFunc := func(item interface{}) []string {
+			m := item.(map[string]interface{})
+			return []string{m["id"].(string)}
+		}
+
+		if err := f.Output(data, headers, rowFunc); err != nil {
+			t.Fatalf("Output() error: %v", err)
+		}
+
+		if !strings.Contains(buf.String(), "123") {
+			t.Error("Expected JSON output to contain '123'")
+		}
+	})
+
+	t.Run("Text format with slice", func(t *testing.T) {
+		var buf bytes.Buffer
+		f := New(&buf, FormatText, "never")
+
+		data := []interface{}{
+			map[string]interface{}{"id": "1", "name": "First"},
+			map[string]interface{}{"id": "2", "name": "Second"},
+		}
+		headers := []string{"ID", "NAME"}
+		rowFunc := func(item interface{}) []string {
+			m := item.(map[string]interface{})
+			return []string{m["id"].(string), m["name"].(string)}
+		}
+
+		if err := f.Output(data, headers, rowFunc); err != nil {
+			t.Fatalf("Output() error: %v", err)
+		}
+
+		output := buf.String()
+		if !strings.Contains(output, "First") || !strings.Contains(output, "Second") {
+			t.Errorf("Expected table output, got: %s", output)
+		}
+	})
+
+	t.Run("Text format with single item", func(t *testing.T) {
+		var buf bytes.Buffer
+		f := New(&buf, FormatText, "never")
+
+		data := map[string]interface{}{"id": "single"}
+		headers := []string{"ID"}
+		rowFunc := func(item interface{}) []string {
+			m := item.(map[string]interface{})
+			return []string{m["id"].(string)}
+		}
+
+		if err := f.Output(data, headers, rowFunc); err != nil {
+			t.Fatalf("Output() error: %v", err)
+		}
+
+		if !strings.Contains(buf.String(), "single") {
+			t.Error("Expected table output to contain 'single'")
+		}
+	})
+}
+
+func TestSuccess(t *testing.T) {
+	var buf bytes.Buffer
+	f := New(&buf, FormatText, "never")
+
+	f.Success("Operation completed")
+
+	output := buf.String()
+	if !strings.Contains(output, "Operation completed") {
+		t.Errorf("Success message not found in output: %s", output)
+	}
+}
+
+func TestError(t *testing.T) {
+	var buf bytes.Buffer
+	f := New(&buf, FormatText, "never")
+
+	f.Error("Something went wrong")
+
+	output := buf.String()
+	if !strings.Contains(output, "Something went wrong") {
+		t.Errorf("Error message not found in output: %s", output)
+	}
+}
+
+func TestWarning(t *testing.T) {
+	var buf bytes.Buffer
+	f := New(&buf, FormatText, "never")
+
+	f.Warning("Be careful")
+
+	output := buf.String()
+	if !strings.Contains(output, "Be careful") {
+		t.Errorf("Warning message not found in output: %s", output)
+	}
+}
+
+func TestNewContext(t *testing.T) {
+	var buf bytes.Buffer
+	f := New(&buf, FormatText, "never")
+
+	ctx := context.Background()
+	newCtx := NewContext(ctx, f)
+
+	if newCtx == ctx {
+		t.Error("NewContext should return a new context")
+	}
+}
+
+func TestFromContext(t *testing.T) {
+	t.Run("formatter in context", func(t *testing.T) {
+		var buf bytes.Buffer
+		f := New(&buf, FormatText, "never")
+
+		ctx := NewContext(context.Background(), f)
+		retrieved := FromContext(ctx)
+
+		if retrieved != f {
+			t.Error("FromContext should return the stored formatter")
+		}
+	})
+
+	t.Run("no formatter in context", func(t *testing.T) {
+		ctx := context.Background()
+		retrieved := FromContext(ctx)
+
+		if retrieved == nil {
+			t.Fatal("FromContext should return a default formatter when none in context")
+		}
+		if retrieved.format != FormatText {
+			t.Error("Default formatter should have FormatText")
+		}
+	})
+}
+
+func TestTableWithSingleColumn(t *testing.T) {
+	var buf bytes.Buffer
+	f := New(&buf, FormatText, "never")
+
+	headers := []string{"NAME"}
+	rows := [][]string{
+		{"Item1"},
+		{"Item2"},
+	}
+
+	f.Table(headers, rows)
+
+	output := buf.String()
+	if !strings.Contains(output, "NAME") {
+		t.Error("Missing header")
+	}
+	if !strings.Contains(output, "Item1") || !strings.Contains(output, "Item2") {
+		t.Error("Missing row data")
+	}
+}
+
+func TestTableWithEmptyRows(t *testing.T) {
+	var buf bytes.Buffer
+	f := New(&buf, FormatText, "never")
+
+	headers := []string{"ID", "NAME"}
+	rows := [][]string{}
+
+	f.Table(headers, rows)
+
+	output := buf.String()
+	if !strings.Contains(output, "ID") {
+		t.Error("Missing header even with empty rows")
+	}
+}
+
+func TestFormatConstants(t *testing.T) {
+	if FormatText != "text" {
+		t.Errorf("FormatText should be 'text', got %s", FormatText)
+	}
+	if FormatJSON != "json" {
+		t.Errorf("FormatJSON should be 'json', got %s", FormatJSON)
+	}
+}
+
+func TestFilteredJSONEncodeError(t *testing.T) {
+	// Use a writer that fails after accepting some bytes
+	// This should trigger the enc.Encode(v) error path
+	fw := &failWriter{failAt: 1}
+	f := New(fw, FormatJSON, "never").WithQuery(".")
+
+	data := map[string]interface{}{"name": "test"}
+	err := f.JSON(data)
+
+	if err == nil {
+		t.Error("Expected error from failing writer, got nil")
+	}
+}

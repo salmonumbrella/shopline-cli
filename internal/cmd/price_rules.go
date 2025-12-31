@@ -1,0 +1,196 @@
+package cmd
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/spf13/cobra"
+)
+
+var priceRulesCmd = &cobra.Command{
+	Use:   "price-rules",
+	Short: "Manage price rules",
+}
+
+var priceRulesListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List price rules",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+
+		opts := &api.PriceRulesListOptions{
+			Page:     page,
+			PageSize: pageSize,
+		}
+
+		resp, err := client.ListPriceRules(cmd.Context(), opts)
+		if err != nil {
+			return fmt.Errorf("failed to list price rules: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		headers := []string{"ID", "TITLE", "VALUE TYPE", "VALUE", "TARGET", "CUSTOMER", "USAGE LIMIT", "ONCE/CUSTOMER"}
+		var rows [][]string
+		for _, pr := range resp.Items {
+			usageLimit := "-"
+			if pr.UsageLimit > 0 {
+				usageLimit = fmt.Sprintf("%d", pr.UsageLimit)
+			}
+			oncePerCustomer := "No"
+			if pr.OncePerCustomer {
+				oncePerCustomer = "Yes"
+			}
+			rows = append(rows, []string{
+				pr.ID,
+				pr.Title,
+				pr.ValueType,
+				pr.Value,
+				pr.TargetType,
+				pr.CustomerSelection,
+				usageLimit,
+				oncePerCustomer,
+			})
+		}
+
+		formatter.Table(headers, rows)
+		fmt.Printf("\nShowing %d of %d price rules\n", len(resp.Items), resp.TotalCount)
+		return nil
+	},
+}
+
+var priceRulesGetCmd = &cobra.Command{
+	Use:   "get <id>",
+	Short: "Get price rule details",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		priceRule, err := client.GetPriceRule(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to get price rule: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(priceRule)
+		}
+
+		fmt.Printf("Price Rule ID:      %s\n", priceRule.ID)
+		fmt.Printf("Title:              %s\n", priceRule.Title)
+		fmt.Printf("Value Type:         %s\n", priceRule.ValueType)
+		fmt.Printf("Value:              %s\n", priceRule.Value)
+		fmt.Printf("Target Type:        %s\n", priceRule.TargetType)
+		fmt.Printf("Target Selection:   %s\n", priceRule.TargetSelection)
+		fmt.Printf("Allocation Method:  %s\n", priceRule.AllocationMethod)
+		fmt.Printf("Customer Selection: %s\n", priceRule.CustomerSelection)
+		fmt.Printf("Once Per Customer:  %v\n", priceRule.OncePerCustomer)
+		if priceRule.UsageLimit > 0 {
+			fmt.Printf("Usage Limit:        %d\n", priceRule.UsageLimit)
+		}
+		if !priceRule.StartsAt.IsZero() {
+			fmt.Printf("Starts At:          %s\n", priceRule.StartsAt.Format(time.RFC3339))
+		}
+		if !priceRule.EndsAt.IsZero() {
+			fmt.Printf("Ends At:            %s\n", priceRule.EndsAt.Format(time.RFC3339))
+		}
+		fmt.Printf("Created:            %s\n", priceRule.CreatedAt.Format(time.RFC3339))
+		return nil
+	},
+}
+
+var priceRulesCreateCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create a price rule",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		title, _ := cmd.Flags().GetString("title")
+		valueType, _ := cmd.Flags().GetString("value-type")
+		value, _ := cmd.Flags().GetString("value")
+
+		req := &api.PriceRuleCreateRequest{
+			Title:     title,
+			ValueType: valueType,
+			Value:     value,
+		}
+
+		priceRule, err := client.CreatePriceRule(cmd.Context(), req)
+		if err != nil {
+			return fmt.Errorf("failed to create price rule: %w", err)
+		}
+
+		fmt.Printf("Created price rule %s (%s)\n", priceRule.ID, priceRule.Title)
+		return nil
+	},
+}
+
+var priceRulesDeleteCmd = &cobra.Command{
+	Use:   "delete <id>",
+	Short: "Delete a price rule",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		yes, _ := cmd.Flags().GetBool("yes")
+		if !yes {
+			fmt.Printf("Delete price rule %s? [y/N] ", args[0])
+			var confirm string
+			_, _ = fmt.Scanln(&confirm)
+			if confirm != "y" && confirm != "Y" {
+				fmt.Println("Cancelled.")
+				return nil
+			}
+		}
+
+		if err := client.DeletePriceRule(cmd.Context(), args[0]); err != nil {
+			return fmt.Errorf("failed to delete price rule: %w", err)
+		}
+
+		fmt.Printf("Deleted price rule %s\n", args[0])
+		return nil
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(priceRulesCmd)
+
+	priceRulesCmd.AddCommand(priceRulesListCmd)
+	priceRulesListCmd.Flags().Int("page", 1, "Page number")
+	priceRulesListCmd.Flags().Int("page-size", 20, "Results per page")
+
+	priceRulesCmd.AddCommand(priceRulesGetCmd)
+
+	priceRulesCmd.AddCommand(priceRulesCreateCmd)
+	priceRulesCreateCmd.Flags().String("title", "", "Price rule title")
+	priceRulesCreateCmd.Flags().String("value-type", "", "Value type (percentage, fixed_amount)")
+	priceRulesCreateCmd.Flags().String("value", "", "Value (e.g., -20 for 20% off)")
+	_ = priceRulesCreateCmd.MarkFlagRequired("title")
+	_ = priceRulesCreateCmd.MarkFlagRequired("value-type")
+	_ = priceRulesCreateCmd.MarkFlagRequired("value")
+
+	priceRulesCmd.AddCommand(priceRulesDeleteCmd)
+}

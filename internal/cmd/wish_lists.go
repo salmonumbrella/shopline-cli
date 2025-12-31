@@ -1,0 +1,309 @@
+package cmd
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/spf13/cobra"
+)
+
+var wishListsCmd = &cobra.Command{
+	Use:   "wish-lists",
+	Short: "Manage customer wish lists",
+}
+
+var wishListsListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List wish lists",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		customerID, _ := cmd.Flags().GetString("customer-id")
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+
+		opts := &api.WishListsListOptions{
+			Page:       page,
+			PageSize:   pageSize,
+			CustomerID: customerID,
+		}
+
+		resp, err := client.ListWishLists(cmd.Context(), opts)
+		if err != nil {
+			return fmt.Errorf("failed to list wish lists: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		headers := []string{"ID", "CUSTOMER", "NAME", "ITEMS", "PUBLIC", "CREATED"}
+		var rows [][]string
+		for _, wl := range resp.Items {
+			isPublic := "No"
+			if wl.IsPublic {
+				isPublic = "Yes"
+			}
+			rows = append(rows, []string{
+				wl.ID,
+				wl.CustomerID,
+				wl.Name,
+				fmt.Sprintf("%d", wl.ItemCount),
+				isPublic,
+				wl.CreatedAt.Format("2006-01-02 15:04"),
+			})
+		}
+
+		formatter.Table(headers, rows)
+		fmt.Printf("\nShowing %d of %d wish lists\n", len(resp.Items), resp.TotalCount)
+		return nil
+	},
+}
+
+var wishListsGetCmd = &cobra.Command{
+	Use:   "get <id>",
+	Short: "Get wish list details",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		wishList, err := client.GetWishList(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to get wish list: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(wishList)
+		}
+
+		fmt.Printf("Wish List ID:  %s\n", wishList.ID)
+		fmt.Printf("Customer ID:   %s\n", wishList.CustomerID)
+		fmt.Printf("Name:          %s\n", wishList.Name)
+		fmt.Printf("Description:   %s\n", wishList.Description)
+		fmt.Printf("Default:       %v\n", wishList.IsDefault)
+		fmt.Printf("Public:        %v\n", wishList.IsPublic)
+		if wishList.IsPublic && wishList.ShareURL != "" {
+			fmt.Printf("Share URL:     %s\n", wishList.ShareURL)
+		}
+		fmt.Printf("Item Count:    %d\n", wishList.ItemCount)
+		fmt.Printf("Created:       %s\n", wishList.CreatedAt.Format(time.RFC3339))
+		fmt.Printf("Updated:       %s\n", wishList.UpdatedAt.Format(time.RFC3339))
+
+		if len(wishList.Items) > 0 {
+			fmt.Printf("\nItems:\n")
+			for _, item := range wishList.Items {
+				available := "unavailable"
+				if item.Available {
+					available = "available"
+				}
+				fmt.Printf("  - %s", item.Title)
+				if item.VariantTitle != "" {
+					fmt.Printf(" (%s)", item.VariantTitle)
+				}
+				fmt.Printf(" - %s %s [%s]\n", item.Price, item.Currency, available)
+				if item.Notes != "" {
+					fmt.Printf("    Notes: %s\n", item.Notes)
+				}
+			}
+		}
+
+		return nil
+	},
+}
+
+var wishListsCreateCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create a wish list",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		customerID, _ := cmd.Flags().GetString("customer-id")
+		name, _ := cmd.Flags().GetString("name")
+		description, _ := cmd.Flags().GetString("description")
+		isDefault, _ := cmd.Flags().GetBool("default")
+		isPublic, _ := cmd.Flags().GetBool("public")
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			fmt.Printf("[DRY-RUN] Would create wish list '%s' for customer %s\n", name, customerID)
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		req := &api.WishListCreateRequest{
+			CustomerID:  customerID,
+			Name:        name,
+			Description: description,
+			IsDefault:   isDefault,
+			IsPublic:    isPublic,
+		}
+
+		wishList, err := client.CreateWishList(cmd.Context(), req)
+		if err != nil {
+			return fmt.Errorf("failed to create wish list: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(wishList)
+		}
+
+		fmt.Printf("Created wish list %s\n", wishList.ID)
+		fmt.Printf("Name:        %s\n", wishList.Name)
+		fmt.Printf("Customer ID: %s\n", wishList.CustomerID)
+		if wishList.IsPublic && wishList.ShareURL != "" {
+			fmt.Printf("Share URL:   %s\n", wishList.ShareURL)
+		}
+
+		return nil
+	},
+}
+
+var wishListsDeleteCmd = &cobra.Command{
+	Use:   "delete <id>",
+	Short: "Delete a wish list",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			fmt.Printf("[DRY-RUN] Would delete wish list %s\n", args[0])
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		if err := client.DeleteWishList(cmd.Context(), args[0]); err != nil {
+			return fmt.Errorf("failed to delete wish list: %w", err)
+		}
+
+		fmt.Printf("Deleted wish list %s\n", args[0])
+		return nil
+	},
+}
+
+var wishListsAddItemCmd = &cobra.Command{
+	Use:   "add-item <wish-list-id>",
+	Short: "Add an item to a wish list",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		productID, _ := cmd.Flags().GetString("product-id")
+		variantID, _ := cmd.Flags().GetString("variant-id")
+		quantity, _ := cmd.Flags().GetInt("quantity")
+		priority, _ := cmd.Flags().GetInt("priority")
+		notes, _ := cmd.Flags().GetString("notes")
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			fmt.Printf("[DRY-RUN] Would add product %s to wish list %s\n", productID, args[0])
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		req := &api.WishListItemCreateRequest{
+			ProductID: productID,
+			VariantID: variantID,
+			Quantity:  quantity,
+			Priority:  priority,
+			Notes:     notes,
+		}
+
+		item, err := client.AddWishListItem(cmd.Context(), args[0], req)
+		if err != nil {
+			return fmt.Errorf("failed to add item to wish list: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(item)
+		}
+
+		fmt.Printf("Added item %s to wish list\n", item.ID)
+		fmt.Printf("Product: %s\n", item.Title)
+		fmt.Printf("Price:   %s %s\n", item.Price, item.Currency)
+
+		return nil
+	},
+}
+
+var wishListsRemoveItemCmd = &cobra.Command{
+	Use:   "remove-item <wish-list-id> <item-id>",
+	Short: "Remove an item from a wish list",
+	Args:  cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			fmt.Printf("[DRY-RUN] Would remove item %s from wish list %s\n", args[1], args[0])
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		if err := client.RemoveWishListItem(cmd.Context(), args[0], args[1]); err != nil {
+			return fmt.Errorf("failed to remove item from wish list: %w", err)
+		}
+
+		fmt.Printf("Removed item %s from wish list %s\n", args[1], args[0])
+		return nil
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(wishListsCmd)
+
+	wishListsCmd.AddCommand(wishListsListCmd)
+	wishListsListCmd.Flags().String("customer-id", "", "Filter by customer ID")
+	wishListsListCmd.Flags().Int("page", 1, "Page number")
+	wishListsListCmd.Flags().Int("page-size", 20, "Results per page")
+
+	wishListsCmd.AddCommand(wishListsGetCmd)
+
+	wishListsCmd.AddCommand(wishListsCreateCmd)
+	wishListsCreateCmd.Flags().String("customer-id", "", "Customer ID")
+	wishListsCreateCmd.Flags().String("name", "", "Wish list name")
+	wishListsCreateCmd.Flags().String("description", "", "Wish list description")
+	wishListsCreateCmd.Flags().Bool("default", false, "Set as default wish list")
+	wishListsCreateCmd.Flags().Bool("public", false, "Make wish list public")
+	_ = wishListsCreateCmd.MarkFlagRequired("customer-id")
+	_ = wishListsCreateCmd.MarkFlagRequired("name")
+
+	wishListsCmd.AddCommand(wishListsDeleteCmd)
+
+	wishListsCmd.AddCommand(wishListsAddItemCmd)
+	wishListsAddItemCmd.Flags().String("product-id", "", "Product ID to add")
+	wishListsAddItemCmd.Flags().String("variant-id", "", "Variant ID (optional)")
+	wishListsAddItemCmd.Flags().Int("quantity", 1, "Quantity")
+	wishListsAddItemCmd.Flags().Int("priority", 0, "Priority (higher = more wanted)")
+	wishListsAddItemCmd.Flags().String("notes", "", "Notes for this item")
+	_ = wishListsAddItemCmd.MarkFlagRequired("product-id")
+
+	wishListsCmd.AddCommand(wishListsRemoveItemCmd)
+}

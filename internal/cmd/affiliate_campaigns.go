@@ -1,0 +1,213 @@
+package cmd
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/spf13/cobra"
+)
+
+var affiliateCampaignsCmd = &cobra.Command{
+	Use:   "affiliate-campaigns",
+	Short: "Manage affiliate marketing campaigns",
+}
+
+var affiliateCampaignsListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List affiliate campaigns",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+		status, _ := cmd.Flags().GetString("status")
+
+		opts := &api.AffiliateCampaignsListOptions{
+			Page:     page,
+			PageSize: pageSize,
+			Status:   status,
+		}
+
+		resp, err := client.ListAffiliateCampaigns(cmd.Context(), opts)
+		if err != nil {
+			return fmt.Errorf("failed to list affiliate campaigns: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		headers := []string{"ID", "NAME", "STATUS", "COMMISSION", "SALES", "CREATED"}
+		var rows [][]string
+		for _, c := range resp.Items {
+			commission := fmt.Sprintf("%.2f%%", c.CommissionValue)
+			if c.CommissionType == "fixed" {
+				commission = fmt.Sprintf("$%.2f", c.CommissionValue)
+			}
+			rows = append(rows, []string{
+				c.ID,
+				c.Name,
+				c.Status,
+				commission,
+				fmt.Sprintf("%d", c.TotalSales),
+				c.CreatedAt.Format("2006-01-02 15:04"),
+			})
+		}
+
+		formatter.Table(headers, rows)
+		fmt.Printf("\nShowing %d of %d affiliate campaigns\n", len(resp.Items), resp.TotalCount)
+		return nil
+	},
+}
+
+var affiliateCampaignsGetCmd = &cobra.Command{
+	Use:   "get <id>",
+	Short: "Get affiliate campaign details",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		campaign, err := client.GetAffiliateCampaign(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to get affiliate campaign: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(campaign)
+		}
+
+		fmt.Printf("Campaign ID:     %s\n", campaign.ID)
+		fmt.Printf("Name:            %s\n", campaign.Name)
+		fmt.Printf("Status:          %s\n", campaign.Status)
+		if campaign.Description != "" {
+			fmt.Printf("Description:     %s\n", campaign.Description)
+		}
+		fmt.Printf("Commission Type: %s\n", campaign.CommissionType)
+		fmt.Printf("Commission:      %.2f\n", campaign.CommissionValue)
+		fmt.Printf("Total Clicks:    %d\n", campaign.TotalClicks)
+		fmt.Printf("Total Sales:     %d\n", campaign.TotalSales)
+		fmt.Printf("Total Revenue:   $%.2f\n", campaign.TotalRevenue)
+		if !campaign.StartDate.IsZero() {
+			fmt.Printf("Start Date:      %s\n", campaign.StartDate.Format(time.RFC3339))
+		}
+		if !campaign.EndDate.IsZero() {
+			fmt.Printf("End Date:        %s\n", campaign.EndDate.Format(time.RFC3339))
+		}
+		fmt.Printf("Created:         %s\n", campaign.CreatedAt.Format(time.RFC3339))
+		fmt.Printf("Updated:         %s\n", campaign.UpdatedAt.Format(time.RFC3339))
+		return nil
+	},
+}
+
+var affiliateCampaignsCreateCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create an affiliate campaign",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		name, _ := cmd.Flags().GetString("name")
+		description, _ := cmd.Flags().GetString("description")
+		commissionType, _ := cmd.Flags().GetString("commission-type")
+		commissionValue, _ := cmd.Flags().GetFloat64("commission-value")
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			fmt.Printf("[DRY-RUN] Would create affiliate campaign: %s\n", name)
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		req := &api.AffiliateCampaignCreateRequest{
+			Name:            name,
+			Description:     description,
+			CommissionType:  commissionType,
+			CommissionValue: commissionValue,
+		}
+
+		campaign, err := client.CreateAffiliateCampaign(cmd.Context(), req)
+		if err != nil {
+			return fmt.Errorf("failed to create affiliate campaign: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(campaign)
+		}
+
+		fmt.Printf("Created affiliate campaign %s\n", campaign.ID)
+		fmt.Printf("Name:       %s\n", campaign.Name)
+		fmt.Printf("Commission: %.2f (%s)\n", campaign.CommissionValue, campaign.CommissionType)
+
+		return nil
+	},
+}
+
+var affiliateCampaignsDeleteCmd = &cobra.Command{
+	Use:   "delete <id>",
+	Short: "Delete an affiliate campaign",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			fmt.Printf("[DRY-RUN] Would delete affiliate campaign %s\n", args[0])
+			return nil
+		}
+
+		yes, _ := cmd.Flags().GetBool("yes")
+		if !yes {
+			fmt.Printf("Are you sure you want to delete affiliate campaign %s? (use --yes to confirm)\n", args[0])
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		if err := client.DeleteAffiliateCampaign(cmd.Context(), args[0]); err != nil {
+			return fmt.Errorf("failed to delete affiliate campaign: %w", err)
+		}
+
+		fmt.Printf("Deleted affiliate campaign %s\n", args[0])
+		return nil
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(affiliateCampaignsCmd)
+
+	affiliateCampaignsCmd.AddCommand(affiliateCampaignsListCmd)
+	affiliateCampaignsListCmd.Flags().Int("page", 1, "Page number")
+	affiliateCampaignsListCmd.Flags().Int("page-size", 20, "Results per page")
+	affiliateCampaignsListCmd.Flags().String("status", "", "Filter by status (active, paused, ended)")
+
+	affiliateCampaignsCmd.AddCommand(affiliateCampaignsGetCmd)
+
+	affiliateCampaignsCmd.AddCommand(affiliateCampaignsCreateCmd)
+	affiliateCampaignsCreateCmd.Flags().String("name", "", "Campaign name (required)")
+	affiliateCampaignsCreateCmd.Flags().String("description", "", "Campaign description")
+	affiliateCampaignsCreateCmd.Flags().String("commission-type", "percentage", "Commission type (percentage, fixed)")
+	affiliateCampaignsCreateCmd.Flags().Float64("commission-value", 0, "Commission value (required)")
+	_ = affiliateCampaignsCreateCmd.MarkFlagRequired("name")
+	_ = affiliateCampaignsCreateCmd.MarkFlagRequired("commission-value")
+
+	affiliateCampaignsCmd.AddCommand(affiliateCampaignsDeleteCmd)
+	affiliateCampaignsDeleteCmd.Flags().Bool("yes", false, "Skip confirmation prompt")
+}

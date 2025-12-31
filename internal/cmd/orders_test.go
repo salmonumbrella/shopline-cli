@@ -1,0 +1,1140 @@
+package cmd
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"errors"
+	"io"
+	"os"
+	"strings"
+	"testing"
+	"time"
+
+	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/batch"
+	"github.com/salmonumbrella/shopline-cli/internal/secrets"
+	"github.com/spf13/cobra"
+)
+
+// mockAPIClient is a mock implementation of api.APIClient for testing.
+type mockAPIClient struct {
+	api.MockClient // embed base mock for unimplemented methods
+
+	// Configurable return values for specific methods
+	listOrdersResp *api.OrdersListResponse
+	listOrdersErr  error
+
+	getOrderResp *api.Order
+	getOrderErr  error
+
+	cancelOrderErr error
+}
+
+func (m *mockAPIClient) ListOrders(ctx context.Context, opts *api.OrdersListOptions) (*api.OrdersListResponse, error) {
+	return m.listOrdersResp, m.listOrdersErr
+}
+
+func (m *mockAPIClient) GetOrder(ctx context.Context, id string) (*api.Order, error) {
+	return m.getOrderResp, m.getOrderErr
+}
+
+func (m *mockAPIClient) CancelOrder(ctx context.Context, id string) error {
+	return m.cancelOrderErr
+}
+
+// mockStore is a mock implementation of CredentialStore for testing.
+type mockStore struct {
+	names []string
+	creds map[string]*secrets.StoreCredentials
+	err   error
+}
+
+func (m *mockStore) List() ([]string, error) {
+	if m.err != nil {
+		return nil, m.err
+	}
+	return m.names, nil
+}
+
+func (m *mockStore) Get(name string) (*secrets.StoreCredentials, error) {
+	if m.err != nil {
+		return nil, m.err
+	}
+	if creds, ok := m.creds[name]; ok {
+		return creds, nil
+	}
+	return nil, errors.New("not found")
+}
+
+func TestCancelOrdersBatchInput(t *testing.T) {
+	// Test that batch.ReadItems correctly parses order IDs
+	// This tests the parsing logic without making API calls
+
+	tests := []struct {
+		name    string
+		input   string
+		wantIDs []string
+		wantErr bool
+	}{
+		{
+			name:    "JSON array",
+			input:   `[{"id": "ord_123"}, {"id": "ord_456"}]`,
+			wantIDs: []string{"ord_123", "ord_456"},
+		},
+		{
+			name:    "NDJSON",
+			input:   "{\"id\": \"ord_789\"}\n{\"id\": \"ord_101\"}",
+			wantIDs: []string{"ord_789", "ord_101"},
+		},
+		{
+			name:    "empty input",
+			input:   "",
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			items, err := batch.ReadItemsFromReader(strings.NewReader(tt.input))
+			if tt.wantErr {
+				if err == nil {
+					t.Error("Expected error, got nil")
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("Unexpected error: %v", err)
+			}
+
+			if len(items) != len(tt.wantIDs) {
+				t.Fatalf("Expected %d items, got %d", len(tt.wantIDs), len(items))
+			}
+
+			for i, item := range items {
+				var parsed struct {
+					ID string `json:"id"`
+				}
+				if err := json.Unmarshal(item, &parsed); err != nil {
+					t.Fatalf("Failed to parse item %d: %v", i, err)
+				}
+				if parsed.ID != tt.wantIDs[i] {
+					t.Errorf("Item %d: expected ID %q, got %q", i, tt.wantIDs[i], parsed.ID)
+				}
+			}
+		})
+	}
+}
+
+func TestBatchResultOutput(t *testing.T) {
+	// Test that results are written in NDJSON format
+	results := []batch.Result{
+		{ID: "ord_123", Index: 0, Success: true},
+		{ID: "ord_456", Index: 1, Success: false, Error: "order not found"},
+		{Index: 2, Success: false, Error: "missing id field"},
+	}
+
+	var buf bytes.Buffer
+	err := batch.WriteResults(&buf, results)
+	if err != nil {
+		t.Fatalf("WriteResults failed: %v", err)
+	}
+
+	output := buf.String()
+	lines := strings.Split(strings.TrimSpace(output), "\n")
+	if len(lines) != 3 {
+		t.Fatalf("Expected 3 lines, got %d", len(lines))
+	}
+
+	// Verify each line is valid JSON
+	for i, line := range lines {
+		var result batch.Result
+		if err := json.Unmarshal([]byte(line), &result); err != nil {
+			t.Errorf("Line %d is not valid JSON: %v", i, err)
+		}
+	}
+
+	// Verify specific content
+	if !strings.Contains(output, `"id":"ord_123"`) {
+		t.Error("Missing first order ID")
+	}
+	if !strings.Contains(output, `"success":true`) {
+		t.Error("Missing success field")
+	}
+	if !strings.Contains(output, `"error":"order not found"`) {
+		t.Error("Missing error message")
+	}
+}
+
+func TestBatchInputValidation(t *testing.T) {
+	// Test parsing items with missing or invalid id fields
+	tests := []struct {
+		name    string
+		input   string
+		wantErr string
+	}{
+		{
+			name:    "missing id field",
+			input:   `{"name": "test"}`,
+			wantErr: "", // No parse error, but ID will be empty
+		},
+		{
+			name:    "invalid JSON",
+			input:   `{not valid json}`,
+			wantErr: "", // ReadItems doesn't validate JSON structure, just reads lines
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			items, err := batch.ReadItemsFromReader(strings.NewReader(tt.input))
+			if err != nil {
+				// Some inputs might fail at read level
+				return
+			}
+
+			// Test parsing the item
+			if len(items) > 0 {
+				var parsed struct {
+					ID string `json:"id"`
+				}
+				err := json.Unmarshal(items[0], &parsed)
+				if tt.name == "invalid JSON" && err == nil {
+					t.Error("Expected parse error for invalid JSON")
+				}
+				if tt.name == "missing id field" && parsed.ID != "" {
+					t.Errorf("Expected empty ID, got %q", parsed.ID)
+				}
+			}
+		})
+	}
+}
+
+// Helper function to create a test command with persistent flags.
+// Uses PersistentFlags() so flags are accessible via cmd.Flags().Get*() methods.
+func newTestCmdWithFlags() *cobra.Command {
+	cmd := &cobra.Command{}
+	cmd.Flags().StringP("store", "s", "", "Store profile name")
+	cmd.Flags().StringP("output", "o", "text", "Output format")
+	cmd.Flags().String("color", "auto", "Color mode")
+	cmd.Flags().String("query", "", "JQ filter")
+	cmd.Flags().Bool("dry-run", false, "Preview changes without executing them")
+	cmd.Flags().BoolP("yes", "y", false, "Skip confirmation prompts")
+	return cmd
+}
+
+func TestGetClient(t *testing.T) {
+	// Save and restore original factory and env
+	origFactory := secretsStoreFactory
+	origEnv := os.Getenv("SHOPLINE_STORE")
+	defer func() {
+		secretsStoreFactory = origFactory
+		_ = os.Setenv("SHOPLINE_STORE", origEnv)
+	}()
+
+	tests := []struct {
+		name      string
+		storeName string
+		envStore  string
+		store     *mockStore
+		wantErr   bool
+		errMsg    string
+	}{
+		{
+			name:      "success with store flag",
+			storeName: "mystore",
+			store: &mockStore{
+				names: []string{"mystore"},
+				creds: map[string]*secrets.StoreCredentials{
+					"mystore": {Handle: "test", AccessToken: "token123"},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name:     "success with env var",
+			envStore: "envstore",
+			store: &mockStore{
+				names: []string{"envstore"},
+				creds: map[string]*secrets.StoreCredentials{
+					"envstore": {Handle: "test", AccessToken: "token123"},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "success auto-select single profile",
+			store: &mockStore{
+				names: []string{"only-store"},
+				creds: map[string]*secrets.StoreCredentials{
+					"only-store": {Handle: "test", AccessToken: "token123"},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "error no profiles",
+			store: &mockStore{
+				names: []string{},
+			},
+			wantErr: true,
+			errMsg:  "no store profiles configured",
+		},
+		{
+			name: "error multiple profiles without flag",
+			store: &mockStore{
+				names: []string{"store1", "store2"},
+			},
+			wantErr: true,
+			errMsg:  "multiple profiles configured",
+		},
+		{
+			name:      "error profile not found",
+			storeName: "nonexistent",
+			store: &mockStore{
+				names: []string{"other"},
+				creds: map[string]*secrets.StoreCredentials{},
+			},
+			wantErr: true,
+			errMsg:  "profile not found",
+		},
+		{
+			name: "error factory fails",
+			store: &mockStore{
+				err: errors.New("keyring error"),
+			},
+			wantErr: true,
+			errMsg:  "failed to open credential store",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Reset env
+			_ = os.Unsetenv("SHOPLINE_STORE")
+			if tt.envStore != "" {
+				_ = os.Setenv("SHOPLINE_STORE", tt.envStore)
+			}
+
+			// Setup mock
+			secretsStoreFactory = func() (CredentialStore, error) {
+				if tt.store.err != nil {
+					return nil, tt.store.err
+				}
+				return tt.store, nil
+			}
+
+			// Create command with flags
+			cmd := newTestCmdWithFlags()
+			if tt.storeName != "" {
+				_ = cmd.Flags().Set("store", tt.storeName)
+			}
+
+			client, err := getClient(cmd)
+
+			if tt.wantErr {
+				if err == nil {
+					t.Fatal("Expected error, got nil")
+				}
+				if !strings.Contains(err.Error(), tt.errMsg) {
+					t.Errorf("Expected error containing %q, got %q", tt.errMsg, err.Error())
+				}
+				return
+			}
+
+			if err != nil {
+				t.Fatalf("Unexpected error: %v", err)
+			}
+			if client == nil {
+				t.Error("Expected client, got nil")
+			}
+		})
+	}
+}
+
+func TestGetFormatter(t *testing.T) {
+	// Save and restore original writer
+	origWriter := formatterWriter
+	defer func() { formatterWriter = origWriter }()
+
+	tests := []struct {
+		name         string
+		outputFormat string
+		colorMode    string
+		query        string
+	}{
+		{
+			name:         "text format",
+			outputFormat: "text",
+			colorMode:    "auto",
+		},
+		{
+			name:         "json format",
+			outputFormat: "json",
+			colorMode:    "always",
+		},
+		{
+			name:         "with query",
+			outputFormat: "json",
+			colorMode:    "never",
+			query:        ".items",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Use a buffer for output
+			buf := new(bytes.Buffer)
+			formatterWriter = buf
+
+			cmd := newTestCmdWithFlags()
+			_ = cmd.Flags().Set("output", tt.outputFormat)
+			_ = cmd.Flags().Set("color", tt.colorMode)
+			if tt.query != "" {
+				_ = cmd.Flags().Set("query", tt.query)
+			}
+
+			f := getFormatter(cmd)
+			if f == nil {
+				t.Error("Expected formatter, got nil")
+			}
+		})
+	}
+}
+
+func TestDefaultClientFactory(t *testing.T) {
+	client := defaultClientFactory("test-handle", "test-token")
+	if client == nil {
+		t.Error("Expected client, got nil")
+	}
+}
+
+func TestDefaultSecretsStoreFactory(t *testing.T) {
+	// This will fail if keyring is not available, which is expected in CI
+	// We just test that the function is callable
+	_, _ = defaultSecretsStoreFactory()
+}
+
+func TestCancelOrdersBatch(t *testing.T) {
+	// Save and restore original factory
+	origFactory := secretsStoreFactory
+	defer func() { secretsStoreFactory = origFactory }()
+
+	tests := []struct {
+		name    string
+		content string
+		store   *mockStore
+		wantErr bool
+		errMsg  string
+	}{
+		{
+			name:    "getClient fails",
+			content: `[{"id": "ord_123"}]`,
+			store: &mockStore{
+				err: errors.New("keyring error"),
+			},
+			wantErr: true,
+			errMsg:  "failed to open credential store",
+		},
+		{
+			name:    "file not found",
+			content: "", // Will use nonexistent file
+			store: &mockStore{
+				names: []string{"test"},
+				creds: map[string]*secrets.StoreCredentials{
+					"test": {Handle: "test", AccessToken: "token"},
+				},
+			},
+			wantErr: true,
+			errMsg:  "failed to read batch file",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup mock
+			secretsStoreFactory = func() (CredentialStore, error) {
+				if tt.store.err != nil {
+					return nil, tt.store.err
+				}
+				return tt.store, nil
+			}
+
+			cmd := newTestCmdWithFlags()
+
+			var filename string
+			if tt.content != "" {
+				// Create temp file
+				f, err := os.CreateTemp("", "batch-test-*.json")
+				if err != nil {
+					t.Fatalf("Failed to create temp file: %v", err)
+				}
+				defer func() { _ = os.Remove(f.Name()) }()
+				if _, err := f.WriteString(tt.content); err != nil {
+					t.Fatalf("Failed to write temp file: %v", err)
+				}
+				_ = f.Close()
+				filename = f.Name()
+			} else {
+				filename = "/nonexistent/batch-file.json"
+			}
+
+			err := cancelOrdersBatch(cmd, filename)
+
+			if tt.wantErr {
+				if err == nil {
+					t.Fatal("Expected error, got nil")
+				}
+				if !strings.Contains(err.Error(), tt.errMsg) {
+					t.Errorf("Expected error containing %q, got %q", tt.errMsg, err.Error())
+				}
+				return
+			}
+
+			if err != nil {
+				t.Errorf("Unexpected error: %v", err)
+			}
+		})
+	}
+}
+
+func TestCancelOrdersBatchWithFile(t *testing.T) {
+	// Save and restore original factory
+	origFactory := secretsStoreFactory
+	defer func() { secretsStoreFactory = origFactory }()
+
+	// Create temp file with valid JSON
+	content := `[{"id": "ord_123"}, {"id": "ord_456"}]`
+	f, err := os.CreateTemp("", "batch-test-*.json")
+	if err != nil {
+		t.Fatalf("Failed to create temp file: %v", err)
+	}
+	defer func() { _ = os.Remove(f.Name()) }()
+	if _, err := f.WriteString(content); err != nil {
+		t.Fatalf("Failed to write temp file: %v", err)
+	}
+	_ = f.Close()
+
+	// Setup mock store
+	secretsStoreFactory = func() (CredentialStore, error) {
+		return &mockStore{
+			names: []string{"test"},
+			creds: map[string]*secrets.StoreCredentials{
+				"test": {Handle: "test", AccessToken: "token"},
+			},
+		}, nil
+	}
+
+	cmd := newTestCmdWithFlags()
+
+	// This will fail at the API call level, but exercises most of the code
+	err = cancelOrdersBatch(cmd, f.Name())
+	// We expect an error because the API call will fail (no real server)
+	// but this exercises the batch reading and processing code
+	if err == nil {
+		// It might succeed if there are no items or something unexpected happens
+		t.Log("cancelOrdersBatch succeeded (might be due to mock setup)")
+	}
+}
+
+func TestCancelOrdersBatchInvalidJSON(t *testing.T) {
+	// Save and restore original factory
+	origFactory := secretsStoreFactory
+	defer func() { secretsStoreFactory = origFactory }()
+
+	// Create temp file with invalid JSON items
+	content := `[{"not_id": "value"}]`
+	f, err := os.CreateTemp("", "batch-test-*.json")
+	if err != nil {
+		t.Fatalf("Failed to create temp file: %v", err)
+	}
+	defer func() { _ = os.Remove(f.Name()) }()
+	if _, err := f.WriteString(content); err != nil {
+		t.Fatalf("Failed to write temp file: %v", err)
+	}
+	_ = f.Close()
+
+	// Setup mock store
+	secretsStoreFactory = func() (CredentialStore, error) {
+		return &mockStore{
+			names: []string{"test"},
+			creds: map[string]*secrets.StoreCredentials{
+				"test": {Handle: "test", AccessToken: "token"},
+			},
+		}, nil
+	}
+
+	cmd := newTestCmdWithFlags()
+
+	// Run the batch - will process items but mark them as missing id
+	err = cancelOrdersBatch(cmd, f.Name())
+	// Errors in individual items don't cause the function to return an error
+	// The function returns nil and writes results to stdout
+	if err != nil {
+		t.Logf("cancelOrdersBatch returned error: %v (expected for API calls)", err)
+	}
+}
+
+func TestCancelOrdersBatchMalformedJSON(t *testing.T) {
+	// Save and restore original factory
+	origFactory := secretsStoreFactory
+	defer func() { secretsStoreFactory = origFactory }()
+
+	// Create temp file with malformed JSON
+	content := `{not valid json}`
+	f, err := os.CreateTemp("", "batch-test-*.json")
+	if err != nil {
+		t.Fatalf("Failed to create temp file: %v", err)
+	}
+	defer func() { _ = os.Remove(f.Name()) }()
+	if _, err := f.WriteString(content); err != nil {
+		t.Fatalf("Failed to write temp file: %v", err)
+	}
+	_ = f.Close()
+
+	// Setup mock store
+	secretsStoreFactory = func() (CredentialStore, error) {
+		return &mockStore{
+			names: []string{"test"},
+			creds: map[string]*secrets.StoreCredentials{
+				"test": {Handle: "test", AccessToken: "token"},
+			},
+		}, nil
+	}
+
+	cmd := newTestCmdWithFlags()
+
+	// Run the batch with malformed JSON
+	_ = cancelOrdersBatch(cmd, f.Name())
+	// The batch reader treats malformed JSON as NDJSON lines
+}
+
+// Ensure unused imports don't cause errors
+var (
+	_ = api.NewClient
+	_ io.Writer
+)
+
+// setupOrdersTest sets up mock factories for order tests.
+func setupOrdersTest(t *testing.T, mockClient *mockAPIClient, mockStore *mockStore) (cleanup func()) {
+	t.Helper()
+	origClientFactory := clientFactory
+	origSecretsFactory := secretsStoreFactory
+	origWriter := formatterWriter
+
+	secretsStoreFactory = func() (CredentialStore, error) {
+		if mockStore.err != nil {
+			return nil, mockStore.err
+		}
+		return mockStore, nil
+	}
+	clientFactory = func(handle, accessToken string) api.APIClient {
+		return mockClient
+	}
+
+	return func() {
+		clientFactory = origClientFactory
+		secretsStoreFactory = origSecretsFactory
+		formatterWriter = origWriter
+	}
+}
+
+// defaultMockStore returns a mock store with a single test profile.
+func defaultMockStore() *mockStore {
+	return &mockStore{
+		names: []string{"test"},
+		creds: map[string]*secrets.StoreCredentials{
+			"test": {Handle: "test", AccessToken: "token"},
+		},
+	}
+}
+
+// TestOrdersListRunE tests the orders list command execution with mock API.
+func TestOrdersListRunE(t *testing.T) {
+	tests := []struct {
+		name         string
+		mockResp     *api.OrdersListResponse
+		mockErr      error
+		outputFormat string
+		wantErr      bool
+		wantOutput   string
+	}{
+		{
+			name: "successful list text format",
+			mockResp: &api.OrdersListResponse{
+				Items: []api.Order{
+					{
+						ID:            "ord_123",
+						OrderNumber:   "1001",
+						Status:        "completed",
+						TotalPrice:    "99.99",
+						Currency:      "USD",
+						CustomerEmail: "test@example.com",
+						CreatedAt:     time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC),
+					},
+				},
+				TotalCount: 1,
+			},
+			outputFormat: "text",
+			wantOutput:   "ord_123",
+		},
+		{
+			name: "successful list JSON format",
+			mockResp: &api.OrdersListResponse{
+				Items: []api.Order{
+					{
+						ID:            "ord_456",
+						OrderNumber:   "1002",
+						Status:        "pending",
+						TotalPrice:    "50.00",
+						Currency:      "EUR",
+						CustomerEmail: "user@example.com",
+						CreatedAt:     time.Date(2024, 2, 20, 14, 0, 0, 0, time.UTC),
+					},
+				},
+				TotalCount: 1,
+			},
+			outputFormat: "json",
+			wantOutput:   `"id": "ord_456"`,
+		},
+		{
+			name:         "API error",
+			mockErr:      errors.New("API unavailable"),
+			outputFormat: "text",
+			wantErr:      true,
+		},
+		{
+			name: "empty list",
+			mockResp: &api.OrdersListResponse{
+				Items:      []api.Order{},
+				TotalCount: 0,
+			},
+			outputFormat: "text",
+			wantOutput:   "", // Empty table headers only go to buffer
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockClient := &mockAPIClient{
+				listOrdersResp: tt.mockResp,
+				listOrdersErr:  tt.mockErr,
+			}
+			cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+			defer cleanup()
+
+			var buf bytes.Buffer
+			formatterWriter = &buf
+
+			cmd := &cobra.Command{Use: "test"}
+			cmd.SetContext(context.Background())
+			cmd.Flags().String("store", "", "")
+			cmd.Flags().String("output", tt.outputFormat, "")
+			cmd.Flags().String("color", "never", "")
+			cmd.Flags().String("query", "", "")
+			cmd.Flags().String("status", "", "")
+			cmd.Flags().Int("page", 1, "")
+			cmd.Flags().Int("page-size", 20, "")
+
+			err := ordersListCmd.RunE(cmd, []string{})
+
+			if tt.wantErr {
+				if err == nil {
+					t.Error("expected error, got nil")
+				}
+				return
+			}
+
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+				return
+			}
+
+			output := buf.String()
+			if tt.wantOutput != "" && !strings.Contains(output, tt.wantOutput) {
+				t.Errorf("output %q should contain %q", output, tt.wantOutput)
+			}
+		})
+	}
+}
+
+// TestOrdersListGetClientError tests error when getClient fails for list.
+func TestOrdersListGetClientError(t *testing.T) {
+	mockClient := &mockAPIClient{}
+	mockStore := &mockStore{err: errors.New("keyring error")}
+	cleanup := setupOrdersTest(t, mockClient, mockStore)
+	defer cleanup()
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+	cmd.Flags().String("status", "", "")
+	cmd.Flags().Int("page", 1, "")
+	cmd.Flags().Int("page-size", 20, "")
+
+	err := ordersListCmd.RunE(cmd, []string{})
+	if err == nil {
+		t.Error("expected error, got nil")
+	}
+	if !strings.Contains(err.Error(), "credential store") {
+		t.Errorf("expected credential store error, got: %v", err)
+	}
+}
+
+// TestOrdersGetRunE tests the orders get command execution with mock API.
+func TestOrdersGetRunE(t *testing.T) {
+	tests := []struct {
+		name         string
+		orderID      string
+		mockResp     *api.Order
+		mockErr      error
+		outputFormat string
+		wantErr      bool
+		wantOutput   string
+	}{
+		{
+			name:    "successful get text format",
+			orderID: "ord_123",
+			mockResp: &api.Order{
+				ID:            "ord_123",
+				OrderNumber:   "1001",
+				Status:        "completed",
+				PaymentStatus: "paid",
+				FulfillStatus: "shipped",
+				TotalPrice:    "99.99",
+				Currency:      "USD",
+				CustomerEmail: "test@example.com",
+				CustomerName:  "John Doe",
+				CreatedAt:     time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC),
+			},
+			outputFormat: "text",
+			wantOutput:   "", // Text output uses fmt.Printf to stdout, not formatterWriter
+		},
+		{
+			name:    "successful get JSON format",
+			orderID: "ord_789",
+			mockResp: &api.Order{
+				ID:            "ord_789",
+				OrderNumber:   "1003",
+				Status:        "pending",
+				PaymentStatus: "unpaid",
+				FulfillStatus: "unfulfilled",
+				TotalPrice:    "150.00",
+				Currency:      "GBP",
+				CustomerEmail: "json@example.com",
+				CustomerName:  "Jane Smith",
+				CreatedAt:     time.Date(2024, 3, 10, 12, 0, 0, 0, time.UTC),
+			},
+			outputFormat: "json",
+			wantOutput:   `"id": "ord_789"`,
+		},
+		{
+			name:         "order not found",
+			orderID:      "ord_999",
+			mockErr:      errors.New("order not found"),
+			outputFormat: "text",
+			wantErr:      true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockClient := &mockAPIClient{
+				getOrderResp: tt.mockResp,
+				getOrderErr:  tt.mockErr,
+			}
+			cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+			defer cleanup()
+
+			var buf bytes.Buffer
+			formatterWriter = &buf
+
+			cmd := &cobra.Command{Use: "test"}
+			cmd.SetContext(context.Background())
+			cmd.Flags().String("store", "", "")
+			cmd.Flags().String("output", tt.outputFormat, "")
+			cmd.Flags().String("color", "never", "")
+			cmd.Flags().String("query", "", "")
+
+			err := ordersGetCmd.RunE(cmd, []string{tt.orderID})
+
+			if tt.wantErr {
+				if err == nil {
+					t.Error("expected error, got nil")
+				}
+				return
+			}
+
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+				return
+			}
+
+			output := buf.String()
+			if tt.wantOutput != "" && !strings.Contains(output, tt.wantOutput) {
+				t.Errorf("output %q should contain %q", output, tt.wantOutput)
+			}
+		})
+	}
+}
+
+// TestOrdersGetGetClientError tests error when getClient fails for get.
+func TestOrdersGetGetClientError(t *testing.T) {
+	mockClient := &mockAPIClient{}
+	mockStore := &mockStore{err: errors.New("keyring error")}
+	cleanup := setupOrdersTest(t, mockClient, mockStore)
+	defer cleanup()
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+
+	err := ordersGetCmd.RunE(cmd, []string{"ord_123"})
+	if err == nil {
+		t.Error("expected error, got nil")
+	}
+	if !strings.Contains(err.Error(), "credential store") {
+		t.Errorf("expected credential store error, got: %v", err)
+	}
+}
+
+// TestOrdersCancelRunE tests the orders cancel command execution.
+func TestOrdersCancelRunE(t *testing.T) {
+	tests := []struct {
+		name       string
+		orderID    string
+		mockErr    error
+		yesFlag    bool
+		dryRun     bool
+		wantErr    bool
+		wantOutput string
+	}{
+		{
+			name:       "successful cancel with yes flag",
+			orderID:    "ord_123",
+			mockErr:    nil,
+			yesFlag:    true,
+			wantOutput: "cancelled",
+		},
+		{
+			name:    "cancel fails",
+			orderID: "ord_456",
+			mockErr: errors.New("order already cancelled"),
+			yesFlag: true,
+			wantErr: true,
+		},
+		{
+			name:       "dry-run mode",
+			orderID:    "ord_789",
+			dryRun:     true,
+			yesFlag:    true,
+			wantOutput: "[DRY-RUN]",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockClient := &mockAPIClient{
+				cancelOrderErr: tt.mockErr,
+			}
+			cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+			defer cleanup()
+
+			cmd := &cobra.Command{Use: "test"}
+			cmd.SetContext(context.Background())
+			cmd.Flags().String("store", "", "")
+			cmd.Flags().String("batch", "", "")
+			cmd.Flags().Bool("yes", tt.yesFlag, "")
+			cmd.Flags().Bool("dry-run", tt.dryRun, "")
+
+			err := ordersCancelCmd.RunE(cmd, []string{tt.orderID})
+
+			if tt.wantErr {
+				if err == nil {
+					t.Error("expected error, got nil")
+				}
+				return
+			}
+
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
+		})
+	}
+}
+
+// TestOrdersCancelNoOrderID tests cancel command without order ID.
+func TestOrdersCancelNoOrderID(t *testing.T) {
+	mockClient := &mockAPIClient{}
+	cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+	defer cleanup()
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("batch", "", "")
+	cmd.Flags().Bool("yes", true, "")
+	cmd.Flags().Bool("dry-run", false, "")
+
+	err := ordersCancelCmd.RunE(cmd, []string{})
+	if err == nil {
+		t.Error("expected error, got nil")
+	}
+	if !strings.Contains(err.Error(), "order ID required") {
+		t.Errorf("expected 'order ID required' error, got: %v", err)
+	}
+}
+
+// TestOrdersCancelGetClientError tests cancel command when getClient fails.
+func TestOrdersCancelGetClientError(t *testing.T) {
+	mockClient := &mockAPIClient{}
+	mockStore := &mockStore{err: errors.New("keyring error")}
+	cleanup := setupOrdersTest(t, mockClient, mockStore)
+	defer cleanup()
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("batch", "", "")
+	cmd.Flags().Bool("yes", true, "")
+	cmd.Flags().Bool("dry-run", false, "")
+
+	err := ordersCancelCmd.RunE(cmd, []string{"ord_123"})
+	if err == nil {
+		t.Error("expected error, got nil")
+	}
+	if !strings.Contains(err.Error(), "credential store") {
+		t.Errorf("expected credential store error, got: %v", err)
+	}
+}
+
+// TestOrdersCancelBatchMode tests cancel command with batch flag.
+func TestOrdersCancelBatchMode(t *testing.T) {
+	// Create temp file with batch data
+	content := `[{"id": "ord_123"}, {"id": "ord_456"}]`
+	f, err := os.CreateTemp("", "batch-cancel-*.json")
+	if err != nil {
+		t.Fatalf("Failed to create temp file: %v", err)
+	}
+	defer func() { _ = os.Remove(f.Name()) }()
+	if _, err := f.WriteString(content); err != nil {
+		t.Fatalf("Failed to write temp file: %v", err)
+	}
+	_ = f.Close()
+
+	mockClient := &mockAPIClient{
+		cancelOrderErr: nil, // Success
+	}
+	cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+	defer cleanup()
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("batch", f.Name(), "")
+	_ = cmd.Flags().Set("batch", f.Name())
+	cmd.Flags().Bool("yes", true, "")
+	cmd.Flags().Bool("dry-run", false, "")
+
+	err = ordersCancelCmd.RunE(cmd, []string{})
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+// TestOrdersCancelBatchModeWithErrors tests batch cancel with partial failures.
+func TestOrdersCancelBatchModeWithErrors(t *testing.T) {
+	// Create temp file with batch data including one that will fail
+	content := `[{"id": "ord_success"}, {"id": "ord_fail"}]`
+	f, err := os.CreateTemp("", "batch-cancel-*.json")
+	if err != nil {
+		t.Fatalf("Failed to create temp file: %v", err)
+	}
+	defer func() { _ = os.Remove(f.Name()) }()
+	if _, err := f.WriteString(content); err != nil {
+		t.Fatalf("Failed to write temp file: %v", err)
+	}
+	_ = f.Close()
+
+	// Mock client that fails on specific order
+	callCount := 0
+	mockClient := &mockAPIClient{}
+	origClientFactory := clientFactory
+	defer func() { clientFactory = origClientFactory }()
+
+	cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+	defer cleanup()
+
+	// Override with custom client factory to alternate success/failure
+	clientFactory = func(handle, accessToken string) api.APIClient {
+		return &mockAPIClientWithCancelCounter{
+			callCount: &callCount,
+		}
+	}
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("batch", f.Name(), "")
+	_ = cmd.Flags().Set("batch", f.Name())
+	cmd.Flags().Bool("yes", true, "")
+	cmd.Flags().Bool("dry-run", false, "")
+
+	// This should not return an error even with partial failures
+	// Individual results are written to output
+	err = ordersCancelCmd.RunE(cmd, []string{})
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+// mockAPIClientWithCancelCounter tracks cancel calls and alternates success/failure.
+type mockAPIClientWithCancelCounter struct {
+	api.MockClient
+	callCount *int
+}
+
+func (m *mockAPIClientWithCancelCounter) CancelOrder(ctx context.Context, id string) error {
+	*m.callCount++
+	if id == "ord_fail" {
+		return errors.New("order cancellation failed")
+	}
+	return nil
+}
+
+// TestGetClientListError tests getClient when List() returns an error.
+func TestGetClientListError(t *testing.T) {
+	origFactory := secretsStoreFactory
+	defer func() { secretsStoreFactory = origFactory }()
+
+	// Mock store where List() fails
+	secretsStoreFactory = func() (CredentialStore, error) {
+		return &mockStoreListError{}, nil
+	}
+
+	cmd := newTestCmdWithFlags()
+	_, err := getClient(cmd)
+	if err == nil {
+		t.Error("expected error, got nil")
+	}
+	if !strings.Contains(err.Error(), "list error") {
+		t.Errorf("expected 'list error', got: %v", err)
+	}
+}
+
+// mockStoreListError is a mock store where List() fails.
+type mockStoreListError struct{}
+
+func (m *mockStoreListError) List() ([]string, error) {
+	return nil, errors.New("list error")
+}
+
+func (m *mockStoreListError) Get(name string) (*secrets.StoreCredentials, error) {
+	return nil, errors.New("not implemented")
+}

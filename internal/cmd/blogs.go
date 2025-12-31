@@ -1,0 +1,194 @@
+package cmd
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/spf13/cobra"
+)
+
+var blogsCmd = &cobra.Command{
+	Use:   "blogs",
+	Short: "Manage blogs",
+}
+
+var blogsListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List blogs",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+
+		opts := &api.BlogsListOptions{
+			Page:     page,
+			PageSize: pageSize,
+		}
+
+		resp, err := client.ListBlogs(cmd.Context(), opts)
+		if err != nil {
+			return fmt.Errorf("failed to list blogs: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		headers := []string{"ID", "TITLE", "HANDLE", "COMMENTABLE", "CREATED"}
+		var rows [][]string
+		for _, b := range resp.Items {
+			rows = append(rows, []string{
+				b.ID,
+				b.Title,
+				b.Handle,
+				b.Commentable,
+				b.CreatedAt.Format("2006-01-02 15:04"),
+			})
+		}
+
+		formatter.Table(headers, rows)
+		fmt.Printf("\nShowing %d of %d blogs\n", len(resp.Items), resp.TotalCount)
+		return nil
+	},
+}
+
+var blogsGetCmd = &cobra.Command{
+	Use:   "get <id>",
+	Short: "Get blog details",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		blog, err := client.GetBlog(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to get blog: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(blog)
+		}
+
+		fmt.Printf("Blog ID:        %s\n", blog.ID)
+		fmt.Printf("Title:          %s\n", blog.Title)
+		fmt.Printf("Handle:         %s\n", blog.Handle)
+		fmt.Printf("Commentable:    %s\n", blog.Commentable)
+		if blog.Tags != "" {
+			fmt.Printf("Tags:           %s\n", blog.Tags)
+		}
+		if blog.TemplateSuffix != "" {
+			fmt.Printf("Template:       %s\n", blog.TemplateSuffix)
+		}
+		fmt.Printf("Created:        %s\n", blog.CreatedAt.Format(time.RFC3339))
+		fmt.Printf("Updated:        %s\n", blog.UpdatedAt.Format(time.RFC3339))
+		return nil
+	},
+}
+
+var blogsCreateCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create a blog",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		title, _ := cmd.Flags().GetString("title")
+		handle, _ := cmd.Flags().GetString("handle")
+		commentable, _ := cmd.Flags().GetString("commentable")
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			fmt.Printf("[DRY-RUN] Would create blog: %s\n", title)
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		req := &api.BlogCreateRequest{
+			Title:       title,
+			Handle:      handle,
+			Commentable: commentable,
+		}
+
+		blog, err := client.CreateBlog(cmd.Context(), req)
+		if err != nil {
+			return fmt.Errorf("failed to create blog: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(blog)
+		}
+
+		fmt.Printf("Created blog %s\n", blog.ID)
+		fmt.Printf("Title:   %s\n", blog.Title)
+		fmt.Printf("Handle:  %s\n", blog.Handle)
+
+		return nil
+	},
+}
+
+var blogsDeleteCmd = &cobra.Command{
+	Use:   "delete <id>",
+	Short: "Delete a blog",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			fmt.Printf("[DRY-RUN] Would delete blog %s\n", args[0])
+			return nil
+		}
+
+		yes, _ := cmd.Flags().GetBool("yes")
+		if !yes {
+			fmt.Printf("Are you sure you want to delete blog %s? (use --yes to confirm)\n", args[0])
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		if err := client.DeleteBlog(cmd.Context(), args[0]); err != nil {
+			return fmt.Errorf("failed to delete blog: %w", err)
+		}
+
+		fmt.Printf("Deleted blog %s\n", args[0])
+		return nil
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(blogsCmd)
+
+	blogsCmd.AddCommand(blogsListCmd)
+	blogsListCmd.Flags().Int("page", 1, "Page number")
+	blogsListCmd.Flags().Int("page-size", 20, "Results per page")
+
+	blogsCmd.AddCommand(blogsGetCmd)
+
+	blogsCmd.AddCommand(blogsCreateCmd)
+	blogsCreateCmd.Flags().String("title", "", "Blog title (required)")
+	blogsCreateCmd.Flags().String("handle", "", "URL handle (auto-generated if not provided)")
+	blogsCreateCmd.Flags().String("commentable", "moderate", "Comment setting (no, moderate, yes)")
+	_ = blogsCreateCmd.MarkFlagRequired("title")
+
+	blogsCmd.AddCommand(blogsDeleteCmd)
+	blogsDeleteCmd.Flags().Bool("yes", false, "Skip confirmation prompt")
+}

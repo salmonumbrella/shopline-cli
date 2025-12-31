@@ -1,0 +1,466 @@
+package api
+
+import "context"
+
+// APIClient defines the interface for Shopline API operations.
+// This interface is implemented by *Client and can be mocked for testing.
+type APIClient interface {
+	AcceptDispute(ctx context.Context, id string) (*Dispute, error)
+	ActivateCoupon(ctx context.Context, id string) (*Coupon, error)
+	ActivateFlashPrice(ctx context.Context, id string) (*FlashPrice, error)
+	ActivateGift(ctx context.Context, id string) (*Gift, error)
+	ActivatePromotion(ctx context.Context, id string) (*Promotion, error)
+	ActivateSale(ctx context.Context, id string) (*Sale, error)
+	AddProductsToCollection(ctx context.Context, id string, productIDs []string) error
+	AddWishListItem(ctx context.Context, wishListID string, req *WishListItemCreateRequest) (*WishListItem, error)
+	AdjustCompanyCredit(ctx context.Context, id string, req *CompanyCreditAdjustRequest) (*CompanyCredit, error)
+	AdjustInventory(ctx context.Context, id string, delta int) (*InventoryLevel, error)
+	AdjustInventoryLevel(ctx context.Context, req *InventoryLevelAdjustRequest) (*InventoryLevel, error)
+	AdjustMemberPoints(ctx context.Context, customerID string, points int, description string) (*MemberPoints, error)
+	AssignUserCoupon(ctx context.Context, req *UserCouponAssignRequest) (*UserCoupon, error)
+	CancelBulkOperation(ctx context.Context, id string) (*BulkOperation, error)
+	CancelFulfillmentOrder(ctx context.Context, id string) (*FulfillmentOrder, error)
+	CancelOrder(ctx context.Context, id string) error
+	CancelPurchaseOrder(ctx context.Context, id string) (*PurchaseOrder, error)
+	CancelReturnOrder(ctx context.Context, id string) error
+	CapturePayment(ctx context.Context, id string, amount string) (*Payment, error)
+	CloseFulfillmentOrder(ctx context.Context, id string) (*FulfillmentOrder, error)
+	CompleteDraftOrder(ctx context.Context, id string) (*DraftOrder, error)
+	CompleteReturnOrder(ctx context.Context, id string) (*ReturnOrder, error)
+	CreateAddonProduct(ctx context.Context, req *AddonProductCreateRequest) (*AddonProduct, error)
+	CreateAffiliateCampaign(ctx context.Context, req *AffiliateCampaignCreateRequest) (*AffiliateCampaign, error)
+	CreateArticle(ctx context.Context, req *ArticleCreateRequest) (*Article, error)
+	CreateBlog(ctx context.Context, req *BlogCreateRequest) (*Blog, error)
+	CreateBulkMutation(ctx context.Context, req *BulkOperationMutationRequest) (*BulkOperation, error)
+	CreateBulkQuery(ctx context.Context, req *BulkOperationCreateRequest) (*BulkOperation, error)
+	CreateCarrierService(ctx context.Context, req *CarrierServiceCreateRequest) (*CarrierService, error)
+	CreateCatalogPricing(ctx context.Context, req *CatalogPricingCreateRequest) (*CatalogPricing, error)
+	CreateCategory(ctx context.Context, req *CategoryCreateRequest) (*Category, error)
+	CreateChannel(ctx context.Context, req *ChannelCreateRequest) (*Channel, error)
+	CreateCollection(ctx context.Context, req *CollectionCreateRequest) (*Collection, error)
+	CreateCompanyCatalog(ctx context.Context, req *CompanyCatalogCreateRequest) (*CompanyCatalog, error)
+	CreateCompanyCredit(ctx context.Context, req *CompanyCreditCreateRequest) (*CompanyCredit, error)
+	CreateConversation(ctx context.Context, req *ConversationCreateRequest) (*Conversation, error)
+	CreateCoupon(ctx context.Context, req *CouponCreateRequest) (*Coupon, error)
+	CreateCustomerAddress(ctx context.Context, customerID string, req *CustomerAddressCreateRequest) (*CustomerAddress, error)
+	CreateCustomerBlacklist(ctx context.Context, req *CustomerBlacklistCreateRequest) (*CustomerBlacklist, error)
+	CreateCustomerGroup(ctx context.Context, req *CustomerGroupCreateRequest) (*CustomerGroup, error)
+	CreateCustomerSavedSearch(ctx context.Context, req *CustomerSavedSearchCreateRequest) (*CustomerSavedSearch, error)
+	CreateCustomField(ctx context.Context, req *CustomFieldCreateRequest) (*CustomField, error)
+	CreateDiscountCode(ctx context.Context, req *DiscountCodeCreateRequest) (*DiscountCode, error)
+	CreateDomain(ctx context.Context, req *DomainCreateRequest) (*Domain, error)
+	CreateDraftOrder(ctx context.Context, req *DraftOrderCreateRequest) (*DraftOrder, error)
+	CreateFile(ctx context.Context, req *FileCreateRequest) (*File, error)
+	CreateFlashPrice(ctx context.Context, req *FlashPriceCreateRequest) (*FlashPrice, error)
+	CreateFulfillmentService(ctx context.Context, req *FulfillmentServiceCreateRequest) (*FulfillmentService, error)
+	CreateGift(ctx context.Context, req *GiftCreateRequest) (*Gift, error)
+	CreateGiftCard(ctx context.Context, req *GiftCardCreateRequest) (*GiftCard, error)
+	CreateLabel(ctx context.Context, req *LabelCreateRequest) (*Label, error)
+	CreateLocalDeliveryOption(ctx context.Context, req *LocalDeliveryCreateRequest) (*LocalDeliveryOption, error)
+	CreateLocation(ctx context.Context, req *LocationCreateRequest) (*Location, error)
+	CreateMarket(ctx context.Context, req *MarketCreateRequest) (*Market, error)
+	CreateMarketingEvent(ctx context.Context, req *MarketingEventCreateRequest) (*MarketingEvent, error)
+	CreateMedia(ctx context.Context, req *MediaCreateRequest) (*Media, error)
+	CreateMembershipTier(ctx context.Context, req *MembershipTierCreateRequest) (*MembershipTier, error)
+	CreateMetafield(ctx context.Context, req *MetafieldCreateRequest) (*Metafield, error)
+	CreateMetafieldDefinition(ctx context.Context, req *MetafieldDefinitionCreateRequest) (*MetafieldDefinition, error)
+	CreateOrderRisk(ctx context.Context, orderID string, req *OrderRiskCreateRequest) (*OrderRisk, error)
+	CreatePage(ctx context.Context, req *PageCreateRequest) (*Page, error)
+	CreatePickupLocation(ctx context.Context, req *PickupCreateRequest) (*PickupLocation, error)
+	CreatePriceRule(ctx context.Context, req *PriceRuleCreateRequest) (*PriceRule, error)
+	CreateProductListing(ctx context.Context, productID string) (*ProductListing, error)
+	CreateProductReview(ctx context.Context, req *ProductReviewCreateRequest) (*ProductReview, error)
+	CreateProductSubscription(ctx context.Context, req *ProductSubscriptionCreateRequest) (*ProductSubscription, error)
+	CreatePromotion(ctx context.Context, req *PromotionCreateRequest) (*Promotion, error)
+	CreatePurchaseOrder(ctx context.Context, req *PurchaseOrderCreateRequest) (*PurchaseOrder, error)
+	CreateRedirect(ctx context.Context, req *RedirectCreateRequest) (*Redirect, error)
+	CreateRefund(ctx context.Context, req *RefundCreateRequest) (*Refund, error)
+	CreateReturnOrder(ctx context.Context, req *ReturnOrderCreateRequest) (*ReturnOrder, error)
+	CreateSale(ctx context.Context, req *SaleCreateRequest) (*Sale, error)
+	CreateScriptTag(ctx context.Context, req *ScriptTagCreateRequest) (*ScriptTag, error)
+	CreateSellingPlan(ctx context.Context, req *SellingPlanCreateRequest) (*SellingPlan, error)
+	CreateShipment(ctx context.Context, req *ShipmentCreateRequest) (*Shipment, error)
+	CreateShippingZone(ctx context.Context, req *ShippingZoneCreateRequest) (*ShippingZone, error)
+	CreateSizeChart(ctx context.Context, req *SizeChartCreateRequest) (*SizeChart, error)
+	CreateSmartCollection(ctx context.Context, req *SmartCollectionCreateRequest) (*SmartCollection, error)
+	CreateStoreCredit(ctx context.Context, req *StoreCreditCreateRequest) (*StoreCredit, error)
+	CreateStorefrontCart(ctx context.Context, req *StorefrontCartCreateRequest) (*StorefrontCart, error)
+	CreateStorefrontOAuthClient(ctx context.Context, req *StorefrontOAuthClientCreateRequest) (*StorefrontOAuthClient, error)
+	CreateStorefrontToken(ctx context.Context, req *StorefrontTokenCreateRequest) (*StorefrontToken, error)
+	CreateSubscription(ctx context.Context, req *SubscriptionCreateRequest) (*Subscription, error)
+	CreateTag(ctx context.Context, req *TagCreateRequest) (*Tag, error)
+	CreateTax(ctx context.Context, req *TaxCreateRequest) (*Tax, error)
+	CreateTaxonomy(ctx context.Context, req *TaxonomyCreateRequest) (*Taxonomy, error)
+	CreateTaxService(ctx context.Context, req *TaxServiceCreateRequest) (*TaxService, error)
+	CreateTheme(ctx context.Context, req *ThemeCreateRequest) (*Theme, error)
+	CreateToken(ctx context.Context, req *TokenCreateRequest) (*Token, error)
+	CreateWarehouse(ctx context.Context, req *WarehouseCreateRequest) (*Warehouse, error)
+	CreateWebhook(ctx context.Context, req *WebhookCreateRequest) (*Webhook, error)
+	CreateWishList(ctx context.Context, req *WishListCreateRequest) (*WishList, error)
+	DeactivateCoupon(ctx context.Context, id string) (*Coupon, error)
+	DeactivateFlashPrice(ctx context.Context, id string) (*FlashPrice, error)
+	DeactivateGift(ctx context.Context, id string) (*Gift, error)
+	DeactivatePromotion(ctx context.Context, id string) (*Promotion, error)
+	DeactivateSale(ctx context.Context, id string) (*Sale, error)
+	Delete(ctx context.Context, path string) error
+	DeleteAddonProduct(ctx context.Context, id string) error
+	DeleteAffiliateCampaign(ctx context.Context, id string) error
+	DeleteArticle(ctx context.Context, id string) error
+	DeleteAsset(ctx context.Context, themeID, key string) error
+	DeleteBlog(ctx context.Context, id string) error
+	DeleteCarrierService(ctx context.Context, id string) error
+	DeleteCatalogPricing(ctx context.Context, id string) error
+	DeleteCategory(ctx context.Context, id string) error
+	DeleteChannel(ctx context.Context, id string) error
+	DeleteCollection(ctx context.Context, id string) error
+	DeleteCompanyCatalog(ctx context.Context, id string) error
+	DeleteCompanyCredit(ctx context.Context, id string) error
+	DeleteConversation(ctx context.Context, id string) error
+	DeleteCoupon(ctx context.Context, id string) error
+	DeleteCustomerAddress(ctx context.Context, customerID, addressID string) error
+	DeleteCustomerBlacklist(ctx context.Context, id string) error
+	DeleteCustomerGroup(ctx context.Context, id string) error
+	DeleteCustomerSavedSearch(ctx context.Context, id string) error
+	DeleteCustomField(ctx context.Context, id string) error
+	DeleteDiscountCode(ctx context.Context, id string) error
+	DeleteDomain(ctx context.Context, id string) error
+	DeleteDraftOrder(ctx context.Context, id string) error
+	DeleteFile(ctx context.Context, id string) error
+	DeleteFlashPrice(ctx context.Context, id string) error
+	DeleteFulfillmentService(ctx context.Context, id string) error
+	DeleteGift(ctx context.Context, id string) error
+	DeleteGiftCard(ctx context.Context, id string) error
+	DeleteLabel(ctx context.Context, id string) error
+	DeleteLocalDeliveryOption(ctx context.Context, id string) error
+	DeleteLocation(ctx context.Context, id string) error
+	DeleteMarket(ctx context.Context, id string) error
+	DeleteMarketingEvent(ctx context.Context, id string) error
+	DeleteMedia(ctx context.Context, id string) error
+	DeleteMembershipTier(ctx context.Context, id string) error
+	DeleteMetafield(ctx context.Context, id string) error
+	DeleteMetafieldDefinition(ctx context.Context, id string) error
+	DeleteOrderRisk(ctx context.Context, orderID, riskID string) error
+	DeletePage(ctx context.Context, id string) error
+	DeletePickupLocation(ctx context.Context, id string) error
+	DeletePriceRule(ctx context.Context, id string) error
+	DeleteProductListing(ctx context.Context, id string) error
+	DeleteProductReview(ctx context.Context, id string) error
+	DeleteProductSubscription(ctx context.Context, id string) error
+	DeletePromotion(ctx context.Context, id string) error
+	DeletePurchaseOrder(ctx context.Context, id string) error
+	DeleteRedirect(ctx context.Context, id string) error
+	DeleteSale(ctx context.Context, id string) error
+	DeleteScriptTag(ctx context.Context, id string) error
+	DeleteSellingPlan(ctx context.Context, id string) error
+	DeleteShipment(ctx context.Context, id string) error
+	DeleteShippingZone(ctx context.Context, id string) error
+	DeleteSizeChart(ctx context.Context, id string) error
+	DeleteSmartCollection(ctx context.Context, id string) error
+	DeleteStaff(ctx context.Context, id string) error
+	DeleteStoreCredit(ctx context.Context, id string) error
+	DeleteStorefrontCart(ctx context.Context, id string) error
+	DeleteStorefrontOAuthClient(ctx context.Context, id string) error
+	DeleteStorefrontToken(ctx context.Context, id string) error
+	DeleteSubscription(ctx context.Context, id string) error
+	DeleteTag(ctx context.Context, id string) error
+	DeleteTax(ctx context.Context, id string) error
+	DeleteTaxonomy(ctx context.Context, id string) error
+	DeleteTaxService(ctx context.Context, id string) error
+	DeleteTheme(ctx context.Context, id string) error
+	DeleteToken(ctx context.Context, id string) error
+	DeleteWarehouse(ctx context.Context, id string) error
+	DeleteWebhook(ctx context.Context, id string) error
+	DeleteWishList(ctx context.Context, id string) error
+	DisableMultipass(ctx context.Context) error
+	EnableMultipass(ctx context.Context) (*Multipass, error)
+	GenerateMultipassToken(ctx context.Context, req *MultipassTokenRequest) (*MultipassToken, error)
+	Get(ctx context.Context, path string, result interface{}) error
+	GetAbandonedCheckout(ctx context.Context, id string) (*AbandonedCheckout, error)
+	GetAddonProduct(ctx context.Context, id string) (*AddonProduct, error)
+	GetAffiliateCampaign(ctx context.Context, id string) (*AffiliateCampaign, error)
+	GetArticle(ctx context.Context, id string) (*Article, error)
+	GetAsset(ctx context.Context, themeID, key string) (*Asset, error)
+	GetBalance(ctx context.Context) (*Balance, error)
+	GetBalanceTransaction(ctx context.Context, id string) (*BalanceTransaction, error)
+	GetBlog(ctx context.Context, id string) (*Blog, error)
+	GetBulkOperation(ctx context.Context, id string) (*BulkOperation, error)
+	GetCarrierService(ctx context.Context, id string) (*CarrierService, error)
+	GetCatalogPricing(ctx context.Context, id string) (*CatalogPricing, error)
+	GetCategory(ctx context.Context, id string) (*Category, error)
+	GetCDPEvent(ctx context.Context, id string) (*CDPEvent, error)
+	GetCDPProfile(ctx context.Context, id string) (*CDPCustomerProfile, error)
+	GetCDPSegment(ctx context.Context, id string) (*CDPSegment, error)
+	GetChannel(ctx context.Context, id string) (*Channel, error)
+	GetChannelProductListing(ctx context.Context, channelID, productID string) (*ChannelProductListing, error)
+	GetCheckoutSettings(ctx context.Context) (*CheckoutSettings, error)
+	GetCollection(ctx context.Context, id string) (*Collection, error)
+	GetCompanyCatalog(ctx context.Context, id string) (*CompanyCatalog, error)
+	GetCompanyCredit(ctx context.Context, id string) (*CompanyCredit, error)
+	GetConversation(ctx context.Context, id string) (*Conversation, error)
+	GetCountry(ctx context.Context, code string) (*Country, error)
+	GetCoupon(ctx context.Context, id string) (*Coupon, error)
+	GetCouponByCode(ctx context.Context, code string) (*Coupon, error)
+	GetCurrency(ctx context.Context, code string) (*Currency, error)
+	GetCurrentBulkOperation(ctx context.Context) (*BulkOperation, error)
+	GetCustomer(ctx context.Context, id string) (*Customer, error)
+	GetCustomerAddress(ctx context.Context, customerID, addressID string) (*CustomerAddress, error)
+	GetCustomerBlacklist(ctx context.Context, id string) (*CustomerBlacklist, error)
+	GetCustomerGroup(ctx context.Context, id string) (*CustomerGroup, error)
+	GetCustomerSavedSearch(ctx context.Context, id string) (*CustomerSavedSearch, error)
+	GetCustomField(ctx context.Context, id string) (*CustomField, error)
+	GetDeliveryOption(ctx context.Context, id string) (*DeliveryOption, error)
+	GetDiscountCode(ctx context.Context, id string) (*DiscountCode, error)
+	GetDiscountCodeByCode(ctx context.Context, code string) (*DiscountCode, error)
+	GetDispute(ctx context.Context, id string) (*Dispute, error)
+	GetDomain(ctx context.Context, id string) (*Domain, error)
+	GetDraftOrder(ctx context.Context, id string) (*DraftOrder, error)
+	GetFile(ctx context.Context, id string) (*File, error)
+	GetFlashPrice(ctx context.Context, id string) (*FlashPrice, error)
+	GetFulfillment(ctx context.Context, id string) (*Fulfillment, error)
+	GetFulfillmentOrder(ctx context.Context, id string) (*FulfillmentOrder, error)
+	GetFulfillmentService(ctx context.Context, id string) (*FulfillmentService, error)
+	GetGift(ctx context.Context, id string) (*Gift, error)
+	GetGiftCard(ctx context.Context, id string) (*GiftCard, error)
+	GetInventoryLevel(ctx context.Context, id string) (*InventoryLevel, error)
+	GetLabel(ctx context.Context, id string) (*Label, error)
+	GetLocalDeliveryOption(ctx context.Context, id string) (*LocalDeliveryOption, error)
+	GetLocation(ctx context.Context, id string) (*Location, error)
+	GetMarket(ctx context.Context, id string) (*Market, error)
+	GetMarketingEvent(ctx context.Context, id string) (*MarketingEvent, error)
+	GetMedia(ctx context.Context, id string) (*Media, error)
+	GetMemberPoints(ctx context.Context, customerID string) (*MemberPoints, error)
+	GetMembershipTier(ctx context.Context, id string) (*MembershipTier, error)
+	GetMerchant(ctx context.Context) (*Merchant, error)
+	GetMerchantStaff(ctx context.Context, id string) (*MerchantStaff, error)
+	GetMetafield(ctx context.Context, id string) (*Metafield, error)
+	GetMetafieldDefinition(ctx context.Context, id string) (*MetafieldDefinition, error)
+	GetMultipass(ctx context.Context) (*Multipass, error)
+	GetOperationLog(ctx context.Context, id string) (*OperationLog, error)
+	GetOrder(ctx context.Context, id string) (*Order, error)
+	GetOrderAttribution(ctx context.Context, orderID string) (*OrderAttribution, error)
+	GetOrderRisk(ctx context.Context, orderID, riskID string) (*OrderRisk, error)
+	GetPage(ctx context.Context, id string) (*Page, error)
+	GetPayment(ctx context.Context, id string) (*Payment, error)
+	GetPayout(ctx context.Context, id string) (*Payout, error)
+	GetPickupLocation(ctx context.Context, id string) (*PickupLocation, error)
+	GetPriceRule(ctx context.Context, id string) (*PriceRule, error)
+	GetProduct(ctx context.Context, id string) (*Product, error)
+	GetProductListing(ctx context.Context, id string) (*ProductListing, error)
+	GetProductReview(ctx context.Context, id string) (*ProductReview, error)
+	GetProductSubscription(ctx context.Context, id string) (*ProductSubscription, error)
+	GetPromotion(ctx context.Context, id string) (*Promotion, error)
+	GetPurchaseOrder(ctx context.Context, id string) (*PurchaseOrder, error)
+	GetRedirect(ctx context.Context, id string) (*Redirect, error)
+	GetRefund(ctx context.Context, id string) (*Refund, error)
+	GetReturnOrder(ctx context.Context, id string) (*ReturnOrder, error)
+	GetSale(ctx context.Context, id string) (*Sale, error)
+	GetScriptTag(ctx context.Context, id string) (*ScriptTag, error)
+	GetSellingPlan(ctx context.Context, id string) (*SellingPlan, error)
+	GetSettings(ctx context.Context) (*SettingsResponse, error)
+	GetShipment(ctx context.Context, id string) (*Shipment, error)
+	GetShippingZone(ctx context.Context, id string) (*ShippingZone, error)
+	GetShop(ctx context.Context) (*Shop, error)
+	GetShopSettings(ctx context.Context) (*ShopSettings, error)
+	GetSizeChart(ctx context.Context, id string) (*SizeChart, error)
+	GetSmartCollection(ctx context.Context, id string) (*SmartCollection, error)
+	GetStaff(ctx context.Context, id string) (*Staff, error)
+	GetStoreCredit(ctx context.Context, id string) (*StoreCredit, error)
+	GetStorefrontCart(ctx context.Context, id string) (*StorefrontCart, error)
+	GetStorefrontOAuthClient(ctx context.Context, id string) (*StorefrontOAuthClient, error)
+	GetStorefrontProduct(ctx context.Context, id string) (*StorefrontProduct, error)
+	GetStorefrontProductByHandle(ctx context.Context, handle string) (*StorefrontProduct, error)
+	GetStorefrontPromotion(ctx context.Context, id string) (*StorefrontPromotion, error)
+	GetStorefrontPromotionByCode(ctx context.Context, code string) (*StorefrontPromotion, error)
+	GetStorefrontToken(ctx context.Context, id string) (*StorefrontToken, error)
+	GetSubscription(ctx context.Context, id string) (*Subscription, error)
+	GetTag(ctx context.Context, id string) (*Tag, error)
+	GetTax(ctx context.Context, id string) (*Tax, error)
+	GetTaxonomy(ctx context.Context, id string) (*Taxonomy, error)
+	GetTaxService(ctx context.Context, id string) (*TaxService, error)
+	GetTheme(ctx context.Context, id string) (*Theme, error)
+	GetToken(ctx context.Context, id string) (*Token, error)
+	GetTransaction(ctx context.Context, id string) (*Transaction, error)
+	GetUserCoupon(ctx context.Context, id string) (*UserCoupon, error)
+	GetWarehouse(ctx context.Context, id string) (*Warehouse, error)
+	GetWebhook(ctx context.Context, id string) (*Webhook, error)
+	GetWishList(ctx context.Context, id string) (*WishList, error)
+	InviteStaff(ctx context.Context, req *StaffInviteRequest) (*Staff, error)
+	ListAbandonedCheckouts(ctx context.Context, opts *AbandonedCheckoutsListOptions) (*AbandonedCheckoutsListResponse, error)
+	ListAddonProducts(ctx context.Context, opts *AddonProductsListOptions) (*AddonProductsListResponse, error)
+	ListAffiliateCampaigns(ctx context.Context, opts *AffiliateCampaignsListOptions) (*AffiliateCampaignsListResponse, error)
+	ListArticles(ctx context.Context, opts *ArticlesListOptions) (*ArticlesListResponse, error)
+	ListAssets(ctx context.Context, themeID string) (*AssetsListResponse, error)
+	ListBalanceTransactions(ctx context.Context, opts *BalanceTransactionsListOptions) (*BalanceTransactionsListResponse, error)
+	ListBlogs(ctx context.Context, opts *BlogsListOptions) (*BlogsListResponse, error)
+	ListBulkOperations(ctx context.Context, opts *BulkOperationsListOptions) (*BulkOperationsListResponse, error)
+	ListCarrierServices(ctx context.Context, opts *CarrierServicesListOptions) (*CarrierServicesListResponse, error)
+	ListCatalogPricing(ctx context.Context, opts *CatalogPricingListOptions) (*CatalogPricingListResponse, error)
+	ListCategories(ctx context.Context, opts *CategoriesListOptions) (*CategoriesListResponse, error)
+	ListCDPEvents(ctx context.Context, opts *CDPEventsListOptions) (*CDPEventsListResponse, error)
+	ListCDPProfiles(ctx context.Context, opts *CDPProfilesListOptions) (*CDPProfilesListResponse, error)
+	ListCDPSegments(ctx context.Context, opts *CDPSegmentsListOptions) (*CDPSegmentsListResponse, error)
+	ListChannelProductListings(ctx context.Context, channelID string, opts *ChannelProductsListOptions) (*ChannelProductsListResponse, error)
+	ListChannelProducts(ctx context.Context, channelID string, page, pageSize int) (*ChannelProductsResponse, error)
+	ListChannels(ctx context.Context, opts *ChannelsListOptions) (*ChannelsListResponse, error)
+	ListCollections(ctx context.Context, opts *CollectionsListOptions) (*CollectionsListResponse, error)
+	ListCompanyCatalogs(ctx context.Context, opts *CompanyCatalogsListOptions) (*CompanyCatalogsListResponse, error)
+	ListCompanyCredits(ctx context.Context, opts *CompanyCreditsListOptions) (*CompanyCreditsListResponse, error)
+	ListCompanyCreditTransactions(ctx context.Context, creditID string, page, pageSize int) (*CompanyCreditTransactionsListResponse, error)
+	ListConversationMessages(ctx context.Context, conversationID string, page, pageSize int) (*ConversationMessagesListResponse, error)
+	ListConversations(ctx context.Context, opts *ConversationsListOptions) (*ConversationsListResponse, error)
+	ListCountries(ctx context.Context) (*CountriesListResponse, error)
+	ListCoupons(ctx context.Context, opts *CouponsListOptions) (*CouponsListResponse, error)
+	ListCurrencies(ctx context.Context) (*CurrenciesListResponse, error)
+	ListCustomerAddresses(ctx context.Context, customerID string, opts *CustomerAddressesListOptions) (*CustomerAddressesListResponse, error)
+	ListCustomerBlacklist(ctx context.Context, opts *CustomerBlacklistListOptions) (*CustomerBlacklistListResponse, error)
+	ListCustomerGroups(ctx context.Context, opts *CustomerGroupsListOptions) (*CustomerGroupsListResponse, error)
+	ListCustomers(ctx context.Context, opts *CustomersListOptions) (*CustomersListResponse, error)
+	ListCustomerSavedSearches(ctx context.Context, opts *CustomerSavedSearchesListOptions) (*CustomerSavedSearchesListResponse, error)
+	ListCustomFields(ctx context.Context, opts *CustomFieldsListOptions) (*CustomFieldsListResponse, error)
+	ListDeliveryOptions(ctx context.Context, opts *DeliveryOptionsListOptions) (*DeliveryOptionsListResponse, error)
+	ListDeliveryTimeSlots(ctx context.Context, id string, opts *DeliveryTimeSlotsListOptions) (*DeliveryTimeSlotsListResponse, error)
+	ListDiscountCodes(ctx context.Context, opts *DiscountCodesListOptions) (*DiscountCodesListResponse, error)
+	ListDisputes(ctx context.Context, opts *DisputesListOptions) (*DisputesListResponse, error)
+	ListDomains(ctx context.Context, opts *DomainsListOptions) (*DomainsListResponse, error)
+	ListDraftOrders(ctx context.Context, opts *DraftOrdersListOptions) (*DraftOrdersListResponse, error)
+	ListFiles(ctx context.Context, opts *FilesListOptions) (*FilesListResponse, error)
+	ListFlashPrices(ctx context.Context, opts *FlashPriceListOptions) (*FlashPriceListResponse, error)
+	ListFulfillmentOrders(ctx context.Context, opts *FulfillmentOrdersListOptions) (*FulfillmentOrdersListResponse, error)
+	ListFulfillments(ctx context.Context, opts *FulfillmentsListOptions) (*FulfillmentsListResponse, error)
+	ListFulfillmentServices(ctx context.Context, opts *FulfillmentServicesListOptions) (*FulfillmentServicesListResponse, error)
+	ListGiftCards(ctx context.Context, opts *GiftCardsListOptions) (*GiftCardsListResponse, error)
+	ListGifts(ctx context.Context, opts *GiftsListOptions) (*GiftsListResponse, error)
+	ListInventoryLevels(ctx context.Context, opts *InventoryListOptions) (*InventoryListResponse, error)
+	ListLabels(ctx context.Context, opts *LabelsListOptions) (*LabelsListResponse, error)
+	ListLocalDeliveryOptions(ctx context.Context, opts *LocalDeliveryListOptions) (*LocalDeliveryListResponse, error)
+	ListLocations(ctx context.Context, opts *LocationsListOptions) (*LocationsListResponse, error)
+	ListMarketingEvents(ctx context.Context, opts *MarketingEventsListOptions) (*MarketingEventsListResponse, error)
+	ListMarkets(ctx context.Context, opts *MarketsListOptions) (*MarketsListResponse, error)
+	ListMedias(ctx context.Context, opts *MediasListOptions) (*MediasListResponse, error)
+	ListMembershipTiers(ctx context.Context, opts *MembershipTiersListOptions) (*MembershipTiersListResponse, error)
+	ListMerchants(ctx context.Context) ([]Merchant, error)
+	ListMerchantStaff(ctx context.Context, opts *MerchantStaffListOptions) (*MerchantStaffListResponse, error)
+	ListMetafieldDefinitions(ctx context.Context, opts *MetafieldDefinitionsListOptions) (*MetafieldDefinitionsListResponse, error)
+	ListMetafields(ctx context.Context, opts *MetafieldsListOptions) (*MetafieldsListResponse, error)
+	ListOperationLogs(ctx context.Context, opts *OperationLogsListOptions) (*OperationLogsListResponse, error)
+	ListOrderAttributions(ctx context.Context, opts *OrderAttributionListOptions) (*OrderAttributionListResponse, error)
+	ListOrderFulfillmentOrders(ctx context.Context, orderID string) (*FulfillmentOrdersListResponse, error)
+	ListOrderPayments(ctx context.Context, orderID string) (*PaymentsListResponse, error)
+	ListOrderRefunds(ctx context.Context, orderID string) (*RefundsListResponse, error)
+	ListOrderRisks(ctx context.Context, orderID string, opts *OrderRisksListOptions) (*OrderRisksListResponse, error)
+	ListOrders(ctx context.Context, opts *OrdersListOptions) (*OrdersListResponse, error)
+	ListOrderTransactions(ctx context.Context, orderID string) (*TransactionsListResponse, error)
+	ListPages(ctx context.Context, opts *PagesListOptions) (*PagesListResponse, error)
+	ListPayments(ctx context.Context, opts *PaymentsListOptions) (*PaymentsListResponse, error)
+	ListPayouts(ctx context.Context, opts *PayoutsListOptions) (*PayoutsListResponse, error)
+	ListPickupLocations(ctx context.Context, opts *PickupListOptions) (*PickupListResponse, error)
+	ListPointsTransactions(ctx context.Context, customerID string, opts *PointsTransactionsListOptions) (*PointsTransactionsListResponse, error)
+	ListPriceRules(ctx context.Context, opts *PriceRulesListOptions) (*PriceRulesListResponse, error)
+	ListProductListings(ctx context.Context, opts *ProductListingsListOptions) (*ProductListingsListResponse, error)
+	ListProductReviews(ctx context.Context, opts *ProductReviewsListOptions) (*ProductReviewsListResponse, error)
+	ListProducts(ctx context.Context, opts *ProductsListOptions) (*ProductsListResponse, error)
+	ListProductSubscriptions(ctx context.Context, opts *ProductSubscriptionsListOptions) (*ProductSubscriptionsListResponse, error)
+	ListPromotions(ctx context.Context, opts *PromotionsListOptions) (*PromotionsListResponse, error)
+	ListPurchaseOrders(ctx context.Context, opts *PurchaseOrdersListOptions) (*PurchaseOrdersListResponse, error)
+	ListRedirects(ctx context.Context, opts *RedirectsListOptions) (*RedirectsListResponse, error)
+	ListRefunds(ctx context.Context, opts *RefundsListOptions) (*RefundsListResponse, error)
+	ListReturnOrders(ctx context.Context, opts *ReturnOrdersListOptions) (*ReturnOrdersListResponse, error)
+	ListSales(ctx context.Context, opts *SalesListOptions) (*SalesListResponse, error)
+	ListScriptTags(ctx context.Context, opts *ScriptTagsListOptions) (*ScriptTagsListResponse, error)
+	ListSellingPlans(ctx context.Context, opts *SellingPlansListOptions) (*SellingPlansListResponse, error)
+	ListShipments(ctx context.Context, opts *ShipmentsListOptions) (*ShipmentsListResponse, error)
+	ListShippingZones(ctx context.Context, opts *ShippingZonesListOptions) (*ShippingZonesListResponse, error)
+	ListSizeCharts(ctx context.Context, opts *SizeChartsListOptions) (*SizeChartsListResponse, error)
+	ListSmartCollections(ctx context.Context, opts *SmartCollectionsListOptions) (*SmartCollectionsListResponse, error)
+	ListStaffs(ctx context.Context, opts *StaffsListOptions) (*StaffsListResponse, error)
+	ListStoreCredits(ctx context.Context, opts *StoreCreditsListOptions) (*StoreCreditsListResponse, error)
+	ListStorefrontCarts(ctx context.Context, opts *StorefrontCartsListOptions) (*StorefrontCartsListResponse, error)
+	ListStorefrontOAuthClients(ctx context.Context, opts *StorefrontOAuthClientsListOptions) (*StorefrontOAuthClientsListResponse, error)
+	ListStorefrontProducts(ctx context.Context, opts *StorefrontProductsListOptions) (*StorefrontProductsListResponse, error)
+	ListStorefrontPromotions(ctx context.Context, opts *StorefrontPromotionsListOptions) (*StorefrontPromotionsListResponse, error)
+	ListStorefrontTokens(ctx context.Context, opts *StorefrontTokensListOptions) (*StorefrontTokensListResponse, error)
+	ListSubscriptions(ctx context.Context, opts *SubscriptionsListOptions) (*SubscriptionsListResponse, error)
+	ListTags(ctx context.Context, opts *TagsListOptions) (*TagsListResponse, error)
+	ListTaxes(ctx context.Context, opts *TaxesListOptions) (*TaxesListResponse, error)
+	ListTaxonomies(ctx context.Context, opts *TaxonomiesListOptions) (*TaxonomiesListResponse, error)
+	ListTaxServices(ctx context.Context, opts *TaxServicesListOptions) (*TaxServicesListResponse, error)
+	ListThemes(ctx context.Context, opts *ThemesListOptions) (*ThemesListResponse, error)
+	ListTokens(ctx context.Context, opts *TokensListOptions) (*TokensListResponse, error)
+	ListTransactions(ctx context.Context, opts *TransactionsListOptions) (*TransactionsListResponse, error)
+	ListUserCoupons(ctx context.Context, opts *UserCouponsListOptions) (*UserCouponsListResponse, error)
+	ListWarehouses(ctx context.Context, opts *WarehousesListOptions) (*WarehousesListResponse, error)
+	ListWebhooks(ctx context.Context, opts *WebhooksListOptions) (*WebhooksListResponse, error)
+	ListWishLists(ctx context.Context, opts *WishListsListOptions) (*WishListsListResponse, error)
+	MoveFulfillmentOrder(ctx context.Context, id string, newLocationID string) (*FulfillmentOrder, error)
+	Post(ctx context.Context, path string, body, result interface{}) error
+	PublishProductToChannel(ctx context.Context, channelID string, req *ChannelPublishProductRequest) error
+	PublishProductToChannelListing(ctx context.Context, channelID string, req *ChannelProductPublishRequest) (*ChannelProductListing, error)
+	Put(ctx context.Context, path string, body, result interface{}) error
+	ReceivePurchaseOrder(ctx context.Context, id string) (*PurchaseOrder, error)
+	ReceiveReturnOrder(ctx context.Context, id string) (*ReturnOrder, error)
+	RefundPayment(ctx context.Context, id string, amount string, reason string) (*Payment, error)
+	RemoveProductFromCollection(ctx context.Context, id, productID string) error
+	RemoveWishListItem(ctx context.Context, wishListID, itemID string) error
+	RevokeUserCoupon(ctx context.Context, id string) error
+	RotateMultipassSecret(ctx context.Context) (*Multipass, error)
+	RotateStorefrontOAuthClientSecret(ctx context.Context, id string) (*StorefrontOAuthClient, error)
+	SendAbandonedCheckoutRecoveryEmail(ctx context.Context, id string) error
+	SendConversationMessage(ctx context.Context, conversationID string, req *ConversationMessageCreateRequest) (*ConversationMessage, error)
+	SendDraftOrderInvoice(ctx context.Context, id string) error
+	SetDefaultCustomerAddress(ctx context.Context, customerID, addressID string) (*CustomerAddress, error)
+	SetInventoryLevel(ctx context.Context, req *InventoryLevelSetRequest) (*InventoryLevel, error)
+	SubmitDispute(ctx context.Context, id string) (*Dispute, error)
+	UnpublishProductFromChannel(ctx context.Context, channelID, productID string) error
+	UnpublishProductFromChannelListing(ctx context.Context, channelID, productID string) error
+	UpdateAffiliateCampaign(ctx context.Context, id string, req *AffiliateCampaignUpdateRequest) (*AffiliateCampaign, error)
+	UpdateArticle(ctx context.Context, id string, req *ArticleUpdateRequest) (*Article, error)
+	UpdateAsset(ctx context.Context, themeID string, req *AssetUpdateRequest) (*Asset, error)
+	UpdateBlog(ctx context.Context, id string, req *BlogUpdateRequest) (*Blog, error)
+	UpdateCarrierService(ctx context.Context, id string, req *CarrierServiceUpdateRequest) (*CarrierService, error)
+	UpdateCatalogPricing(ctx context.Context, id string, req *CatalogPricingUpdateRequest) (*CatalogPricing, error)
+	UpdateCategory(ctx context.Context, id string, req *CategoryUpdateRequest) (*Category, error)
+	UpdateChannel(ctx context.Context, id string, req *ChannelUpdateRequest) (*Channel, error)
+	UpdateChannelProductListing(ctx context.Context, channelID, productID string, req *ChannelProductUpdateRequest) (*ChannelProductListing, error)
+	UpdateCheckoutSettings(ctx context.Context, req *CheckoutSettingsUpdateRequest) (*CheckoutSettings, error)
+	UpdateCollection(ctx context.Context, id string, req *CollectionUpdateRequest) (*Collection, error)
+	UpdateCompanyCatalog(ctx context.Context, id string, req *CompanyCatalogUpdateRequest) (*CompanyCatalog, error)
+	UpdateConversation(ctx context.Context, id string, req *ConversationUpdateRequest) (*Conversation, error)
+	UpdateCoupon(ctx context.Context, id string, req *CouponUpdateRequest) (*Coupon, error)
+	UpdateCurrency(ctx context.Context, code string, req *CurrencyUpdateRequest) (*Currency, error)
+	UpdateCustomerGroup(ctx context.Context, id string, req *CustomerGroupUpdateRequest) (*CustomerGroup, error)
+	UpdateCustomField(ctx context.Context, id string, req *CustomFieldUpdateRequest) (*CustomField, error)
+	UpdateDeliveryOptionPickupStore(ctx context.Context, id string, req *PickupStoreUpdateRequest) (*DeliveryOption, error)
+	UpdateDisputeEvidence(ctx context.Context, id string, req *DisputeUpdateEvidenceRequest) (*Dispute, error)
+	UpdateDomain(ctx context.Context, id string, req *DomainUpdateRequest) (*Domain, error)
+	UpdateFile(ctx context.Context, id string, req *FileUpdateRequest) (*File, error)
+	UpdateFlashPrice(ctx context.Context, id string, req *FlashPriceUpdateRequest) (*FlashPrice, error)
+	UpdateFulfillmentService(ctx context.Context, id string, req *FulfillmentServiceUpdateRequest) (*FulfillmentService, error)
+	UpdateLabel(ctx context.Context, id string, req *LabelUpdateRequest) (*Label, error)
+	UpdateLocalDeliveryOption(ctx context.Context, id string, req *LocalDeliveryUpdateRequest) (*LocalDeliveryOption, error)
+	UpdateLocation(ctx context.Context, id string, req *LocationUpdateRequest) (*Location, error)
+	UpdateMarketingEvent(ctx context.Context, id string, req *MarketingEventUpdateRequest) (*MarketingEvent, error)
+	UpdateMedia(ctx context.Context, id string, req *MediaUpdateRequest) (*Media, error)
+	UpdateMetafield(ctx context.Context, id string, req *MetafieldUpdateRequest) (*Metafield, error)
+	UpdateMetafieldDefinition(ctx context.Context, id string, req *MetafieldDefinitionUpdateRequest) (*MetafieldDefinition, error)
+	UpdateOrderRisk(ctx context.Context, orderID, riskID string, req *OrderRiskUpdateRequest) (*OrderRisk, error)
+	UpdatePage(ctx context.Context, id string, req *PageUpdateRequest) (*Page, error)
+	UpdatePickupLocation(ctx context.Context, id string, req *PickupUpdateRequest) (*PickupLocation, error)
+	UpdatePriceRule(ctx context.Context, id string, req *PriceRuleUpdateRequest) (*PriceRule, error)
+	UpdateRedirect(ctx context.Context, id string, req *RedirectUpdateRequest) (*Redirect, error)
+	UpdateReturnOrder(ctx context.Context, id string, req *ReturnOrderUpdateRequest) (*ReturnOrder, error)
+	UpdateScriptTag(ctx context.Context, id string, req *ScriptTagUpdateRequest) (*ScriptTag, error)
+	UpdateSettings(ctx context.Context, req *UserSettingsUpdateRequest) (*SettingsResponse, error)
+	UpdateShipment(ctx context.Context, id string, req *ShipmentUpdateRequest) (*Shipment, error)
+	UpdateShopSettings(ctx context.Context, req *ShopSettingsUpdateRequest) (*ShopSettings, error)
+	UpdateSizeChart(ctx context.Context, id string, req *SizeChartUpdateRequest) (*SizeChart, error)
+	UpdateSmartCollection(ctx context.Context, id string, req *SmartCollectionUpdateRequest) (*SmartCollection, error)
+	UpdateStaff(ctx context.Context, id string, req *StaffUpdateRequest) (*Staff, error)
+	UpdateStorefrontOAuthClient(ctx context.Context, id string, req *StorefrontOAuthClientUpdateRequest) (*StorefrontOAuthClient, error)
+	UpdateTax(ctx context.Context, id string, req *TaxUpdateRequest) (*Tax, error)
+	UpdateTaxonomy(ctx context.Context, id string, req *TaxonomyUpdateRequest) (*Taxonomy, error)
+	UpdateTaxService(ctx context.Context, id string, req *TaxServiceUpdateRequest) (*TaxService, error)
+	UpdateTheme(ctx context.Context, id string, req *ThemeUpdateRequest) (*Theme, error)
+	UpdateWarehouse(ctx context.Context, id string, req *WarehouseUpdateRequest) (*Warehouse, error)
+	VerifyDomain(ctx context.Context, id string) (*Domain, error)
+	VoidPayment(ctx context.Context, id string) (*Payment, error)
+}

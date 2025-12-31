@@ -1,0 +1,226 @@
+package cmd
+
+import (
+	"fmt"
+	"strings"
+	"time"
+
+	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/spf13/cobra"
+)
+
+var deliveryOptionsCmd = &cobra.Command{
+	Use:   "delivery-options",
+	Short: "Manage delivery options",
+}
+
+var deliveryOptionsListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List delivery options",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+		status, _ := cmd.Flags().GetString("status")
+		optType, _ := cmd.Flags().GetString("type")
+
+		opts := &api.DeliveryOptionsListOptions{
+			Page:     page,
+			PageSize: pageSize,
+			Status:   status,
+			Type:     optType,
+		}
+
+		resp, err := client.ListDeliveryOptions(cmd.Context(), opts)
+		if err != nil {
+			return fmt.Errorf("failed to list delivery options: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		headers := []string{"ID", "NAME", "TYPE", "STATUS", "COUNTRIES", "CREATED"}
+		var rows [][]string
+		for _, d := range resp.Items {
+			rows = append(rows, []string{
+				d.ID,
+				d.Name,
+				d.Type,
+				d.Status,
+				fmt.Sprintf("%d", len(d.SupportedCountries)),
+				d.CreatedAt.Format("2006-01-02"),
+			})
+		}
+
+		formatter.Table(headers, rows)
+		fmt.Printf("\nShowing %d of %d delivery options\n", len(resp.Items), resp.TotalCount)
+		return nil
+	},
+}
+
+var deliveryOptionsGetCmd = &cobra.Command{
+	Use:   "get <id>",
+	Short: "Get delivery option details",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		opt, err := client.GetDeliveryOption(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to get delivery option: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(opt)
+		}
+
+		fmt.Printf("Option ID:    %s\n", opt.ID)
+		fmt.Printf("Name:         %s\n", opt.Name)
+		fmt.Printf("Type:         %s\n", opt.Type)
+		fmt.Printf("Status:       %s\n", opt.Status)
+		fmt.Printf("Description:  %s\n", opt.Description)
+		fmt.Printf("Created:      %s\n", opt.CreatedAt.Format(time.RFC3339))
+		fmt.Printf("Updated:      %s\n", opt.UpdatedAt.Format(time.RFC3339))
+
+		if len(opt.SupportedCountries) > 0 {
+			fmt.Printf("\nSupported Countries:\n  %s\n", strings.Join(opt.SupportedCountries, ", "))
+		}
+		return nil
+	},
+}
+
+var deliveryOptionsTimeSlotsCmd = &cobra.Command{
+	Use:   "time-slots <id>",
+	Short: "List time slots for a delivery option",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+		startDate, _ := cmd.Flags().GetString("start-date")
+		endDate, _ := cmd.Flags().GetString("end-date")
+
+		opts := &api.DeliveryTimeSlotsListOptions{
+			Page:      page,
+			PageSize:  pageSize,
+			StartDate: startDate,
+			EndDate:   endDate,
+		}
+
+		resp, err := client.ListDeliveryTimeSlots(cmd.Context(), args[0], opts)
+		if err != nil {
+			return fmt.Errorf("failed to list delivery time slots: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		headers := []string{"ID", "DATE", "START", "END", "AVAILABLE", "CAPACITY", "BOOKED"}
+		var rows [][]string
+		for _, s := range resp.Items {
+			available := "No"
+			if s.Available {
+				available = "Yes"
+			}
+			rows = append(rows, []string{
+				s.ID,
+				s.Date,
+				s.StartTime,
+				s.EndTime,
+				available,
+				fmt.Sprintf("%d", s.Capacity),
+				fmt.Sprintf("%d", s.Booked),
+			})
+		}
+
+		formatter.Table(headers, rows)
+		fmt.Printf("\nShowing %d of %d time slots\n", len(resp.Items), resp.TotalCount)
+		return nil
+	},
+}
+
+var deliveryOptionsUpdatePickupCmd = &cobra.Command{
+	Use:   "update-pickup <id>",
+	Short: "Update pickup store for a delivery option",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		storeID, _ := cmd.Flags().GetString("store-id")
+		storeName, _ := cmd.Flags().GetString("store-name")
+		address, _ := cmd.Flags().GetString("address")
+		phone, _ := cmd.Flags().GetString("phone")
+
+		req := &api.PickupStoreUpdateRequest{
+			StoreID:   storeID,
+			StoreName: storeName,
+			Address:   address,
+			Phone:     phone,
+		}
+
+		opt, err := client.UpdateDeliveryOptionPickupStore(cmd.Context(), args[0], req)
+		if err != nil {
+			return fmt.Errorf("failed to update pickup store: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(opt)
+		}
+
+		fmt.Printf("Updated pickup store for delivery option %s\n", opt.ID)
+		return nil
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(deliveryOptionsCmd)
+
+	deliveryOptionsCmd.AddCommand(deliveryOptionsListCmd)
+	deliveryOptionsListCmd.Flags().Int("page", 1, "Page number")
+	deliveryOptionsListCmd.Flags().Int("page-size", 20, "Results per page")
+	deliveryOptionsListCmd.Flags().String("status", "", "Filter by status")
+	deliveryOptionsListCmd.Flags().String("type", "", "Filter by type")
+
+	deliveryOptionsCmd.AddCommand(deliveryOptionsGetCmd)
+
+	deliveryOptionsCmd.AddCommand(deliveryOptionsTimeSlotsCmd)
+	deliveryOptionsTimeSlotsCmd.Flags().Int("page", 1, "Page number")
+	deliveryOptionsTimeSlotsCmd.Flags().Int("page-size", 20, "Results per page")
+	deliveryOptionsTimeSlotsCmd.Flags().String("start-date", "", "Filter by start date (YYYY-MM-DD)")
+	deliveryOptionsTimeSlotsCmd.Flags().String("end-date", "", "Filter by end date (YYYY-MM-DD)")
+
+	deliveryOptionsCmd.AddCommand(deliveryOptionsUpdatePickupCmd)
+	deliveryOptionsUpdatePickupCmd.Flags().String("store-id", "", "Store ID")
+	deliveryOptionsUpdatePickupCmd.Flags().String("store-name", "", "Store name")
+	deliveryOptionsUpdatePickupCmd.Flags().String("address", "", "Store address")
+	deliveryOptionsUpdatePickupCmd.Flags().String("phone", "", "Store phone")
+	_ = deliveryOptionsUpdatePickupCmd.MarkFlagRequired("store-id")
+}

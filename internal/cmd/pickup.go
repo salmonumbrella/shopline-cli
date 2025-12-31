@@ -1,0 +1,260 @@
+package cmd
+
+import (
+	"fmt"
+	"strconv"
+	"time"
+
+	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/spf13/cobra"
+)
+
+var pickupCmd = &cobra.Command{
+	Use:   "pickup",
+	Short: "Manage store pickup locations",
+}
+
+var pickupListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List pickup locations",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		locationID, _ := cmd.Flags().GetString("location-id")
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+		activeFlag, _ := cmd.Flags().GetString("active")
+
+		opts := &api.PickupListOptions{
+			Page:       page,
+			PageSize:   pageSize,
+			LocationID: locationID,
+		}
+
+		if activeFlag != "" {
+			active := activeFlag == "true"
+			opts.Active = &active
+		}
+
+		resp, err := client.ListPickupLocations(cmd.Context(), opts)
+		if err != nil {
+			return fmt.Errorf("failed to list pickup locations: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		headers := []string{"ID", "NAME", "ADDRESS", "CITY", "ACTIVE", "PHONE"}
+		var rows [][]string
+		for _, l := range resp.Items {
+			address := l.Address1
+			if l.Address2 != "" {
+				address += ", " + l.Address2
+			}
+			rows = append(rows, []string{
+				l.ID,
+				l.Name,
+				address,
+				l.City,
+				strconv.FormatBool(l.Active),
+				l.Phone,
+			})
+		}
+
+		formatter.Table(headers, rows)
+		fmt.Printf("\nShowing %d of %d pickup locations\n", len(resp.Items), resp.TotalCount)
+		return nil
+	},
+}
+
+var pickupGetCmd = &cobra.Command{
+	Use:   "get <id>",
+	Short: "Get pickup location details",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		location, err := client.GetPickupLocation(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to get pickup location: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(location)
+		}
+
+		fmt.Printf("Location ID:      %s\n", location.ID)
+		fmt.Printf("Name:             %s\n", location.Name)
+		fmt.Printf("Active:           %t\n", location.Active)
+		fmt.Printf("\n--- Address ---\n")
+		fmt.Printf("Address 1:        %s\n", location.Address1)
+		if location.Address2 != "" {
+			fmt.Printf("Address 2:        %s\n", location.Address2)
+		}
+		fmt.Printf("City:             %s\n", location.City)
+		if location.Province != "" {
+			fmt.Printf("Province/State:   %s\n", location.Province)
+		}
+		fmt.Printf("Country:          %s\n", location.Country)
+		if location.ZipCode != "" {
+			fmt.Printf("ZIP Code:         %s\n", location.ZipCode)
+		}
+		fmt.Printf("\n--- Contact ---\n")
+		if location.Phone != "" {
+			fmt.Printf("Phone:            %s\n", location.Phone)
+		}
+		if location.Email != "" {
+			fmt.Printf("Email:            %s\n", location.Email)
+		}
+		if location.Instructions != "" {
+			fmt.Printf("\n--- Instructions ---\n")
+			fmt.Printf("%s\n", location.Instructions)
+		}
+		if location.LocationID != "" {
+			fmt.Printf("\nLinked Location:  %s\n", location.LocationID)
+		}
+		fmt.Printf("\nCreated:          %s\n", location.CreatedAt.Format(time.RFC3339))
+		fmt.Printf("Updated:          %s\n", location.UpdatedAt.Format(time.RFC3339))
+
+		if len(location.Hours) > 0 {
+			fmt.Printf("\n--- Operating Hours ---\n")
+			for _, h := range location.Hours {
+				if h.Closed {
+					fmt.Printf("  %s: Closed\n", h.Day)
+				} else {
+					fmt.Printf("  %s: %s - %s\n", h.Day, h.OpenTime, h.CloseTime)
+				}
+			}
+		}
+		return nil
+	},
+}
+
+var pickupCreateCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create a pickup location",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		name, _ := cmd.Flags().GetString("name")
+		address1, _ := cmd.Flags().GetString("address1")
+		address2, _ := cmd.Flags().GetString("address2")
+		city, _ := cmd.Flags().GetString("city")
+		province, _ := cmd.Flags().GetString("province")
+		country, _ := cmd.Flags().GetString("country")
+		zipCode, _ := cmd.Flags().GetString("zip-code")
+		phone, _ := cmd.Flags().GetString("phone")
+		email, _ := cmd.Flags().GetString("email")
+		instructions, _ := cmd.Flags().GetString("instructions")
+		active, _ := cmd.Flags().GetBool("active")
+		locationID, _ := cmd.Flags().GetString("location-id")
+
+		req := &api.PickupCreateRequest{
+			Name:         name,
+			Address1:     address1,
+			Address2:     address2,
+			City:         city,
+			Province:     province,
+			Country:      country,
+			ZipCode:      zipCode,
+			Phone:        phone,
+			Email:        email,
+			Instructions: instructions,
+			Active:       active,
+			LocationID:   locationID,
+		}
+
+		location, err := client.CreatePickupLocation(cmd.Context(), req)
+		if err != nil {
+			return fmt.Errorf("failed to create pickup location: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(location)
+		}
+
+		fmt.Printf("Created pickup location %s: %s\n", location.ID, location.Name)
+		return nil
+	},
+}
+
+var pickupDeleteCmd = &cobra.Command{
+	Use:   "delete <id>",
+	Short: "Delete a pickup location",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		yes, _ := cmd.Flags().GetBool("yes")
+		if !yes {
+			fmt.Printf("Delete pickup location %s? [y/N] ", args[0])
+			var confirm string
+			_, _ = fmt.Scanln(&confirm)
+			if confirm != "y" && confirm != "Y" {
+				fmt.Println("Cancelled.")
+				return nil
+			}
+		}
+
+		if err := client.DeletePickupLocation(cmd.Context(), args[0]); err != nil {
+			return fmt.Errorf("failed to delete pickup location: %w", err)
+		}
+
+		fmt.Printf("Pickup location %s deleted.\n", args[0])
+		return nil
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(pickupCmd)
+
+	pickupCmd.AddCommand(pickupListCmd)
+	pickupListCmd.Flags().String("location-id", "", "Filter by inventory location ID")
+	pickupListCmd.Flags().String("active", "", "Filter by active status (true/false)")
+	pickupListCmd.Flags().Int("page", 1, "Page number")
+	pickupListCmd.Flags().Int("page-size", 20, "Results per page")
+
+	pickupCmd.AddCommand(pickupGetCmd)
+
+	pickupCmd.AddCommand(pickupCreateCmd)
+	pickupCreateCmd.Flags().String("name", "", "Location name")
+	pickupCreateCmd.Flags().String("address1", "", "Street address")
+	pickupCreateCmd.Flags().String("address2", "", "Address line 2 (apt, suite, etc)")
+	pickupCreateCmd.Flags().String("city", "", "City")
+	pickupCreateCmd.Flags().String("province", "", "Province or state")
+	pickupCreateCmd.Flags().String("country", "", "Country")
+	pickupCreateCmd.Flags().String("zip-code", "", "ZIP or postal code")
+	pickupCreateCmd.Flags().String("phone", "", "Phone number")
+	pickupCreateCmd.Flags().String("email", "", "Email address")
+	pickupCreateCmd.Flags().String("instructions", "", "Pickup instructions for customers")
+	pickupCreateCmd.Flags().Bool("active", true, "Whether the location is active")
+	pickupCreateCmd.Flags().String("location-id", "", "Linked inventory location ID")
+	_ = pickupCreateCmd.MarkFlagRequired("name")
+	_ = pickupCreateCmd.MarkFlagRequired("address1")
+	_ = pickupCreateCmd.MarkFlagRequired("city")
+	_ = pickupCreateCmd.MarkFlagRequired("country")
+
+	pickupCmd.AddCommand(pickupDeleteCmd)
+}

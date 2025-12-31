@@ -1,0 +1,199 @@
+package cmd
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/spf13/cobra"
+)
+
+var themesCmd = &cobra.Command{
+	Use:   "themes",
+	Short: "Manage themes",
+}
+
+var themesListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List themes",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+		role, _ := cmd.Flags().GetString("role")
+
+		opts := &api.ThemesListOptions{
+			Page:     page,
+			PageSize: pageSize,
+			Role:     role,
+		}
+
+		resp, err := client.ListThemes(cmd.Context(), opts)
+		if err != nil {
+			return fmt.Errorf("failed to list themes: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		headers := []string{"ID", "NAME", "ROLE", "PREVIEWABLE", "PROCESSING", "CREATED"}
+		var rows [][]string
+		for _, t := range resp.Items {
+			previewable := "no"
+			if t.Previewable {
+				previewable = "yes"
+			}
+			processing := "no"
+			if t.Processing {
+				processing = "yes"
+			}
+			rows = append(rows, []string{
+				t.ID,
+				t.Name,
+				t.Role,
+				previewable,
+				processing,
+				t.CreatedAt.Format("2006-01-02"),
+			})
+		}
+
+		formatter.Table(headers, rows)
+		fmt.Printf("\nShowing %d of %d themes\n", len(resp.Items), resp.TotalCount)
+		return nil
+	},
+}
+
+var themesGetCmd = &cobra.Command{
+	Use:   "get <id>",
+	Short: "Get theme details",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		theme, err := client.GetTheme(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to get theme: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(theme)
+		}
+
+		fmt.Printf("Theme ID:    %s\n", theme.ID)
+		fmt.Printf("Name:        %s\n", theme.Name)
+		fmt.Printf("Role:        %s\n", theme.Role)
+		fmt.Printf("Previewable: %t\n", theme.Previewable)
+		fmt.Printf("Processing:  %t\n", theme.Processing)
+		fmt.Printf("Created:     %s\n", theme.CreatedAt.Format(time.RFC3339))
+		fmt.Printf("Updated:     %s\n", theme.UpdatedAt.Format(time.RFC3339))
+		return nil
+	},
+}
+
+var themesCreateCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create a theme",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		name, _ := cmd.Flags().GetString("name")
+		role, _ := cmd.Flags().GetString("role")
+		src, _ := cmd.Flags().GetString("src")
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		req := &api.ThemeCreateRequest{
+			Name: name,
+			Role: role,
+			Src:  src,
+		}
+
+		theme, err := client.CreateTheme(cmd.Context(), req)
+		if err != nil {
+			return fmt.Errorf("failed to create theme: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(theme)
+		}
+
+		fmt.Printf("Created theme %s\n", theme.ID)
+		fmt.Printf("Name: %s\n", theme.Name)
+		fmt.Printf("Role: %s\n", theme.Role)
+
+		return nil
+	},
+}
+
+var themesDeleteCmd = &cobra.Command{
+	Use:   "delete <id>",
+	Short: "Delete a theme",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			fmt.Printf("[DRY-RUN] Would delete theme %s\n", args[0])
+			return nil
+		}
+
+		yes, _ := cmd.Flags().GetBool("yes")
+		if !yes {
+			fmt.Printf("Delete theme %s? [y/N] ", args[0])
+			var confirm string
+			_, _ = fmt.Scanln(&confirm)
+			if confirm != "y" && confirm != "Y" {
+				fmt.Println("Cancelled.")
+				return nil
+			}
+		}
+
+		if err := client.DeleteTheme(cmd.Context(), args[0]); err != nil {
+			return fmt.Errorf("failed to delete theme: %w", err)
+		}
+
+		fmt.Printf("Deleted theme %s\n", args[0])
+		return nil
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(themesCmd)
+
+	themesCmd.AddCommand(themesListCmd)
+	themesListCmd.Flags().Int("page", 1, "Page number")
+	themesListCmd.Flags().Int("page-size", 20, "Results per page")
+	themesListCmd.Flags().String("role", "", "Filter by role (main, mobile, unpublished)")
+
+	themesCmd.AddCommand(themesGetCmd)
+
+	themesCmd.AddCommand(themesCreateCmd)
+	themesCreateCmd.Flags().String("name", "", "Theme name")
+	themesCreateCmd.Flags().String("role", "", "Theme role (main, mobile, unpublished)")
+	themesCreateCmd.Flags().String("src", "", "URL to theme zip file")
+	_ = themesCreateCmd.MarkFlagRequired("name")
+
+	themesCmd.AddCommand(themesDeleteCmd)
+}
