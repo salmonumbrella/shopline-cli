@@ -57,7 +57,7 @@ brews:
     repository:
       owner: salmonumbrella
       name: homebrew-tap
-      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
     directory: Formula
     homepage: "https://github.com/salmonumbrella/shopline-cli"
     description: "CLI for Shopline e-commerce platform"
