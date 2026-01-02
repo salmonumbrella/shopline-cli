@@ -22,3 +22,10 @@ dist/
 # Editor/Tool specific
 .cursor/
 .specstory/
+.private-journal/
+
+# Generated
+man/
+
+# Dev scripts
+scripts/

@@ -52,6 +52,21 @@ release:
   draft: false
   prerelease: auto
 
+brews:
+  - name: shopline-cli
+    repository:
+      owner: salmonumbrella
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    directory: Formula
+    homepage: "https://github.com/salmonumbrella/shopline-cli"
+    description: "CLI for Shopline e-commerce platform"
+    license: "MIT"
+    install: |
+      bin.install "shopline"
+    test: |
+      system "#{bin}/shopline", "--help"
+
 changelog:
   sort: asc
   filters:
