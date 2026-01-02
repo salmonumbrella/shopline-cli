@@ -2,10 +2,6 @@ version: 2
 
 project_name: shopline-cli
 
-before:
-  hooks:
-    - go mod tidy
-
 builds:
   - id: shopline
     main: ./cmd/shopline
