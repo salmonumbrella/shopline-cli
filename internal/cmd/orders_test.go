@@ -658,6 +658,8 @@ func TestOrdersListRunE(t *testing.T) {
 		outputFormat string
 		wantErr      bool
 		wantOutput   string
+		wantHeaders  []string
+		wantJSONID   string
 	}{
 		{
 			name: "successful list text format",
@@ -677,6 +679,7 @@ func TestOrdersListRunE(t *testing.T) {
 			},
 			outputFormat: "text",
 			wantOutput:   "ord_123",
+			wantHeaders:  []string{"ID", "NUMBER", "STATUS", "TOTAL", "CUSTOMER", "CREATED"},
 		},
 		{
 			name: "successful list JSON format",
@@ -696,6 +699,7 @@ func TestOrdersListRunE(t *testing.T) {
 			},
 			outputFormat: "json",
 			wantOutput:   `"id": "ord_456"`,
+			wantJSONID:   "ord_456",
 		},
 		{
 			name:         "API error",
@@ -753,6 +757,27 @@ func TestOrdersListRunE(t *testing.T) {
 			output := buf.String()
 			if tt.wantOutput != "" && !strings.Contains(output, tt.wantOutput) {
 				t.Errorf("output %q should contain %q", output, tt.wantOutput)
+			}
+			if len(tt.wantHeaders) > 0 {
+				firstLine := strings.SplitN(output, "\n", 2)[0]
+				fields := strings.Fields(firstLine)
+				if len(fields) != len(tt.wantHeaders) {
+					t.Fatalf("expected %d headers, got %d: %q", len(tt.wantHeaders), len(fields), firstLine)
+				}
+				for i, header := range tt.wantHeaders {
+					if fields[i] != header {
+						t.Fatalf("header[%d] = %q, want %q (line: %q)", i, fields[i], header, firstLine)
+					}
+				}
+			}
+			if tt.wantJSONID != "" {
+				var resp api.OrdersListResponse
+				if err := json.Unmarshal([]byte(output), &resp); err != nil {
+					t.Fatalf("failed to unmarshal JSON output: %v", err)
+				}
+				if len(resp.Items) == 0 || resp.Items[0].ID != tt.wantJSONID {
+					t.Fatalf("unexpected JSON items: %+v", resp.Items)
+				}
 			}
 		})
 	}
