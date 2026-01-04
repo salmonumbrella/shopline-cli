@@ -77,6 +77,11 @@ shopline orders list
 - `SHOPLINE_STORE` - Default store profile name to use
 - `SHOPLINE_OUTPUT` - Output format: `text` (default) or `json`
 - `SHOPLINE_COLOR` - Color mode: `auto` (default), `always`, or `never`
+- `SHOPLINE_DEBUG` - Enable HTTP request debug logging to stderr
+- `SHOPLINE_RETRY_BASE` - Base backoff delay for network error retries (e.g. `200ms`)
+- `SHOPLINE_RETRY_MAX` - Max backoff delay for network error retries (e.g. `2s`)
+- `SHOPLINE_RETRY_BUDGET` - Total retry budget for network errors (e.g. `5s`, `0` disables)
+- `SHOPLINE_RETRY_JITTER` - Jitter factor (0-1) applied to backoff (e.g. `0.2`)
 - `NO_COLOR` - Set to any value to disable colors (standard convention)
 
 ## Security

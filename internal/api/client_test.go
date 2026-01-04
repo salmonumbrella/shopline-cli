@@ -3,12 +3,19 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
 )
+
+type roundTripperFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripperFunc) RoundTrip(r *http.Request) (*http.Response, error) {
+	return f(r)
+}
 
 func TestClientGet(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -560,13 +567,77 @@ func TestClientResponseDecodeError(t *testing.T) {
 }
 
 func TestClientNetworkError(t *testing.T) {
+	attempts := 0
 	client := NewClient("test-handle", "test-token")
-	// Use an invalid URL to trigger network error
-	client.BaseURL = "http://localhost:1" // Port 1 should never be available
+	client.BaseURL = "http://example.invalid"
+	client.SetUseOpenAPI(false)
+	client.retry = retryConfig{
+		baseDelay: 0,
+		maxDelay:  0,
+		budget:    0,
+		jitter:    0,
+	}
+	client.httpClient.Transport = roundTripperFunc(func(*http.Request) (*http.Response, error) {
+		attempts++
+		return nil, errors.New("network error")
+	})
 
 	err := client.Get(context.Background(), "/test", nil)
 	if err == nil {
 		t.Fatal("Expected network error, got nil")
+	}
+	if attempts != maxRetries {
+		t.Errorf("Expected %d attempts, got %d", maxRetries, attempts)
+	}
+}
+
+func TestClientPostNetworkErrorNoRetry(t *testing.T) {
+	attempts := 0
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = "http://example.invalid"
+	client.SetUseOpenAPI(false)
+	client.retry = retryConfig{
+		baseDelay: 0,
+		maxDelay:  0,
+		budget:    0,
+		jitter:    0,
+	}
+	client.httpClient.Transport = roundTripperFunc(func(*http.Request) (*http.Response, error) {
+		attempts++
+		return nil, errors.New("network error")
+	})
+
+	err := client.Post(context.Background(), "/test", map[string]string{"key": "value"}, nil)
+	if err == nil {
+		t.Fatal("Expected network error, got nil")
+	}
+	if attempts != 1 {
+		t.Errorf("Expected 1 attempt for POST, got %d", attempts)
+	}
+}
+
+func TestClientNetworkErrorRetryBudget(t *testing.T) {
+	attempts := 0
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = "http://example.invalid"
+	client.SetUseOpenAPI(false)
+	client.retry = retryConfig{
+		baseDelay: 100 * time.Millisecond,
+		maxDelay:  100 * time.Millisecond,
+		budget:    time.Nanosecond,
+		jitter:    0,
+	}
+	client.httpClient.Transport = roundTripperFunc(func(*http.Request) (*http.Response, error) {
+		attempts++
+		return nil, errors.New("network error")
+	})
+
+	err := client.Get(context.Background(), "/test", nil)
+	if err == nil {
+		t.Fatal("Expected network error, got nil")
+	}
+	if attempts != 1 {
+		t.Errorf("Expected 1 attempt due to retry budget, got %d", attempts)
 	}
 }
 

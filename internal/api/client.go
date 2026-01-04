@@ -5,13 +5,18 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
+	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
+
+	"github.com/salmonumbrella/shopline-cli/internal/debug"
 )
 
 const (
@@ -20,10 +25,21 @@ const (
 	maxRetries        = 3
 	circuitThreshold  = 5
 	circuitTimeout    = 30 * time.Second
+	retryBaseDelay    = 200 * time.Millisecond
+	retryMaxDelay     = 2 * time.Second
+	retryBudget       = 5 * time.Second
+	retryJitter       = 0.2
 
 	// OpenAPIBaseURL is the base URL for Shopline Open API (token-scoped)
 	OpenAPIBaseURL = "https://open.shopline.io/v1"
 )
+
+type retryConfig struct {
+	baseDelay time.Duration
+	maxDelay  time.Duration
+	budget    time.Duration
+	jitter    float64
+}
 
 // Client is the Shopline API client.
 type Client struct {
@@ -33,6 +49,8 @@ type Client struct {
 	BaseURL     string
 	httpClient  *http.Client
 	useOpenAPI  bool // true for open.shopline.io, false for {handle}.myshopline.com
+	retry       retryConfig
+	debug       *debug.Logger
 
 	mu               sync.RWMutex
 	consecutiveFails int
@@ -63,6 +81,8 @@ func NewOpenAPIClient(accessToken string) *Client {
 		apiVersion:  "v1",
 		BaseURL:     OpenAPIBaseURL,
 		useOpenAPI:  true,
+		retry:       retryConfigFromEnv(),
+		debug:       debugLoggerFromEnv(),
 		httpClient: &http.Client{
 			Transport: transport,
 			Timeout:   httpTimeout,
@@ -88,6 +108,8 @@ func NewAdminAPIClient(handle, accessToken string) *Client {
 		apiVersion:  defaultAPIVersion,
 		BaseURL:     fmt.Sprintf("https://%s.myshopline.com/admin/openapi/%s", handle, defaultAPIVersion),
 		useOpenAPI:  false,
+		retry:       retryConfigFromEnv(),
+		debug:       debugLoggerFromEnv(),
 		httpClient: &http.Client{
 			Transport: transport,
 			Timeout:   httpTimeout,
@@ -136,8 +158,10 @@ func (c *Client) do(ctx context.Context, method, path string, body, result inter
 	// Unlike Shopify, Shopline endpoints work without .json and some fail with it
 	url := c.BaseURL + path
 
+	start := time.Now()
 	var lastErr error
 	for attempt := 0; attempt < maxRetries; attempt++ {
+		attemptStart := time.Now()
 		var bodyReader io.Reader
 		if body != nil {
 			data, err := json.Marshal(body)
@@ -158,11 +182,18 @@ func (c *Client) do(ctx context.Context, method, path string, body, result inter
 		req.Header.Set("X-Shopline-Access-Token", c.accessToken)
 		req.Header.Set("User-Agent", "shopline-cli")
 
+		c.logf("api request method=%s url=%s attempt=%d", method, url, attempt+1)
+
 		resp, err := c.httpClient.Do(req)
 		if err != nil {
 			lastErr = err
-			continue
+			c.logf("api error method=%s url=%s attempt=%d duration=%s err=%v", method, url, attempt+1, time.Since(attemptStart), err)
+			if c.shouldRetryNetworkError(ctx, method, attempt, start, err) {
+				continue
+			}
+			break
 		}
+		c.logf("api response method=%s url=%s status=%d duration=%s", method, url, resp.StatusCode, time.Since(attemptStart))
 
 		// Handle rate limiting
 		// Only retry for safe/idempotent methods to avoid duplicate resources
@@ -172,6 +203,7 @@ func (c *Client) do(ctx context.Context, method, path string, body, result inter
 			isIdempotent := method == http.MethodGet || method == http.MethodHead || method == http.MethodOptions
 			if isIdempotent && attempt < maxRetries-1 {
 				jitter := time.Duration(rand.Intn(1000)) * time.Millisecond
+				c.logf("api rate limited retryAfter=%s", retryAfter)
 				time.Sleep(retryAfter + jitter)
 				continue
 			}
@@ -183,6 +215,7 @@ func (c *Client) do(ctx context.Context, method, path string, body, result inter
 			c.recordFailure()
 			resp.Body.Close() //nolint:errcheck
 			if method == http.MethodGet && attempt < maxRetries-1 {
+				c.logf("api server error status=%d attempt=%d", resp.StatusCode, attempt+1)
 				time.Sleep(time.Second)
 				continue
 			}
@@ -289,4 +322,119 @@ func parseRetryAfter(header string) time.Duration {
 	}
 
 	return time.Second
+}
+
+func (c *Client) logf(format string, args ...interface{}) {
+	if c.debug == nil {
+		return
+	}
+	c.debug.Printf(format, args...)
+}
+
+func (c *Client) shouldRetryNetworkError(ctx context.Context, method string, attempt int, start time.Time, err error) bool {
+	if !isIdempotentMethod(method) || attempt >= maxRetries-1 {
+		return false
+	}
+	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		return false
+	}
+	delay := c.retryDelay(attempt)
+	if !c.withinRetryBudget(start, delay) {
+		c.logf("api retry budget exceeded, skipping retry")
+		return false
+	}
+	if delay > 0 {
+		c.logf("api retrying after network error in %s", delay)
+		time.Sleep(delay)
+	}
+	return true
+}
+
+func (c *Client) retryDelay(attempt int) time.Duration {
+	if c.retry.baseDelay <= 0 {
+		return 0
+	}
+	multiplier := time.Duration(1 << attempt)
+	delay := c.retry.baseDelay * multiplier
+	if c.retry.maxDelay > 0 && delay > c.retry.maxDelay {
+		delay = c.retry.maxDelay
+	}
+	if c.retry.jitter > 0 {
+		jitterRange := c.retry.jitter * float64(delay)
+		jitter := (rand.Float64()*2 - 1) * jitterRange
+		delay = time.Duration(float64(delay) + jitter)
+		if delay < 0 {
+			return 0
+		}
+	}
+	return delay
+}
+
+func (c *Client) withinRetryBudget(start time.Time, delay time.Duration) bool {
+	if c.retry.budget <= 0 {
+		return true
+	}
+	return time.Since(start)+delay <= c.retry.budget
+}
+
+func isIdempotentMethod(method string) bool {
+	switch method {
+	case http.MethodGet, http.MethodHead, http.MethodOptions, http.MethodPut, http.MethodDelete:
+		return true
+	default:
+		return false
+	}
+}
+
+func retryConfigFromEnv() retryConfig {
+	cfg := retryConfig{
+		baseDelay: retryBaseDelay,
+		maxDelay:  retryMaxDelay,
+		budget:    retryBudget,
+		jitter:    retryJitter,
+	}
+	if val := strings.TrimSpace(os.Getenv("SHOPLINE_RETRY_BASE")); val != "" {
+		if d, err := time.ParseDuration(val); err == nil {
+			cfg.baseDelay = d
+		}
+	}
+	if val := strings.TrimSpace(os.Getenv("SHOPLINE_RETRY_MAX")); val != "" {
+		if d, err := time.ParseDuration(val); err == nil {
+			cfg.maxDelay = d
+		}
+	}
+	if val := strings.TrimSpace(os.Getenv("SHOPLINE_RETRY_BUDGET")); val != "" {
+		if d, err := time.ParseDuration(val); err == nil {
+			cfg.budget = d
+		}
+	}
+	if val := strings.TrimSpace(os.Getenv("SHOPLINE_RETRY_JITTER")); val != "" {
+		if f, err := strconv.ParseFloat(val, 64); err == nil {
+			if f < 0 {
+				f = 0
+			}
+			if f > 1 {
+				f = 1
+			}
+			cfg.jitter = f
+		}
+	}
+	return cfg
+}
+
+func debugLoggerFromEnv() *debug.Logger {
+	if envBool("SHOPLINE_DEBUG") {
+		return debug.New(os.Stderr)
+	}
+	return debug.Nop()
+}
+
+func envBool(key string) bool {
+	val := strings.ToLower(strings.TrimSpace(os.Getenv(key)))
+	switch val {
+	case "1", "true", "yes", "on":
+		return true
+	default:
+		return false
+	}
 }
