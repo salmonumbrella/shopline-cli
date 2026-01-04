@@ -340,11 +340,11 @@ func (c *Client) shouldRetryNetworkError(ctx context.Context, method string, att
 	}
 	delay := c.retryDelay(attempt)
 	if !c.withinRetryBudget(start, delay) {
-		c.logf("api retry budget exceeded, skipping retry")
+		c.logf("api retry budget_exceeded=true")
 		return false
 	}
 	if delay > 0 {
-		c.logf("api retrying after network error in %s", delay)
+		c.logf("api retry delay=%s", delay)
 		time.Sleep(delay)
 	}
 	return true
