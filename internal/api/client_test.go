@@ -38,6 +38,23 @@ func TestClientGet(t *testing.T) {
 	}
 }
 
+func TestClientEmptyBodyNoError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	var result map[string]string
+	err := client.Get(context.Background(), "/test", &result)
+	if err != nil {
+		t.Fatalf("Expected no error for empty body, got %v", err)
+	}
+}
+
 func TestClientRateLimitRetry(t *testing.T) {
 	attempts := 0
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -249,6 +266,28 @@ func TestCircuitBreaker_Timeout(t *testing.T) {
 	}
 }
 
+func TestCircuitBreaker_TimeoutResetsCounter(t *testing.T) {
+	client := NewClient("test-handle", "test-token")
+	client.mu.Lock()
+	client.circuitOpen = true
+	client.consecutiveFails = circuitThreshold
+	client.circuitOpenedAt = time.Now().Add(-circuitTimeout - time.Second)
+	client.mu.Unlock()
+
+	if client.isCircuitOpen() {
+		t.Fatal("Expected circuit to be closed after timeout")
+	}
+
+	client.mu.RLock()
+	open := client.circuitOpen
+	fails := client.consecutiveFails
+	client.mu.RUnlock()
+
+	if open || fails != 0 {
+		t.Fatalf("Expected circuit reset, got open=%v fails=%d", open, fails)
+	}
+}
+
 func TestCircuitBreaker_PartialFailuresDoNotOpenCircuit(t *testing.T) {
 	requestCount := 0
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -316,6 +355,14 @@ func TestParseRetryAfterRFC1123(t *testing.T) {
 	// Allow some tolerance for timing
 	if result < 59*time.Second || result > 61*time.Second {
 		t.Errorf("Expected approximately 60s, got %v", result)
+	}
+}
+
+func TestParseRetryAfterRFC1123Past(t *testing.T) {
+	past := time.Now().Add(-10 * time.Second).UTC().Format(time.RFC1123)
+	result := parseRetryAfter(past)
+	if result != 0 {
+		t.Errorf("Expected 0s for past Retry-After, got %v", result)
 	}
 }
 

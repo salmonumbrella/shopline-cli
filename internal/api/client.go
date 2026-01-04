@@ -214,8 +214,10 @@ func (c *Client) do(ctx context.Context, method, path string, body, result inter
 		// Decode successful response
 		if result != nil && resp.StatusCode != http.StatusNoContent {
 			if err := json.NewDecoder(resp.Body).Decode(result); err != nil {
-				resp.Body.Close() //nolint:errcheck
-				return fmt.Errorf("failed to decode response: %w", err)
+				if err != io.EOF {
+					resp.Body.Close() //nolint:errcheck
+					return fmt.Errorf("failed to decode response: %w", err)
+				}
 			}
 		}
 		resp.Body.Close() //nolint:errcheck
@@ -228,17 +230,26 @@ func (c *Client) do(ctx context.Context, method, path string, body, result inter
 
 func (c *Client) isCircuitOpen() bool {
 	c.mu.RLock()
-	defer c.mu.RUnlock()
-
 	if !c.circuitOpen {
+		c.mu.RUnlock()
 		return false
 	}
 
-	if time.Since(c.circuitOpenedAt) > circuitTimeout {
-		return false
+	if time.Since(c.circuitOpenedAt) <= circuitTimeout {
+		c.mu.RUnlock()
+		return true
 	}
 
-	return true
+	c.mu.RUnlock()
+
+	c.mu.Lock()
+	if c.circuitOpen && time.Since(c.circuitOpenedAt) > circuitTimeout {
+		c.circuitOpen = false
+		c.consecutiveFails = 0
+	}
+	c.mu.Unlock()
+
+	return false
 }
 
 func (c *Client) recordFailure() {
@@ -270,7 +281,11 @@ func parseRetryAfter(header string) time.Duration {
 	}
 
 	if t, err := time.Parse(time.RFC1123, header); err == nil {
-		return time.Until(t)
+		until := time.Until(t)
+		if until > 0 {
+			return until
+		}
+		return 0
 	}
 
 	return time.Second
