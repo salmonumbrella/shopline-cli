@@ -35,7 +35,7 @@ type URLBuilder func(handle string) string
 // DefaultURLBuilder returns the production Shopline Open API URL.
 // The handle is not used in the URL since Open API tokens are store-scoped.
 func DefaultURLBuilder(handle string) string {
-	return "https://open.shopline.io/v1/orders.json?per_page=1"
+	return "https://open.shopline.io/v1/orders?per_page=1"
 }
 
 // APICredentialValidator validates credentials by making a test API call.

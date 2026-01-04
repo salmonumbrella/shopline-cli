@@ -657,7 +657,7 @@ func TestRateLimiting_ExpiredAttemptsAreCleared(t *testing.T) {
 func TestDefaultURLBuilder(t *testing.T) {
 	// Open API uses a fixed URL since tokens are store-scoped
 	url := DefaultURLBuilder("my-store")
-	expected := "https://open.shopline.io/v1/orders.json?per_page=1"
+	expected := "https://open.shopline.io/v1/orders?per_page=1"
 	if url != expected {
 		t.Errorf("DefaultURLBuilder returned %q, expected %q", url, expected)
 	}
@@ -665,7 +665,7 @@ func TestDefaultURLBuilder(t *testing.T) {
 
 func TestDefaultURLBuilder_DifferentHandles(t *testing.T) {
 	// Open API uses the same URL regardless of handle since tokens are store-scoped
-	expected := "https://open.shopline.io/v1/orders.json?per_page=1"
+	expected := "https://open.shopline.io/v1/orders?per_page=1"
 	tests := []struct {
 		handle string
 	}{
