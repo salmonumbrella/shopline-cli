@@ -371,8 +371,11 @@ func (c *Client) retryDelay(attempt int) time.Duration {
 }
 
 func (c *Client) withinRetryBudget(start time.Time, delay time.Duration) bool {
-	if c.retry.budget <= 0 {
-		return true
+	if c.retry.budget == 0 {
+		return false // 0 explicitly disables retries
+	}
+	if c.retry.budget < 0 {
+		return true // negative means unlimited
 	}
 	return time.Since(start)+delay <= c.retry.budget
 }

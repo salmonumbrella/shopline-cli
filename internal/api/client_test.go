@@ -579,7 +579,7 @@ func TestClientNetworkError(t *testing.T) {
 	client.retry = retryConfig{
 		baseDelay: 0,
 		maxDelay:  0,
-		budget:    0,
+		budget:    -1, // negative means unlimited retries
 		jitter:    0,
 	}
 	client.httpClient.Transport = roundTripperFunc(func(*http.Request) (*http.Response, error) {
@@ -621,7 +621,7 @@ func TestClientPostNetworkErrorNoRetry(t *testing.T) {
 	}
 }
 
-func TestClientNetworkErrorRetryBudget(t *testing.T) {
+func TestClientNetworkErrorRetryBudgetZeroDisables(t *testing.T) {
 	attempts := 0
 	client := NewClient("test-handle", "test-token")
 	client.BaseURL = "http://example.invalid"
@@ -629,7 +629,7 @@ func TestClientNetworkErrorRetryBudget(t *testing.T) {
 	client.retry = retryConfig{
 		baseDelay: 100 * time.Millisecond,
 		maxDelay:  100 * time.Millisecond,
-		budget:    time.Nanosecond,
+		budget:    0, // 0 explicitly disables retries
 		jitter:    0,
 	}
 	client.httpClient.Transport = roundTripperFunc(func(*http.Request) (*http.Response, error) {
@@ -642,7 +642,32 @@ func TestClientNetworkErrorRetryBudget(t *testing.T) {
 		t.Fatal("Expected network error, got nil")
 	}
 	if attempts != 1 {
-		t.Errorf("Expected 1 attempt due to retry budget, got %d", attempts)
+		t.Errorf("Expected 1 attempt when budget=0 disables retries, got %d", attempts)
+	}
+}
+
+func TestClientNetworkErrorRetryBudgetExhausted(t *testing.T) {
+	attempts := 0
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = "http://example.invalid"
+	client.SetUseOpenAPI(false)
+	client.retry = retryConfig{
+		baseDelay: 100 * time.Millisecond,
+		maxDelay:  100 * time.Millisecond,
+		budget:    time.Nanosecond, // very small budget exhausts immediately
+		jitter:    0,
+	}
+	client.httpClient.Transport = roundTripperFunc(func(*http.Request) (*http.Response, error) {
+		attempts++
+		return nil, errors.New("network error")
+	})
+
+	err := client.Get(context.Background(), "/test", nil)
+	if err == nil {
+		t.Fatal("Expected network error, got nil")
+	}
+	if attempts != 1 {
+		t.Errorf("Expected 1 attempt due to exhausted retry budget, got %d", attempts)
 	}
 }
 
