@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/debug"
+	"github.com/salmonumbrella/shopline-cli/internal/env"
 )
 
 const (
@@ -426,18 +427,8 @@ func retryConfigFromEnv() retryConfig {
 }
 
 func debugLoggerFromEnv() *debug.Logger {
-	if envBool("SHOPLINE_DEBUG") {
+	if env.Bool("SHOPLINE_DEBUG") {
 		return debug.New(os.Stderr)
 	}
 	return debug.Nop()
-}
-
-func envBool(key string) bool {
-	val := strings.ToLower(strings.TrimSpace(os.Getenv(key)))
-	switch val {
-	case "1", "true", "yes", "on":
-		return true
-	default:
-		return false
-	}
 }
