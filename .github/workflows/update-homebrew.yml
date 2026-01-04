@@ -1,0 +1,25 @@
+name: Update Homebrew
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update-homebrew:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger homebrew-tap update
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          repository: salmonumbrella/homebrew-tap
+          event-type: update-formula
+          client-payload: |
+            {
+              "formula_name": "shopline-cli",
+              "version": "${{ github.event.release.tag_name }}",
+              "repo": "salmonumbrella/shopline-cli",
+              "binary_name": "shopline",
+              "archive_prefix": "shopline-cli",
+              "description": "CLI for Shopline e-commerce platform"
+            }
