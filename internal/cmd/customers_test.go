@@ -620,3 +620,78 @@ func TestFormatCustomerCreditBalance(t *testing.T) {
 		})
 	}
 }
+
+// TestFormatCustomerSubscriptions tests the formatCustomerSubscriptions function.
+func TestFormatCustomerSubscriptions(t *testing.T) {
+	tests := []struct {
+		name     string
+		customer *api.Customer
+		want     string
+	}{
+		{
+			name:     "nil customer",
+			customer: nil,
+			want:     "N/A",
+		},
+		{
+			name:     "empty subscriptions slice",
+			customer: &api.Customer{Subscriptions: []api.CustomerSubscription{}},
+			want:     "N/A",
+		},
+		{
+			name: "single active subscription",
+			customer: &api.Customer{
+				Subscriptions: []api.CustomerSubscription{
+					{Platform: "email", IsActive: true},
+				},
+			},
+			want: "email=active",
+		},
+		{
+			name: "single inactive subscription",
+			customer: &api.Customer{
+				Subscriptions: []api.CustomerSubscription{
+					{Platform: "sms", IsActive: false},
+				},
+			},
+			want: "sms=inactive",
+		},
+		{
+			name: "mixed active and inactive subscriptions",
+			customer: &api.Customer{
+				Subscriptions: []api.CustomerSubscription{
+					{Platform: "email", IsActive: true},
+					{Platform: "sms", IsActive: false},
+				},
+			},
+			want: "email=active, sms=inactive",
+		},
+		{
+			name: "empty platform name active",
+			customer: &api.Customer{
+				Subscriptions: []api.CustomerSubscription{
+					{Platform: "", IsActive: true},
+				},
+			},
+			want: "active",
+		},
+		{
+			name: "empty platform name inactive",
+			customer: &api.Customer{
+				Subscriptions: []api.CustomerSubscription{
+					{Platform: "", IsActive: false},
+				},
+			},
+			want: "inactive",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := formatCustomerSubscriptions(tt.customer)
+			if got != tt.want {
+				t.Errorf("formatCustomerSubscriptions() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}

@@ -115,7 +115,7 @@ var customersGetCmd = &cobra.Command{
 		fmt.Printf("Name:             %s\n", name)
 		fmt.Printf("Phone:            %s\n", customer.Phone)
 		fmt.Printf("State:            %s\n", customer.State)
-		fmt.Printf("Accepts Marketing:%t\n", customer.AcceptsMarketing)
+		fmt.Printf("Accepts Marketing: %t\n", customer.AcceptsMarketing)
 		fmt.Printf("Credit Balance:   %s\n", formatCustomerCreditBalance(customer))
 		fmt.Printf("Subscriptions:    %s\n", formatCustomerSubscriptions(customer))
 		fmt.Printf("Orders Count:     %d\n", customer.OrdersCount)
