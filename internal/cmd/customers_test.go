@@ -566,3 +566,57 @@ func TestCustomersGetRunEWithJSON(t *testing.T) {
 		t.Errorf("JSON output should contain customer ID, got: %s", output)
 	}
 }
+
+// ptr returns a pointer to the given value.
+func ptr[T any](v T) *T {
+	return &v
+}
+
+// TestFormatCustomerCreditBalance tests the formatCustomerCreditBalance function.
+func TestFormatCustomerCreditBalance(t *testing.T) {
+	tests := []struct {
+		name     string
+		customer *api.Customer
+		want     string
+	}{
+		{
+			name:     "nil customer",
+			customer: nil,
+			want:     "N/A",
+		},
+		{
+			name:     "nil balance",
+			customer: &api.Customer{Currency: "USD"},
+			want:     "N/A",
+		},
+		{
+			name:     "zero balance with currency",
+			customer: &api.Customer{CreditBalance: ptr(0.0), Currency: "USD"},
+			want:     "0.00 USD",
+		},
+		{
+			name:     "positive balance with currency",
+			customer: &api.Customer{CreditBalance: ptr(42.50), Currency: "USD"},
+			want:     "42.50 USD",
+		},
+		{
+			name:     "balance without currency",
+			customer: &api.Customer{CreditBalance: ptr(100.0)},
+			want:     "100.00",
+		},
+		{
+			name:     "negative balance",
+			customer: &api.Customer{CreditBalance: ptr(-50.0), Currency: "USD"},
+			want:     "-50.00 USD",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := formatCustomerCreditBalance(tt.customer)
+			if got != tt.want {
+				t.Errorf("formatCustomerCreditBalance() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
