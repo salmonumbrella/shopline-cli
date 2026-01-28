@@ -9,20 +9,28 @@ import (
 
 // Customer represents a Shopline customer.
 type Customer struct {
-	ID               string    `json:"id"`
-	Email            string    `json:"email"`
-	FirstName        string    `json:"first_name"`
-	LastName         string    `json:"last_name"`
-	Phone            string    `json:"phone"`
-	AcceptsMarketing bool      `json:"accepts_marketing"`
-	OrdersCount      int       `json:"orders_count"`
-	TotalSpent       string    `json:"total_spent"`
-	Currency         string    `json:"currency"`
-	Tags             []string  `json:"tags"`
-	Note             string    `json:"note"`
-	State            string    `json:"state"`
-	CreatedAt        time.Time `json:"created_at"`
-	UpdatedAt        time.Time `json:"updated_at"`
+	ID               string                 `json:"id"`
+	Email            string                 `json:"email"`
+	FirstName        string                 `json:"first_name"`
+	LastName         string                 `json:"last_name"`
+	Phone            string                 `json:"phone"`
+	AcceptsMarketing bool                   `json:"accepts_marketing"`
+	CreditBalance    *float64               `json:"credit_balance,omitempty"`
+	Subscriptions    []CustomerSubscription `json:"subscriptions,omitempty"`
+	OrdersCount      int                    `json:"orders_count"`
+	TotalSpent       string                 `json:"total_spent"`
+	Currency         string                 `json:"currency"`
+	Tags             []string               `json:"tags"`
+	Note             string                 `json:"note"`
+	State            string                 `json:"state"`
+	CreatedAt        time.Time              `json:"created_at"`
+	UpdatedAt        time.Time              `json:"updated_at"`
+}
+
+// CustomerSubscription represents a marketing subscription state for a customer.
+type CustomerSubscription struct {
+	Platform string `json:"platform"`
+	IsActive bool   `json:"is_active"`
 }
 
 // CustomersListOptions contains options for listing customers.

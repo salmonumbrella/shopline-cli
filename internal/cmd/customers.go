@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
@@ -115,6 +116,8 @@ var customersGetCmd = &cobra.Command{
 		fmt.Printf("Phone:            %s\n", customer.Phone)
 		fmt.Printf("State:            %s\n", customer.State)
 		fmt.Printf("Accepts Marketing:%t\n", customer.AcceptsMarketing)
+		fmt.Printf("Credit Balance:   %s\n", formatCustomerCreditBalance(customer))
+		fmt.Printf("Subscriptions:    %s\n", formatCustomerSubscriptions(customer))
 		fmt.Printf("Orders Count:     %d\n", customer.OrdersCount)
 		fmt.Printf("Total Spent:      %s %s\n", customer.TotalSpent, customer.Currency)
 		fmt.Printf("Tags:             %s\n", customer.Tags)
@@ -123,6 +126,36 @@ var customersGetCmd = &cobra.Command{
 		fmt.Printf("Updated:          %s\n", customer.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
+}
+
+func formatCustomerCreditBalance(customer *api.Customer) string {
+	if customer == nil || customer.CreditBalance == nil {
+		return "N/A"
+	}
+	amount := fmt.Sprintf("%.2f", *customer.CreditBalance)
+	if customer.Currency != "" {
+		return amount + " " + customer.Currency
+	}
+	return amount
+}
+
+func formatCustomerSubscriptions(customer *api.Customer) string {
+	if customer == nil || len(customer.Subscriptions) == 0 {
+		return "N/A"
+	}
+	parts := make([]string, 0, len(customer.Subscriptions))
+	for _, sub := range customer.Subscriptions {
+		status := "inactive"
+		if sub.IsActive {
+			status = "active"
+		}
+		if sub.Platform != "" {
+			parts = append(parts, sub.Platform+"="+status)
+		} else {
+			parts = append(parts, status)
+		}
+	}
+	return strings.Join(parts, ", ")
 }
 
 func init() {

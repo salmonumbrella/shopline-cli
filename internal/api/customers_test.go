@@ -53,7 +53,19 @@ func TestCustomersGet(t *testing.T) {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
 		}
 
-		customer := Customer{ID: "cust_123", Email: "alice@example.com", FirstName: "Alice", LastName: "Smith", State: "enabled"}
+		creditBalance := 42.5
+		customer := Customer{
+			ID:            "cust_123",
+			Email:         "alice@example.com",
+			FirstName:     "Alice",
+			LastName:      "Smith",
+			State:         "enabled",
+			CreditBalance: &creditBalance,
+			Subscriptions: []CustomerSubscription{
+				{Platform: "email", IsActive: true},
+				{Platform: "sms", IsActive: false},
+			},
+		}
 		_ = json.NewEncoder(w).Encode(customer)
 	}))
 	defer server.Close()
@@ -69,6 +81,12 @@ func TestCustomersGet(t *testing.T) {
 
 	if customer.ID != "cust_123" {
 		t.Errorf("Unexpected customer ID: %s", customer.ID)
+	}
+	if customer.CreditBalance == nil || *customer.CreditBalance != 42.5 {
+		t.Errorf("Unexpected credit balance: %v", customer.CreditBalance)
+	}
+	if len(customer.Subscriptions) != 2 {
+		t.Errorf("Unexpected subscription count: %d", len(customer.Subscriptions))
 	}
 }
 

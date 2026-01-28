@@ -102,6 +102,7 @@ var webhooksGetCmd = &cobra.Command{
 var webhooksCreateCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create a webhook",
+	Long:  "Create a webhook. The API rejects duplicate webhooks with the same topic and address.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		topic, _ := cmd.Flags().GetString("topic")
 		address, _ := cmd.Flags().GetString("address")
