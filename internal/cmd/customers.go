@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -169,4 +170,11 @@ func init() {
 	customersListCmd.Flags().Int("page-size", 20, "Results per page")
 
 	customersCmd.AddCommand(customersGetCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "customers",
+		Description: "Manage customer accounts",
+		Commands:    []string{"list", "get"},
+		IDPrefix:    "customer",
+	})
 }
