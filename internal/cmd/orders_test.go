@@ -678,8 +678,8 @@ func TestOrdersListRunE(t *testing.T) {
 				TotalCount: 1,
 			},
 			outputFormat: "text",
-			wantOutput:   "ord_123",
-			wantHeaders:  []string{"ID", "NUMBER", "STATUS", "TOTAL", "CUSTOMER", "CREATED"},
+			wantOutput:   "[order:$ord_123]",
+			wantHeaders:  []string{"ORDER", "NUMBER", "STATUS", "TOTAL", "CUSTOMER", "CREATED"},
 		},
 		{
 			name: "successful list JSON format",
@@ -1162,4 +1162,178 @@ func (m *mockStoreListError) List() ([]string, error) {
 
 func (m *mockStoreListError) Get(name string) (*secrets.StoreCredentials, error) {
 	return nil, errors.New("not implemented")
+}
+
+// TestEnrichError tests the enrichError helper function.
+func TestEnrichError(t *testing.T) {
+	tests := []struct {
+		name       string
+		err        error
+		resource   string
+		resourceID string
+		wantNil    bool
+	}{
+		{
+			name:       "nil error returns nil",
+			err:        nil,
+			resource:   "orders",
+			resourceID: "ord_123",
+			wantNil:    true,
+		},
+		{
+			name:       "basic error is enriched",
+			err:        errors.New("something went wrong"),
+			resource:   "orders",
+			resourceID: "ord_456",
+			wantNil:    false,
+		},
+		{
+			name:       "API 404 error gets enriched",
+			err:        &api.APIError{Code: "not_found", Message: "order not found", Status: 404},
+			resource:   "orders",
+			resourceID: "ord_789",
+			wantNil:    false,
+		},
+		{
+			name:       "auth error gets enriched",
+			err:        &api.AuthError{Reason: "token expired"},
+			resource:   "orders",
+			resourceID: "",
+			wantNil:    false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := enrichError(tt.err, tt.resource, tt.resourceID)
+
+			if tt.wantNil {
+				if result != nil {
+					t.Errorf("expected nil, got %v", result)
+				}
+				return
+			}
+
+			if result == nil {
+				t.Error("expected non-nil error, got nil")
+				return
+			}
+
+			// Check that it's a RichError
+			var richErr *api.RichError
+			if !errors.As(result, &richErr) {
+				t.Errorf("expected RichError, got %T", result)
+				return
+			}
+
+			// Verify resource info is set
+			if richErr.Resource != tt.resource {
+				t.Errorf("resource = %q, want %q", richErr.Resource, tt.resource)
+			}
+			if richErr.ResourceID != tt.resourceID {
+				t.Errorf("resourceID = %q, want %q", richErr.ResourceID, tt.resourceID)
+			}
+		})
+	}
+}
+
+// TestHandleError tests the handleError helper function.
+func TestHandleError(t *testing.T) {
+	tests := []struct {
+		name           string
+		err            error
+		resource       string
+		resourceID     string
+		wantSuggestion string
+	}{
+		{
+			name:           "404 error shows suggestions",
+			err:            &api.APIError{Code: "not_found", Message: "order not found", Status: 404},
+			resource:       "orders",
+			resourceID:     "ord_123",
+			wantSuggestion: "Verify the orders ID",
+		},
+		{
+			name:           "auth error shows auth suggestions",
+			err:            &api.AuthError{Reason: "token expired"},
+			resource:       "orders",
+			resourceID:     "",
+			wantSuggestion: "shopline auth login",
+		},
+		{
+			name:           "rate limit error shows retry suggestion",
+			err:            &api.RateLimitError{RetryAfter: 30 * time.Second},
+			resource:       "orders",
+			resourceID:     "",
+			wantSuggestion: "Wait 30 seconds",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Capture stderr output
+			var stderr bytes.Buffer
+			cmd := &cobra.Command{Use: "test"}
+			cmd.SetErr(&stderr)
+
+			result := handleError(cmd, tt.err, tt.resource, tt.resourceID)
+
+			// Verify error was returned
+			if result == nil {
+				t.Error("expected non-nil error, got nil")
+				return
+			}
+
+			// Verify stderr contains suggestion
+			output := stderr.String()
+			if !strings.Contains(output, tt.wantSuggestion) {
+				t.Errorf("stderr output %q should contain %q", output, tt.wantSuggestion)
+			}
+		})
+	}
+}
+
+// TestOrdersGetRichError tests that orders get command produces rich errors.
+func TestOrdersGetRichError(t *testing.T) {
+	mockClient := &mockAPIClient{
+		getOrderErr: &api.APIError{Code: "not_found", Message: "order not found", Status: 404},
+	}
+	cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+	defer cleanup()
+
+	// Capture stderr
+	var stderr bytes.Buffer
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.SetErr(&stderr)
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "text", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+
+	err := ordersGetCmd.RunE(cmd, []string{"ord_nonexistent"})
+
+	// Should return an error
+	if err == nil {
+		t.Error("expected error, got nil")
+		return
+	}
+
+	// Should be a RichError
+	var richErr *api.RichError
+	if !errors.As(err, &richErr) {
+		t.Errorf("expected RichError, got %T", err)
+		return
+	}
+
+	// Should have suggestions
+	if len(richErr.Suggestions) == 0 {
+		t.Error("expected suggestions in RichError")
+	}
+
+	// Stderr should contain formatted error with suggestions
+	output := stderr.String()
+	if !strings.Contains(output, "Suggestions:") {
+		t.Errorf("stderr should contain suggestions, got: %q", output)
+	}
 }

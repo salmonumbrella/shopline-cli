@@ -10,6 +10,7 @@ import (
 	"github.com/salmonumbrella/shopline-cli/internal/api"
 	"github.com/salmonumbrella/shopline-cli/internal/batch"
 	"github.com/salmonumbrella/shopline-cli/internal/outfmt"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/salmonumbrella/shopline-cli/internal/secrets"
 	"github.com/spf13/cobra"
 )
@@ -79,11 +80,11 @@ var ordersListCmd = &cobra.Command{
 			return formatter.JSON(resp)
 		}
 
-		headers := []string{"ID", "NUMBER", "STATUS", "TOTAL", "CUSTOMER", "CREATED"}
+		headers := []string{"ORDER", "NUMBER", "STATUS", "TOTAL", "CUSTOMER", "CREATED"}
 		var rows [][]string
 		for _, o := range resp.Items {
 			rows = append(rows, []string{
-				o.ID,
+				outfmt.FormatID("order", o.ID),
 				o.OrderNumber,
 				o.Status,
 				o.TotalPrice + " " + o.Currency,
@@ -105,12 +106,13 @@ var ordersGetCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := getClient(cmd)
 		if err != nil {
-			return err
+			return handleError(cmd, err, "orders", "")
 		}
 
-		order, err := client.GetOrder(cmd.Context(), args[0])
+		orderID := args[0]
+		order, err := client.GetOrder(cmd.Context(), orderID)
 		if err != nil {
-			return fmt.Errorf("failed to get order: %w", err)
+			return handleError(cmd, err, "orders", orderID)
 		}
 
 		formatter := getFormatter(cmd)
@@ -274,4 +276,11 @@ func init() {
 	ordersCmd.AddCommand(ordersGetCmd)
 	ordersCmd.AddCommand(ordersCancelCmd)
 	ordersCancelCmd.Flags().String("batch", "", "Batch input file (JSON array or NDJSON)")
+
+	schema.Register(schema.Resource{
+		Name:        "orders",
+		Description: "Manage customer orders",
+		Commands:    []string{"list", "get", "cancel"},
+		IDPrefix:    "order",
+	})
 }
