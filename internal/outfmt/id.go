@@ -11,7 +11,7 @@ func FormatID(prefix, id string) string {
 	return fmt.Sprintf("[%s:$%s]", prefix, id)
 }
 
-var idPattern = regexp.MustCompile(`^\[([a-z_]+):\$(.+)\]$`)
+var idPattern = regexp.MustCompile(`^\[([a-zA-Z0-9_-]+):\$(.+)\]$`)
 
 // ParseID extracts prefix and ID from formatted string.
 // Returns ("", "", false) if input doesn't match the format.
