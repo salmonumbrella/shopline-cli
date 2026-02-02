@@ -3,9 +3,11 @@ package secrets
 import (
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"time"
 
 	"github.com/99designs/keyring"
+	"github.com/salmonumbrella/shopline-cli/internal/config"
 )
 
 const (
@@ -70,6 +72,10 @@ type Store struct {
 func NewStore() (*Store, error) {
 	ring, err := keyringOpener(keyring.Config{
 		ServiceName: serviceName,
+		// FileDir is required for the file backend (used when CGO is disabled
+		// and macOS keychain is unavailable). Store in a "keyring" subdirectory
+		// to keep credential files organized separately from other app data.
+		FileDir: filepath.Join(config.DataDir(), "keyring"),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to open keyring: %w", err)
