@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -263,4 +264,11 @@ func init() {
 	paymentsCmd.AddCommand(paymentsRefundCmd)
 	paymentsRefundCmd.Flags().String("amount", "", "Amount to refund (defaults to full amount)")
 	paymentsRefundCmd.Flags().String("reason", "", "Reason for refund")
+
+	schema.Register(schema.Resource{
+		Name:        "payments",
+		Description: "Manage payments",
+		Commands:    []string{"list", "get", "order", "capture", "void", "refund"},
+		IDPrefix:    "payment",
+	})
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -196,4 +197,11 @@ func init() {
 	_ = themesCreateCmd.MarkFlagRequired("name")
 
 	themesCmd.AddCommand(themesDeleteCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "themes",
+		Description: "Manage themes",
+		Commands:    []string{"list", "get", "create", "delete"},
+		IDPrefix:    "theme",
+	})
 }

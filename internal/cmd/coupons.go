@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -303,4 +304,11 @@ func init() {
 
 	couponsCmd.AddCommand(couponsDeleteCmd)
 	couponsDeleteCmd.Flags().Bool("yes", false, "Skip confirmation prompt")
+
+	schema.Register(schema.Resource{
+		Name:        "coupons",
+		Description: "Manage coupons",
+		Commands:    []string{"list", "get", "lookup", "create", "activate", "deactivate", "delete"},
+		IDPrefix:    "coupon",
+	})
 }

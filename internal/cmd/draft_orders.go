@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -214,4 +215,11 @@ func init() {
 	draftOrdersCmd.AddCommand(draftOrdersDeleteCmd)
 	draftOrdersCmd.AddCommand(draftOrdersCompleteCmd)
 	draftOrdersCmd.AddCommand(draftOrdersSendInvoiceCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "draft-orders",
+		Description: "Manage draft orders",
+		Commands:    []string{"list", "get", "delete", "complete", "send-invoice"},
+		IDPrefix:    "draft_order",
+	})
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -244,4 +245,11 @@ func init() {
 	disputesEvidenceCmd.Flags().String("shipping-carrier", "", "Shipping carrier")
 	disputesEvidenceCmd.Flags().String("tracking-number", "", "Shipping tracking number")
 	disputesEvidenceCmd.Flags().String("shipping-date", "", "Shipping date")
+
+	schema.Register(schema.Resource{
+		Name:        "disputes",
+		Description: "Manage payment disputes",
+		Commands:    []string{"list", "get", "submit", "accept", "evidence"},
+		IDPrefix:    "dispute",
+	})
 }

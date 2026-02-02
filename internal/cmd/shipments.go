@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -262,4 +263,11 @@ func init() {
 
 	shipmentsCmd.AddCommand(shipmentsDeleteCmd)
 	shipmentsDeleteCmd.Flags().Bool("yes", false, "Skip confirmation prompt")
+
+	schema.Register(schema.Resource{
+		Name:        "shipments",
+		Description: "Manage shipments",
+		Commands:    []string{"list", "get", "create", "update", "delete"},
+		IDPrefix:    "shipment",
+	})
 }

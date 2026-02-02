@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -119,4 +120,11 @@ func init() {
 	fulfillmentsListCmd.Flags().Int("page-size", 20, "Results per page")
 
 	fulfillmentsCmd.AddCommand(fulfillmentsGetCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "fulfillments",
+		Description: "Manage order fulfillments",
+		Commands:    []string{"list", "get"},
+		IDPrefix:    "fulfillment",
+	})
 }

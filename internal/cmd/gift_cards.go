@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -214,4 +215,11 @@ func init() {
 	_ = giftCardsCreateCmd.MarkFlagRequired("initial-value")
 
 	giftCardsCmd.AddCommand(giftCardsDeleteCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "gift-cards",
+		Description: "Manage gift cards",
+		Commands:    []string{"list", "get", "create", "delete"},
+		IDPrefix:    "gift_card",
+	})
 }

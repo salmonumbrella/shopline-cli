@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -208,4 +209,11 @@ func init() {
 	_ = webhooksCreateCmd.MarkFlagRequired("address")
 
 	webhooksCmd.AddCommand(webhooksDeleteCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "webhooks",
+		Description: "Manage webhook subscriptions",
+		Commands:    []string{"list", "get", "create", "delete"},
+		IDPrefix:    "webhook",
+	})
 }

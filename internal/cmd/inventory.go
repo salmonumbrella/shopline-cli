@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -155,4 +156,11 @@ func init() {
 	inventoryCmd.AddCommand(inventoryAdjustCmd)
 	inventoryAdjustCmd.Flags().Int("delta", 0, "Quantity adjustment (positive or negative)")
 	_ = inventoryAdjustCmd.MarkFlagRequired("delta")
+
+	schema.Register(schema.Resource{
+		Name:        "inventory",
+		Description: "Manage inventory levels",
+		Commands:    []string{"list", "get", "adjust"},
+		IDPrefix:    "inventory",
+	})
 }

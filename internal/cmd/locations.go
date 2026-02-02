@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -204,4 +205,11 @@ func init() {
 	_ = locationsCreateCmd.MarkFlagRequired("country")
 
 	locationsCmd.AddCommand(locationsDeleteCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "locations",
+		Description: "Manage store locations",
+		Commands:    []string{"list", "get", "create", "delete"},
+		IDPrefix:    "location",
+	})
 }
