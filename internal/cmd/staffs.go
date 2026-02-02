@@ -106,57 +106,29 @@ var staffsGetCmd = &cobra.Command{
 
 var staffsInviteCmd = &cobra.Command{
 	Use:   "invite",
-	Short: "Invite a new staff member",
+	Short: "Invite a new staff member (not supported by Shopline API)",
+	Long: `Invite a new staff member.
+
+NOTE: The Shopline Open API does not support inviting staff members.
+Staff must be added manually through the Shopline Admin panel:
+
+  Settings > Staff and Permissions > Add Staff
+
+This command is provided for forward compatibility in case Shopline
+adds this functionality to their API in the future.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		email, _ := cmd.Flags().GetString("email")
-		firstName, _ := cmd.Flags().GetString("first-name")
-		lastName, _ := cmd.Flags().GetString("last-name")
-		permissionsStr, _ := cmd.Flags().GetString("permissions")
 
-		var permissions []string
-		if permissionsStr != "" {
-			permissions = strings.Split(permissionsStr, ",")
-			for i := range permissions {
-				permissions[i] = strings.TrimSpace(permissions[i])
-			}
-		}
+		// The Shopline Open API does not support staff invites.
+		// Return a helpful error message instead of hitting the API.
+		return fmt.Errorf(`staff invite is not supported by the Shopline API
 
-		dryRun, _ := cmd.Flags().GetBool("dry-run")
-		if dryRun {
-			fmt.Printf("[DRY-RUN] Would invite staff member %s\n", email)
-			return nil
-		}
+To add %s as a staff member, use the Shopline Admin panel:
+  1. Go to Settings > Staff and Permissions
+  2. Click "Add Staff"
+  3. Enter the email address and set permissions
 
-		client, err := getClient(cmd)
-		if err != nil {
-			return err
-		}
-
-		req := &api.StaffInviteRequest{
-			Email:       email,
-			FirstName:   firstName,
-			LastName:    lastName,
-			Permissions: permissions,
-		}
-
-		staff, err := client.InviteStaff(cmd.Context(), req)
-		if err != nil {
-			return fmt.Errorf("failed to invite staff: %w", err)
-		}
-
-		formatter := getFormatter(cmd)
-		outputFormat, _ := cmd.Flags().GetString("output")
-
-		if outputFormat == "json" {
-			return formatter.JSON(staff)
-		}
-
-		fmt.Printf("Invited staff member %s\n", staff.ID)
-		fmt.Printf("Email:       %s\n", staff.Email)
-		fmt.Printf("Name:        %s %s\n", staff.FirstName, staff.LastName)
-		fmt.Printf("Permissions: %s\n", strings.Join(staff.Permissions, ", "))
-
-		return nil
+See: https://help.shopline.com/hc/en-001/articles/900004300606`, email)
 	},
 }
 
@@ -261,11 +233,8 @@ func init() {
 	staffsCmd.AddCommand(staffsGetCmd)
 
 	staffsCmd.AddCommand(staffsInviteCmd)
-	staffsInviteCmd.Flags().String("email", "", "Staff email address")
-	staffsInviteCmd.Flags().String("first-name", "", "First name")
-	staffsInviteCmd.Flags().String("last-name", "", "Last name")
-	staffsInviteCmd.Flags().String("permissions", "", "Comma-separated list of permissions")
-	_ = staffsInviteCmd.MarkFlagRequired("email")
+	staffsInviteCmd.Flags().String("email", "", "Staff email address (for error message only)")
+	// Note: Other flags removed since Shopline API doesn't support staff invites
 
 	staffsCmd.AddCommand(staffsUpdateCmd)
 	staffsUpdateCmd.Flags().String("first-name", "", "First name")

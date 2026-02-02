@@ -112,14 +112,13 @@ func TestStaffsDeleteCmdArgs(t *testing.T) {
 }
 
 func TestStaffsInviteCmdFlags(t *testing.T) {
+	// Only email flag is kept for error message context.
+	// Other flags removed since Shopline API doesn't support staff invites.
 	flags := []struct {
 		name         string
 		defaultValue string
 	}{
 		{"email", ""},
-		{"first-name", ""},
-		{"last-name", ""},
-		{"permissions", ""},
 	}
 
 	for _, f := range flags {
@@ -133,6 +132,17 @@ func TestStaffsInviteCmdFlags(t *testing.T) {
 				t.Errorf("expected default %q, got %q", f.defaultValue, flag.DefValue)
 			}
 		})
+	}
+}
+
+func TestStaffsInviteCmdReturnsError(t *testing.T) {
+	// The invite command should always return an error since the API doesn't support it
+	err := staffsInviteCmd.RunE(staffsInviteCmd, []string{})
+	if err == nil {
+		t.Error("expected error, got nil")
+	}
+	if !strings.Contains(err.Error(), "not supported by the Shopline API") {
+		t.Errorf("expected error to mention API not supported, got: %v", err)
 	}
 }
 
@@ -534,140 +544,39 @@ func TestStaffsGetRunEWithJSON(t *testing.T) {
 	}
 }
 
-// TestStaffsInviteRunE tests the staffs invite command with mock API.
-func TestStaffsInviteRunE(t *testing.T) {
+// TestStaffsInviteAlwaysReturnsAPINotSupportedError verifies that invite command
+// always returns an error since the Shopline API doesn't support staff invites.
+func TestStaffsInviteAlwaysReturnsAPINotSupportedError(t *testing.T) {
 	tests := []struct {
-		name        string
-		email       string
-		firstName   string
-		lastName    string
-		permissions string
-		mockResp    *api.Staff
-		mockErr     error
-		wantErr     bool
+		name  string
+		email string
 	}{
 		{
-			name:        "successful invite",
-			email:       "newstaff@example.com",
-			firstName:   "New",
-			lastName:    "Staff",
-			permissions: "orders, products",
-			mockResp: &api.Staff{
-				ID:          "staff_new",
-				Email:       "newstaff@example.com",
-				FirstName:   "New",
-				LastName:    "Staff",
-				Permissions: []string{"orders", "products"},
-			},
+			name:  "with email",
+			email: "newstaff@example.com",
 		},
 		{
-			name:      "invite with minimal data",
-			email:     "minimal@example.com",
-			firstName: "",
-			lastName:  "",
-			mockResp: &api.Staff{
-				ID:    "staff_minimal",
-				Email: "minimal@example.com",
-			},
-		},
-		{
-			name:    "invite API error",
-			email:   "error@example.com",
-			mockErr: errors.New("email already exists"),
-			wantErr: true,
+			name:  "without email",
+			email: "",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockClient := &staffsMockAPIClient{
-				inviteStaffResp: tt.mockResp,
-				inviteStaffErr:  tt.mockErr,
-			}
-			cleanup, _ := setupStaffsMockFactories(mockClient)
-			defer cleanup()
-
 			cmd := newStaffsTestCmd()
 			cmd.Flags().String("email", "", "")
-			cmd.Flags().String("first-name", "", "")
-			cmd.Flags().String("last-name", "", "")
-			cmd.Flags().String("permissions", "", "")
 			_ = cmd.Flags().Set("email", tt.email)
-			if tt.firstName != "" {
-				_ = cmd.Flags().Set("first-name", tt.firstName)
-			}
-			if tt.lastName != "" {
-				_ = cmd.Flags().Set("last-name", tt.lastName)
-			}
-			if tt.permissions != "" {
-				_ = cmd.Flags().Set("permissions", tt.permissions)
-			}
 
 			err := staffsInviteCmd.RunE(cmd, []string{})
 
-			if tt.wantErr {
-				if err == nil {
-					t.Error("expected error, got nil")
-				}
+			if err == nil {
+				t.Error("expected error, got nil")
 				return
 			}
-
-			if err != nil {
-				t.Errorf("unexpected error: %v", err)
+			if !strings.Contains(err.Error(), "not supported by the Shopline API") {
+				t.Errorf("expected 'not supported' error, got: %v", err)
 			}
 		})
-	}
-}
-
-// TestStaffsInviteRunEWithJSON tests JSON output format for invite command.
-func TestStaffsInviteRunEWithJSON(t *testing.T) {
-	mockClient := &staffsMockAPIClient{
-		inviteStaffResp: &api.Staff{
-			ID:        "staff_invited",
-			Email:     "invited@example.com",
-			FirstName: "Invited",
-			LastName:  "User",
-		},
-	}
-	cleanup, buf := setupStaffsMockFactories(mockClient)
-	defer cleanup()
-
-	cmd := newStaffsTestCmd()
-	_ = cmd.Flags().Set("output", "json")
-	cmd.Flags().String("email", "", "")
-	cmd.Flags().String("first-name", "", "")
-	cmd.Flags().String("last-name", "", "")
-	cmd.Flags().String("permissions", "", "")
-	_ = cmd.Flags().Set("email", "invited@example.com")
-
-	err := staffsInviteCmd.RunE(cmd, []string{})
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-
-	output := buf.String()
-	if !strings.Contains(output, "staff_invited") {
-		t.Errorf("JSON output should contain staff ID, got: %s", output)
-	}
-}
-
-// TestStaffsInviteDryRun tests the staffs invite command with dry-run flag.
-func TestStaffsInviteDryRun(t *testing.T) {
-	mockClient := &staffsMockAPIClient{}
-	cleanup, _ := setupStaffsMockFactories(mockClient)
-	defer cleanup()
-
-	cmd := newStaffsTestCmd()
-	cmd.Flags().String("email", "", "")
-	cmd.Flags().String("first-name", "", "")
-	cmd.Flags().String("last-name", "", "")
-	cmd.Flags().String("permissions", "", "")
-	_ = cmd.Flags().Set("email", "dryrun@example.com")
-	_ = cmd.Flags().Set("dry-run", "true")
-
-	err := staffsInviteCmd.RunE(cmd, []string{})
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
 	}
 }
 
@@ -880,34 +789,21 @@ func TestStaffsDeleteDryRun(t *testing.T) {
 	}
 }
 
-// TestStaffsInviteGetClientError verifies invite command error handling when getClient fails.
-func TestStaffsInviteGetClientError(t *testing.T) {
-	origFactory := secretsStoreFactory
-	origEnv := os.Getenv("SHOPLINE_STORE")
-	defer func() {
-		secretsStoreFactory = origFactory
-		_ = os.Setenv("SHOPLINE_STORE", origEnv)
-	}()
-	_ = os.Unsetenv("SHOPLINE_STORE")
-
-	secretsStoreFactory = func() (CredentialStore, error) {
-		return nil, errors.New("keyring error")
-	}
-
+// TestStaffsInviteDoesNotCallGetClient verifies invite command returns API not supported
+// error before even trying to get a client, since the Shopline API doesn't support invites.
+func TestStaffsInviteDoesNotCallGetClient(t *testing.T) {
 	cmd := newTestCmdWithFlags()
 	cmd.Flags().String("email", "", "")
-	cmd.Flags().String("first-name", "", "")
-	cmd.Flags().String("last-name", "", "")
-	cmd.Flags().String("permissions", "", "")
 	_ = cmd.Flags().Set("email", "test@example.com")
 	cmd.AddCommand(staffsInviteCmd)
 
 	err := staffsInviteCmd.RunE(cmd, []string{})
 	if err == nil {
-		t.Error("Expected error when getClient fails")
+		t.Error("Expected error from invite command")
 	}
-	if !strings.Contains(err.Error(), "failed to open credential store") {
-		t.Errorf("Expected 'failed to open credential store' error, got: %v", err)
+	// Should return "not supported" error, not a client error
+	if !strings.Contains(err.Error(), "not supported by the Shopline API") {
+		t.Errorf("Expected 'not supported' error, got: %v", err)
 	}
 }
 
