@@ -30,14 +30,6 @@ type StaffsListOptions struct {
 // StaffsListResponse is the paginated response for staffs.
 type StaffsListResponse = ListResponse[Staff]
 
-// StaffInviteRequest contains the data for inviting a staff member.
-type StaffInviteRequest struct {
-	Email       string   `json:"email"`
-	FirstName   string   `json:"first_name,omitempty"`
-	LastName    string   `json:"last_name,omitempty"`
-	Permissions []string `json:"permissions,omitempty"`
-}
-
 // StaffUpdateRequest contains the data for updating a staff member.
 type StaffUpdateRequest struct {
 	FirstName   string   `json:"first_name,omitempty"`
@@ -71,15 +63,6 @@ func (c *Client) GetStaff(ctx context.Context, id string) (*Staff, error) {
 	}
 	var staff Staff
 	if err := c.Get(ctx, fmt.Sprintf("/staffs/%s", id), &staff); err != nil {
-		return nil, err
-	}
-	return &staff, nil
-}
-
-// InviteStaff sends an invitation to a new staff member.
-func (c *Client) InviteStaff(ctx context.Context, req *StaffInviteRequest) (*Staff, error) {
-	var staff Staff
-	if err := c.Post(ctx, "/staffs/invite", req, &staff); err != nil {
 		return nil, err
 	}
 	return &staff, nil

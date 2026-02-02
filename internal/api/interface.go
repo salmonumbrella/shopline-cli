@@ -284,7 +284,6 @@ type APIClient interface {
 	GetWarehouse(ctx context.Context, id string) (*Warehouse, error)
 	GetWebhook(ctx context.Context, id string) (*Webhook, error)
 	GetWishList(ctx context.Context, id string) (*WishList, error)
-	InviteStaff(ctx context.Context, req *StaffInviteRequest) (*Staff, error)
 	ListAbandonedCheckouts(ctx context.Context, opts *AbandonedCheckoutsListOptions) (*AbandonedCheckoutsListResponse, error)
 	ListAddonProducts(ctx context.Context, opts *AddonProductsListOptions) (*AddonProductsListResponse, error)
 	ListAffiliateCampaigns(ctx context.Context, opts *AffiliateCampaignsListOptions) (*AffiliateCampaignsListResponse, error)

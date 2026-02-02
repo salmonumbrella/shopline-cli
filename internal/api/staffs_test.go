@@ -140,58 +140,6 @@ func TestStaffsGet(t *testing.T) {
 	}
 }
 
-func TestStaffsInvite(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			t.Errorf("Expected POST, got %s", r.Method)
-		}
-		if r.URL.Path != "/staffs/invite" {
-			t.Errorf("Unexpected path: %s", r.URL.Path)
-		}
-
-		var req StaffInviteRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			t.Fatalf("Failed to decode request: %v", err)
-		}
-
-		if req.Email != "newstaff@example.com" {
-			t.Errorf("Unexpected email: %s", req.Email)
-		}
-
-		staff := Staff{
-			ID:          "staff_new",
-			Email:       req.Email,
-			FirstName:   req.FirstName,
-			LastName:    req.LastName,
-			Permissions: req.Permissions,
-		}
-		_ = json.NewEncoder(w).Encode(staff)
-	}))
-	defer server.Close()
-
-	client := NewClient("test", "token")
-	client.BaseURL = server.URL
-	client.SetUseOpenAPI(false)
-
-	req := &StaffInviteRequest{
-		Email:       "newstaff@example.com",
-		FirstName:   "New",
-		LastName:    "Staff",
-		Permissions: []string{"orders"},
-	}
-	staff, err := client.InviteStaff(context.Background(), req)
-	if err != nil {
-		t.Fatalf("InviteStaff failed: %v", err)
-	}
-
-	if staff.ID != "staff_new" {
-		t.Errorf("Unexpected staff ID: %s", staff.ID)
-	}
-	if staff.Email != "newstaff@example.com" {
-		t.Errorf("Unexpected email: %s", staff.Email)
-	}
-}
-
 func TestStaffsUpdate(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPut {

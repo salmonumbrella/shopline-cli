@@ -1149,10 +1149,6 @@ func (m *MockClient) GetWishList(ctx context.Context, id string) (*WishList, err
 	return nil, m.notImplemented("GetWishList")
 }
 
-func (m *MockClient) InviteStaff(ctx context.Context, req *StaffInviteRequest) (*Staff, error) {
-	return nil, m.notImplemented("InviteStaff")
-}
-
 func (m *MockClient) ListAbandonedCheckouts(ctx context.Context, opts *AbandonedCheckoutsListOptions) (*AbandonedCheckoutsListResponse, error) {
 	return nil, m.notImplemented("ListAbandonedCheckouts")
 }

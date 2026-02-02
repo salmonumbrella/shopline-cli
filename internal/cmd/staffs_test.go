@@ -229,8 +229,6 @@ type staffsMockAPIClient struct {
 	listStaffsErr   error
 	getStaffResp    *api.Staff
 	getStaffErr     error
-	inviteStaffResp *api.Staff
-	inviteStaffErr  error
 	updateStaffResp *api.Staff
 	updateStaffErr  error
 	deleteStaffErr  error
@@ -242,10 +240,6 @@ func (m *staffsMockAPIClient) ListStaffs(ctx context.Context, opts *api.StaffsLi
 
 func (m *staffsMockAPIClient) GetStaff(ctx context.Context, id string) (*api.Staff, error) {
 	return m.getStaffResp, m.getStaffErr
-}
-
-func (m *staffsMockAPIClient) InviteStaff(ctx context.Context, req *api.StaffInviteRequest) (*api.Staff, error) {
-	return m.inviteStaffResp, m.inviteStaffErr
 }
 
 func (m *staffsMockAPIClient) UpdateStaff(ctx context.Context, id string, req *api.StaffUpdateRequest) (*api.Staff, error) {
