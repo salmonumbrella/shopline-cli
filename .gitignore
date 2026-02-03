@@ -29,3 +29,8 @@ man/
 
 # Dev scripts
 scripts/
+
+# Planning/temporary files
+breaking_changes_plan/
+digest.txt
+docs/
