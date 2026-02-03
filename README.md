@@ -2,6 +2,8 @@
 
 Shopline in your terminal. Manage orders, products, inventory, customers, fulfillments, shipping, webhooks, and more.
 
+**Built for humans and AI agents alike.** Structured output, rich error messages, and self-documenting commands make this CLI ideal for automation and LLM-driven workflows.
+
 ## Features
 
 - **Authentication** - OAuth flow with secure token storage and automatic refresh
@@ -363,6 +365,64 @@ shopline bulk-operations list
 shopline bulk-operations get <operationId>
 shopline bulk-operations create --query <graphql>
 ```
+
+## Agent-Friendly Design
+
+This CLI is designed for AI agents and automation tools with features that make programmatic interaction reliable and predictable.
+
+### Schema Discovery
+
+Agents can discover available API resources and their operations without guessing:
+
+```bash
+# List all available resources
+shopline schema list
+
+# Get details about a specific resource
+shopline schema get orders
+shopline schema get products
+shopline schema get customers
+```
+
+### Rich Errors with Suggestions
+
+Errors include actionable suggestions for recovery:
+
+```bash
+$ shopline orders get ord_invalid123
+Error: Order not found (404)
+
+Suggestions:
+  • Verify the order ID is correct
+  • Run 'shopline orders list' to see available orders
+  • Check that you're using the correct store profile
+```
+
+### Structured Output
+
+JSON output follows consistent conventions that agents can parse reliably:
+
+- Data goes to stdout, errors and progress to stderr
+- Pagination info included in response metadata
+- Consistent field naming across all resources
+
+```bash
+# Pipe-friendly: only data goes to stdout
+shopline orders list --output json | jq '.items[0]'
+
+# Parse errors programmatically
+shopline orders get invalid 2>&1 | jq -r '.error.suggestions[]'
+```
+
+### Automation Flags
+
+Flags designed for non-interactive use:
+
+- `--yes` — Skip confirmation prompts
+- `--dry-run` — Preview changes without executing
+- `--output json` — Machine-readable output
+- `--query` — Built-in JQ filtering
+- `--limit 0` — Fetch all results (no pagination limit)
 
 ## Output Formats
 
