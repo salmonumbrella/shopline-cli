@@ -41,6 +41,21 @@ checksum:
   name_template: 'checksums.txt'
   algorithm: sha256
 
+brews:
+  - name: shopline-cli
+    repository:
+      owner: salmonumbrella
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    directory: Formula
+    homepage: "https://github.com/salmonumbrella/shopline-cli"
+    description: "CLI for Shopline e-commerce platform"
+    license: "MIT"
+    install: |
+      bin.install "shopline"
+    test: |
+      system "#{bin}/shopline", "--help"
+
 release:
   github:
     owner: salmonumbrella
