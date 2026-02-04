@@ -33,5 +33,6 @@ scripts/
 # Planning/temporary files
 breaking_changes_plan/
 BREAKING_CHANGES_PLAN.md
+PLAN.md
 digest.txt
 docs/
