@@ -34,13 +34,17 @@ var storefrontProductsListCmd = &cobra.Command{
 
 		opts := &api.StorefrontProductsListOptions{
 			Page:        page,
-			PageSize:   pageSize,
-			Collection: collection,
-			Category:   category,
-			Vendor:     vendor,
+			PageSize:    pageSize,
+			Collection:  collection,
+			Category:    category,
+			Vendor:      vendor,
 			ProductType: productType,
-			Tag:        tag,
-			Query:      query,
+			Tag:         tag,
+			Query:       query,
+		}
+		if sortBy, sortOrder := readSortOptions(cmd); sortBy != "" {
+			opts.SortBy = sortBy
+			opts.SortOrder = sortOrder
 		}
 
 		resp, err := client.ListStorefrontProducts(cmd.Context(), opts)

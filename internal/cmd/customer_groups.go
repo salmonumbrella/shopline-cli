@@ -29,6 +29,10 @@ var customerGroupsListCmd = &cobra.Command{
 			Page:     page,
 			PageSize: pageSize,
 		}
+		if sortBy, sortOrder := readSortOptions(cmd); sortBy != "" {
+			opts.SortBy = sortBy
+			opts.SortOrder = sortOrder
+		}
 
 		resp, err := client.ListCustomerGroups(cmd.Context(), opts)
 		if err != nil {

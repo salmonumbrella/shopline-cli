@@ -370,19 +370,37 @@ shopline bulk-operations create --query <graphql>
 
 This CLI is designed for AI agents and automation tools with features that make programmatic interaction reliable and predictable.
 
+For a concise agent workflow guide, see `AGENTS.md`.
+
 ### Schema Discovery
 
 Agents can discover available API resources and their operations without guessing:
 
 ```bash
 # List all available resources
+shopline schema
 shopline schema list
 
 # Get details about a specific resource
 shopline schema get orders
 shopline schema get products
 shopline schema get customers
+
+# JSON introspection for tools/agents
+shopline help --json
+shopline schema --output json
 ```
+
+### Copy/Pasteable IDs
+
+List tables include IDs in a structured format that can be pasted directly into other commands:
+
+```
+[order:$ord_123]
+[product:$prod_456]
+```
+
+The CLI will accept these in positional args and any `--*-id` flags.
 
 ### Rich Errors with Suggestions
 
@@ -422,7 +440,9 @@ Flags designed for non-interactive use:
 - `--dry-run` — Preview changes without executing
 - `--output json` — Machine-readable output
 - `--query` — Built-in JQ filtering
-- `--limit 0` — Fetch all results (no pagination limit)
+- `--limit` — Set page size for list commands (0 uses API defaults)
+- `--sort-by` / `--desc` — Sort list results (where supported)
+- `--from` / `--to` — Date filters on supported list commands
 
 ## Output Formats
 
@@ -432,14 +452,14 @@ Human-readable tables with colors and formatting:
 
 ```bash
 $ shopline orders list
-ORDER_ID                   STATUS      TOTAL       CUSTOMER          CREATED
-order_abc123...            PAID        $125.00     john@example.com  2024-01-15
-order_def456...            PENDING     $89.50      jane@example.com  2024-01-14
+ORDER                      STATUS      TOTAL       CUSTOMER          CREATED
+[order:$ord_abc123]         PAID        $125.00     john@example.com  2024-01-15
+[order:$ord_def456]         PENDING     $89.50      jane@example.com  2024-01-14
 
 $ shopline products list
-PRODUCT_ID                 TITLE              PRICE     INVENTORY   STATUS
-prod_xyz789...             Blue T-Shirt       $29.99    150         ACTIVE
-prod_uvw012...             Running Shoes      $89.00    42          ACTIVE
+ID                         TITLE              PRICE     INVENTORY   STATUS
+[product:$prod_xyz789]     Blue T-Shirt       $29.99    150         ACTIVE
+[product:$prod_uvw012]     Running Shoes      $89.00    42          ACTIVE
 ```
 
 ### JSON
@@ -449,10 +469,16 @@ Machine-readable output:
 ```bash
 $ shopline orders list --output json
 {
-  "orders": [
-    {"id": "order_abc123", "status": "PAID", "total": 125.00},
-    {"id": "order_def456", "status": "PENDING", "total": 89.50}
-  ]
+  "items": [
+    {"id": "ord_abc123", "status": "PAID", "total_price": "125.00", "currency": "USD"},
+    {"id": "ord_def456", "status": "PENDING", "total_price": "89.50", "currency": "USD"}
+  ],
+  "pagination": {
+    "current_page": 1,
+    "per_page": 20,
+    "total_count": 2,
+    "total_pages": 1
+  }
 }
 ```
 

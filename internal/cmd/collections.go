@@ -34,6 +34,10 @@ var collectionsListCmd = &cobra.Command{
 			Title:    title,
 			Handle:   handle,
 		}
+		if sortBy, sortOrder := readSortOptions(cmd); sortBy != "" {
+			opts.SortBy = sortBy
+			opts.SortOrder = sortOrder
+		}
 
 		resp, err := client.ListCollections(cmd.Context(), opts)
 		if err != nil {

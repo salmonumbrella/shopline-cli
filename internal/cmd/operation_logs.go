@@ -29,8 +29,17 @@ var operationLogsListCmd = &cobra.Command{
 		resourceType, _ := cmd.Flags().GetString("resource-type")
 		resourceID, _ := cmd.Flags().GetString("resource-id")
 		userID, _ := cmd.Flags().GetString("user-id")
+		from, _ := cmd.Flags().GetString("from")
+		to, _ := cmd.Flags().GetString("to")
 		since, _ := cmd.Flags().GetString("since")
 		until, _ := cmd.Flags().GetString("until")
+
+		if from == "" {
+			from = since
+		}
+		if to == "" {
+			to = until
+		}
 
 		opts := &api.OperationLogsListOptions{
 			Page:         page,
@@ -41,22 +50,22 @@ var operationLogsListCmd = &cobra.Command{
 			UserID:       userID,
 		}
 
-		if since != "" {
-			t, err := time.Parse(time.RFC3339, since)
+		if from != "" {
+			t, err := time.Parse(time.RFC3339, from)
 			if err != nil {
-				t, err = time.Parse("2006-01-02", since)
+				t, err = time.Parse("2006-01-02", from)
 				if err != nil {
-					return fmt.Errorf("invalid since date format, use RFC3339 or YYYY-MM-DD: %w", err)
+					return fmt.Errorf("invalid from date format, use RFC3339 or YYYY-MM-DD: %w", err)
 				}
 			}
 			opts.StartDate = &t
 		}
-		if until != "" {
-			t, err := time.Parse(time.RFC3339, until)
+		if to != "" {
+			t, err := time.Parse(time.RFC3339, to)
 			if err != nil {
-				t, err = time.Parse("2006-01-02", until)
+				t, err = time.Parse("2006-01-02", to)
 				if err != nil {
-					return fmt.Errorf("invalid until date format, use RFC3339 or YYYY-MM-DD: %w", err)
+					return fmt.Errorf("invalid to date format, use RFC3339 or YYYY-MM-DD: %w", err)
 				}
 			}
 			opts.EndDate = &t
@@ -170,6 +179,8 @@ func init() {
 	operationLogsListCmd.Flags().String("resource-type", "", "Filter by resource type (product, order, customer, etc.)")
 	operationLogsListCmd.Flags().String("resource-id", "", "Filter by resource ID")
 	operationLogsListCmd.Flags().String("user-id", "", "Filter by user ID")
+	operationLogsListCmd.Flags().String("from", "", "Filter by start date (YYYY-MM-DD or RFC3339)")
+	operationLogsListCmd.Flags().String("to", "", "Filter by end date (YYYY-MM-DD or RFC3339)")
 	operationLogsListCmd.Flags().String("since", "", "Filter by start date (YYYY-MM-DD or RFC3339)")
 	operationLogsListCmd.Flags().String("until", "", "Filter by end date (YYYY-MM-DD or RFC3339)")
 

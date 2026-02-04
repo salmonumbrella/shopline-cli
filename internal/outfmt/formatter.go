@@ -27,6 +27,8 @@ type Formatter struct {
 	format Format
 	output *termenv.Output
 	query  string
+	// idPrefix formats the first column as [prefix:$id] when set.
+	idPrefix string
 }
 
 // New creates a new formatter.
@@ -52,6 +54,12 @@ func (f *Formatter) WithQuery(query string) *Formatter {
 	return f
 }
 
+// WithIDPrefix formats the first column as [prefix:$id] for tables.
+func (f *Formatter) WithIDPrefix(prefix string) *Formatter {
+	f.idPrefix = prefix
+	return f
+}
+
 // Table outputs data as a text table.
 func (f *Formatter) Table(headers []string, rows [][]string) {
 	tw := tabwriter.NewWriter(f.w, 0, 0, 2, ' ', 0)
@@ -67,6 +75,11 @@ func (f *Formatter) Table(headers []string, rows [][]string) {
 
 	// Print rows
 	for _, row := range rows {
+		if f.idPrefix != "" && len(row) > 0 {
+			if _, _, ok := ParseID(row[0]); !ok && row[0] != "" {
+				row[0] = FormatID(f.idPrefix, row[0])
+			}
+		}
 		for i, col := range row {
 			if i > 0 {
 				fmt.Fprint(tw, "\t") //nolint:errcheck

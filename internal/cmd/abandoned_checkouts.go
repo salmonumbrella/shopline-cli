@@ -24,6 +24,8 @@ var abandonedCheckoutsListCmd = &cobra.Command{
 
 		status, _ := cmd.Flags().GetString("status")
 		customerID, _ := cmd.Flags().GetString("customer-id")
+		from, _ := cmd.Flags().GetString("from")
+		to, _ := cmd.Flags().GetString("to")
 		page, _ := cmd.Flags().GetInt("page")
 		pageSize, _ := cmd.Flags().GetInt("page-size")
 
@@ -32,6 +34,20 @@ var abandonedCheckoutsListCmd = &cobra.Command{
 			PageSize:   pageSize,
 			Status:     status,
 			CustomerID: customerID,
+		}
+		if from != "" {
+			since, err := parseTimeFlag(from, "from")
+			if err != nil {
+				return err
+			}
+			opts.Since = since
+		}
+		if to != "" {
+			until, err := parseTimeFlag(to, "to")
+			if err != nil {
+				return err
+			}
+			opts.Until = until
 		}
 
 		resp, err := client.ListAbandonedCheckouts(cmd.Context(), opts)
@@ -149,6 +165,8 @@ func init() {
 	abandonedCheckoutsCmd.AddCommand(abandonedCheckoutsListCmd)
 	abandonedCheckoutsListCmd.Flags().String("status", "", "Filter by status")
 	abandonedCheckoutsListCmd.Flags().String("customer-id", "", "Filter by customer ID")
+	abandonedCheckoutsListCmd.Flags().String("from", "", "Filter by created date from (YYYY-MM-DD or RFC3339)")
+	abandonedCheckoutsListCmd.Flags().String("to", "", "Filter by created date to (YYYY-MM-DD or RFC3339)")
 	abandonedCheckoutsListCmd.Flags().Int("page", 1, "Page number")
 	abandonedCheckoutsListCmd.Flags().Int("page-size", 20, "Results per page")
 

@@ -37,6 +37,10 @@ var customersListCmd = &cobra.Command{
 			State:    state,
 			Tags:     tags,
 		}
+		if sortBy, sortOrder := readSortOptions(cmd); sortBy != "" {
+			opts.SortBy = sortBy
+			opts.SortOrder = sortOrder
+		}
 
 		resp, err := client.ListCustomers(cmd.Context(), opts)
 		if err != nil {

@@ -35,6 +35,10 @@ var storefrontPromotionsListCmd = &cobra.Command{
 			Type:         promoType,
 			DiscountType: discountType,
 		}
+		if sortBy, sortOrder := readSortOptions(cmd); sortBy != "" {
+			opts.SortBy = sortBy
+			opts.SortOrder = sortOrder
+		}
 
 		resp, err := client.ListStorefrontPromotions(cmd.Context(), opts)
 		if err != nil {

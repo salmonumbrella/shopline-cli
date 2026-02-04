@@ -42,6 +42,10 @@ var cdpProfilesListCmd = &cobra.Command{
 			Tag:       tag,
 			ChurnRisk: churnRisk,
 		}
+		if sortBy, sortOrder := readSortOptions(cmd); sortBy != "" {
+			opts.SortBy = sortBy
+			opts.SortOrder = sortOrder
+		}
 
 		resp, err := client.ListCDPProfiles(cmd.Context(), opts)
 		if err != nil {
@@ -175,6 +179,10 @@ var cdpEventsListCmd = &cobra.Command{
 			EventName:  eventName,
 			Source:     source,
 		}
+		if sortBy, sortOrder := readSortOptions(cmd); sortBy != "" {
+			opts.SortBy = sortBy
+			opts.SortOrder = sortOrder
+		}
 
 		resp, err := client.ListCDPEvents(cmd.Context(), opts)
 		if err != nil {
@@ -276,6 +284,10 @@ var cdpSegmentsListCmd = &cobra.Command{
 			PageSize: pageSize,
 			Type:     segmentType,
 			Status:   status,
+		}
+		if sortBy, sortOrder := readSortOptions(cmd); sortBy != "" {
+			opts.SortBy = sortBy
+			opts.SortOrder = sortOrder
 		}
 
 		resp, err := client.ListCDPSegments(cmd.Context(), opts)

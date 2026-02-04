@@ -31,6 +31,10 @@ var categoriesListCmd = &cobra.Command{
 			PageSize: pageSize,
 			ParentID: parentID,
 		}
+		if sortBy, sortOrder := readSortOptions(cmd); sortBy != "" {
+			opts.SortBy = sortBy
+			opts.SortOrder = sortOrder
+		}
 
 		resp, err := client.ListCategories(cmd.Context(), opts)
 		if err != nil {

@@ -33,6 +33,10 @@ var storefrontCartsListCmd = &cobra.Command{
 			CustomerID: customerID,
 			Status:     status,
 		}
+		if sortBy, sortOrder := readSortOptions(cmd); sortBy != "" {
+			opts.SortBy = sortBy
+			opts.SortOrder = sortOrder
+		}
 
 		resp, err := client.ListStorefrontCarts(cmd.Context(), opts)
 		if err != nil {

@@ -26,6 +26,8 @@ var returnOrdersListCmd = &cobra.Command{
 		orderID, _ := cmd.Flags().GetString("order-id")
 		customerID, _ := cmd.Flags().GetString("customer-id")
 		returnType, _ := cmd.Flags().GetString("type")
+		from, _ := cmd.Flags().GetString("from")
+		to, _ := cmd.Flags().GetString("to")
 		page, _ := cmd.Flags().GetInt("page")
 		pageSize, _ := cmd.Flags().GetInt("page-size")
 
@@ -36,6 +38,20 @@ var returnOrdersListCmd = &cobra.Command{
 			OrderID:    orderID,
 			CustomerID: customerID,
 			ReturnType: returnType,
+		}
+		if from != "" {
+			since, err := parseTimeFlag(from, "from")
+			if err != nil {
+				return err
+			}
+			opts.Since = since
+		}
+		if to != "" {
+			until, err := parseTimeFlag(to, "to")
+			if err != nil {
+				return err
+			}
+			opts.Until = until
 		}
 
 		resp, err := client.ListReturnOrders(cmd.Context(), opts)
@@ -212,6 +228,8 @@ func init() {
 	returnOrdersListCmd.Flags().String("order-id", "", "Filter by original order ID")
 	returnOrdersListCmd.Flags().String("customer-id", "", "Filter by customer ID")
 	returnOrdersListCmd.Flags().String("type", "", "Filter by return type (return, exchange)")
+	returnOrdersListCmd.Flags().String("from", "", "Filter by created date from (YYYY-MM-DD or RFC3339)")
+	returnOrdersListCmd.Flags().String("to", "", "Filter by created date to (YYYY-MM-DD or RFC3339)")
 	returnOrdersListCmd.Flags().Int("page", 1, "Page number")
 	returnOrdersListCmd.Flags().Int("page-size", 20, "Results per page")
 

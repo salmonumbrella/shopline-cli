@@ -37,6 +37,10 @@ var productsListCmd = &cobra.Command{
 			Vendor:      vendor,
 			ProductType: productType,
 		}
+		if sortBy, sortOrder := readSortOptions(cmd); sortBy != "" {
+			opts.SortBy = sortBy
+			opts.SortOrder = sortOrder
+		}
 
 		resp, err := client.ListProducts(cmd.Context(), opts)
 		if err != nil {

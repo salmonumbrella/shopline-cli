@@ -19,12 +19,36 @@ With a resource name, shows detailed information about that resource.
 Examples:
   shopline schema              # List all resources
   shopline schema orders       # Show orders resource details
-  shopline schema --json       # Output as JSON for programmatic use`,
+  shopline schema list         # Explicit list subcommand
+  shopline schema get orders   # Explicit get subcommand
+  shopline schema --output json`,
 	Args: cobra.MaximumNArgs(1),
 	RunE: runSchema,
 }
 
+var schemaListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List all resources",
+	Args:  cobra.NoArgs,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		formatter := getFormatter(cmd)
+		return listResources(cmd, formatter)
+	},
+}
+
+var schemaGetCmd = &cobra.Command{
+	Use:   "get <resource>",
+	Short: "Show details for a resource",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		formatter := getFormatter(cmd)
+		return showResource(cmd, formatter, args[0])
+	},
+}
+
 func init() {
+	schemaCmd.AddCommand(schemaListCmd)
+	schemaCmd.AddCommand(schemaGetCmd)
 	rootCmd.AddCommand(schemaCmd)
 }
 

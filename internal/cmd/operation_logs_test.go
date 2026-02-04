@@ -371,25 +371,25 @@ func TestOperationLogsListRunE_DateFilters(t *testing.T) {
 			name:    "invalid since date",
 			since:   "not-a-date",
 			wantErr: true,
-			errMsg:  "invalid since date format",
+			errMsg:  "invalid from date format",
 		},
 		{
 			name:    "invalid until date",
 			until:   "also-not-a-date",
 			wantErr: true,
-			errMsg:  "invalid until date format",
+			errMsg:  "invalid to date format",
 		},
 		{
 			name:    "partially valid since date",
 			since:   "2024/01/01",
 			wantErr: true,
-			errMsg:  "invalid since date format",
+			errMsg:  "invalid from date format",
 		},
 		{
 			name:    "partially valid until date",
 			until:   "01-01-2024",
 			wantErr: true,
-			errMsg:  "invalid until date format",
+			errMsg:  "invalid to date format",
 		},
 	}
 

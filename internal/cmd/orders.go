@@ -59,6 +59,8 @@ var ordersListCmd = &cobra.Command{
 		}
 
 		status, _ := cmd.Flags().GetString("status")
+		from, _ := cmd.Flags().GetString("from")
+		to, _ := cmd.Flags().GetString("to")
 		page, _ := cmd.Flags().GetInt("page")
 		pageSize, _ := cmd.Flags().GetInt("page-size")
 
@@ -66,6 +68,24 @@ var ordersListCmd = &cobra.Command{
 			Page:     page,
 			PageSize: pageSize,
 			Status:   status,
+		}
+		if sortBy, sortOrder := readSortOptions(cmd); sortBy != "" {
+			opts.SortBy = sortBy
+			opts.SortOrder = sortOrder
+		}
+		if from != "" {
+			since, err := parseTimeFlag(from, "from")
+			if err != nil {
+				return err
+			}
+			opts.Since = since
+		}
+		if to != "" {
+			until, err := parseTimeFlag(to, "to")
+			if err != nil {
+				return err
+			}
+			opts.Until = until
 		}
 
 		resp, err := client.ListOrders(cmd.Context(), opts)
@@ -259,6 +279,9 @@ func getFormatter(cmd *cobra.Command) *outfmt.Formatter {
 	}
 
 	f := outfmt.New(formatterWriter, format, colorMode)
+	if prefix := idPrefixForCommand(cmd); prefix != "" {
+		f = f.WithIDPrefix(prefix)
+	}
 	if query != "" {
 		f = f.WithQuery(query)
 	}
@@ -270,6 +293,8 @@ func init() {
 
 	ordersCmd.AddCommand(ordersListCmd)
 	ordersListCmd.Flags().String("status", "", "Filter by status")
+	ordersListCmd.Flags().String("from", "", "Filter by created date from (YYYY-MM-DD or RFC3339)")
+	ordersListCmd.Flags().String("to", "", "Filter by created date to (YYYY-MM-DD or RFC3339)")
 	ordersListCmd.Flags().Int("page", 1, "Page number")
 	ordersListCmd.Flags().Int("page-size", 20, "Results per page")
 

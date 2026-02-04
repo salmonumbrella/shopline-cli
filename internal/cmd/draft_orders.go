@@ -25,6 +25,8 @@ var draftOrdersListCmd = &cobra.Command{
 
 		status, _ := cmd.Flags().GetString("status")
 		customerID, _ := cmd.Flags().GetString("customer-id")
+		from, _ := cmd.Flags().GetString("from")
+		to, _ := cmd.Flags().GetString("to")
 		page, _ := cmd.Flags().GetInt("page")
 		pageSize, _ := cmd.Flags().GetInt("page-size")
 
@@ -33,6 +35,20 @@ var draftOrdersListCmd = &cobra.Command{
 			PageSize:   pageSize,
 			Status:     status,
 			CustomerID: customerID,
+		}
+		if from != "" {
+			since, err := parseTimeFlag(from, "from")
+			if err != nil {
+				return err
+			}
+			opts.Since = since
+		}
+		if to != "" {
+			until, err := parseTimeFlag(to, "to")
+			if err != nil {
+				return err
+			}
+			opts.Until = until
 		}
 
 		resp, err := client.ListDraftOrders(cmd.Context(), opts)
@@ -208,6 +224,8 @@ func init() {
 	draftOrdersCmd.AddCommand(draftOrdersListCmd)
 	draftOrdersListCmd.Flags().String("status", "", "Filter by status (open, invoice_sent, completed)")
 	draftOrdersListCmd.Flags().String("customer-id", "", "Filter by customer ID")
+	draftOrdersListCmd.Flags().String("from", "", "Filter by created date from (YYYY-MM-DD or RFC3339)")
+	draftOrdersListCmd.Flags().String("to", "", "Filter by created date to (YYYY-MM-DD or RFC3339)")
 	draftOrdersListCmd.Flags().Int("page", 1, "Page number")
 	draftOrdersListCmd.Flags().Int("page-size", 20, "Results per page")
 

@@ -25,6 +25,8 @@ var orderAttributionListCmd = &cobra.Command{
 		source, _ := cmd.Flags().GetString("source")
 		medium, _ := cmd.Flags().GetString("medium")
 		campaign, _ := cmd.Flags().GetString("campaign")
+		from, _ := cmd.Flags().GetString("from")
+		to, _ := cmd.Flags().GetString("to")
 		page, _ := cmd.Flags().GetInt("page")
 		pageSize, _ := cmd.Flags().GetInt("page-size")
 
@@ -34,6 +36,20 @@ var orderAttributionListCmd = &cobra.Command{
 			Source:   source,
 			Medium:   medium,
 			Campaign: campaign,
+		}
+		if from != "" {
+			since, err := parseTimeFlag(from, "from")
+			if err != nil {
+				return err
+			}
+			opts.Since = since
+		}
+		if to != "" {
+			until, err := parseTimeFlag(to, "to")
+			if err != nil {
+				return err
+			}
+			opts.Until = until
 		}
 
 		resp, err := client.ListOrderAttributions(cmd.Context(), opts)
@@ -146,6 +162,8 @@ func init() {
 	orderAttributionListCmd.Flags().String("source", "", "Filter by source (e.g., google, facebook)")
 	orderAttributionListCmd.Flags().String("medium", "", "Filter by medium (e.g., cpc, organic, social)")
 	orderAttributionListCmd.Flags().String("campaign", "", "Filter by campaign")
+	orderAttributionListCmd.Flags().String("from", "", "Filter by created date from (YYYY-MM-DD or RFC3339)")
+	orderAttributionListCmd.Flags().String("to", "", "Filter by created date to (YYYY-MM-DD or RFC3339)")
 	orderAttributionListCmd.Flags().Int("page", 1, "Page number")
 	orderAttributionListCmd.Flags().Int("page-size", 20, "Results per page")
 

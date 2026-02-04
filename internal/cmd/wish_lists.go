@@ -31,6 +31,10 @@ var wishListsListCmd = &cobra.Command{
 			PageSize:   pageSize,
 			CustomerID: customerID,
 		}
+		if sortBy, sortOrder := readSortOptions(cmd); sortBy != "" {
+			opts.SortBy = sortBy
+			opts.SortOrder = sortOrder
+		}
 
 		resp, err := client.ListWishLists(cmd.Context(), opts)
 		if err != nil {
