@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"encoding/json"
-	"fmt"
 	"sort"
 
 	"github.com/spf13/cobra"
@@ -72,7 +71,7 @@ func buildHelpCommand(cmd *cobra.Command) helpCommand {
 		Use:        cmd.Use,
 		Short:      cmd.Short,
 		Long:       cmd.Long,
-		Aliases:    append([]string{}, cmd.Aliases...),
+		Aliases:    cmd.Aliases,
 		Example:    cmd.Example,
 		Deprecated: cmd.Deprecated,
 	}
@@ -134,6 +133,3 @@ func isFlagRequired(f *pflag.Flag) bool {
 	return vals[0] == "true"
 }
 
-func (h helpCommand) String() string {
-	return fmt.Sprintf("%s: %s", h.Name, h.Use)
-}

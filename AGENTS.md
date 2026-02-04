@@ -1,8 +1,8 @@
 # Shopline CLI Agent Guide
 
 ## Quick Discovery
-1. `shopline schema` or `shopline schema list`
-2. `shopline schema get <resource>`
+1. `shopline schema` or `shopline schema list` (add `--output json` for structured output)
+2. `shopline schema get <resource>` (add `--output json` for structured output)
 3. `shopline help --json`
 
 ## ID Conventions

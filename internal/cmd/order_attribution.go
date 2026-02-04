@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -168,4 +169,11 @@ func init() {
 	orderAttributionListCmd.Flags().Int("page-size", 20, "Results per page")
 
 	orderAttributionCmd.AddCommand(orderAttributionGetCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "order-attribution",
+		Description: "Manage order attribution tracking",
+		Commands:    []string{"list", "get"},
+		IDPrefix:    "attribution",
+	})
 }

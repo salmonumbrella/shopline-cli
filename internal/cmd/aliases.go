@@ -102,6 +102,10 @@ func singularize(name string) string {
 		strings.HasSuffix(name, "ches") || strings.HasSuffix(name, "shes") {
 		return name[:len(name)-2]
 	}
+	// Don't strip trailing "s" from words ending in "us", "ss", or "is"
+	if strings.HasSuffix(name, "us") || strings.HasSuffix(name, "ss") || strings.HasSuffix(name, "is") {
+		return name
+	}
 	if strings.HasSuffix(name, "s") && len(name) > 1 {
 		return name[:len(name)-1]
 	}

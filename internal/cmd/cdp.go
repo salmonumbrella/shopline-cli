@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -401,4 +402,11 @@ func init() {
 	cdpSegmentsListCmd.Flags().Int("page-size", 20, "Results per page")
 
 	cdpSegmentsCmd.AddCommand(cdpSegmentsGetCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "cdp",
+		Description: "Access Customer Data Platform analytics (profiles, events, segments)",
+		Commands:    []string{"profiles list", "profiles get", "events list", "events get", "segments list", "segments get"},
+		IDPrefix:    "cdp",
+	})
 }

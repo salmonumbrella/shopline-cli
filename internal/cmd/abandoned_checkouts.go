@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -172,4 +173,11 @@ func init() {
 
 	abandonedCheckoutsCmd.AddCommand(abandonedCheckoutsGetCmd)
 	abandonedCheckoutsCmd.AddCommand(abandonedCheckoutsSendRecoveryCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "abandoned-checkouts",
+		Description: "Manage abandoned checkouts",
+		Commands:    []string{"list", "get", "send-recovery"},
+		IDPrefix:    "checkout",
+	})
 }

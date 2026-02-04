@@ -51,24 +51,18 @@ var operationLogsListCmd = &cobra.Command{
 		}
 
 		if from != "" {
-			t, err := time.Parse(time.RFC3339, from)
+			t, err := parseTimeFlag(from, "from")
 			if err != nil {
-				t, err = time.Parse("2006-01-02", from)
-				if err != nil {
-					return fmt.Errorf("invalid from date format, use RFC3339 or YYYY-MM-DD: %w", err)
-				}
+				return err
 			}
-			opts.StartDate = &t
+			opts.StartDate = t
 		}
 		if to != "" {
-			t, err := time.Parse(time.RFC3339, to)
+			t, err := parseTimeFlag(to, "to")
 			if err != nil {
-				t, err = time.Parse("2006-01-02", to)
-				if err != nil {
-					return fmt.Errorf("invalid to date format, use RFC3339 or YYYY-MM-DD: %w", err)
-				}
+				return err
 			}
-			opts.EndDate = &t
+			opts.EndDate = t
 		}
 
 		resp, err := client.ListOperationLogs(cmd.Context(), opts)

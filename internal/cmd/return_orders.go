@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -237,4 +238,11 @@ func init() {
 	returnOrdersCmd.AddCommand(returnOrdersCancelCmd)
 	returnOrdersCmd.AddCommand(returnOrdersCompleteCmd)
 	returnOrdersCmd.AddCommand(returnOrdersReceiveCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "return-orders",
+		Description: "Manage return orders",
+		Commands:    []string{"list", "get", "cancel", "complete", "receive"},
+		IDPrefix:    "return",
+	})
 }
