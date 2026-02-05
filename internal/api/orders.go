@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -9,17 +10,52 @@ import (
 
 // Order represents a Shopline order.
 type Order struct {
-	ID            string    `json:"id"`
-	OrderNumber   string    `json:"order_number"`
-	Status        string    `json:"status"`
-	PaymentStatus string    `json:"payment_status"`
-	FulfillStatus string    `json:"fulfill_status"`
-	TotalPrice    string    `json:"total_price"`
-	Currency      string    `json:"currency"`
-	CustomerEmail string    `json:"customer_email"`
-	CustomerName  string    `json:"customer_name"`
-	CreatedAt     time.Time `json:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at"`
+	ID            string `json:"id"`
+	OrderNumber   string `json:"order_number"`
+	Status        string `json:"status"`
+	PaymentStatus string `json:"payment_status"`
+	FulfillStatus string `json:"fulfill_status"`
+	TotalPrice    string `json:"total_price"`
+	Currency      string `json:"currency"`
+	CustomerEmail string `json:"customer_email"`
+	CustomerName  string `json:"customer_name"`
+	CustomerID    string `json:"customer_id,omitempty"`
+	// Customer is populated when the API includes it or when expanded via the CLI.
+	Customer *Customer `json:"customer,omitempty"`
+	// LineItems are typically present on order detail endpoints.
+	LineItems []OrderLineItem `json:"line_items,omitempty"`
+	// Common optional fields returned by the order detail endpoint.
+	Note            string    `json:"note,omitempty"`
+	Tags            []string  `json:"tags,omitempty"`
+	ShippingAddress *Address  `json:"shipping_address,omitempty"`
+	BillingAddress  *Address  `json:"billing_address,omitempty"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
+}
+
+// OrderLineItem represents a line item on an order (read side).
+// Fields vary by endpoint; keep this permissive to avoid losing data.
+type OrderLineItem struct {
+	ID        string `json:"id,omitempty"`
+	ProductID string `json:"product_id,omitempty"`
+	VariantID string `json:"variant_id,omitempty"`
+	SKU       string `json:"sku,omitempty"`
+	Title     string `json:"title,omitempty"`
+	Name      string `json:"name,omitempty"`
+	Vendor    string `json:"vendor,omitempty"`
+	Brand     string `json:"brand,omitempty"`
+	Quantity  int    `json:"quantity,omitempty"`
+
+	// These often vary in shape (number, string, or object). Preserve raw JSON.
+	Price    json.RawMessage `json:"price,omitempty"`
+	Currency string          `json:"currency,omitempty"`
+	Total    json.RawMessage `json:"total,omitempty"`
+	Subtotal json.RawMessage `json:"subtotal,omitempty"`
+	Tax      json.RawMessage `json:"tax,omitempty"`
+	Discount json.RawMessage `json:"discount,omitempty"`
+
+	// Product is populated when expanded via the CLI.
+	Product *Product `json:"product,omitempty"`
 }
 
 // OrdersListOptions contains options for listing orders.

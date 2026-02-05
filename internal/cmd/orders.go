@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
@@ -135,10 +136,60 @@ var ordersGetCmd = &cobra.Command{
 			return handleError(cmd, err, "orders", orderID)
 		}
 
+		// Optional expansion/enrichment (opt-in because it can add API calls).
+		expands, expandErr := cmd.Flags().GetStringSlice("expand")
+		if expandErr == nil && len(expands) > 0 {
+			var expandCustomer, expandProducts bool
+			for _, e := range expands {
+				switch strings.ToLower(strings.TrimSpace(e)) {
+				case "":
+					continue
+				case "customer":
+					expandCustomer = true
+				case "products", "product":
+					expandProducts = true
+				default:
+					return fmt.Errorf("invalid --expand value %q (supported: customer, products)", e)
+				}
+			}
+
+			if expandCustomer && order.Customer == nil && order.CustomerID != "" {
+				c, err := client.GetCustomer(cmd.Context(), order.CustomerID)
+				if err != nil {
+					return fmt.Errorf("failed to expand customer: %w", err)
+				}
+				order.Customer = c
+			}
+
+			if expandProducts && len(order.LineItems) > 0 {
+				cache := map[string]*api.Product{}
+				for i := range order.LineItems {
+					pid := strings.TrimSpace(order.LineItems[i].ProductID)
+					if pid == "" {
+						continue
+					}
+					if p, ok := cache[pid]; ok {
+						order.LineItems[i].Product = p
+						continue
+					}
+					p, err := client.GetProduct(cmd.Context(), pid)
+					if err != nil {
+						return fmt.Errorf("failed to expand products: %w", err)
+					}
+					cache[pid] = p
+					order.LineItems[i].Product = p
+				}
+			}
+		}
+
 		formatter := getFormatter(cmd)
 		outputFormat, _ := cmd.Flags().GetString("output")
 
 		if outputFormat == "json" {
+			// Make jq safer: null line_items is a footgun for `.line_items[]`.
+			if order.LineItems == nil {
+				order.LineItems = []api.OrderLineItem{}
+			}
 			return formatter.JSON(order)
 		}
 
@@ -150,6 +201,34 @@ var ordersGetCmd = &cobra.Command{
 		fmt.Printf("Total:          %s %s\n", order.TotalPrice, order.Currency)
 		fmt.Printf("Customer:       %s <%s>\n", order.CustomerName, order.CustomerEmail)
 		fmt.Printf("Created:        %s\n", order.CreatedAt.Format(time.RFC3339))
+		if len(order.LineItems) > 0 {
+			fmt.Printf("\nLine items:\n")
+			for _, li := range order.LineItems {
+				title := li.Title
+				if title == "" {
+					title = li.Name
+				}
+				vendor := li.Vendor
+				if vendor == "" && li.Product != nil {
+					vendor = li.Product.Vendor
+				}
+				if vendor != "" {
+					fmt.Printf("  %dx %s (%s)\n", li.Quantity, title, vendor)
+				} else {
+					fmt.Printf("  %dx %s\n", li.Quantity, title)
+				}
+			}
+		}
+		if order.Customer != nil {
+			fmt.Printf("\nExpanded customer:\n")
+			fmt.Printf("  ID:    %s\n", order.Customer.ID)
+			if order.Customer.Email != "" {
+				fmt.Printf("  Email: %s\n", order.Customer.Email)
+			}
+			if order.Customer.Phone != "" {
+				fmt.Printf("  Phone: %s\n", order.Customer.Phone)
+			}
+		}
 		return nil
 	},
 }
@@ -272,6 +351,7 @@ func getFormatter(cmd *cobra.Command) *outfmt.Formatter {
 	outputFormat, _ := cmd.Flags().GetString("output")
 	colorMode, _ := cmd.Flags().GetString("color")
 	query, _ := cmd.Flags().GetString("query")
+	itemsOnly, _ := cmd.Flags().GetBool("items-only")
 
 	format := outfmt.FormatText
 	if outputFormat == "json" {
@@ -284,6 +364,9 @@ func getFormatter(cmd *cobra.Command) *outfmt.Formatter {
 	}
 	if query != "" {
 		f = f.WithQuery(query)
+	}
+	if itemsOnly {
+		f = f.WithItemsOnly(true)
 	}
 	return f
 }
@@ -299,6 +382,7 @@ func init() {
 	ordersListCmd.Flags().Int("page-size", 20, "Results per page")
 
 	ordersCmd.AddCommand(ordersGetCmd)
+	ordersGetCmd.Flags().StringSlice("expand", nil, "Expand related resources: customer, products (adds API calls)")
 	ordersCmd.AddCommand(ordersCancelCmd)
 	ordersCancelCmd.Flags().String("batch", "", "Batch input file (JSON array or NDJSON)")
 

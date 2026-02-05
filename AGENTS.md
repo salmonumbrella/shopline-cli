@@ -13,6 +13,7 @@
 ## Output + Filtering
 - Use `--output json` for machine-readable results.
 - Use `--query` for JQ-style filtering on JSON output.
+- List commands return a pagination envelope (`{ items, pagination, ... }`). Use `--items-only` to emit just the `items` array.
 - Data goes to stdout; errors go to stderr.
 
 ## Pagination + Sorting
@@ -47,4 +48,10 @@ shopline products list --sort-by created_at --desc
 
 # Date filters
 shopline orders list --from 2024-01-01 --to 2024-01-31
+
+# JSON list convenience (items only)
+shopline orders list --limit 50 -o json --items-only
+
+# Order detail with expanded customer + product info on line items (extra API calls)
+shopline orders get [order:$ord_123] -o json --expand customer,products
 ```

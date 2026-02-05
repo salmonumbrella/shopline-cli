@@ -106,6 +106,51 @@ func TestWithQuery(t *testing.T) {
 	}
 }
 
+func TestWithItemsOnly(t *testing.T) {
+	var buf bytes.Buffer
+	f := New(&buf, FormatJSON, "never")
+
+	result := f.WithItemsOnly(true)
+	if result != f {
+		t.Error("WithItemsOnly should return the same formatter")
+	}
+	if !f.itemsOnly {
+		t.Error("itemsOnly not set correctly")
+	}
+}
+
+func TestFormatterJSONItemsOnlyUnwrap(t *testing.T) {
+	type resp struct {
+		Items      []map[string]interface{} `json:"items"`
+		Pagination map[string]interface{}   `json:"pagination"`
+	}
+
+	data := &resp{
+		Items: []map[string]interface{}{
+			{"id": "1"},
+			{"id": "2"},
+		},
+		Pagination: map[string]interface{}{"current_page": 1},
+	}
+
+	var buf bytes.Buffer
+	f := New(&buf, FormatJSON, "never").WithItemsOnly(true)
+	if err := f.JSON(data); err != nil {
+		t.Fatalf("JSON() returned error: %v", err)
+	}
+
+	var out []map[string]interface{}
+	if err := json.Unmarshal(buf.Bytes(), &out); err != nil {
+		t.Fatalf("Failed to parse JSON output: %v", err)
+	}
+	if len(out) != 2 {
+		t.Fatalf("Expected 2 items, got %d", len(out))
+	}
+	if out[0]["id"] != "1" {
+		t.Fatalf("Unexpected first id: %v", out[0]["id"])
+	}
+}
+
 func TestFilteredJSON(t *testing.T) {
 	tests := []struct {
 		name     string

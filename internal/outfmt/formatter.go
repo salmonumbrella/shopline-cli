@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"reflect"
 	"text/tabwriter"
 
 	"github.com/itchyny/gojq"
@@ -27,6 +28,8 @@ type Formatter struct {
 	format Format
 	output *termenv.Output
 	query  string
+	// itemsOnly unwraps common list responses (structs with an Items field) to emit only the items array in JSON mode.
+	itemsOnly bool
 	// idPrefix formats the first column as [prefix:$id] when set.
 	idPrefix string
 }
@@ -51,6 +54,12 @@ func New(w io.Writer, format Format, colorMode string) *Formatter {
 // WithQuery sets a JQ query for filtering.
 func (f *Formatter) WithQuery(query string) *Formatter {
 	f.query = query
+	return f
+}
+
+// WithItemsOnly unwraps list responses to emit only the items array for JSON output.
+func (f *Formatter) WithItemsOnly(itemsOnly bool) *Formatter {
+	f.itemsOnly = itemsOnly
 	return f
 }
 
@@ -94,6 +103,11 @@ func (f *Formatter) Table(headers []string, rows [][]string) {
 
 // JSON outputs data as JSON.
 func (f *Formatter) JSON(data interface{}) error {
+	if f.itemsOnly {
+		if unwrapped, ok := unwrapItemsField(data); ok {
+			data = unwrapped
+		}
+	}
 	if f.query != "" {
 		return f.filteredJSON(data)
 	}
@@ -101,6 +115,34 @@ func (f *Formatter) JSON(data interface{}) error {
 	enc := json.NewEncoder(f.w)
 	enc.SetIndent("", "  ")
 	return enc.Encode(data)
+}
+
+func unwrapItemsField(data interface{}) (interface{}, bool) {
+	if data == nil {
+		return nil, false
+	}
+
+	v := reflect.ValueOf(data)
+	if v.Kind() == reflect.Pointer {
+		if v.IsNil() {
+			return data, false
+		}
+		v = v.Elem()
+	}
+
+	if v.Kind() != reflect.Struct {
+		return data, false
+	}
+
+	f := v.FieldByName("Items")
+	if !f.IsValid() {
+		return data, false
+	}
+	if f.Kind() != reflect.Slice && f.Kind() != reflect.Array {
+		return data, false
+	}
+
+	return f.Interface(), true
 }
 
 func (f *Formatter) filteredJSON(data interface{}) error {

@@ -25,6 +25,7 @@ func init() {
 	rootCmd.PersistentFlags().StringP("output", "o", getDefaultOutput(), "Output format: text, json (or set SHOPLINE_OUTPUT)")
 	rootCmd.PersistentFlags().String("color", "auto", "Color mode: auto, always, never")
 	rootCmd.PersistentFlags().String("query", "", "JQ filter for JSON output")
+	rootCmd.PersistentFlags().Bool("items-only", false, "For JSON list output, emit only the items array (no pagination envelope)")
 	rootCmd.PersistentFlags().BoolP("yes", "y", false, "Skip confirmation prompts")
 	rootCmd.PersistentFlags().Int("limit", 0, "Limit number of results (sets page size for list commands)")
 	rootCmd.PersistentFlags().String("sort-by", "", "Field to sort by")
