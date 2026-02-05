@@ -23,7 +23,7 @@ type Order struct {
 	// Customer is populated when the API includes it or when expanded via the CLI.
 	Customer *Customer `json:"customer,omitempty"`
 	// LineItems are typically present on order detail endpoints.
-	LineItems []OrderLineItem `json:"line_items,omitempty"`
+	LineItems []OrderLineItem `json:"line_items"`
 	// Common optional fields returned by the order detail endpoint.
 	Note            string    `json:"note,omitempty"`
 	Tags            []string  `json:"tags,omitempty"`
