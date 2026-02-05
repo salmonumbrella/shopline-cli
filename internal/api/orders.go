@@ -96,9 +96,13 @@ func (o *Order) UnmarshalJSON(data []byte) error {
 				}
 			}
 
-			if title, sku := extractTitleSKUFromItemData(si.ItemData); title != "" {
-				li.Title = title
-				li.SKU = sku
+			if title, sku := extractTitleSKUFromItemData(si.ItemData); title != "" || sku != "" {
+				if title != "" {
+					li.Title = title
+				}
+				if sku != "" {
+					li.SKU = sku
+				}
 			}
 			derived = append(derived, li)
 		}
