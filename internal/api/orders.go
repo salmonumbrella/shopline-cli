@@ -8,7 +8,23 @@ import (
 	"time"
 )
 
-// Order represents a Shopline order.
+// OrderSummary represents the fields returned by list/search endpoints.
+// Use Order for order detail (which may include items and expanded resources).
+type OrderSummary struct {
+	ID            string    `json:"id"`
+	OrderNumber   string    `json:"order_number"`
+	Status        string    `json:"status"`
+	PaymentStatus string    `json:"payment_status"`
+	FulfillStatus string    `json:"fulfill_status"`
+	TotalPrice    string    `json:"total_price"`
+	Currency      string    `json:"currency"`
+	CustomerEmail string    `json:"customer_email"`
+	CustomerName  string    `json:"customer_name"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
+}
+
+// Order represents a Shopline order detail.
 type Order struct {
 	ID            string `json:"id"`
 	OrderNumber   string `json:"order_number"`
@@ -22,6 +38,8 @@ type Order struct {
 	CustomerID    string `json:"customer_id,omitempty"`
 	// Customer is populated when the API includes it or when expanded via the CLI.
 	Customer *Customer `json:"customer,omitempty"`
+	// SubtotalItems is the API-native representation of order items (see docs).
+	SubtotalItems []OrderSubtotalItem `json:"subtotal_items,omitempty"`
 	// LineItems are typically present on order detail endpoints.
 	LineItems []OrderLineItem `json:"line_items"`
 	// Common optional fields returned by the order detail endpoint.
@@ -31,6 +49,141 @@ type Order struct {
 	BillingAddress  *Address  `json:"billing_address,omitempty"`
 	CreatedAt       time.Time `json:"created_at"`
 	UpdatedAt       time.Time `json:"updated_at"`
+}
+
+// UnmarshalJSON preserves normal unmarshaling and derives LineItems from SubtotalItems when needed.
+func (o *Order) UnmarshalJSON(data []byte) error {
+	type Alias Order
+	aux := (*Alias)(o)
+	if err := json.Unmarshal(data, aux); err != nil {
+		return err
+	}
+
+	if o.LineItems == nil {
+		o.LineItems = []OrderLineItem{}
+	}
+
+	// Some Shopline APIs return order items under `subtotal_items` rather than `line_items`.
+	// Derive line_items for CLI convenience.
+	if len(o.LineItems) == 0 && len(o.SubtotalItems) > 0 {
+		derived := make([]OrderLineItem, 0, len(o.SubtotalItems))
+		for _, si := range o.SubtotalItems {
+			li := OrderLineItem{
+				ID:        strings.TrimSpace(si.ID),
+				ProductID: strings.TrimSpace(si.ItemID),
+				Quantity:  si.Quantity,
+			}
+			if si.ItemVariationKey != "" {
+				li.VariantID = strings.TrimSpace(si.ItemVariationKey)
+			} else {
+				li.VariantID = strings.TrimSpace(si.ItemVariationID)
+			}
+
+			if si.ItemPrice != nil {
+				if b, err := json.Marshal(si.ItemPrice); err == nil {
+					li.Price = b
+					li.Currency = si.ItemPrice.CurrencyISO
+				}
+			} else if si.Price != nil {
+				if b, err := json.Marshal(si.Price); err == nil {
+					li.Price = b
+					li.Currency = si.Price.CurrencyISO
+				}
+			}
+			if si.TotalPrice != nil {
+				if b, err := json.Marshal(si.TotalPrice); err == nil {
+					li.Total = b
+				}
+			}
+
+			if title, sku := extractTitleSKUFromItemData(si.ItemData); title != "" {
+				li.Title = title
+				li.SKU = sku
+			}
+			derived = append(derived, li)
+		}
+		o.LineItems = derived
+	}
+
+	return nil
+}
+
+// OrderSubtotalItem represents an order item in the `subtotal_items` array.
+// Shape is based on Shopline docs; keep permissive to avoid losing fields.
+type OrderSubtotalItem struct {
+	ID               string          `json:"id,omitempty"`
+	ItemType         string          `json:"item_type,omitempty"`
+	ItemID           string          `json:"item_id,omitempty"`
+	ItemVariationID  string          `json:"item_variation_id,omitempty"`
+	ItemVariationKey string          `json:"item_variation_key,omitempty"`
+	Quantity         int             `json:"quantity,omitempty"`
+	ItemPrice        *Price          `json:"item_price,omitempty"`
+	Price            *Price          `json:"price,omitempty"`
+	PriceSale        *Price          `json:"price_sale,omitempty"`
+	DiscountedPrice  *Price          `json:"discounted_price,omitempty"`
+	TotalPrice       *Price          `json:"total_price,omitempty"`
+	ItemData         json.RawMessage `json:"item_data,omitempty"`
+	ObjectData       json.RawMessage `json:"object_data,omitempty"`
+}
+
+func extractTitleSKUFromItemData(raw json.RawMessage) (string, string) {
+	if len(raw) == 0 {
+		return "", ""
+	}
+	var m map[string]any
+	if err := json.Unmarshal(raw, &m); err != nil {
+		return "", ""
+	}
+
+	// Common paths seen in Shopline docs.
+	if title := nestedString(m, "variation_data", "title"); title != "" {
+		return title, nestedString(m, "variation_data", "sku")
+	}
+	if title := nestedString(m, "product_data", "title"); title != "" {
+		return title, nestedString(m, "variation_data", "sku")
+	}
+
+	// Translation map fallbacks (e.g. title_translations.en).
+	if title := nestedString(m, "variation_data", "title_translations", "en"); title != "" {
+		return title, nestedString(m, "variation_data", "sku")
+	}
+	if title := nestedString(m, "product_data", "title_translations", "en"); title != "" {
+		return title, nestedString(m, "variation_data", "sku")
+	}
+
+	return "", nestedString(m, "variation_data", "sku")
+}
+
+func nestedString(m map[string]any, path ...string) string {
+	var cur any = m
+	for _, p := range path {
+		obj, ok := cur.(map[string]any)
+		if !ok {
+			return ""
+		}
+		cur, ok = obj[p]
+		if !ok {
+			return ""
+		}
+	}
+	switch v := cur.(type) {
+	case string:
+		return v
+	case map[string]any:
+		// Try a few common translation keys.
+		for _, k := range []string{"en", "en-US", "default"} {
+			if s, ok := v[k].(string); ok {
+				return s
+			}
+		}
+		// As a last resort, return the first string value.
+		for _, vv := range v {
+			if s, ok := vv.(string); ok {
+				return s
+			}
+		}
+	}
+	return ""
 }
 
 // OrderLineItem represents a line item on an order (read side).
@@ -70,7 +223,7 @@ type OrdersListOptions struct {
 }
 
 // OrdersListResponse is the paginated response for orders.
-type OrdersListResponse = ListResponse[Order]
+type OrdersListResponse = ListResponse[OrderSummary]
 
 // ListOrders retrieves a list of orders.
 func (c *Client) ListOrders(ctx context.Context, opts *OrdersListOptions) (*OrdersListResponse, error) {

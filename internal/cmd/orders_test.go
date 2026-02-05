@@ -664,7 +664,7 @@ func TestOrdersListRunE(t *testing.T) {
 		{
 			name: "successful list text format",
 			mockResp: &api.OrdersListResponse{
-				Items: []api.Order{
+				Items: []api.OrderSummary{
 					{
 						ID:            "ord_123",
 						OrderNumber:   "1001",
@@ -684,7 +684,7 @@ func TestOrdersListRunE(t *testing.T) {
 		{
 			name: "successful list JSON format",
 			mockResp: &api.OrdersListResponse{
-				Items: []api.Order{
+				Items: []api.OrderSummary{
 					{
 						ID:            "ord_456",
 						OrderNumber:   "1002",
@@ -710,7 +710,7 @@ func TestOrdersListRunE(t *testing.T) {
 		{
 			name: "empty list",
 			mockResp: &api.OrdersListResponse{
-				Items:      []api.Order{},
+				Items:      []api.OrderSummary{},
 				TotalCount: 0,
 			},
 			outputFormat: "text",

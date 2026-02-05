@@ -18,7 +18,7 @@ func TestOrdersList(t *testing.T) {
 		}
 
 		resp := OrdersListResponse{
-			Items: []Order{
+			Items: []OrderSummary{
 				{ID: "ord_123", Status: "pending", TotalPrice: "99.99"},
 				{ID: "ord_456", Status: "completed", TotalPrice: "149.99"},
 			},
@@ -141,7 +141,7 @@ func TestOrdersListWithOptions(t *testing.T) {
 		}
 
 		resp := OrdersListResponse{
-			Items:      []Order{{ID: "ord_123", Status: "pending"}},
+			Items:      []OrderSummary{{ID: "ord_123", Status: "pending"}},
 			Page:       2,
 			PageSize:   50,
 			TotalCount: 100,
@@ -248,7 +248,7 @@ func TestSearchOrders(t *testing.T) {
 		}
 
 		resp := OrdersListResponse{
-			Items: []Order{
+			Items: []OrderSummary{
 				{ID: "ord_123", Status: "pending", CustomerEmail: "test@example.com"},
 			},
 			Page:       1,
@@ -318,7 +318,7 @@ func TestListArchivedOrders(t *testing.T) {
 		}
 
 		resp := OrdersListResponse{
-			Items: []Order{
+			Items: []OrderSummary{
 				{ID: "ord_archived_1", Status: "archived"},
 				{ID: "ord_archived_2", Status: "archived"},
 			},
