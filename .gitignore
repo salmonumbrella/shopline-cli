@@ -28,12 +28,22 @@ dist/
 man/
 
 # Dev scripts
-scripts/
+scripts/*
+!scripts/download_shopline_openapi_docs.py
+!scripts/extract_shopline_openapi_urls.py
 
 # Planning/temporary files
 breaking_changes_plan/
 BREAKING_CHANGES_PLAN.md
 PLAN.md
 digest.txt
-docs/
+docs/*
+!docs/plan.md
+!docs/shopline-openapi/
+# Keep only lightweight index files in git; keep the mirrored doc corpus local.
+docs/shopline-openapi/*
+!docs/shopline-openapi/README.md
+!docs/shopline-openapi/urls.txt
+!docs/shopline-openapi/urls_endpoints.txt
+!docs/shopline-openapi/urls_non_endpoints.txt
 .goreleaser.yaml.tmp
