@@ -36,3 +36,4 @@ BREAKING_CHANGES_PLAN.md
 PLAN.md
 digest.txt
 docs/
+.goreleaser.yaml.tmp
