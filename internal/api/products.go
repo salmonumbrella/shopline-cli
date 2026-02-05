@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -30,6 +31,43 @@ type Product struct {
 	Currency    string    `json:"currency"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+
+	// OpenAPI fields (preferred). Many endpoints use translations instead of plain strings.
+	TitleTranslations       map[string]string `json:"title_translations,omitempty"`
+	DescriptionTranslations map[string]string `json:"description_translations,omitempty"`
+	Brand                   *string           `json:"brand,omitempty"`
+}
+
+// UnmarshalJSON derives legacy fields (Title/Description) from translation maps when present.
+func (p *Product) UnmarshalJSON(data []byte) error {
+	type Alias Product
+	aux := (*Alias)(p)
+	if err := json.Unmarshal(data, aux); err != nil {
+		return err
+	}
+
+	if p.Title == "" && len(p.TitleTranslations) > 0 {
+		p.Title = pickTranslation(p.TitleTranslations)
+	}
+	if p.Description == "" && len(p.DescriptionTranslations) > 0 {
+		p.Description = pickTranslation(p.DescriptionTranslations)
+	}
+
+	return nil
+}
+
+func pickTranslation(m map[string]string) string {
+	for _, k := range []string{"en", "en-US", "zh-hant", "zh-tw", "zh-cn"} {
+		if v := strings.TrimSpace(m[k]); v != "" {
+			return v
+		}
+	}
+	for _, v := range m {
+		if s := strings.TrimSpace(v); s != "" {
+			return s
+		}
+	}
+	return ""
 }
 
 // ProductsListOptions contains options for listing products.
@@ -82,11 +120,11 @@ func (c *Client) GetProduct(ctx context.Context, id string) (*Product, error) {
 
 // ProductSearchOptions contains options for searching products.
 type ProductSearchOptions struct {
-	Query     string
-	Status    string
-	Vendor    string
-	Page      int
-	PageSize  int
+	Query    string
+	Status   string
+	Vendor   string
+	Page     int
+	PageSize int
 }
 
 // ProductCreateRequest contains the request body for creating a product.
