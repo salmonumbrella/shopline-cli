@@ -61,7 +61,7 @@ var webhooksListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d webhooks\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d webhooks\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -88,13 +88,14 @@ var webhooksGetCmd = &cobra.Command{
 			return formatter.JSON(webhook)
 		}
 
-		fmt.Printf("Webhook ID:   %s\n", webhook.ID)
-		fmt.Printf("Topic:        %s\n", webhook.Topic)
-		fmt.Printf("Address:      %s\n", webhook.Address)
-		fmt.Printf("Format:       %s\n", webhook.Format)
-		fmt.Printf("API Version:  %s\n", webhook.APIVersion)
-		fmt.Printf("Created:      %s\n", webhook.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:      %s\n", webhook.UpdatedAt.Format(time.RFC3339))
+		out := outWriter(cmd)
+		_, _ = fmt.Fprintf(out, "Webhook ID:   %s\n", webhook.ID)
+		_, _ = fmt.Fprintf(out, "Topic:        %s\n", webhook.Topic)
+		_, _ = fmt.Fprintf(out, "Address:      %s\n", webhook.Address)
+		_, _ = fmt.Fprintf(out, "Format:       %s\n", webhook.Format)
+		_, _ = fmt.Fprintf(out, "API Version:  %s\n", webhook.APIVersion)
+		_, _ = fmt.Fprintf(out, "Created:      %s\n", webhook.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(out, "Updated:      %s\n", webhook.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -117,7 +118,7 @@ var webhooksCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create webhook for topic %s at %s\n", topic, address)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create webhook for topic %s at %s\n", topic, address)
 			return nil
 		}
 
@@ -147,10 +148,11 @@ var webhooksCreateCmd = &cobra.Command{
 			return formatter.JSON(webhook)
 		}
 
-		fmt.Printf("Created webhook %s\n", webhook.ID)
-		fmt.Printf("Topic:    %s\n", webhook.Topic)
-		fmt.Printf("Address:  %s\n", webhook.Address)
-		fmt.Printf("Format:   %s\n", webhook.Format)
+		out := outWriter(cmd)
+		_, _ = fmt.Fprintf(out, "Created webhook %s\n", webhook.ID)
+		_, _ = fmt.Fprintf(out, "Topic:    %s\n", webhook.Topic)
+		_, _ = fmt.Fprintf(out, "Address:  %s\n", webhook.Address)
+		_, _ = fmt.Fprintf(out, "Format:   %s\n", webhook.Format)
 
 		return nil
 	},
@@ -181,7 +183,7 @@ var webhooksUpdateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would update webhook %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update webhook %s\n", args[0])
 			return nil
 		}
 
@@ -216,10 +218,11 @@ var webhooksUpdateCmd = &cobra.Command{
 			return formatter.JSON(webhook)
 		}
 
-		fmt.Printf("Updated webhook %s\n", webhook.ID)
-		fmt.Printf("Topic:    %s\n", webhook.Topic)
-		fmt.Printf("Address:  %s\n", webhook.Address)
-		fmt.Printf("Format:   %s\n", webhook.Format)
+		out := outWriter(cmd)
+		_, _ = fmt.Fprintf(out, "Updated webhook %s\n", webhook.ID)
+		_, _ = fmt.Fprintf(out, "Topic:    %s\n", webhook.Topic)
+		_, _ = fmt.Fprintf(out, "Address:  %s\n", webhook.Address)
+		_, _ = fmt.Fprintf(out, "Format:   %s\n", webhook.Format)
 
 		return nil
 	},
@@ -232,7 +235,7 @@ var webhooksDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete webhook %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete webhook %s\n", args[0])
 			return nil
 		}
 
@@ -245,7 +248,7 @@ var webhooksDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete webhook: %w", err)
 		}
 
-		fmt.Printf("Deleted webhook %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted webhook %s\n", args[0])
 		return nil
 	},
 }

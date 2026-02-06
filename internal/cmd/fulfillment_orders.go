@@ -61,7 +61,7 @@ var fulfillmentOrdersListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d fulfillment orders\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d fulfillment orders\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -88,20 +88,21 @@ var fulfillmentOrdersGetCmd = &cobra.Command{
 			return formatter.JSON(fo)
 		}
 
-		fmt.Printf("Fulfillment Order ID: %s\n", fo.ID)
-		fmt.Printf("Order ID:             %s\n", fo.OrderID)
-		fmt.Printf("Status:               %s\n", fo.Status)
-		fmt.Printf("Fulfillment Status:   %s\n", fo.FulfillmentStatus)
-		fmt.Printf("Assigned Location:    %s\n", fo.AssignedLocationID)
-		fmt.Printf("Request Status:       %s\n", fo.RequestStatus)
-		fmt.Printf("Delivery Method:      %s (%s)\n", fo.DeliveryMethod.MethodType, fo.DeliveryMethod.ServiceCode)
-		fmt.Printf("Created:              %s\n", fo.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:              %s\n", fo.UpdatedAt.Format(time.RFC3339))
+		out := outWriter(cmd)
+		_, _ = fmt.Fprintf(out, "Fulfillment Order ID: %s\n", fo.ID)
+		_, _ = fmt.Fprintf(out, "Order ID:             %s\n", fo.OrderID)
+		_, _ = fmt.Fprintf(out, "Status:               %s\n", fo.Status)
+		_, _ = fmt.Fprintf(out, "Fulfillment Status:   %s\n", fo.FulfillmentStatus)
+		_, _ = fmt.Fprintf(out, "Assigned Location:    %s\n", fo.AssignedLocationID)
+		_, _ = fmt.Fprintf(out, "Request Status:       %s\n", fo.RequestStatus)
+		_, _ = fmt.Fprintf(out, "Delivery Method:      %s (%s)\n", fo.DeliveryMethod.MethodType, fo.DeliveryMethod.ServiceCode)
+		_, _ = fmt.Fprintf(out, "Created:              %s\n", fo.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(out, "Updated:              %s\n", fo.UpdatedAt.Format(time.RFC3339))
 
 		if len(fo.LineItems) > 0 {
-			fmt.Printf("\nLine Items (%d):\n", len(fo.LineItems))
+			_, _ = fmt.Fprintf(out, "\nLine Items (%d):\n", len(fo.LineItems))
 			for _, item := range fo.LineItems {
-				fmt.Printf("  - Variant: %s, Qty: %d (Fulfillable: %d, Fulfilled: %d)\n",
+				_, _ = fmt.Fprintf(out, "  - Variant: %s, Qty: %d (Fulfillable: %d, Fulfilled: %d)\n",
 					item.VariantID, item.Quantity, item.FulfillableQuantity, item.FulfilledQuantity)
 			}
 		}
@@ -126,7 +127,7 @@ var fulfillmentOrdersMoveCmd = &cobra.Command{
 			return fmt.Errorf("failed to move fulfillment order: %w", err)
 		}
 
-		fmt.Printf("Moved fulfillment order %s to location %s\n", fo.ID, fo.AssignedLocationID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Moved fulfillment order %s to location %s\n", fo.ID, fo.AssignedLocationID)
 		return nil
 	},
 }
@@ -143,11 +144,11 @@ var fulfillmentOrdersCancelCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Cancel fulfillment order %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Cancel fulfillment order %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -157,7 +158,7 @@ var fulfillmentOrdersCancelCmd = &cobra.Command{
 			return fmt.Errorf("failed to cancel fulfillment order: %w", err)
 		}
 
-		fmt.Printf("Cancelled fulfillment order %s (status: %s)\n", fo.ID, fo.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Cancelled fulfillment order %s (status: %s)\n", fo.ID, fo.Status)
 		return nil
 	},
 }
@@ -174,11 +175,11 @@ var fulfillmentOrdersCloseCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Close fulfillment order %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Close fulfillment order %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -188,7 +189,7 @@ var fulfillmentOrdersCloseCmd = &cobra.Command{
 			return fmt.Errorf("failed to close fulfillment order: %w", err)
 		}
 
-		fmt.Printf("Closed fulfillment order %s (status: %s)\n", fo.ID, fo.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Closed fulfillment order %s (status: %s)\n", fo.ID, fo.Status)
 		return nil
 	},
 }

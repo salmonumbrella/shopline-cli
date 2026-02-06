@@ -12,8 +12,10 @@
 
 ## Output + Filtering
 - Use `--output json` for machine-readable results.
+- Use `--json` as shorthand for `--output json`.
 - Use `--query` (or `--jq`) for JQ-style filtering on JSON output.
 - Use `--fields id,order_number,...` as a shorthand for common projections (builds an internal jq query).
+- On `orders`, `products`, `customers`, `--fields minimal|default|debug` expands to a preset field list.
 - List commands return a pagination envelope (`{ items, pagination, ... }`). Use `--items-only` to emit just the `items` array.
 - Data goes to stdout; errors go to stderr.
 - Avoid `2>&1 | jq ...` unless you *want* stderr mixed into your JSON stream.
@@ -57,6 +59,11 @@ shopline orders list --limit 50 -o json --items-only
 
 # Orders with line items (extra API calls; pulls order details for each list item)
 shopline orders list --limit 20 --desc -o json --items-only --expand details
+
+# Field presets (agent-friendly JSON slices)
+shopline orders list --limit 20 --desc --json --items-only --fields minimal
+shopline products list --limit 20 --desc --json --items-only --fields default
+shopline customers list --limit 20 --desc --json --items-only --fields debug
 
 # Order detail with expanded customer + product info on line items (extra API calls)
 shopline orders get [order:$ord_123] -o json --expand customer,products

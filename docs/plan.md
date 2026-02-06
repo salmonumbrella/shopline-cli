@@ -170,9 +170,9 @@ go run ./cmd/shopline-coverage
 
 ### Phase 5: Everything Else + Polish
 
-- [ ] Channels, staff permissions, conversations, etc.
-- [ ] Agent-friendly improvements (help/schema/fields/expand)
-- [ ] Final coverage report is 100%
+- [x] Agent-friendly improvements: `--json`, `--jq`, `--fields` presets + help JSON compatibility keys
+- [ ] Convert remaining text output to use Cobra writers (remove direct fmt.Printf/Println)
+- [ ] Add CLI command coverage report (docs endpoints -> CLI subcommands), or explicitly declare it out of scope
 
 ## Tracking
 

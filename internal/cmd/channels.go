@@ -61,7 +61,7 @@ var channelsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d channels\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d channels\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -88,16 +88,17 @@ var channelsGetCmd = &cobra.Command{
 			return formatter.JSON(channel)
 		}
 
-		fmt.Printf("Channel ID:        %s\n", channel.ID)
-		fmt.Printf("Name:              %s\n", channel.Name)
-		fmt.Printf("Handle:            %s\n", channel.Handle)
-		fmt.Printf("Type:              %s\n", channel.Type)
-		fmt.Printf("Active:            %t\n", channel.Active)
-		fmt.Printf("Products:          %d\n", channel.ProductCount)
-		fmt.Printf("Collections:       %d\n", channel.CollectionCount)
-		fmt.Printf("Remote Fulfillment: %t\n", channel.SupportsRemoteFulfillment)
-		fmt.Printf("Created:           %s\n", channel.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:           %s\n", channel.UpdatedAt.Format(time.RFC3339))
+		out := outWriter(cmd)
+		_, _ = fmt.Fprintf(out, "Channel ID:        %s\n", channel.ID)
+		_, _ = fmt.Fprintf(out, "Name:              %s\n", channel.Name)
+		_, _ = fmt.Fprintf(out, "Handle:            %s\n", channel.Handle)
+		_, _ = fmt.Fprintf(out, "Type:              %s\n", channel.Type)
+		_, _ = fmt.Fprintf(out, "Active:            %t\n", channel.Active)
+		_, _ = fmt.Fprintf(out, "Products:          %d\n", channel.ProductCount)
+		_, _ = fmt.Fprintf(out, "Collections:       %d\n", channel.CollectionCount)
+		_, _ = fmt.Fprintf(out, "Remote Fulfillment: %t\n", channel.SupportsRemoteFulfillment)
+		_, _ = fmt.Fprintf(out, "Created:           %s\n", channel.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(out, "Updated:           %s\n", channel.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -133,10 +134,11 @@ var channelsCreateCmd = &cobra.Command{
 			return formatter.JSON(channel)
 		}
 
-		fmt.Printf("Created channel %s\n", channel.ID)
-		fmt.Printf("Name:   %s\n", channel.Name)
-		fmt.Printf("Handle: %s\n", channel.Handle)
-		fmt.Printf("Type:   %s\n", channel.Type)
+		out := outWriter(cmd)
+		_, _ = fmt.Fprintf(out, "Created channel %s\n", channel.ID)
+		_, _ = fmt.Fprintf(out, "Name:   %s\n", channel.Name)
+		_, _ = fmt.Fprintf(out, "Handle: %s\n", channel.Handle)
+		_, _ = fmt.Fprintf(out, "Type:   %s\n", channel.Type)
 		return nil
 	},
 }
@@ -153,11 +155,11 @@ var channelsDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete channel %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete channel %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -166,7 +168,7 @@ var channelsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete channel: %w", err)
 		}
 
-		fmt.Printf("Deleted channel %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted channel %s\n", args[0])
 		return nil
 	},
 }
@@ -206,7 +208,7 @@ var channelsProductsCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d products in channel\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d products in channel\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -229,7 +231,7 @@ var channelsPublishCmd = &cobra.Command{
 			return fmt.Errorf("failed to publish product: %w", err)
 		}
 
-		fmt.Printf("Published product %s to channel %s\n", args[1], args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Published product %s to channel %s\n", args[1], args[0])
 		return nil
 	},
 }
@@ -248,7 +250,7 @@ var channelsUnpublishCmd = &cobra.Command{
 			return fmt.Errorf("failed to unpublish product: %w", err)
 		}
 
-		fmt.Printf("Unpublished product %s from channel %s\n", args[1], args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Unpublished product %s from channel %s\n", args[1], args[0])
 		return nil
 	},
 }
