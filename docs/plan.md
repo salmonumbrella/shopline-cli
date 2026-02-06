@@ -10,6 +10,7 @@ This plan is the living checklist for bringing `shopline-cli` to:
 - Shopline Open API reference (mirrored locally via Firecrawl)
   - URL lists: `docs/shopline-openapi/urls_endpoints.txt`, `docs/shopline-openapi/urls_non_endpoints.txt`
   - Local mirror fetch: `scripts/download_shopline_openapi_docs.py`
+    - Important: default now uses `onlyMainContent=false` so endpoint URL + method are present for coverage indexing.
 
 ## Current Status (Snapshot)
 
@@ -44,13 +45,15 @@ Goal: generate a canonical list of documented endpoints and compare it to implem
 
 Tasks:
 
-1. Build an endpoint indexer that reads the mirrored docs markdown and outputs a normalized endpoint catalog.
-   - Output: `docs/coverage/endpoints.json`
-   - Fields: `method`, `path`, `doc_url`, `resource_group`, `operation_id (derived)`, `params`, `request_schema`, `response_schema`
-2. Build a coverage checker that compares `endpoints.json` to:
-   - `internal/api/interface.go` (client coverage)
-   - `internal/cmd/*` (CLI command coverage)
-   - Output: `docs/coverage/report.md`
+1. Build an endpoint indexer that reads the mirrored docs pages and outputs a normalized endpoint catalog.
+   - Implemented: `go run ./cmd/shopline-coverage`
+   - Outputs:
+     - `docs/coverage/openapi_endpoints.json`
+     - `docs/coverage/code_endpoints.json`
+     - `docs/coverage/report.md`
+2. Iterate on doc mirroring until parsing is stable for ~100% of endpoint pages.
+   - Current state: coverage parsing expects "full" scrapes (firecrawl `onlyMainContent=false`).
+3. Extend coverage checker to also account for CLI command coverage (later).
 
 Tests:
 
@@ -122,7 +125,17 @@ Tests:
 
 - [x] Extract doc URLs from reference sidebar HTML
 - [x] Mirror endpoint pages via Firecrawl to plaintext markdown
-- [ ] Add endpoint indexer + coverage report generator
+- [x] Add endpoint indexer + coverage report generator (`cmd/shopline-coverage`)
+
+Run it locally:
+
+```bash
+# Refresh docs mirror (full pages; required for endpoint URL + method parsing)
+./scripts/download_shopline_openapi_docs.py --urls docs/shopline-openapi/urls_endpoints.txt --force
+
+# Generate coverage report
+go run ./cmd/shopline-coverage
+```
 
 ### Phase 1: Orders + Order Items + Metafields (Complete the Core Commerce Loop)
 
@@ -158,6 +171,7 @@ Tests:
 
 We’ll maintain these artifacts:
 
-- `docs/coverage/endpoints.json` (from docs mirror)
+- `docs/coverage/openapi_endpoints.json` (from docs mirror)
+- `docs/coverage/code_endpoints.json` (from code scan)
 - `docs/coverage/report.md` (what’s missing)
 - `docs/coverage/progress.md` (checklist by resource)

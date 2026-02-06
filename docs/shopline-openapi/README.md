@@ -15,8 +15,14 @@ The bulk downloaded corpus is intentionally **not committed** (it’s large and 
 Download endpoint docs as markdown + raw JSON responses:
 
 ```bash
-./scripts/download_shopline_openapi_docs.py --urls docs/shopline-openapi/urls_endpoints.txt --jobs 4
+./scripts/download_shopline_openapi_docs.py --urls docs/shopline-openapi/urls_endpoints.txt
 ```
+
+By default this uses:
+
+- `onlyMainContent=false` (the endpoint URL + method often disappear when `onlyMainContent=true`)
+- `excludeTags=script,style` (prevents huge pages / corrupted cached outputs)
+- automatic fallback to `--max-age 0` when cached scrapes are invalid JSON
 
 Download non-endpoint pages (optional):
 

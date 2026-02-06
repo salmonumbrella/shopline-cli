@@ -1,0 +1,1850 @@
+[
+  {
+    "method": "GET",
+    "path": "/addon_products",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_addon-products-1",
+    "source": "docs/shopline-openapi/pages/reference/get_addon-products-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/addon_products",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_addon-products",
+    "source": "docs/shopline-openapi/pages/reference/post_addon-products.json"
+  },
+  {
+    "method": "GET",
+    "path": "/addon_products/search",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_addon-products-search-1",
+    "source": "docs/shopline-openapi/pages/reference/get_addon-products-search-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/addon_products/update_quantity",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_addon-products-update-quantity-1",
+    "source": "docs/shopline-openapi/pages/reference/put_addon-products-update-quantity-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/addon_products/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_addon-products-id-1",
+    "source": "docs/shopline-openapi/pages/reference/get_addon-products-id-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/addon_products/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_addon-products-id",
+    "source": "docs/shopline-openapi/pages/reference/put_addon-products-id.json"
+  },
+  {
+    "method": "GET",
+    "path": "/addon_products/{}/stocks",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_addon-products-id-stocks-1",
+    "source": "docs/shopline-openapi/pages/reference/get_addon-products-id-stocks-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/addon_products/{}/stocks",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_addon-products-id-stocks-1",
+    "source": "docs/shopline-openapi/pages/reference/put_addon-products-id-stocks-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/addon_products/{}/update_quantity",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_addon-products-id-update-quantity-1",
+    "source": "docs/shopline-openapi/pages/reference/put_addon-products-id-update-quantity-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/affiliate_campaigns",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_affiliate-campaigns",
+    "source": "docs/shopline-openapi/pages/reference/get_affiliate-campaigns.json"
+  },
+  {
+    "method": "POST",
+    "path": "/affiliate_campaigns",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_affiliate-campaigns",
+    "source": "docs/shopline-openapi/pages/reference/post_affiliate-campaigns.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/affiliate_campaigns/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_affiliate-campaigns-id",
+    "source": "docs/shopline-openapi/pages/reference/delete_affiliate-campaigns-id.json"
+  },
+  {
+    "method": "GET",
+    "path": "/affiliate_campaigns/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_affiliate-campaigns-id",
+    "source": "docs/shopline-openapi/pages/reference/get_affiliate-campaigns-id.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/affiliate_campaigns/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_affiliate-campaigns-id",
+    "source": "docs/shopline-openapi/pages/reference/put_affiliate-campaigns-id.json"
+  },
+  {
+    "method": "POST",
+    "path": "/affiliate_campaigns/{}/export_report",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_affiliate-campaigns-id-export-report",
+    "source": "docs/shopline-openapi/pages/reference/post_affiliate-campaigns-id-export-report.json"
+  },
+  {
+    "method": "GET",
+    "path": "/affiliate_campaigns/{}/get_products_sales_ranking",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_affiliate-campaigns-id-get-products-sales-ranking",
+    "source": "docs/shopline-openapi/pages/reference/get_affiliate-campaigns-id-get-products-sales-ranking.json"
+  },
+  {
+    "method": "GET",
+    "path": "/affiliate_campaigns/{}/orders",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_affiliate-campaigns-id-orders",
+    "source": "docs/shopline-openapi/pages/reference/get_affiliate-campaigns-id-orders.json"
+  },
+  {
+    "method": "GET",
+    "path": "/affiliate_campaigns/{}/summary",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_affiliate-campaigns-id-summary",
+    "source": "docs/shopline-openapi/pages/reference/get_affiliate-campaigns-id-summary.json"
+  },
+  {
+    "method": "GET",
+    "path": "/bulk_operations",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_bulk-operations",
+    "source": "docs/shopline-openapi/pages/reference/get_bulk-operations.json"
+  },
+  {
+    "method": "GET",
+    "path": "/bulk_operations/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_bulk-operations-id",
+    "source": "docs/shopline-openapi/pages/reference/get_bulk-operations-id.json"
+  },
+  {
+    "method": "POST",
+    "path": "/carts/exchange",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_carts-exchange",
+    "source": "docs/shopline-openapi/pages/reference/post_carts-exchange.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/carts/{}/items",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_carts-cart-id-items",
+    "source": "docs/shopline-openapi/pages/reference/delete_carts-cart-id-items.json"
+  },
+  {
+    "method": "PATCH",
+    "path": "/carts/{}/items",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/patch_carts-cart-id-items",
+    "source": "docs/shopline-openapi/pages/reference/patch_carts-cart-id-items.json"
+  },
+  {
+    "method": "POST",
+    "path": "/carts/{}/items",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_carts-cart-id-items",
+    "source": "docs/shopline-openapi/pages/reference/post_carts-cart-id-items.json"
+  },
+  {
+    "method": "GET",
+    "path": "/carts/{}/items/app_metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_carts-cart-id-items-app-metafields",
+    "source": "docs/shopline-openapi/pages/reference/get_carts-cart-id-items-app-metafields.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/carts/{}/items/app_metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_carts-cart-id-items-app-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/delete_carts-cart-id-items-app-metafields-bulk.json"
+  },
+  {
+    "method": "POST",
+    "path": "/carts/{}/items/app_metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_carts-cart-id-items-app-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/post_carts-cart-id-items-app-metafields-bulk.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/carts/{}/items/app_metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_carts-cart-id-items-app-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/put_carts-cart-id-items-app-metafields-bulk.json"
+  },
+  {
+    "method": "GET",
+    "path": "/carts/{}/items/metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_carts-cart-id-items-metafields",
+    "source": "docs/shopline-openapi/pages/reference/get_carts-cart-id-items-metafields.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/carts/{}/items/metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_carts-cart-id-items-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/delete_carts-cart-id-items-metafields-bulk.json"
+  },
+  {
+    "method": "POST",
+    "path": "/carts/{}/items/metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_carts-cart-id-items-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/post_carts-cart-id-items-metafields-bulk.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/carts/{}/items/metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_carts-cart-id-items-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/put_carts-cart-id-items-metafields-bulk.json"
+  },
+  {
+    "method": "POST",
+    "path": "/carts/{}/prepare",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_carts-cart-id-prepare",
+    "source": "docs/shopline-openapi/pages/reference/post_carts-cart-id-prepare.json"
+  },
+  {
+    "method": "GET",
+    "path": "/categories",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_categories-1",
+    "source": "docs/shopline-openapi/pages/reference/get_categories-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/categories",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_categories-1",
+    "source": "docs/shopline-openapi/pages/reference/post_categories-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/categories/bulk_assign",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_categories-bulk-assign-category-1",
+    "source": "docs/shopline-openapi/pages/reference/post_categories-bulk-assign-category-1.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/categories/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_categories-id-1",
+    "source": "docs/shopline-openapi/pages/reference/delete_categories-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/categories/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_categories-id-1",
+    "source": "docs/shopline-openapi/pages/reference/get_categories-id-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/categories/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_categories-id-1",
+    "source": "docs/shopline-openapi/pages/reference/put_categories-id-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/categories/{}/products_sorting",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_categories-id-products-sorting",
+    "source": "docs/shopline-openapi/pages/reference/put_categories-id-products-sorting.json"
+  },
+  {
+    "method": "GET",
+    "path": "/channels",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_channels",
+    "source": "docs/shopline-openapi/pages/reference/get_channels.json"
+  },
+  {
+    "method": "GET",
+    "path": "/channels/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_channels-id",
+    "source": "docs/shopline-openapi/pages/reference/get_channels-id.json"
+  },
+  {
+    "method": "GET",
+    "path": "/channels/{}/prices",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_channels-id-prices",
+    "source": "docs/shopline-openapi/pages/reference/get_channels-id-prices.json"
+  },
+  {
+    "method": "POST",
+    "path": "/channels/{}/products/{}/prices",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_channels-channel-id-products-id-prices",
+    "source": "docs/shopline-openapi/pages/reference/post_channels-channel-id-products-id-prices.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/channels/{}/products/{}/prices/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_channels-channel-id-products-product-id-prices-id",
+    "source": "docs/shopline-openapi/pages/reference/put_channels-channel-id-products-product-id-prices-id.json"
+  },
+  {
+    "method": "GET",
+    "path": "/conversations",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_conversations-1",
+    "source": "docs/shopline-openapi/pages/reference/get_conversations-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/conversations/message",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_conversations-message",
+    "source": "docs/shopline-openapi/pages/reference/post_conversations-message.json"
+  },
+  {
+    "method": "GET",
+    "path": "/conversations/{}/messages",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_conversations-conversationid-messages-1",
+    "source": "docs/shopline-openapi/pages/reference/get_conversations-conversationid-messages-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/custom_fields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_custom-fields-1",
+    "source": "docs/shopline-openapi/pages/reference/get_custom-fields-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customer_groups",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customer-groups",
+    "source": "docs/shopline-openapi/pages/reference/get_customer-groups.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customer_groups/search",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customer-groups-search",
+    "source": "docs/shopline-openapi/pages/reference/get_customer-groups-search.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customer_groups/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customer-groups-id",
+    "source": "docs/shopline-openapi/pages/reference/get_customer-groups-id.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customer_groups/{}/customer_group_children",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customer-groups-parentcustomergroupid-customer-group-children",
+    "source": "docs/shopline-openapi/pages/reference/get_customer-groups-parentcustomergroupid-customer-group-children.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customer_groups/{}/customer_group_children/{}/customer_ids",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customer-groups-parentcustomergroupid-customer-group-children-id-customer-ids",
+    "source": "docs/shopline-openapi/pages/reference/get_customer-groups-parentcustomergroupid-customer-group-children-id-customer-ids.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customer_groups/{}/customer_ids",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customer-groups-id-customer-ids",
+    "source": "docs/shopline-openapi/pages/reference/get_customer-groups-id-customer-ids.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customers",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customers-1",
+    "source": "docs/shopline-openapi/pages/reference/get_customers-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/customers",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_customers-1",
+    "source": "docs/shopline-openapi/pages/reference/post_customers-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/line/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customers-line-lineid",
+    "source": "docs/shopline-openapi/pages/reference/get_customers-line-lineid.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/membership_info",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customers-membership-info-1",
+    "source": "docs/shopline-openapi/pages/reference/get_customers-membership-info-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/search",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customers-search-1",
+    "source": "docs/shopline-openapi/pages/reference/get_customers-search-1.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/customers/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_customers-id-1",
+    "source": "docs/shopline-openapi/pages/reference/delete_customers-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customers-id-1",
+    "source": "docs/shopline-openapi/pages/reference/get_customers-id-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/customers/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_customers-id-1",
+    "source": "docs/shopline-openapi/pages/reference/put_customers-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/{}/app_metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customers-customer-id-app-metafields",
+    "source": "docs/shopline-openapi/pages/reference/get_customers-customer-id-app-metafields.json"
+  },
+  {
+    "method": "POST",
+    "path": "/customers/{}/app_metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_customers-customer-id-app-metafields",
+    "source": "docs/shopline-openapi/pages/reference/post_customers-customer-id-app-metafields.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/customers/{}/app_metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_customers-customer-id-app-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/delete_customers-customer-id-app-metafields-bulk.json"
+  },
+  {
+    "method": "POST",
+    "path": "/customers/{}/app_metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_customers-customer-id-app-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/post_customers-customer-id-app-metafields-bulk.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/customers/{}/app_metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_customers-customer-id-app-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/put_customers-customer-id-app-metafields-bulk.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/customers/{}/app_metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_customers-customer-id-app-metafields-metafield-id",
+    "source": "docs/shopline-openapi/pages/reference/delete_customers-customer-id-app-metafields-metafield-id.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/{}/app_metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customers-customer-id-app-metafields-metafield-id",
+    "source": "docs/shopline-openapi/pages/reference/get_customers-customer-id-app-metafields-metafield-id.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/customers/{}/app_metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_customers-customer-id-app-metafields-metafield-id",
+    "source": "docs/shopline-openapi/pages/reference/put_customers-customer-id-app-metafields-metafield-id.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/{}/coupon_promotions",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customers-customer-id-coupon-promotions",
+    "source": "docs/shopline-openapi/pages/reference/get_customers-customer-id-coupon-promotions.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/{}/member_points",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customers-id-member-points-1",
+    "source": "docs/shopline-openapi/pages/reference/get_customers-id-member-points-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/customers/{}/member_points",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_customers-id-member-points-1",
+    "source": "docs/shopline-openapi/pages/reference/post_customers-id-member-points-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/{}/membership_tier/action_logs",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customers-id-membership-tier-action-logs-1",
+    "source": "docs/shopline-openapi/pages/reference/get_customers-id-membership-tier-action-logs-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/{}/metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customers-customer-id-metafields-1",
+    "source": "docs/shopline-openapi/pages/reference/get_customers-customer-id-metafields-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/customers/{}/metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_customers-customer-id-metafields-1",
+    "source": "docs/shopline-openapi/pages/reference/post_customers-customer-id-metafields-1.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/customers/{}/metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_customers-customer-id-metafields-bulk-1",
+    "source": "docs/shopline-openapi/pages/reference/delete_customers-customer-id-metafields-bulk-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/customers/{}/metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_customers-customer-id-metafields-bulk-1",
+    "source": "docs/shopline-openapi/pages/reference/post_customers-customer-id-metafields-bulk-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/customers/{}/metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_customers-customer-id-metafields-bulk-1",
+    "source": "docs/shopline-openapi/pages/reference/put_customers-customer-id-metafields-bulk-1.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/customers/{}/metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_customers-customer-id-metafields-metafield-id-1",
+    "source": "docs/shopline-openapi/pages/reference/delete_customers-customer-id-metafields-metafield-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/{}/metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customers-customer-id-metafields-metafield-id-1",
+    "source": "docs/shopline-openapi/pages/reference/get_customers-customer-id-metafields-metafield-id-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/customers/{}/metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_customers-customer-id-metafields-metafield-id-1",
+    "source": "docs/shopline-openapi/pages/reference/put_customers-customer-id-metafields-metafield-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/{}/promotions",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customers-customer-id-promotions",
+    "source": "docs/shopline-openapi/pages/reference/get_customers-customer-id-promotions.json"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/{}/store_credits",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_customers-id-store-credits-1",
+    "source": "docs/shopline-openapi/pages/reference/get_customers-id-store-credits-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/customers/{}/store_credits",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_customers-id-store-credits-1",
+    "source": "docs/shopline-openapi/pages/reference/post_customers-id-store-credits-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/customers/{}/subscriptions",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_customers-customer-id-subscriptions",
+    "source": "docs/shopline-openapi/pages/reference/put_customers-customer-id-subscriptions.json"
+  },
+  {
+    "method": "PATCH",
+    "path": "/customers/{}/tags",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/patch_customers-id-tags-1",
+    "source": "docs/shopline-openapi/pages/reference/patch_customers-id-tags-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/customers/{}/tags",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_customers-id-tags-1",
+    "source": "docs/shopline-openapi/pages/reference/put_customers-id-tags-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/delivery_options",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_delivery-options-1",
+    "source": "docs/shopline-openapi/pages/reference/get_delivery-options-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/delivery_options/delivery_config",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_delivery-options-delivery-config",
+    "source": "docs/shopline-openapi/pages/reference/get_delivery-options-delivery-config.json"
+  },
+  {
+    "method": "GET",
+    "path": "/delivery_options/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_delivery-options-id-1",
+    "source": "docs/shopline-openapi/pages/reference/get_delivery-options-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/delivery_options/{}/delivery_time_slots",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_delivery-options-delivery-option-id-delivery-time-slots",
+    "source": "docs/shopline-openapi/pages/reference/get_delivery-options-delivery-option-id-delivery-time-slots.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/delivery_options/{}/stores_info",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_delivery-options-id-stores-info-1",
+    "source": "docs/shopline-openapi/pages/reference/put_delivery-options-id-stores-info-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/flash_price_campaigns",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_flash-price-campaigns-1",
+    "source": "docs/shopline-openapi/pages/reference/get_flash-price-campaigns-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/flash_price_campaigns",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_flash-price-campaigns-1",
+    "source": "docs/shopline-openapi/pages/reference/post_flash-price-campaigns-1.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/flash_price_campaigns/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_flash-price-campaigns-id-1",
+    "source": "docs/shopline-openapi/pages/reference/delete_flash-price-campaigns-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/flash_price_campaigns/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_flash-price-campaigns-id-1",
+    "source": "docs/shopline-openapi/pages/reference/get_flash-price-campaigns-id-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/flash_price_campaigns/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_flash-price-campaigns-id-1",
+    "source": "docs/shopline-openapi/pages/reference/put_flash-price-campaigns-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/gifts",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_gifts-1",
+    "source": "docs/shopline-openapi/pages/reference/get_gifts-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/gifts",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_gifts",
+    "source": "docs/shopline-openapi/pages/reference/post_gifts.json"
+  },
+  {
+    "method": "GET",
+    "path": "/gifts/search",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_gifts-search-1",
+    "source": "docs/shopline-openapi/pages/reference/get_gifts-search-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/gifts/update_quantity",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_gifts-update-quantity-1",
+    "source": "docs/shopline-openapi/pages/reference/put_gifts-update-quantity-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/gifts/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_gifts-id",
+    "source": "docs/shopline-openapi/pages/reference/put_gifts-id.json"
+  },
+  {
+    "method": "GET",
+    "path": "/gifts/{}/stocks",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_gifts-id-stocks-1",
+    "source": "docs/shopline-openapi/pages/reference/get_gifts-id-stocks-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/gifts/{}/stocks",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_gifts-id-stocks-1",
+    "source": "docs/shopline-openapi/pages/reference/put_gifts-id-stocks-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/gifts/{}/update_quantity",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_gifts-id-update-quantity-1",
+    "source": "docs/shopline-openapi/pages/reference/put_gifts-id-update-quantity-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/media",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_media-1",
+    "source": "docs/shopline-openapi/pages/reference/post_media-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/member_point_rules",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_member-point-rules-1",
+    "source": "docs/shopline-openapi/pages/reference/get_member-point-rules-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/member_points/bulk_update",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_member-points-bulk-update",
+    "source": "docs/shopline-openapi/pages/reference/post_member-points-bulk-update.json"
+  },
+  {
+    "method": "GET",
+    "path": "/membership_tiers",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_membership-tiers-1",
+    "source": "docs/shopline-openapi/pages/reference/get_membership-tiers-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/merchants",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_merchants",
+    "source": "docs/shopline-openapi/pages/reference/get_merchants.json"
+  },
+  {
+    "method": "GET",
+    "path": "/merchants/current/app_metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_merchants-current-app-metafields",
+    "source": "docs/shopline-openapi/pages/reference/get_merchants-current-app-metafields.json"
+  },
+  {
+    "method": "POST",
+    "path": "/merchants/current/app_metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_merchants-current-app-metafields",
+    "source": "docs/shopline-openapi/pages/reference/post_merchants-current-app-metafields.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/merchants/current/app_metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_merchants-current-app-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/delete_merchants-current-app-metafields-bulk.json"
+  },
+  {
+    "method": "POST",
+    "path": "/merchants/current/app_metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_merchants-current-app-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/post_merchants-current-app-metafields-bulk.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/merchants/current/app_metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_merchants-current-app-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/put_merchants-current-app-metafields-bulk.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/merchants/current/app_metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_merchants-current-app-metafields-metafield-id",
+    "source": "docs/shopline-openapi/pages/reference/delete_merchants-current-app-metafields-metafield-id.json"
+  },
+  {
+    "method": "GET",
+    "path": "/merchants/current/app_metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_merchants-current-app-metafields-metafield-id",
+    "source": "docs/shopline-openapi/pages/reference/get_merchants-current-app-metafields-metafield-id.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/merchants/current/app_metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_merchants-current-app-metafields-metafield-id",
+    "source": "docs/shopline-openapi/pages/reference/put_merchants-current-app-metafields-metafield-id.json"
+  },
+  {
+    "method": "GET",
+    "path": "/merchants/current/metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_merchants-current-metafields-1",
+    "source": "docs/shopline-openapi/pages/reference/get_merchants-current-metafields-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/merchants/current/metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_merchants-current-metafields-1",
+    "source": "docs/shopline-openapi/pages/reference/post_merchants-current-metafields-1.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/merchants/current/metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_merchants-current-metafields-bulk-1",
+    "source": "docs/shopline-openapi/pages/reference/delete_merchants-current-metafields-bulk-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/merchants/current/metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_merchants-current-metafields-bulk-1",
+    "source": "docs/shopline-openapi/pages/reference/post_merchants-current-metafields-bulk-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/merchants/current/metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_merchants-current-metafields-bulk-1",
+    "source": "docs/shopline-openapi/pages/reference/put_merchants-current-metafields-bulk-1.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/merchants/current/metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_merchants-current-metafields-metafield-id-1",
+    "source": "docs/shopline-openapi/pages/reference/delete_merchants-current-metafields-metafield-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/merchants/current/metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_merchants-current-metafields-metafield-id-1",
+    "source": "docs/shopline-openapi/pages/reference/get_merchants-current-metafields-metafield-id-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/merchants/current/metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_merchants-current-metafields-metafield-id-1",
+    "source": "docs/shopline-openapi/pages/reference/put_merchants-current-metafields-metafield-id-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/merchants/generate_express_link",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_merchants-generate-express-link",
+    "source": "docs/shopline-openapi/pages/reference/post_merchants-generate-express-link.json"
+  },
+  {
+    "method": "GET",
+    "path": "/merchants/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_merchants-merchant-id-1",
+    "source": "docs/shopline-openapi/pages/reference/get_merchants-merchant-id-1.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/multipass/customers/{}/linkings",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_multipass-customers-customer-id-linkings",
+    "source": "docs/shopline-openapi/pages/reference/delete_multipass-customers-customer-id-linkings.json"
+  },
+  {
+    "method": "POST",
+    "path": "/multipass/customers/{}/linkings",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_multipass-customers-customer-id-linkings",
+    "source": "docs/shopline-openapi/pages/reference/post_multipass-customers-customer-id-linkings.json"
+  },
+  {
+    "method": "GET",
+    "path": "/multipass/linkings",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_multipass-linkings",
+    "source": "docs/shopline-openapi/pages/reference/get_multipass-linkings.json"
+  },
+  {
+    "method": "GET",
+    "path": "/multipass/secret",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_multipass-secret",
+    "source": "docs/shopline-openapi/pages/reference/get_multipass-secret.json"
+  },
+  {
+    "method": "POST",
+    "path": "/multipass/secret",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_multipass-secret",
+    "source": "docs/shopline-openapi/pages/reference/post_multipass-secret.json"
+  },
+  {
+    "method": "GET",
+    "path": "/orders",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_orders-1",
+    "source": "docs/shopline-openapi/pages/reference/get_orders-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/orders",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_orders-1",
+    "source": "docs/shopline-openapi/pages/reference/post_orders-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/orders/archived_orders",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_orders-archived-orders",
+    "source": "docs/shopline-openapi/pages/reference/post_orders-archived-orders.json"
+  },
+  {
+    "method": "PATCH",
+    "path": "/orders/execute_shipment",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/patch_orders-execute-shipment-1",
+    "source": "docs/shopline-openapi/pages/reference/patch_orders-execute-shipment-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/label",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_orders-label-1",
+    "source": "docs/shopline-openapi/pages/reference/get_orders-label-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/search",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_orders-search-1",
+    "source": "docs/shopline-openapi/pages/reference/get_orders-search-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/tags",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_orders-tags-1",
+    "source": "docs/shopline-openapi/pages/reference/get_orders-tags-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/transactions",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_orders-transactions-1",
+    "source": "docs/shopline-openapi/pages/reference/get_orders-transactions-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_orders-id-1",
+    "source": "docs/shopline-openapi/pages/reference/get_orders-id-1.json"
+  },
+  {
+    "method": "PATCH",
+    "path": "/orders/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/patch_orders-id-1",
+    "source": "docs/shopline-openapi/pages/reference/patch_orders-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/{}/action_logs",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_orders-id-action-logs-1",
+    "source": "docs/shopline-openapi/pages/reference/get_orders-id-action-logs-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/{}/app_metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_orders-order-id-app-metafields",
+    "source": "docs/shopline-openapi/pages/reference/get_orders-order-id-app-metafields.json"
+  },
+  {
+    "method": "POST",
+    "path": "/orders/{}/app_metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_orders-order-id-app-metafields",
+    "source": "docs/shopline-openapi/pages/reference/post_orders-order-id-app-metafields.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/orders/{}/app_metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_orders-order-id-app-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/delete_orders-order-id-app-metafields-bulk.json"
+  },
+  {
+    "method": "POST",
+    "path": "/orders/{}/app_metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_orders-order-id-app-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/post_orders-order-id-app-metafields-bulk.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/orders/{}/app_metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_orders-order-id-app-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/put_orders-order-id-app-metafields-bulk.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/orders/{}/app_metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_orders-order-id-app-metafields-metafield-id",
+    "source": "docs/shopline-openapi/pages/reference/delete_orders-order-id-app-metafields-metafield-id.json"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/{}/app_metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_orders-order-id-app-metafields-metafield-id",
+    "source": "docs/shopline-openapi/pages/reference/get_orders-order-id-app-metafields-metafield-id.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/orders/{}/app_metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_orders-order-id-app-metafields-metafield-id",
+    "source": "docs/shopline-openapi/pages/reference/put_orders-order-id-app-metafields-metafield-id.json"
+  },
+  {
+    "method": "PATCH",
+    "path": "/orders/{}/cancel",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/patch_orders-orderid-cancel",
+    "source": "docs/shopline-openapi/pages/reference/patch_orders-orderid-cancel.json"
+  },
+  {
+    "method": "PATCH",
+    "path": "/orders/{}/execute_shipment",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/patch_orders-id-execute-shipment-1",
+    "source": "docs/shopline-openapi/pages/reference/patch_orders-id-execute-shipment-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/{}/items/app_metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_orders-order-id-items-app-metafields",
+    "source": "docs/shopline-openapi/pages/reference/get_orders-order-id-items-app-metafields.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/orders/{}/items/app_metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_orders-order-id-items-app-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/delete_orders-order-id-items-app-metafields-bulk.json"
+  },
+  {
+    "method": "POST",
+    "path": "/orders/{}/items/app_metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_orders-order-id-items-app-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/post_orders-order-id-items-app-metafields-bulk.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/orders/{}/items/app_metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_orders-order-id-items-app-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/put_orders-order-id-items-app-metafields-bulk.json"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/{}/items/metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_orders-order-id-items-metafields",
+    "source": "docs/shopline-openapi/pages/reference/get_orders-order-id-items-metafields.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/orders/{}/items/metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_orders-order-id-items-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/delete_orders-order-id-items-metafields-bulk.json"
+  },
+  {
+    "method": "POST",
+    "path": "/orders/{}/items/metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_orders-order-id-items-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/post_orders-order-id-items-metafields-bulk.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/orders/{}/items/metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_orders-order-id-items-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/put_orders-order-id-items-metafields-bulk.json"
+  },
+  {
+    "method": "POST",
+    "path": "/orders/{}/messages",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_orders-id-messages-1",
+    "source": "docs/shopline-openapi/pages/reference/post_orders-id-messages-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/{}/metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_orders-order-id-metafields-1",
+    "source": "docs/shopline-openapi/pages/reference/get_orders-order-id-metafields-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/orders/{}/metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_orders-order-id-metafields-1",
+    "source": "docs/shopline-openapi/pages/reference/post_orders-order-id-metafields-1.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/orders/{}/metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_orders-order-id-metafields-bulk-1",
+    "source": "docs/shopline-openapi/pages/reference/delete_orders-order-id-metafields-bulk-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/orders/{}/metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_orders-order-id-metafields-bulk-1",
+    "source": "docs/shopline-openapi/pages/reference/post_orders-order-id-metafields-bulk-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/orders/{}/metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_orders-order-id-metafields-bulk-1",
+    "source": "docs/shopline-openapi/pages/reference/put_orders-order-id-metafields-bulk-1.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/orders/{}/metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_orders-order-id-metafields-metafield-id-1",
+    "source": "docs/shopline-openapi/pages/reference/delete_orders-order-id-metafields-metafield-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/{}/metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_orders-order-id-metafields-metafield-id-1",
+    "source": "docs/shopline-openapi/pages/reference/get_orders-order-id-metafields-metafield-id-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/orders/{}/metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_orders-order-id-metafields-metafield-id-1",
+    "source": "docs/shopline-openapi/pages/reference/put_orders-order-id-metafields-metafield-id-1.json"
+  },
+  {
+    "method": "PATCH",
+    "path": "/orders/{}/order_delivery_status",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/patch_orders-id-order-delivery-status-1",
+    "source": "docs/shopline-openapi/pages/reference/patch_orders-id-order-delivery-status-1.json"
+  },
+  {
+    "method": "PATCH",
+    "path": "/orders/{}/order_payment_status",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/patch_orders-id-order-payment-status-1",
+    "source": "docs/shopline-openapi/pages/reference/patch_orders-id-order-payment-status-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/orders/{}/split",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_orders-id-split",
+    "source": "docs/shopline-openapi/pages/reference/post_orders-id-split.json"
+  },
+  {
+    "method": "PATCH",
+    "path": "/orders/{}/status",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/patch_orders-id-status-1",
+    "source": "docs/shopline-openapi/pages/reference/patch_orders-id-status-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/orders/{}/tags",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_orders-id-tags-1",
+    "source": "docs/shopline-openapi/pages/reference/put_orders-id-tags-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/payments",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_payments-1",
+    "source": "docs/shopline-openapi/pages/reference/get_payments-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/payments/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_payments-id-1",
+    "source": "docs/shopline-openapi/pages/reference/get_payments-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/pos/purchase_orders",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_pos-purchase-orders",
+    "source": "docs/shopline-openapi/pages/reference/get_pos-purchase-orders.json"
+  },
+  {
+    "method": "POST",
+    "path": "/pos/purchase_orders",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_pos-purchase-orders",
+    "source": "docs/shopline-openapi/pages/reference/post_pos-purchase-orders.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/pos/purchase_orders/bulk_delete",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_pos-purchase-orders-bulk-delete",
+    "source": "docs/shopline-openapi/pages/reference/put_pos-purchase-orders-bulk-delete.json"
+  },
+  {
+    "method": "GET",
+    "path": "/pos/purchase_orders/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_pos-purchase-orders-purchaseorderid",
+    "source": "docs/shopline-openapi/pages/reference/get_pos-purchase-orders-purchaseorderid.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/pos/purchase_orders/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_pos-purchase-orders-purchaseorderid",
+    "source": "docs/shopline-openapi/pages/reference/put_pos-purchase-orders-purchaseorderid.json"
+  },
+  {
+    "method": "POST",
+    "path": "/pos/purchase_orders/{}/child",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_pos-purchase-orders-purchaseorderid-child",
+    "source": "docs/shopline-openapi/pages/reference/post_pos-purchase-orders-purchaseorderid-child.json"
+  },
+  {
+    "method": "GET",
+    "path": "/product_review_comments",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_product-review-comments-1",
+    "source": "docs/shopline-openapi/pages/reference/get_product-review-comments-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/product_review_comments",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_product-review-comments-1",
+    "source": "docs/shopline-openapi/pages/reference/post_product-review-comments-1.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/product_review_comments/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_product-review-comments-bulk-1",
+    "source": "docs/shopline-openapi/pages/reference/delete_product-review-comments-bulk-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/product_review_comments/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_product-review-comments-bulk-1",
+    "source": "docs/shopline-openapi/pages/reference/post_product-review-comments-bulk-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/product_review_comments/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_product-review-comments-bulk-1",
+    "source": "docs/shopline-openapi/pages/reference/put_product-review-comments-bulk-1.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/product_review_comments/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_product-review-comments-id-1",
+    "source": "docs/shopline-openapi/pages/reference/delete_product-review-comments-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/product_review_comments/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_product-review-comments-id-1",
+    "source": "docs/shopline-openapi/pages/reference/get_product-review-comments-id-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/product_review_comments/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_product-review-comments-id-1",
+    "source": "docs/shopline-openapi/pages/reference/put_product-review-comments-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/product_subscriptions",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_product-subscriptions-1",
+    "source": "docs/shopline-openapi/pages/reference/get_product-subscriptions-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/product_subscriptions/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_product-subscriptions-id-1",
+    "source": "docs/shopline-openapi/pages/reference/get_product-subscriptions-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/products",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_products-1",
+    "source": "docs/shopline-openapi/pages/reference/get_products-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/products",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_products-1",
+    "source": "docs/shopline-openapi/pages/reference/post_products-1.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/products/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_products-bulk-1",
+    "source": "docs/shopline-openapi/pages/reference/delete_products-bulk-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/bulk_update_stocks",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_products-bulk-update-stocks",
+    "source": "docs/shopline-openapi/pages/reference/put_products-bulk-update-stocks.json"
+  },
+  {
+    "method": "PATCH",
+    "path": "/products/labels",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/patch_products-labels",
+    "source": "docs/shopline-openapi/pages/reference/patch_products-labels.json"
+  },
+  {
+    "method": "POST",
+    "path": "/products/locked_inventory_count",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_products-locked-inventory-count",
+    "source": "docs/shopline-openapi/pages/reference/post_products-locked-inventory-count.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/retail_status/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_products-retail-status-bulk-1",
+    "source": "docs/shopline-openapi/pages/reference/put_products-retail-status-bulk-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/products/search",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_products-search-1",
+    "source": "docs/shopline-openapi/pages/reference/get_products-search-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/products/search",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_products-search",
+    "source": "docs/shopline-openapi/pages/reference/post_products-search.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/status/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_products-status-bulk-1",
+    "source": "docs/shopline-openapi/pages/reference/put_products-status-bulk-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/update_quantity",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_products-update-quantity-1",
+    "source": "docs/shopline-openapi/pages/reference/put_products-update-quantity-1.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/products/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_products-id-1",
+    "source": "docs/shopline-openapi/pages/reference/delete_products-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/products/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_products-id-1",
+    "source": "docs/shopline-openapi/pages/reference/get_products-id-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_products-id-1",
+    "source": "docs/shopline-openapi/pages/reference/put_products-id-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/products/{}/add_images",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_products-id-add-images-1",
+    "source": "docs/shopline-openapi/pages/reference/post_products-id-add-images-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/products/{}/app_metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_products-product-id-app-metafields",
+    "source": "docs/shopline-openapi/pages/reference/get_products-product-id-app-metafields.json"
+  },
+  {
+    "method": "POST",
+    "path": "/products/{}/app_metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_products-product-id-app-metafields",
+    "source": "docs/shopline-openapi/pages/reference/post_products-product-id-app-metafields.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/products/{}/app_metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_products-product-id-app-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/delete_products-product-id-app-metafields-bulk.json"
+  },
+  {
+    "method": "POST",
+    "path": "/products/{}/app_metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_products-product-id-app-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/post_products-product-id-app-metafields-bulk.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}/app_metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_products-product-id-app-metafields-bulk",
+    "source": "docs/shopline-openapi/pages/reference/put_products-product-id-app-metafields-bulk.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/products/{}/app_metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_products-product-id-app-metafields-metafield-id",
+    "source": "docs/shopline-openapi/pages/reference/delete_products-product-id-app-metafields-metafield-id.json"
+  },
+  {
+    "method": "GET",
+    "path": "/products/{}/app_metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_products-product-id-app-metafields-metafield-id",
+    "source": "docs/shopline-openapi/pages/reference/get_products-product-id-app-metafields-metafield-id.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}/app_metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_products-product-id-app-metafields-metafield-id",
+    "source": "docs/shopline-openapi/pages/reference/put_products-product-id-app-metafields-metafield-id.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/products/{}/delete_images",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_products-id-delete-images-1",
+    "source": "docs/shopline-openapi/pages/reference/delete_products-id-delete-images-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/products/{}/metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_products-product-id-metafields-1",
+    "source": "docs/shopline-openapi/pages/reference/get_products-product-id-metafields-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/products/{}/metafields",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_products-product-id-metafields-1",
+    "source": "docs/shopline-openapi/pages/reference/post_products-product-id-metafields-1.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/products/{}/metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_products-product-id-metafields-bulk-1",
+    "source": "docs/shopline-openapi/pages/reference/delete_products-product-id-metafields-bulk-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/products/{}/metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_products-product-id-metafields-bulk-1",
+    "source": "docs/shopline-openapi/pages/reference/post_products-product-id-metafields-bulk-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}/metafields/bulk",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_products-product-id-metafields-bulk-1",
+    "source": "docs/shopline-openapi/pages/reference/put_products-product-id-metafields-bulk-1.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/products/{}/metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_products-product-id-metafields-metafield-id-1",
+    "source": "docs/shopline-openapi/pages/reference/delete_products-product-id-metafields-metafield-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/products/{}/metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_products-product-id-metafields-metafield-id-1",
+    "source": "docs/shopline-openapi/pages/reference/get_products-product-id-metafields-metafield-id-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}/metafields/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_products-product-id-metafields-metafield-id-1",
+    "source": "docs/shopline-openapi/pages/reference/put_products-product-id-metafields-metafield-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/products/{}/promotions",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_products-product-id-promotions",
+    "source": "docs/shopline-openapi/pages/reference/get_products-product-id-promotions.json"
+  },
+  {
+    "method": "GET",
+    "path": "/products/{}/stocks",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_products-id-stocks-1",
+    "source": "docs/shopline-openapi/pages/reference/get_products-id-stocks-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}/stocks",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_products-id-stocks-1",
+    "source": "docs/shopline-openapi/pages/reference/put_products-id-stocks-1.json"
+  },
+  {
+    "method": "PATCH",
+    "path": "/products/{}/tags",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/patch_products-productid-tags-1",
+    "source": "docs/shopline-openapi/pages/reference/patch_products-productid-tags-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}/tags",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_products-productid-tags-1",
+    "source": "docs/shopline-openapi/pages/reference/put_products-productid-tags-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}/update_price",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_products-productid-update-price",
+    "source": "docs/shopline-openapi/pages/reference/put_products-productid-update-price.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}/update_quantity",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_products-id-update-quantity-1",
+    "source": "docs/shopline-openapi/pages/reference/put_products-id-update-quantity-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/products/{}/variations",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_products-product-id-variations-1",
+    "source": "docs/shopline-openapi/pages/reference/post_products-product-id-variations-1.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/products/{}/variations/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_products-product-id-variations-id-1",
+    "source": "docs/shopline-openapi/pages/reference/delete_products-product-id-variations-id-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}/variations/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_products-product-id-variations-id-1",
+    "source": "docs/shopline-openapi/pages/reference/put_products-product-id-variations-id-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}/variations/{}/update_price",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_products-product-id-variations-id-update-price-1",
+    "source": "docs/shopline-openapi/pages/reference/put_products-product-id-variations-id-update-price-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}/variations/{}/update_quantity",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_products-product-id-variations-id-update-quantity-1",
+    "source": "docs/shopline-openapi/pages/reference/put_products-product-id-variations-id-update-quantity-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/promotions",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_promotions-1",
+    "source": "docs/shopline-openapi/pages/reference/get_promotions-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/promotions",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_promotions-1",
+    "source": "docs/shopline-openapi/pages/reference/post_promotions-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/promotions/coupon-center",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_promotions-coupon-center",
+    "source": "docs/shopline-openapi/pages/reference/get_promotions-coupon-center.json"
+  },
+  {
+    "method": "GET",
+    "path": "/promotions/search",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_promotions-search",
+    "source": "docs/shopline-openapi/pages/reference/get_promotions-search.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/promotions/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_promotions-id-1",
+    "source": "docs/shopline-openapi/pages/reference/delete_promotions-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/promotions/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_promotions-id-1",
+    "source": "docs/shopline-openapi/pages/reference/get_promotions-id-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/promotions/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_promotions-id-1",
+    "source": "docs/shopline-openapi/pages/reference/put_promotions-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/return_orders",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_return-orders-1",
+    "source": "docs/shopline-openapi/pages/reference/get_return-orders-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/return_orders",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_return-orders-1",
+    "source": "docs/shopline-openapi/pages/reference/post_return-orders-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/return_orders/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_return-orders-id-1",
+    "source": "docs/shopline-openapi/pages/reference/get_return-orders-id-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/return_orders/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_return-orders-id-1",
+    "source": "docs/shopline-openapi/pages/reference/put_return-orders-id-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/sales/{}/comments",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_sales-saleid-comments",
+    "source": "docs/shopline-openapi/pages/reference/get_sales-saleid-comments.json"
+  },
+  {
+    "method": "GET",
+    "path": "/sales/{}/customers",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_sales-saleid-customers",
+    "source": "docs/shopline-openapi/pages/reference/get_sales-saleid-customers.json"
+  },
+  {
+    "method": "POST",
+    "path": "/sales/{}/delete_products",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_sales-saleid-delete-products",
+    "source": "docs/shopline-openapi/pages/reference/post_sales-saleid-delete-products.json"
+  },
+  {
+    "method": "GET",
+    "path": "/sales/{}/products",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_sales-saleid-products",
+    "source": "docs/shopline-openapi/pages/reference/get_sales-saleid-products.json"
+  },
+  {
+    "method": "POST",
+    "path": "/sales/{}/products",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_sales-saleid-products",
+    "source": "docs/shopline-openapi/pages/reference/post_sales-saleid-products.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/sales/{}/products",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_sales-saleid-products",
+    "source": "docs/shopline-openapi/pages/reference/put_sales-saleid-products.json"
+  },
+  {
+    "method": "GET",
+    "path": "/settings",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_settings-1",
+    "source": "docs/shopline-openapi/pages/reference/get_settings-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/checkout",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_settings-checkout-1",
+    "source": "docs/shopline-openapi/pages/reference/get_settings-checkout-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/domains",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_settings-domains",
+    "source": "docs/shopline-openapi/pages/reference/get_settings-domains.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/settings/domains",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_settings-domains",
+    "source": "docs/shopline-openapi/pages/reference/put_settings-domains.json"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/layouts",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_settings-layouts-1",
+    "source": "docs/shopline-openapi/pages/reference/get_settings-layouts-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/layouts/draft",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_settings-layouts-draft-1",
+    "source": "docs/shopline-openapi/pages/reference/get_settings-layouts-draft-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/settings/layouts/draft",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_settings-layouts-draft-1",
+    "source": "docs/shopline-openapi/pages/reference/put_settings-layouts-draft-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/settings/layouts/publish",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_settings-layouts-publish-1",
+    "source": "docs/shopline-openapi/pages/reference/post_settings-layouts-publish-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/orders",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_settings-orders-1",
+    "source": "docs/shopline-openapi/pages/reference/get_settings-orders-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/payments",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_settings-payments",
+    "source": "docs/shopline-openapi/pages/reference/get_settings-payments.json"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/pos",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_settings-pos",
+    "source": "docs/shopline-openapi/pages/reference/get_settings-pos.json"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/product_review",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_settings-product-review",
+    "source": "docs/shopline-openapi/pages/reference/get_settings-product-review.json"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/products",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_settings-products",
+    "source": "docs/shopline-openapi/pages/reference/get_settings-products.json"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/promotions",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_settings-promotions",
+    "source": "docs/shopline-openapi/pages/reference/get_settings-promotions.json"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/shop",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_settings-shop",
+    "source": "docs/shopline-openapi/pages/reference/get_settings-shop.json"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/tax",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_settings-tax-1",
+    "source": "docs/shopline-openapi/pages/reference/get_settings-tax-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/theme",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_settings-theme-1",
+    "source": "docs/shopline-openapi/pages/reference/get_settings-theme-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/theme/draft",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_settings-theme-draft-1",
+    "source": "docs/shopline-openapi/pages/reference/get_settings-theme-draft-1.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/settings/theme/draft",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_settings-theme-draft-1",
+    "source": "docs/shopline-openapi/pages/reference/put_settings-theme-draft-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/settings/theme/publish",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_settings-theme-publish-1",
+    "source": "docs/shopline-openapi/pages/reference/post_settings-theme-publish-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/third_party_ads",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_settings-third-party-ads-1",
+    "source": "docs/shopline-openapi/pages/reference/get_settings-third-party-ads-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/users",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_settings-users-1",
+    "source": "docs/shopline-openapi/pages/reference/get_settings-users-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/staffs",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_staffs-1",
+    "source": "docs/shopline-openapi/pages/reference/get_staffs-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/staffs/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_staffs-id",
+    "source": "docs/shopline-openapi/pages/reference/get_staffs-id.json"
+  },
+  {
+    "method": "GET",
+    "path": "/staffs/{}/permissions",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_staffs-id-permissions-1",
+    "source": "docs/shopline-openapi/pages/reference/get_staffs-id-permissions-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/storefront/oauth_applications",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_storefront-oauth-applications",
+    "source": "docs/shopline-openapi/pages/reference/get_storefront-oauth-applications.json"
+  },
+  {
+    "method": "POST",
+    "path": "/storefront/oauth_applications",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_storefront-oauth-applications",
+    "source": "docs/shopline-openapi/pages/reference/post_storefront-oauth-applications.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/storefront/oauth_applications/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_storefront-oauth-applications-id",
+    "source": "docs/shopline-openapi/pages/reference/delete_storefront-oauth-applications-id.json"
+  },
+  {
+    "method": "GET",
+    "path": "/storefront/oauth_applications/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_storefront-oauth-applications-id",
+    "source": "docs/shopline-openapi/pages/reference/get_storefront-oauth-applications-id.json"
+  },
+  {
+    "method": "GET",
+    "path": "/storefront_tokens",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_storefront-tokens",
+    "source": "docs/shopline-openapi/pages/reference/get_storefront-tokens.json"
+  },
+  {
+    "method": "POST",
+    "path": "/storefront_tokens",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_storefront-tokens",
+    "source": "docs/shopline-openapi/pages/reference/post_storefront-tokens.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/storefront_tokens/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_storefront-tokens-id",
+    "source": "docs/shopline-openapi/pages/reference/delete_storefront-tokens-id.json"
+  },
+  {
+    "method": "GET",
+    "path": "/storefront_tokens/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_storefront-tokens-id",
+    "source": "docs/shopline-openapi/pages/reference/get_storefront-tokens-id.json"
+  },
+  {
+    "method": "GET",
+    "path": "/taxes",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_taxes-1",
+    "source": "docs/shopline-openapi/pages/reference/get_taxes-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/token/info",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_token-info-1",
+    "source": "docs/shopline-openapi/pages/reference/get_token-info-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/user_coupons",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_user-coupons",
+    "source": "docs/shopline-openapi/pages/reference/get_user-coupons.json"
+  },
+  {
+    "method": "POST",
+    "path": "/user_coupons",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_user-coupons",
+    "source": "docs/shopline-openapi/pages/reference/post_user-coupons.json"
+  },
+  {
+    "method": "GET",
+    "path": "/user_coupons/list",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_user-coupons-list",
+    "source": "docs/shopline-openapi/pages/reference/get_user-coupons-list.json"
+  },
+  {
+    "method": "POST",
+    "path": "/user_coupons/{}/claim",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_user-coupons-coupon-code-claim",
+    "source": "docs/shopline-openapi/pages/reference/post_user-coupons-coupon-code-claim.json"
+  },
+  {
+    "method": "POST",
+    "path": "/user_coupons/{}/redeem",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_user-coupons-couponcode-redeem",
+    "source": "docs/shopline-openapi/pages/reference/post_user-coupons-couponcode-redeem.json"
+  },
+  {
+    "method": "GET",
+    "path": "/user_credits",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_user-credits-1",
+    "source": "docs/shopline-openapi/pages/reference/get_user-credits-1.json"
+  },
+  {
+    "method": "POST",
+    "path": "/user_credits/bulk_update",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_user-credits-bulk-update",
+    "source": "docs/shopline-openapi/pages/reference/post_user-credits-bulk-update.json"
+  },
+  {
+    "method": "GET",
+    "path": "/warehouses",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_warehouses-1",
+    "source": "docs/shopline-openapi/pages/reference/get_warehouses-1.json"
+  },
+  {
+    "method": "GET",
+    "path": "/webhooks",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_webhooks",
+    "source": "docs/shopline-openapi/pages/reference/get_webhooks.json"
+  },
+  {
+    "method": "POST",
+    "path": "/webhooks",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_webhooks",
+    "source": "docs/shopline-openapi/pages/reference/post_webhooks.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/webhooks/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_webhooks-id",
+    "source": "docs/shopline-openapi/pages/reference/delete_webhooks-id.json"
+  },
+  {
+    "method": "GET",
+    "path": "/webhooks/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_webhooks-id",
+    "source": "docs/shopline-openapi/pages/reference/get_webhooks-id.json"
+  },
+  {
+    "method": "PUT",
+    "path": "/webhooks/{}",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/put_webhooks-id",
+    "source": "docs/shopline-openapi/pages/reference/put_webhooks-id.json"
+  },
+  {
+    "method": "DELETE",
+    "path": "/wish_list_items",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/delete_wish-list-items",
+    "source": "docs/shopline-openapi/pages/reference/delete_wish-list-items.json"
+  },
+  {
+    "method": "GET",
+    "path": "/wish_list_items",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/get_wish-list-items",
+    "source": "docs/shopline-openapi/pages/reference/get_wish-list-items.json"
+  },
+  {
+    "method": "POST",
+    "path": "/wish_list_items",
+    "doc_url": "https://open-api.docs.shoplineapp.com/reference/post_wish-list-items",
+    "source": "docs/shopline-openapi/pages/reference/post_wish-list-items.json"
+  }
+]
