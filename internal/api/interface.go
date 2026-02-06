@@ -258,6 +258,24 @@ type APIClient interface {
 	GetCustomerMembershipTierActionLogs(ctx context.Context, customerID string) (json.RawMessage, error)
 	GetMembershipTier(ctx context.Context, id string) (*MembershipTier, error)
 	GetMerchant(ctx context.Context) (*Merchant, error)
+	// Merchant metafields (/merchants/current/*)
+	ListMerchantMetafields(ctx context.Context) (json.RawMessage, error)
+	GetMerchantMetafield(ctx context.Context, metafieldID string) (json.RawMessage, error)
+	CreateMerchantMetafield(ctx context.Context, body any) (json.RawMessage, error)
+	UpdateMerchantMetafield(ctx context.Context, metafieldID string, body any) (json.RawMessage, error)
+	DeleteMerchantMetafield(ctx context.Context, metafieldID string) error
+	BulkCreateMerchantMetafields(ctx context.Context, body any) error
+	BulkUpdateMerchantMetafields(ctx context.Context, body any) error
+	BulkDeleteMerchantMetafields(ctx context.Context, body any) error
+	// Merchant app metafields (/merchants/current/app_metafields*)
+	ListMerchantAppMetafields(ctx context.Context) (json.RawMessage, error)
+	GetMerchantAppMetafield(ctx context.Context, metafieldID string) (json.RawMessage, error)
+	CreateMerchantAppMetafield(ctx context.Context, body any) (json.RawMessage, error)
+	UpdateMerchantAppMetafield(ctx context.Context, metafieldID string, body any) (json.RawMessage, error)
+	DeleteMerchantAppMetafield(ctx context.Context, metafieldID string) error
+	BulkCreateMerchantAppMetafields(ctx context.Context, body any) error
+	BulkUpdateMerchantAppMetafields(ctx context.Context, body any) error
+	BulkDeleteMerchantAppMetafields(ctx context.Context, body any) error
 	GetMerchantStaff(ctx context.Context, id string) (*MerchantStaff, error)
 	GetMetafield(ctx context.Context, id string) (*Metafield, error)
 	GetMetafieldDefinition(ctx context.Context, id string) (*MetafieldDefinition, error)

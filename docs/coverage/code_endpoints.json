@@ -1506,6 +1506,86 @@
   },
   {
     "method": "GET",
+    "path": "/merchants/current/app_metafields",
+    "source": "internal/api/merchant_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/merchants/current/app_metafields",
+    "source": "internal/api/merchant_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/merchants/current/app_metafields/bulk",
+    "source": "internal/api/merchant_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/merchants/current/app_metafields/bulk",
+    "source": "internal/api/merchant_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/merchants/current/app_metafields/bulk",
+    "source": "internal/api/merchant_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/merchants/current/app_metafields/{}",
+    "source": "internal/api/merchant_metafields.go"
+  },
+  {
+    "method": "GET",
+    "path": "/merchants/current/app_metafields/{}",
+    "source": "internal/api/merchant_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/merchants/current/app_metafields/{}",
+    "source": "internal/api/merchant_metafields.go"
+  },
+  {
+    "method": "GET",
+    "path": "/merchants/current/metafields",
+    "source": "internal/api/merchant_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/merchants/current/metafields",
+    "source": "internal/api/merchant_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/merchants/current/metafields/bulk",
+    "source": "internal/api/merchant_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/merchants/current/metafields/bulk",
+    "source": "internal/api/merchant_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/merchants/current/metafields/bulk",
+    "source": "internal/api/merchant_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/merchants/current/metafields/{}",
+    "source": "internal/api/merchant_metafields.go"
+  },
+  {
+    "method": "GET",
+    "path": "/merchants/current/metafields/{}",
+    "source": "internal/api/merchant_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/merchants/current/metafields/{}",
+    "source": "internal/api/merchant_metafields.go"
+  },
+  {
+    "method": "GET",
     "path": "/metafield_definitions",
     "source": "internal/api/metafield_definitions.go"
   },

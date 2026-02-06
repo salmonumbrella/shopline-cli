@@ -3,8 +3,8 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 639
-- Missing in code: 73
+- Code endpoints detected: 655
+- Missing in code: 57
 - Extra in code: 404
 - Unparsed doc pages: 55
 
@@ -90,22 +90,6 @@
 - `PUT /gifts/{}/stocks` (https://open-api.docs.shoplineapp.com/reference/put_gifts-id-stocks-1)
 - `PUT /gifts/{}/update_quantity` (https://open-api.docs.shoplineapp.com/reference/put_gifts-id-update-quantity-1)
 - `POST /media` (https://open-api.docs.shoplineapp.com/reference/post_media-1)
-- `GET /merchants/current/app_metafields` (https://open-api.docs.shoplineapp.com/reference/get_merchants-current-app-metafields)
-- `POST /merchants/current/app_metafields` (https://open-api.docs.shoplineapp.com/reference/post_merchants-current-app-metafields)
-- `DELETE /merchants/current/app_metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/delete_merchants-current-app-metafields-bulk)
-- `POST /merchants/current/app_metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/post_merchants-current-app-metafields-bulk)
-- `PUT /merchants/current/app_metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/put_merchants-current-app-metafields-bulk)
-- `DELETE /merchants/current/app_metafields/{}` (https://open-api.docs.shoplineapp.com/reference/delete_merchants-current-app-metafields-metafield-id)
-- `GET /merchants/current/app_metafields/{}` (https://open-api.docs.shoplineapp.com/reference/get_merchants-current-app-metafields-metafield-id)
-- `PUT /merchants/current/app_metafields/{}` (https://open-api.docs.shoplineapp.com/reference/put_merchants-current-app-metafields-metafield-id)
-- `GET /merchants/current/metafields` (https://open-api.docs.shoplineapp.com/reference/get_merchants-current-metafields-1)
-- `POST /merchants/current/metafields` (https://open-api.docs.shoplineapp.com/reference/post_merchants-current-metafields-1)
-- `DELETE /merchants/current/metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/delete_merchants-current-metafields-bulk-1)
-- `POST /merchants/current/metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/post_merchants-current-metafields-bulk-1)
-- `PUT /merchants/current/metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/put_merchants-current-metafields-bulk-1)
-- `DELETE /merchants/current/metafields/{}` (https://open-api.docs.shoplineapp.com/reference/delete_merchants-current-metafields-metafield-id-1)
-- `GET /merchants/current/metafields/{}` (https://open-api.docs.shoplineapp.com/reference/get_merchants-current-metafields-metafield-id-1)
-- `PUT /merchants/current/metafields/{}` (https://open-api.docs.shoplineapp.com/reference/put_merchants-current-metafields-metafield-id-1)
 - `POST /merchants/generate_express_link` (https://open-api.docs.shoplineapp.com/reference/post_merchants-generate-express-link)
 - `GET /merchants/{}` (https://open-api.docs.shoplineapp.com/reference/get_merchants-merchant-id-1)
 - `DELETE /multipass/customers/{}/linkings` (https://open-api.docs.shoplineapp.com/reference/delete_multipass-customers-customer-id-linkings)

@@ -2248,3 +2248,67 @@ func (m *MockClient) GetSettingsThirdPartyAds(ctx context.Context) (json.RawMess
 func (m *MockClient) GetSettingsUsers(ctx context.Context) (json.RawMessage, error) {
 	return nil, m.notImplemented("GetSettingsUsers")
 }
+
+func (m *MockClient) ListMerchantMetafields(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListMerchantMetafields")
+}
+
+func (m *MockClient) GetMerchantMetafield(ctx context.Context, metafieldID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetMerchantMetafield")
+}
+
+func (m *MockClient) CreateMerchantMetafield(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("CreateMerchantMetafield")
+}
+
+func (m *MockClient) UpdateMerchantMetafield(ctx context.Context, metafieldID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateMerchantMetafield")
+}
+
+func (m *MockClient) DeleteMerchantMetafield(ctx context.Context, metafieldID string) error {
+	return m.notImplemented("DeleteMerchantMetafield")
+}
+
+func (m *MockClient) BulkCreateMerchantMetafields(ctx context.Context, body any) error {
+	return m.notImplemented("BulkCreateMerchantMetafields")
+}
+
+func (m *MockClient) BulkUpdateMerchantMetafields(ctx context.Context, body any) error {
+	return m.notImplemented("BulkUpdateMerchantMetafields")
+}
+
+func (m *MockClient) BulkDeleteMerchantMetafields(ctx context.Context, body any) error {
+	return m.notImplemented("BulkDeleteMerchantMetafields")
+}
+
+func (m *MockClient) ListMerchantAppMetafields(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListMerchantAppMetafields")
+}
+
+func (m *MockClient) GetMerchantAppMetafield(ctx context.Context, metafieldID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetMerchantAppMetafield")
+}
+
+func (m *MockClient) CreateMerchantAppMetafield(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("CreateMerchantAppMetafield")
+}
+
+func (m *MockClient) UpdateMerchantAppMetafield(ctx context.Context, metafieldID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateMerchantAppMetafield")
+}
+
+func (m *MockClient) DeleteMerchantAppMetafield(ctx context.Context, metafieldID string) error {
+	return m.notImplemented("DeleteMerchantAppMetafield")
+}
+
+func (m *MockClient) BulkCreateMerchantAppMetafields(ctx context.Context, body any) error {
+	return m.notImplemented("BulkCreateMerchantAppMetafields")
+}
+
+func (m *MockClient) BulkUpdateMerchantAppMetafields(ctx context.Context, body any) error {
+	return m.notImplemented("BulkUpdateMerchantAppMetafields")
+}
+
+func (m *MockClient) BulkDeleteMerchantAppMetafields(ctx context.Context, body any) error {
+	return m.notImplemented("BulkDeleteMerchantAppMetafields")
+}

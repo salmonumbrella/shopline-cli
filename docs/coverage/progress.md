@@ -27,6 +27,8 @@ go run ./cmd/shopline-coverage
 - Cart items (`POST/PATCH/DELETE /carts/{cart_id}/items`) + prepare/exchange + item metafields/app_metafields (done)
 - [x] Settings
 - /settings/* documented endpoints (checkout/domains/layouts/theme/users/etc.) (done)
+- [x] Merchant metafields
+- `/merchants/current/metafields` + `/merchants/current/app_metafields` (done)
 - [ ] Webhooks
 
 ## Storefront API
