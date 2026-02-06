@@ -505,10 +505,10 @@ func TestMetafieldsGetRunEJSONOutput(t *testing.T) {
 func TestMetafieldsCreateRunE(t *testing.T) {
 	now := time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC)
 	tests := []struct {
-		name    string
-		mockResp   *api.Metafield
-		mockErr    error
-		wantErr    bool
+		name     string
+		mockResp *api.Metafield
+		mockErr  error
+		wantErr  bool
 	}{
 		{
 			name: "successful create",

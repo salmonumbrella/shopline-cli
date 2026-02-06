@@ -19,26 +19,31 @@ func TestGiftCardsCmd(t *testing.T) {
 		t.Errorf("Expected Use, got %q", giftCardsCmd.Use)
 	}
 }
+
 func TestGiftCardsListCmd(t *testing.T) {
 	if giftCardsListCmd.Use != "list" {
 		t.Errorf("Expected Use, got %q", giftCardsListCmd.Use)
 	}
 }
+
 func TestGiftCardsGetCmd(t *testing.T) {
 	if giftCardsGetCmd.Use != "get <id>" {
 		t.Errorf("Expected Use, got %q", giftCardsGetCmd.Use)
 	}
 }
+
 func TestGiftCardsCreateCmd(t *testing.T) {
 	if giftCardsCreateCmd.Use != "create" {
 		t.Errorf("Expected Use, got %q", giftCardsCreateCmd.Use)
 	}
 }
+
 func TestGiftCardsDeleteCmd(t *testing.T) {
 	if giftCardsDeleteCmd.Use != "delete <id>" {
 		t.Errorf("Expected Use, got %q", giftCardsDeleteCmd.Use)
 	}
 }
+
 func TestGiftCardsListFlags(t *testing.T) {
 	flags := []string{"status", "customer-id", "page", "page-size"}
 	for _, flag := range flags {
@@ -47,6 +52,7 @@ func TestGiftCardsListFlags(t *testing.T) {
 		}
 	}
 }
+
 func TestGiftCardsCreateFlags(t *testing.T) {
 	flags := []string{"initial-value", "currency", "code", "customer-id", "note"}
 	for _, flag := range flags {
@@ -55,6 +61,7 @@ func TestGiftCardsCreateFlags(t *testing.T) {
 		}
 	}
 }
+
 func TestGiftCardsListRunE_GetClientFails(t *testing.T) {
 	origFactory := secretsStoreFactory
 	defer func() { secretsStoreFactory = origFactory }()
@@ -71,6 +78,7 @@ func TestGiftCardsListRunE_GetClientFails(t *testing.T) {
 		t.Fatal("Expected error")
 	}
 }
+
 func TestGiftCardsGetRunE_GetClientFails(t *testing.T) {
 	origFactory := secretsStoreFactory
 	defer func() { secretsStoreFactory = origFactory }()
@@ -83,6 +91,7 @@ func TestGiftCardsGetRunE_GetClientFails(t *testing.T) {
 		t.Fatal("Expected error")
 	}
 }
+
 func TestGiftCardsCreateRunE_GetClientFails(t *testing.T) {
 	origFactory := secretsStoreFactory
 	defer func() { secretsStoreFactory = origFactory }()
@@ -100,6 +109,7 @@ func TestGiftCardsCreateRunE_GetClientFails(t *testing.T) {
 		t.Fatal("Expected error")
 	}
 }
+
 func TestGiftCardsDeleteRunE_GetClientFails(t *testing.T) {
 	origFactory := secretsStoreFactory
 	defer func() { secretsStoreFactory = origFactory }()
@@ -112,6 +122,7 @@ func TestGiftCardsDeleteRunE_GetClientFails(t *testing.T) {
 		t.Fatal("Expected error")
 	}
 }
+
 func TestGiftCardsListRunE_NoProfiles(t *testing.T) {
 	origFactory := secretsStoreFactory
 	origEnv := os.Getenv("SHOPLINE_STORE")
@@ -133,6 +144,7 @@ func TestGiftCardsListRunE_NoProfiles(t *testing.T) {
 		t.Fatal("Expected error")
 	}
 }
+
 func TestGiftCardsCreateRunE_DryRun(t *testing.T) {
 	var buf bytes.Buffer
 	origStdout := os.Stdout
@@ -159,6 +171,7 @@ func TestGiftCardsCreateRunE_DryRun(t *testing.T) {
 		t.Errorf("Expected dry-run, got: %s", output)
 	}
 }
+
 func TestGiftCardsDeleteRunE_DryRun(t *testing.T) {
 	var buf bytes.Buffer
 	origStdout := os.Stdout

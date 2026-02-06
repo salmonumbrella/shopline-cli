@@ -215,13 +215,13 @@ func TestSmartCollectionsCreateFlagDescriptions(t *testing.T) {
 // smartCollectionsMockAPIClient is a mock implementation of api.APIClient for smart collections tests.
 type smartCollectionsMockAPIClient struct {
 	api.MockClient
-	listSmartCollectionsResp   *api.SmartCollectionsListResponse
-	listSmartCollectionsErr    error
-	getSmartCollectionResp     *api.SmartCollection
-	getSmartCollectionErr      error
-	createSmartCollectionResp  *api.SmartCollection
-	createSmartCollectionErr   error
-	deleteSmartCollectionErr   error
+	listSmartCollectionsResp  *api.SmartCollectionsListResponse
+	listSmartCollectionsErr   error
+	getSmartCollectionResp    *api.SmartCollection
+	getSmartCollectionErr     error
+	createSmartCollectionResp *api.SmartCollection
+	createSmartCollectionErr  error
+	deleteSmartCollectionErr  error
 }
 
 func (m *smartCollectionsMockAPIClient) ListSmartCollections(ctx context.Context, opts *api.SmartCollectionsListOptions) (*api.SmartCollectionsListResponse, error) {

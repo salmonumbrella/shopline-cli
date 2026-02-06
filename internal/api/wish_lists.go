@@ -25,21 +25,21 @@ type WishList struct {
 
 // WishListItem represents an item in a wish list.
 type WishListItem struct {
-	ID           string     `json:"id"`
-	ProductID    string     `json:"product_id"`
-	VariantID    string     `json:"variant_id"`
-	Title        string     `json:"title"`
-	VariantTitle string     `json:"variant_title"`
-	Handle       string     `json:"handle"`
-	Price        string     `json:"price"`
-	CompareAtPrice string   `json:"compare_at_price"`
-	Currency     string     `json:"currency"`
-	Available    bool       `json:"available"`
-	ImageURL     string     `json:"image_url"`
-	Quantity     int        `json:"quantity"`
-	Priority     int        `json:"priority"`
-	Notes        string     `json:"notes"`
-	AddedAt      time.Time  `json:"added_at"`
+	ID             string    `json:"id"`
+	ProductID      string    `json:"product_id"`
+	VariantID      string    `json:"variant_id"`
+	Title          string    `json:"title"`
+	VariantTitle   string    `json:"variant_title"`
+	Handle         string    `json:"handle"`
+	Price          string    `json:"price"`
+	CompareAtPrice string    `json:"compare_at_price"`
+	Currency       string    `json:"currency"`
+	Available      bool      `json:"available"`
+	ImageURL       string    `json:"image_url"`
+	Quantity       int       `json:"quantity"`
+	Priority       int       `json:"priority"`
+	Notes          string    `json:"notes"`
+	AddedAt        time.Time `json:"added_at"`
 }
 
 // WishListsListOptions contains options for listing wish lists.

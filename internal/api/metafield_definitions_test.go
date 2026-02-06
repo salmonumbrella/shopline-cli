@@ -654,7 +654,7 @@ func TestListMetafieldDefinitionsPartialOptions(t *testing.T) {
 
 			client := NewClient("test", "token")
 			client.BaseURL = server.URL
-	client.SetUseOpenAPI(false)
+			client.SetUseOpenAPI(false)
 
 			_, err := client.ListMetafieldDefinitions(context.Background(), tt.opts)
 			if err != nil {

@@ -122,13 +122,13 @@ func (c *Client) DeactivateSale(ctx context.Context, id string) (*Sale, error) {
 
 // SaleProduct represents a product in a live sale.
 type SaleProduct struct {
-	ID        string   `json:"id"`
-	ProductID string   `json:"product_id"`
-	VariantID string   `json:"variant_id,omitempty"`
-	Price     float64  `json:"price"`
-	Quantity  int      `json:"quantity"`
-	Keywords  []string `json:"keywords,omitempty"`
-	Position  int      `json:"position"`
+	ID        string    `json:"id"`
+	ProductID string    `json:"product_id"`
+	VariantID string    `json:"variant_id,omitempty"`
+	Price     float64   `json:"price"`
+	Quantity  int       `json:"quantity"`
+	Keywords  []string  `json:"keywords,omitempty"`
+	Position  int       `json:"position"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

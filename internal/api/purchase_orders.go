@@ -11,36 +11,36 @@ import (
 
 // PurchaseOrder represents a Shopline purchase order.
 type PurchaseOrder struct {
-	ID             string              `json:"id"`
-	Number         string              `json:"number"`
-	Status         string              `json:"status"`
-	SupplierID     string              `json:"supplier_id"`
-	SupplierName   string              `json:"supplier_name"`
-	WarehouseID    string              `json:"warehouse_id"`
-	WarehouseName  string              `json:"warehouse_name"`
-	Currency       string              `json:"currency"`
-	Subtotal       string              `json:"subtotal"`
-	Tax            string              `json:"tax"`
-	Total          string              `json:"total"`
-	Note           string              `json:"note"`
-	ExpectedAt     time.Time           `json:"expected_at"`
-	ReceivedAt     time.Time           `json:"received_at"`
-	LineItems      []PurchaseOrderItem `json:"line_items"`
-	CreatedAt      time.Time           `json:"created_at"`
-	UpdatedAt      time.Time           `json:"updated_at"`
+	ID            string              `json:"id"`
+	Number        string              `json:"number"`
+	Status        string              `json:"status"`
+	SupplierID    string              `json:"supplier_id"`
+	SupplierName  string              `json:"supplier_name"`
+	WarehouseID   string              `json:"warehouse_id"`
+	WarehouseName string              `json:"warehouse_name"`
+	Currency      string              `json:"currency"`
+	Subtotal      string              `json:"subtotal"`
+	Tax           string              `json:"tax"`
+	Total         string              `json:"total"`
+	Note          string              `json:"note"`
+	ExpectedAt    time.Time           `json:"expected_at"`
+	ReceivedAt    time.Time           `json:"received_at"`
+	LineItems     []PurchaseOrderItem `json:"line_items"`
+	CreatedAt     time.Time           `json:"created_at"`
+	UpdatedAt     time.Time           `json:"updated_at"`
 }
 
 // PurchaseOrderItem represents a line item in a purchase order.
 type PurchaseOrderItem struct {
-	ID           string `json:"id"`
-	ProductID    string `json:"product_id"`
-	VariantID    string `json:"variant_id"`
-	SKU          string `json:"sku"`
-	Title        string `json:"title"`
-	Quantity     int    `json:"quantity"`
-	ReceivedQty  int    `json:"received_qty"`
-	UnitCost     string `json:"unit_cost"`
-	Total        string `json:"total"`
+	ID          string `json:"id"`
+	ProductID   string `json:"product_id"`
+	VariantID   string `json:"variant_id"`
+	SKU         string `json:"sku"`
+	Title       string `json:"title"`
+	Quantity    int    `json:"quantity"`
+	ReceivedQty int    `json:"received_qty"`
+	UnitCost    string `json:"unit_cost"`
+	Total       string `json:"total"`
 }
 
 // PurchaseOrdersListOptions contains options for listing purchase orders.
@@ -63,12 +63,12 @@ type PurchaseOrdersListResponse struct {
 
 // PurchaseOrderCreateRequest contains the request body for creating a purchase order.
 type PurchaseOrderCreateRequest struct {
-	SupplierID  string                       `json:"supplier_id"`
-	WarehouseID string                       `json:"warehouse_id"`
-	Currency    string                       `json:"currency,omitempty"`
-	Note        string                       `json:"note,omitempty"`
-	ExpectedAt  *time.Time                   `json:"expected_at,omitempty"`
-	LineItems   []PurchaseOrderItemRequest   `json:"line_items"`
+	SupplierID  string                     `json:"supplier_id"`
+	WarehouseID string                     `json:"warehouse_id"`
+	Currency    string                     `json:"currency,omitempty"`
+	Note        string                     `json:"note,omitempty"`
+	ExpectedAt  *time.Time                 `json:"expected_at,omitempty"`
+	LineItems   []PurchaseOrderItemRequest `json:"line_items"`
 }
 
 // PurchaseOrderItemRequest contains the request body for a line item.

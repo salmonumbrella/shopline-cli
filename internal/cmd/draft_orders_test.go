@@ -131,14 +131,14 @@ func TestDraftOrdersListWithEnvVar(t *testing.T) {
 // draftOrdersMockAPIClient is a mock implementation of api.APIClient for draft orders tests.
 type draftOrdersMockAPIClient struct {
 	api.MockClient
-	listDraftOrdersResp       *api.DraftOrdersListResponse
-	listDraftOrdersErr        error
-	getDraftOrderResp         *api.DraftOrder
-	getDraftOrderErr          error
-	deleteDraftOrderErr       error
-	completeDraftOrderResp    *api.DraftOrder
-	completeDraftOrderErr     error
-	sendDraftOrderInvoiceErr  error
+	listDraftOrdersResp      *api.DraftOrdersListResponse
+	listDraftOrdersErr       error
+	getDraftOrderResp        *api.DraftOrder
+	getDraftOrderErr         error
+	deleteDraftOrderErr      error
+	completeDraftOrderResp   *api.DraftOrder
+	completeDraftOrderErr    error
+	sendDraftOrderInvoiceErr error
 }
 
 func (m *draftOrdersMockAPIClient) ListDraftOrders(ctx context.Context, opts *api.DraftOrdersListOptions) (*api.DraftOrdersListResponse, error) {

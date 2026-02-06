@@ -428,7 +428,7 @@ func TestListTransactionsWithOptions(t *testing.T) {
 
 			client := NewClient("test", "token")
 			client.BaseURL = server.URL
-	client.SetUseOpenAPI(false)
+			client.SetUseOpenAPI(false)
 
 			transactions, err := client.ListTransactions(context.Background(), tc.opts)
 			if err != nil {

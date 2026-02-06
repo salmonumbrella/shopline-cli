@@ -182,33 +182,33 @@ func TestListCarrierServicesWithOptions(t *testing.T) {
 	boolPtr := func(b bool) *bool { return &b }
 
 	testCases := []struct {
-		name           string
-		opts           *CarrierServicesListOptions
-		expectedQuery  map[string]string
+		name          string
+		opts          *CarrierServicesListOptions
+		expectedQuery map[string]string
 	}{
 		{
-			name: "page only",
-			opts: &CarrierServicesListOptions{Page: 2},
+			name:          "page only",
+			opts:          &CarrierServicesListOptions{Page: 2},
 			expectedQuery: map[string]string{"page": "2"},
 		},
 		{
-			name: "page_size only",
-			opts: &CarrierServicesListOptions{PageSize: 50},
+			name:          "page_size only",
+			opts:          &CarrierServicesListOptions{PageSize: 50},
 			expectedQuery: map[string]string{"page_size": "50"},
 		},
 		{
-			name: "active true",
-			opts: &CarrierServicesListOptions{Active: boolPtr(true)},
+			name:          "active true",
+			opts:          &CarrierServicesListOptions{Active: boolPtr(true)},
 			expectedQuery: map[string]string{"active": "true"},
 		},
 		{
-			name: "active false",
-			opts: &CarrierServicesListOptions{Active: boolPtr(false)},
+			name:          "active false",
+			opts:          &CarrierServicesListOptions{Active: boolPtr(false)},
 			expectedQuery: map[string]string{"active": "false"},
 		},
 		{
-			name: "all options combined",
-			opts: &CarrierServicesListOptions{Page: 3, PageSize: 25, Active: boolPtr(true)},
+			name:          "all options combined",
+			opts:          &CarrierServicesListOptions{Page: 3, PageSize: 25, Active: boolPtr(true)},
 			expectedQuery: map[string]string{"page": "3", "page_size": "25", "active": "true"},
 		},
 	}
@@ -240,7 +240,7 @@ func TestListCarrierServicesWithOptions(t *testing.T) {
 
 			client := NewClient("test", "token")
 			client.BaseURL = server.URL
-	client.SetUseOpenAPI(false)
+			client.SetUseOpenAPI(false)
 
 			services, err := client.ListCarrierServices(context.Background(), tc.opts)
 			if err != nil {

@@ -11,19 +11,19 @@ import (
 
 // Transaction represents a Shopline transaction.
 type Transaction struct {
-	ID              string    `json:"id"`
-	OrderID         string    `json:"order_id"`
-	Kind            string    `json:"kind"`
-	Gateway         string    `json:"gateway"`
-	Status          string    `json:"status"`
-	Amount          string    `json:"amount"`
-	Currency        string    `json:"currency"`
-	Authorization   string    `json:"authorization"`
-	ParentID        string    `json:"parent_id"`
-	ErrorCode       string    `json:"error_code"`
-	Message         string    `json:"message"`
-	ProcessedAt     time.Time `json:"processed_at"`
-	CreatedAt       time.Time `json:"created_at"`
+	ID            string    `json:"id"`
+	OrderID       string    `json:"order_id"`
+	Kind          string    `json:"kind"`
+	Gateway       string    `json:"gateway"`
+	Status        string    `json:"status"`
+	Amount        string    `json:"amount"`
+	Currency      string    `json:"currency"`
+	Authorization string    `json:"authorization"`
+	ParentID      string    `json:"parent_id"`
+	ErrorCode     string    `json:"error_code"`
+	Message       string    `json:"message"`
+	ProcessedAt   time.Time `json:"processed_at"`
+	CreatedAt     time.Time `json:"created_at"`
 }
 
 // TransactionsListOptions contains options for listing transactions.

@@ -303,17 +303,17 @@ func TestGiftsCreateRunE_InvalidEndsAt(t *testing.T) {
 // giftsMockAPIClient is a mock implementation of api.APIClient for gifts tests.
 type giftsMockAPIClient struct {
 	api.MockClient
-	listGiftsResp     *api.GiftsListResponse
-	listGiftsErr      error
-	getGiftResp       *api.Gift
-	getGiftErr        error
-	createGiftResp    *api.Gift
-	createGiftErr     error
-	activateGiftResp  *api.Gift
-	activateGiftErr   error
+	listGiftsResp      *api.GiftsListResponse
+	listGiftsErr       error
+	getGiftResp        *api.Gift
+	getGiftErr         error
+	createGiftResp     *api.Gift
+	createGiftErr      error
+	activateGiftResp   *api.Gift
+	activateGiftErr    error
 	deactivateGiftResp *api.Gift
 	deactivateGiftErr  error
-	deleteGiftErr     error
+	deleteGiftErr      error
 }
 
 func (m *giftsMockAPIClient) ListGifts(ctx context.Context, opts *api.GiftsListOptions) (*api.GiftsListResponse, error) {
@@ -684,12 +684,12 @@ func TestGiftsGetRunE_JSONOutput(t *testing.T) {
 // TestGiftsCreateRunE tests the gifts create command with mock API.
 func TestGiftsCreateRunE(t *testing.T) {
 	tests := []struct {
-		name       string
-		mockResp   *api.Gift
-		mockErr    error
-		wantErr    bool
-		startsAt   string
-		endsAt     string
+		name     string
+		mockResp *api.Gift
+		mockErr  error
+		wantErr  bool
+		startsAt string
+		endsAt   string
 	}{
 		{
 			name: "successful create",

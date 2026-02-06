@@ -125,15 +125,15 @@ func TestCustomFieldsUpdateFlags(t *testing.T) {
 // customFieldsMockAPIClient is a mock implementation of api.APIClient for custom fields tests.
 type customFieldsMockAPIClient struct {
 	api.MockClient
-	listCustomFieldsResp   *api.CustomFieldsListResponse
-	listCustomFieldsErr    error
-	getCustomFieldResp     *api.CustomField
-	getCustomFieldErr      error
-	createCustomFieldResp  *api.CustomField
-	createCustomFieldErr   error
-	updateCustomFieldResp  *api.CustomField
-	updateCustomFieldErr   error
-	deleteCustomFieldErr   error
+	listCustomFieldsResp  *api.CustomFieldsListResponse
+	listCustomFieldsErr   error
+	getCustomFieldResp    *api.CustomField
+	getCustomFieldErr     error
+	createCustomFieldResp *api.CustomField
+	createCustomFieldErr  error
+	updateCustomFieldResp *api.CustomField
+	updateCustomFieldErr  error
+	deleteCustomFieldErr  error
 }
 
 func (m *customFieldsMockAPIClient) ListCustomFields(ctx context.Context, opts *api.CustomFieldsListOptions) (*api.CustomFieldsListResponse, error) {
@@ -331,8 +331,8 @@ func TestCustomFieldsListRunEJSON(t *testing.T) {
 // TestCustomFieldsGetRunE tests the custom fields get command with mock API.
 func TestCustomFieldsGetRunE(t *testing.T) {
 	tests := []struct {
-		name    string
-		fieldID string
+		name     string
+		fieldID  string
 		mockResp *api.CustomField
 		mockErr  error
 		wantErr  bool

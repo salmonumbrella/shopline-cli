@@ -445,11 +445,11 @@ func TestStorefrontTokensListRunEJSON(t *testing.T) {
 // TestStorefrontTokensGetRunE tests the storefront tokens get command execution with mock API.
 func TestStorefrontTokensGetRunE(t *testing.T) {
 	tests := []struct {
-		name    string
-		tokenID string
-		mockResp  *api.StorefrontToken
-		mockErr   error
-		wantErr bool
+		name     string
+		tokenID  string
+		mockResp *api.StorefrontToken
+		mockErr  error
+		wantErr  bool
 	}{
 		{
 			name:    "successful get",

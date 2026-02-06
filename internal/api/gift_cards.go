@@ -17,19 +17,19 @@ const (
 
 // GiftCard represents a gift card.
 type GiftCard struct {
-	ID             string         `json:"id"`
-	Code           string         `json:"code"`
-	MaskedCode     string         `json:"masked_code"`
-	InitialValue   string         `json:"initial_value"`
-	Balance        string         `json:"balance"`
-	Currency       string         `json:"currency"`
-	Status         GiftCardStatus `json:"status"`
-	CustomerID     string         `json:"customer_id"`
-	Note           string         `json:"note"`
-	ExpiresAt      time.Time      `json:"expires_at"`
-	DisabledAt     time.Time      `json:"disabled_at"`
-	CreatedAt      time.Time      `json:"created_at"`
-	UpdatedAt      time.Time      `json:"updated_at"`
+	ID           string         `json:"id"`
+	Code         string         `json:"code"`
+	MaskedCode   string         `json:"masked_code"`
+	InitialValue string         `json:"initial_value"`
+	Balance      string         `json:"balance"`
+	Currency     string         `json:"currency"`
+	Status       GiftCardStatus `json:"status"`
+	CustomerID   string         `json:"customer_id"`
+	Note         string         `json:"note"`
+	ExpiresAt    time.Time      `json:"expires_at"`
+	DisabledAt   time.Time      `json:"disabled_at"`
+	CreatedAt    time.Time      `json:"created_at"`
+	UpdatedAt    time.Time      `json:"updated_at"`
 }
 
 // GiftCardsListOptions contains options for listing gift cards.

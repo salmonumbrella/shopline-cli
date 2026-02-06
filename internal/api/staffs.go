@@ -9,16 +9,16 @@ import (
 
 // Staff represents a Shopline staff account.
 type Staff struct {
-	ID          string    `json:"id"`
-	Email       string    `json:"email"`
-	FirstName   string    `json:"first_name"`
-	LastName    string    `json:"last_name"`
-	Phone       string    `json:"phone,omitempty"`
-	AccountOwner bool     `json:"account_owner"`
-	Locale      string    `json:"locale"`
-	Permissions []string  `json:"permissions"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID           string    `json:"id"`
+	Email        string    `json:"email"`
+	FirstName    string    `json:"first_name"`
+	LastName     string    `json:"last_name"`
+	Phone        string    `json:"phone,omitempty"`
+	AccountOwner bool      `json:"account_owner"`
+	Locale       string    `json:"locale"`
+	Permissions  []string  `json:"permissions"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 // StaffsListOptions contains options for listing staff accounts.

@@ -816,13 +816,13 @@ func TestSellingPlansListEmptyDiscount(t *testing.T) {
 		listSellingPlansResp: &api.SellingPlansListResponse{
 			Items: []api.SellingPlan{
 				{
-					ID:           "plan_no_discount",
-					Name:         "No Discount Plan",
-					Status:       "active",
-					Frequency:    "monthly",
-					DiscountType: "",  // Empty discount type
+					ID:            "plan_no_discount",
+					Name:          "No Discount Plan",
+					Status:        "active",
+					Frequency:     "monthly",
+					DiscountType:  "", // Empty discount type
 					DiscountValue: "",
-					CreatedAt:    testTime,
+					CreatedAt:     testTime,
 				},
 			},
 			TotalCount: 1,

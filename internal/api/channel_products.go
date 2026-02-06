@@ -9,39 +9,39 @@ import (
 
 // ChannelProductListing represents a product listing in a sales channel.
 type ChannelProductListing struct {
-	ID              string                   `json:"id"`
-	ProductID       string                   `json:"product_id"`
-	ChannelID       string                   `json:"channel_id"`
-	Title           string                   `json:"title"`
-	Handle          string                   `json:"handle"`
-	Status          string                   `json:"status"`
-	Published       bool                     `json:"published"`
-	PublishedAt     *time.Time               `json:"published_at,omitempty"`
+	ID               string                  `json:"id"`
+	ProductID        string                  `json:"product_id"`
+	ChannelID        string                  `json:"channel_id"`
+	Title            string                  `json:"title"`
+	Handle           string                  `json:"handle"`
+	Status           string                  `json:"status"`
+	Published        bool                    `json:"published"`
+	PublishedAt      *time.Time              `json:"published_at,omitempty"`
 	AvailableForSale bool                    `json:"available_for_sale"`
-	Variants        []ChannelVariantListing  `json:"variants,omitempty"`
-	CreatedAt       time.Time                `json:"created_at"`
-	UpdatedAt       time.Time                `json:"updated_at"`
+	Variants         []ChannelVariantListing `json:"variants,omitempty"`
+	CreatedAt        time.Time               `json:"created_at"`
+	UpdatedAt        time.Time               `json:"updated_at"`
 }
 
 // ChannelVariantListing represents a variant listing in a channel.
 type ChannelVariantListing struct {
-	ID               string `json:"id"`
-	VariantID        string `json:"variant_id"`
-	Title            string `json:"title"`
-	SKU              string `json:"sku,omitempty"`
-	Price            string `json:"price"`
-	CompareAtPrice   string `json:"compare_at_price,omitempty"`
-	InventoryQuantity int   `json:"inventory_quantity"`
-	Available        bool   `json:"available"`
+	ID                string `json:"id"`
+	VariantID         string `json:"variant_id"`
+	Title             string `json:"title"`
+	SKU               string `json:"sku,omitempty"`
+	Price             string `json:"price"`
+	CompareAtPrice    string `json:"compare_at_price,omitempty"`
+	InventoryQuantity int    `json:"inventory_quantity"`
+	Available         bool   `json:"available"`
 }
 
 // ChannelProductsListOptions contains options for listing channel products.
 type ChannelProductsListOptions struct {
-	Page            int
-	PageSize        int
-	Published       *bool
+	Page             int
+	PageSize         int
+	Published        *bool
 	AvailableForSale *bool
-	Status          string
+	Status           string
 }
 
 // ChannelProductsListResponse is the paginated response for channel products.

@@ -18,8 +18,8 @@ import (
 type merchantsMockAPIClient struct {
 	api.MockClient
 
-	getMerchantResp      *api.Merchant
-	getMerchantErr       error
+	getMerchantResp       *api.Merchant
+	getMerchantErr        error
 	listMerchantStaffResp *api.MerchantStaffListResponse
 	listMerchantStaffErr  error
 	getMerchantStaffResp  *api.MerchantStaff

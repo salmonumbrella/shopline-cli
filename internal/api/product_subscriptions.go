@@ -9,23 +9,23 @@ import (
 
 // ProductSubscription represents a Shopline product subscription plan.
 type ProductSubscription struct {
-	ID                 string    `json:"id"`
-	ProductID          string    `json:"product_id"`
-	VariantID          string    `json:"variant_id"`
-	CustomerID         string    `json:"customer_id"`
-	SellingPlanID      string    `json:"selling_plan_id"`
-	Status             string    `json:"status"`
-	Frequency          string    `json:"frequency"`
-	FrequencyInterval  int       `json:"frequency_interval"`
-	NextBillingDate    time.Time `json:"next_billing_date"`
-	LastBillingDate    time.Time `json:"last_billing_date"`
-	Price              string    `json:"price"`
-	Currency           string    `json:"currency"`
-	Quantity           int       `json:"quantity"`
-	TotalCycles        int       `json:"total_cycles"`
-	CompletedCycles    int       `json:"completed_cycles"`
-	CreatedAt          time.Time `json:"created_at"`
-	UpdatedAt          time.Time `json:"updated_at"`
+	ID                string    `json:"id"`
+	ProductID         string    `json:"product_id"`
+	VariantID         string    `json:"variant_id"`
+	CustomerID        string    `json:"customer_id"`
+	SellingPlanID     string    `json:"selling_plan_id"`
+	Status            string    `json:"status"`
+	Frequency         string    `json:"frequency"`
+	FrequencyInterval int       `json:"frequency_interval"`
+	NextBillingDate   time.Time `json:"next_billing_date"`
+	LastBillingDate   time.Time `json:"last_billing_date"`
+	Price             string    `json:"price"`
+	Currency          string    `json:"currency"`
+	Quantity          int       `json:"quantity"`
+	TotalCycles       int       `json:"total_cycles"`
+	CompletedCycles   int       `json:"completed_cycles"`
+	CreatedAt         time.Time `json:"created_at"`
+	UpdatedAt         time.Time `json:"updated_at"`
 }
 
 // ProductSubscriptionsListOptions contains options for listing product subscriptions.
@@ -42,12 +42,12 @@ type ProductSubscriptionsListResponse = ListResponse[ProductSubscription]
 
 // ProductSubscriptionCreateRequest contains the data for creating a product subscription.
 type ProductSubscriptionCreateRequest struct {
-	ProductID         string `json:"product_id"`
-	VariantID         string `json:"variant_id,omitempty"`
-	CustomerID        string `json:"customer_id"`
-	SellingPlanID     string `json:"selling_plan_id"`
-	Quantity          int    `json:"quantity,omitempty"`
-	NextBillingDate   string `json:"next_billing_date,omitempty"`
+	ProductID       string `json:"product_id"`
+	VariantID       string `json:"variant_id,omitempty"`
+	CustomerID      string `json:"customer_id"`
+	SellingPlanID   string `json:"selling_plan_id"`
+	Quantity        int    `json:"quantity,omitempty"`
+	NextBillingDate string `json:"next_billing_date,omitempty"`
 }
 
 // ListProductSubscriptions retrieves a list of product subscriptions.

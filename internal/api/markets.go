@@ -11,16 +11,16 @@ import (
 
 // Market represents a Shopline market.
 type Market struct {
-	ID          string    `json:"id"`
-	Name        string    `json:"name"`
-	Handle      string    `json:"handle"`
-	Enabled     bool      `json:"enabled"`
-	Primary     bool      `json:"primary"`
-	Countries   []string  `json:"countries"`
-	Currencies  []string  `json:"currencies"`
-	Languages   []string  `json:"languages"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID         string    `json:"id"`
+	Name       string    `json:"name"`
+	Handle     string    `json:"handle"`
+	Enabled    bool      `json:"enabled"`
+	Primary    bool      `json:"primary"`
+	Countries  []string  `json:"countries"`
+	Currencies []string  `json:"currencies"`
+	Languages  []string  `json:"languages"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
 }
 
 // MarketsListOptions contains options for listing markets.

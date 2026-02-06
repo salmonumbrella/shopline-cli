@@ -231,13 +231,13 @@ var _ = secrets.StoreCredentials{}
 // storefrontCartsMockAPIClient is a mock implementation of api.APIClient for storefront carts tests.
 type storefrontCartsMockAPIClient struct {
 	api.MockClient
-	listStorefrontCartsResp   *api.StorefrontCartsListResponse
-	listStorefrontCartsErr    error
-	getStorefrontCartResp     *api.StorefrontCart
-	getStorefrontCartErr      error
-	createStorefrontCartResp  *api.StorefrontCart
-	createStorefrontCartErr   error
-	deleteStorefrontCartErr   error
+	listStorefrontCartsResp  *api.StorefrontCartsListResponse
+	listStorefrontCartsErr   error
+	getStorefrontCartResp    *api.StorefrontCart
+	getStorefrontCartErr     error
+	createStorefrontCartResp *api.StorefrontCart
+	createStorefrontCartErr  error
+	deleteStorefrontCartErr  error
 }
 
 func (m *storefrontCartsMockAPIClient) ListStorefrontCarts(ctx context.Context, opts *api.StorefrontCartsListOptions) (*api.StorefrontCartsListResponse, error) {

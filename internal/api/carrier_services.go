@@ -11,15 +11,15 @@ import (
 
 // CarrierService represents a Shopline carrier service.
 type CarrierService struct {
-	ID                string    `json:"id"`
-	Name              string    `json:"name"`
-	CallbackURL       string    `json:"callback_url"`
-	Active            bool      `json:"active"`
-	ServiceDiscovery  bool      `json:"service_discovery"`
-	CarrierServiceType string   `json:"carrier_service_type"`
-	Format            string    `json:"format"`
-	CreatedAt         time.Time `json:"created_at"`
-	UpdatedAt         time.Time `json:"updated_at"`
+	ID                 string    `json:"id"`
+	Name               string    `json:"name"`
+	CallbackURL        string    `json:"callback_url"`
+	Active             bool      `json:"active"`
+	ServiceDiscovery   bool      `json:"service_discovery"`
+	CarrierServiceType string    `json:"carrier_service_type"`
+	Format             string    `json:"format"`
+	CreatedAt          time.Time `json:"created_at"`
+	UpdatedAt          time.Time `json:"updated_at"`
 }
 
 // CarrierServicesListOptions contains options for listing carrier services.

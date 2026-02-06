@@ -19,15 +19,15 @@ import (
 type purchaseOrdersAPIClient struct {
 	api.MockClient
 
-	listPurchaseOrdersResp    *api.PurchaseOrdersListResponse
-	listPurchaseOrdersErr     error
-	getPurchaseOrderResp      *api.PurchaseOrder
-	getPurchaseOrderErr       error
-	receivePurchaseOrderResp  *api.PurchaseOrder
-	receivePurchaseOrderErr   error
-	cancelPurchaseOrderResp   *api.PurchaseOrder
-	cancelPurchaseOrderErr    error
-	deletePurchaseOrderErr    error
+	listPurchaseOrdersResp   *api.PurchaseOrdersListResponse
+	listPurchaseOrdersErr    error
+	getPurchaseOrderResp     *api.PurchaseOrder
+	getPurchaseOrderErr      error
+	receivePurchaseOrderResp *api.PurchaseOrder
+	receivePurchaseOrderErr  error
+	cancelPurchaseOrderResp  *api.PurchaseOrder
+	cancelPurchaseOrderErr   error
+	deletePurchaseOrderErr   error
 }
 
 func (m *purchaseOrdersAPIClient) ListPurchaseOrders(ctx context.Context, opts *api.PurchaseOrdersListOptions) (*api.PurchaseOrdersListResponse, error) {
@@ -632,8 +632,8 @@ func TestPurchaseOrdersGetRunE_JSONOutput(t *testing.T) {
 // TestPurchaseOrdersReceiveRunE_Success tests the receive command with mock API.
 func TestPurchaseOrdersReceiveRunE_Success(t *testing.T) {
 	tests := []struct {
-		name    string
-		id      string
+		name     string
+		id       string
 		mockResp *api.PurchaseOrder
 		mockErr  error
 		wantErr  bool
@@ -687,8 +687,8 @@ func TestPurchaseOrdersReceiveRunE_Success(t *testing.T) {
 // TestPurchaseOrdersCancelRunE_Success tests the cancel command with mock API.
 func TestPurchaseOrdersCancelRunE_Success(t *testing.T) {
 	tests := []struct {
-		name    string
-		id      string
+		name     string
+		id       string
 		mockResp *api.PurchaseOrder
 		mockErr  error
 		wantErr  bool

@@ -17,15 +17,15 @@ import (
 type wishListsMockAPIClient struct {
 	api.MockClient // embed base mock for unimplemented methods
 
-	listWishListsResp   *api.WishListsListResponse
-	listWishListsErr    error
-	getWishListResp     *api.WishList
-	getWishListErr      error
-	createWishListResp  *api.WishList
-	createWishListErr   error
-	deleteWishListErr   error
-	addWishListItemResp *api.WishListItem
-	addWishListItemErr  error
+	listWishListsResp     *api.WishListsListResponse
+	listWishListsErr      error
+	getWishListResp       *api.WishList
+	getWishListErr        error
+	createWishListResp    *api.WishList
+	createWishListErr     error
+	deleteWishListErr     error
+	addWishListItemResp   *api.WishListItem
+	addWishListItemErr    error
 	removeWishListItemErr error
 }
 

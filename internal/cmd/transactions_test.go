@@ -419,7 +419,6 @@ func TestTransactionsListRunEWithFilters(t *testing.T) {
 	cmd.Flags().String("kind", "refund", "")
 
 	err := transactionsListCmd.RunE(cmd, []string{})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 		return

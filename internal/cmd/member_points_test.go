@@ -19,26 +19,31 @@ func TestMemberPointsCmd(t *testing.T) {
 		t.Errorf("Expected Use to be 'member-points', got %q", memberPointsCmd.Use)
 	}
 }
+
 func TestMemberPointsGetCmd(t *testing.T) {
 	if memberPointsGetCmd.Use != "get" {
 		t.Errorf("Expected Use to be 'get', got %q", memberPointsGetCmd.Use)
 	}
 }
+
 func TestMemberPointsTransactionsCmd(t *testing.T) {
 	if memberPointsTransactionsCmd.Use != "transactions" {
 		t.Errorf("Expected Use to be 'transactions', got %q", memberPointsTransactionsCmd.Use)
 	}
 }
+
 func TestMemberPointsAdjustCmd(t *testing.T) {
 	if memberPointsAdjustCmd.Use != "adjust" {
 		t.Errorf("Expected Use to be 'adjust', got %q", memberPointsAdjustCmd.Use)
 	}
 }
+
 func TestMemberPointsPersistentFlags(t *testing.T) {
 	if memberPointsCmd.PersistentFlags().Lookup("customer-id") == nil {
 		t.Error("Expected persistent flag 'customer-id' to be defined")
 	}
 }
+
 func TestMemberPointsTransactionsFlags(t *testing.T) {
 	flags := []string{"page", "page-size", "type"}
 	for _, flag := range flags {
@@ -47,6 +52,7 @@ func TestMemberPointsTransactionsFlags(t *testing.T) {
 		}
 	}
 }
+
 func TestMemberPointsAdjustFlags(t *testing.T) {
 	flags := []string{"points", "description"}
 	for _, flag := range flags {
@@ -55,6 +61,7 @@ func TestMemberPointsAdjustFlags(t *testing.T) {
 		}
 	}
 }
+
 func TestMemberPointsGetRunE_GetClientFails(t *testing.T) {
 	origFactory := secretsStoreFactory
 	defer func() { secretsStoreFactory = origFactory }()
@@ -68,6 +75,7 @@ func TestMemberPointsGetRunE_GetClientFails(t *testing.T) {
 		t.Fatal("Expected error, got nil")
 	}
 }
+
 func TestMemberPointsTransactionsRunE_GetClientFails(t *testing.T) {
 	origFactory := secretsStoreFactory
 	defer func() { secretsStoreFactory = origFactory }()
@@ -84,6 +92,7 @@ func TestMemberPointsTransactionsRunE_GetClientFails(t *testing.T) {
 		t.Fatal("Expected error, got nil")
 	}
 }
+
 func TestMemberPointsAdjustRunE_GetClientFails(t *testing.T) {
 	origFactory := secretsStoreFactory
 	defer func() { secretsStoreFactory = origFactory }()
@@ -99,6 +108,7 @@ func TestMemberPointsAdjustRunE_GetClientFails(t *testing.T) {
 		t.Fatal("Expected error, got nil")
 	}
 }
+
 func TestMemberPointsGetRunE_NoProfiles(t *testing.T) {
 	origFactory := secretsStoreFactory
 	origEnv := os.Getenv("SHOPLINE_STORE")
@@ -122,12 +132,12 @@ func TestMemberPointsGetRunE_NoProfiles(t *testing.T) {
 type memberPointsTestClient struct {
 	api.MockClient
 
-	getMemberPointsResp          *api.MemberPoints
-	getMemberPointsErr           error
-	listPointsTransactionsResp   *api.PointsTransactionsListResponse
-	listPointsTransactionsErr    error
-	adjustMemberPointsResp       *api.MemberPoints
-	adjustMemberPointsErr        error
+	getMemberPointsResp        *api.MemberPoints
+	getMemberPointsErr         error
+	listPointsTransactionsResp *api.PointsTransactionsListResponse
+	listPointsTransactionsErr  error
+	adjustMemberPointsResp     *api.MemberPoints
+	adjustMemberPointsErr      error
 }
 
 func (m *memberPointsTestClient) GetMemberPoints(ctx context.Context, customerID string) (*api.MemberPoints, error) {
@@ -291,7 +301,6 @@ func TestMemberPointsGetRunE_JSON(t *testing.T) {
 	cmd.Flags().String("customer-id", "cust_123", "")
 
 	err := memberPointsGetCmd.RunE(cmd, []string{})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 		return
@@ -478,7 +487,6 @@ func TestMemberPointsTransactionsRunE_JSON(t *testing.T) {
 	cmd.Flags().String("type", "", "")
 
 	err := memberPointsTransactionsCmd.RunE(cmd, []string{})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 		return
@@ -700,7 +708,6 @@ func TestMemberPointsAdjustRunE_JSON(t *testing.T) {
 	cmd.Flags().String("description", "Bonus points", "")
 
 	err := memberPointsAdjustCmd.RunE(cmd, []string{})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 		return

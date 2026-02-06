@@ -17,7 +17,7 @@ const appName = "shopline-cli"
 // osType and homeDirFunc are package-level variables to enable testing
 // of OS-specific code paths across all platforms.
 var (
-	osType     = runtime.GOOS
+	osType      = runtime.GOOS
 	homeDirFunc = os.UserHomeDir
 )
 

@@ -241,15 +241,15 @@ func TestMultipassTokenDryRun(t *testing.T) {
 // multipassMockAPIClient is a mock implementation of api.APIClient for multipass tests.
 type multipassMockAPIClient struct {
 	api.MockClient
-	getMultipassResp            *api.Multipass
-	getMultipassErr             error
-	enableMultipassResp         *api.Multipass
-	enableMultipassErr          error
-	disableMultipassErr         error
-	rotateMultipassSecretResp   *api.Multipass
-	rotateMultipassSecretErr    error
-	generateMultipassTokenResp  *api.MultipassToken
-	generateMultipassTokenErr   error
+	getMultipassResp           *api.Multipass
+	getMultipassErr            error
+	enableMultipassResp        *api.Multipass
+	enableMultipassErr         error
+	disableMultipassErr        error
+	rotateMultipassSecretResp  *api.Multipass
+	rotateMultipassSecretErr   error
+	generateMultipassTokenResp *api.MultipassToken
+	generateMultipassTokenErr  error
 }
 
 func (m *multipassMockAPIClient) GetMultipass(ctx context.Context) (*api.Multipass, error) {

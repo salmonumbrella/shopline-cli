@@ -401,8 +401,8 @@ func TestTaxesListWithFilters(t *testing.T) {
 func TestTaxesGetRunE(t *testing.T) {
 	fixedTime := time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC)
 	tests := []struct {
-		name    string
-		taxID   string
+		name     string
+		taxID    string
 		mockResp *api.Tax
 		mockErr  error
 		wantErr  bool

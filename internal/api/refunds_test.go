@@ -268,7 +268,7 @@ func TestListRefundsWithOptions(t *testing.T) {
 
 			client := NewClient("test", "token")
 			client.BaseURL = server.URL
-	client.SetUseOpenAPI(false)
+			client.SetUseOpenAPI(false)
 
 			refunds, err := client.ListRefunds(context.Background(), tc.opts)
 			if err != nil {

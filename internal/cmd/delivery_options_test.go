@@ -16,14 +16,14 @@ import (
 type deliveryOptionsAPIClient struct {
 	api.MockClient
 
-	listDeliveryOptionsResp          *api.DeliveryOptionsListResponse
-	listDeliveryOptionsErr           error
-	getDeliveryOptionResp            *api.DeliveryOption
-	getDeliveryOptionErr             error
-	listDeliveryTimeSlotsResp        *api.DeliveryTimeSlotsListResponse
-	listDeliveryTimeSlotsErr         error
-	updateDeliveryOptionPickupResp   *api.DeliveryOption
-	updateDeliveryOptionPickupErr    error
+	listDeliveryOptionsResp        *api.DeliveryOptionsListResponse
+	listDeliveryOptionsErr         error
+	getDeliveryOptionResp          *api.DeliveryOption
+	getDeliveryOptionErr           error
+	listDeliveryTimeSlotsResp      *api.DeliveryTimeSlotsListResponse
+	listDeliveryTimeSlotsErr       error
+	updateDeliveryOptionPickupResp *api.DeliveryOption
+	updateDeliveryOptionPickupErr  error
 }
 
 func (m *deliveryOptionsAPIClient) ListDeliveryOptions(ctx context.Context, opts *api.DeliveryOptionsListOptions) (*api.DeliveryOptionsListResponse, error) {

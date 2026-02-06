@@ -17,13 +17,13 @@ import (
 // subscriptionsMockAPIClient is a mock implementation of api.APIClient for subscriptions tests.
 type subscriptionsMockAPIClient struct {
 	api.MockClient
-	listSubscriptionsResp   *api.SubscriptionsListResponse
-	listSubscriptionsErr    error
-	getSubscriptionResp     *api.Subscription
-	getSubscriptionErr      error
-	createSubscriptionResp  *api.Subscription
-	createSubscriptionErr   error
-	deleteSubscriptionErr   error
+	listSubscriptionsResp  *api.SubscriptionsListResponse
+	listSubscriptionsErr   error
+	getSubscriptionResp    *api.Subscription
+	getSubscriptionErr     error
+	createSubscriptionResp *api.Subscription
+	createSubscriptionErr  error
+	deleteSubscriptionErr  error
 }
 
 func (m *subscriptionsMockAPIClient) ListSubscriptions(ctx context.Context, opts *api.SubscriptionsListOptions) (*api.SubscriptionsListResponse, error) {

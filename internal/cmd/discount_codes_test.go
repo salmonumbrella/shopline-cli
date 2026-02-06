@@ -198,15 +198,15 @@ func TestDiscountCodesDeleteArgs(t *testing.T) {
 // discountCodesMockAPIClient is a mock implementation of api.APIClient for discount codes tests.
 type discountCodesMockAPIClient struct {
 	api.MockClient
-	listDiscountCodesResp      *api.DiscountCodesListResponse
-	listDiscountCodesErr       error
-	getDiscountCodeResp        *api.DiscountCode
-	getDiscountCodeErr         error
-	getDiscountCodeByCodeResp  *api.DiscountCode
-	getDiscountCodeByCodeErr   error
-	createDiscountCodeResp     *api.DiscountCode
-	createDiscountCodeErr      error
-	deleteDiscountCodeErr      error
+	listDiscountCodesResp     *api.DiscountCodesListResponse
+	listDiscountCodesErr      error
+	getDiscountCodeResp       *api.DiscountCode
+	getDiscountCodeErr        error
+	getDiscountCodeByCodeResp *api.DiscountCode
+	getDiscountCodeByCodeErr  error
+	createDiscountCodeResp    *api.DiscountCode
+	createDiscountCodeErr     error
+	deleteDiscountCodeErr     error
 }
 
 func (m *discountCodesMockAPIClient) ListDiscountCodes(ctx context.Context, opts *api.DiscountCodesListOptions) (*api.DiscountCodesListResponse, error) {

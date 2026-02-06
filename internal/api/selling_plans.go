@@ -9,20 +9,20 @@ import (
 
 // SellingPlan represents a Shopline selling plan configuration.
 type SellingPlan struct {
-	ID                 string    `json:"id"`
-	Name               string    `json:"name"`
-	Description        string    `json:"description"`
-	BillingPolicy      string    `json:"billing_policy"`
-	DeliveryPolicy     string    `json:"delivery_policy"`
-	Frequency          string    `json:"frequency"`
-	FrequencyInterval  int       `json:"frequency_interval"`
-	TrialDays          int       `json:"trial_days"`
-	DiscountType       string    `json:"discount_type"`
-	DiscountValue      string    `json:"discount_value"`
-	Status             string    `json:"status"`
-	Position           int       `json:"position"`
-	CreatedAt          time.Time `json:"created_at"`
-	UpdatedAt          time.Time `json:"updated_at"`
+	ID                string    `json:"id"`
+	Name              string    `json:"name"`
+	Description       string    `json:"description"`
+	BillingPolicy     string    `json:"billing_policy"`
+	DeliveryPolicy    string    `json:"delivery_policy"`
+	Frequency         string    `json:"frequency"`
+	FrequencyInterval int       `json:"frequency_interval"`
+	TrialDays         int       `json:"trial_days"`
+	DiscountType      string    `json:"discount_type"`
+	DiscountValue     string    `json:"discount_value"`
+	Status            string    `json:"status"`
+	Position          int       `json:"position"`
+	CreatedAt         time.Time `json:"created_at"`
+	UpdatedAt         time.Time `json:"updated_at"`
 }
 
 // SellingPlansListOptions contains options for listing selling plans.

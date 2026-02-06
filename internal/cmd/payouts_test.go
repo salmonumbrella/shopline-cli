@@ -294,7 +294,6 @@ func TestPayoutsListRunEWithJSON(t *testing.T) {
 	_ = cmd.Flags().Set("output", "json")
 
 	err := payoutsListCmd.RunE(cmd, []string{})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 		return
@@ -346,7 +345,6 @@ func TestPayoutsListRunEWithStatusFilter(t *testing.T) {
 	_ = cmd.Flags().Set("status", "pending")
 
 	err := payoutsListCmd.RunE(cmd, []string{})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -541,7 +539,6 @@ func TestPayoutsGetRunEWithJSON(t *testing.T) {
 	_ = cmd.Flags().Set("output", "json")
 
 	err := payoutsGetCmd.RunE(cmd, []string{"payout_json_get_123"})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 		return
@@ -636,7 +633,6 @@ func TestPayoutsGetRunEWithAllOptionalFields(t *testing.T) {
 	cmd.Flags().String("query", "", "")
 
 	err := payoutsGetCmd.RunE(cmd, []string{"payout_complete_001"})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -683,7 +679,6 @@ func TestPayoutsListRunEWithPagination(t *testing.T) {
 	_ = cmd.Flags().Set("page-size", "10")
 
 	err := payoutsListCmd.RunE(cmd, []string{})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}

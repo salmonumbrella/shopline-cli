@@ -9,30 +9,30 @@ import (
 
 // StorefrontProduct represents a product as displayed in the storefront.
 type StorefrontProduct struct {
-	ID              string                    `json:"id"`
-	Handle          string                    `json:"handle"`
-	Title           string                    `json:"title"`
-	Description     string                    `json:"description"`
-	Vendor          string                    `json:"vendor"`
-	ProductType     string                    `json:"product_type"`
-	Tags            []string                  `json:"tags"`
-	Status          string                    `json:"status"`
-	Available       bool                      `json:"available"`
-	Price           string                    `json:"price"`
-	CompareAtPrice  string                    `json:"compare_at_price"`
-	Currency        string                    `json:"currency"`
-	Images          []StorefrontProductImage  `json:"images"`
-	Variants        []StorefrontProductVariant `json:"variants"`
-	Options         []StorefrontProductOption `json:"options"`
-	SEOTitle        string                    `json:"seo_title"`
-	SEODescription  string                    `json:"seo_description"`
-	ViewCount       int                       `json:"view_count"`
-	SalesCount      int                       `json:"sales_count"`
-	ReviewCount     int                       `json:"review_count"`
-	AverageRating   float64                   `json:"average_rating"`
-	PublishedAt     *time.Time                `json:"published_at"`
-	CreatedAt       time.Time                 `json:"created_at"`
-	UpdatedAt       time.Time                 `json:"updated_at"`
+	ID             string                     `json:"id"`
+	Handle         string                     `json:"handle"`
+	Title          string                     `json:"title"`
+	Description    string                     `json:"description"`
+	Vendor         string                     `json:"vendor"`
+	ProductType    string                     `json:"product_type"`
+	Tags           []string                   `json:"tags"`
+	Status         string                     `json:"status"`
+	Available      bool                       `json:"available"`
+	Price          string                     `json:"price"`
+	CompareAtPrice string                     `json:"compare_at_price"`
+	Currency       string                     `json:"currency"`
+	Images         []StorefrontProductImage   `json:"images"`
+	Variants       []StorefrontProductVariant `json:"variants"`
+	Options        []StorefrontProductOption  `json:"options"`
+	SEOTitle       string                     `json:"seo_title"`
+	SEODescription string                     `json:"seo_description"`
+	ViewCount      int                        `json:"view_count"`
+	SalesCount     int                        `json:"sales_count"`
+	ReviewCount    int                        `json:"review_count"`
+	AverageRating  float64                    `json:"average_rating"`
+	PublishedAt    *time.Time                 `json:"published_at"`
+	CreatedAt      time.Time                  `json:"created_at"`
+	UpdatedAt      time.Time                  `json:"updated_at"`
 }
 
 // StorefrontProductImage represents a product image.

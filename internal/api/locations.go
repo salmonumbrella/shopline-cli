@@ -11,20 +11,20 @@ import (
 
 // Location represents a Shopline location.
 type Location struct {
-	ID         string    `json:"id"`
-	Name       string    `json:"name"`
-	Address1   string    `json:"address1"`
-	Address2   string    `json:"address2"`
-	City       string    `json:"city"`
-	Province   string    `json:"province"`
-	Country    string    `json:"country"`
-	CountryCode string   `json:"country_code"`
-	Zip        string    `json:"zip"`
-	Phone      string    `json:"phone"`
-	Active     bool      `json:"active"`
-	IsDefault  bool      `json:"is_default"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	Address1    string    `json:"address1"`
+	Address2    string    `json:"address2"`
+	City        string    `json:"city"`
+	Province    string    `json:"province"`
+	Country     string    `json:"country"`
+	CountryCode string    `json:"country_code"`
+	Zip         string    `json:"zip"`
+	Phone       string    `json:"phone"`
+	Active      bool      `json:"active"`
+	IsDefault   bool      `json:"is_default"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 // LocationsListOptions contains options for listing locations.

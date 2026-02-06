@@ -129,13 +129,13 @@ func TestSettingsGetRunE_TextOutput(t *testing.T) {
 	defer cleanup()
 
 	tests := []struct {
-		name            string
-		merchantResp    *api.Merchant
-		merchantErr     error
-		settingsResp    *api.SettingsResponse
-		settingsErr     error
-		wantErr         bool
-		wantOutput      []string
+		name         string
+		merchantResp *api.Merchant
+		merchantErr  error
+		settingsResp *api.SettingsResponse
+		settingsErr  error
+		wantErr      bool
+		wantOutput   []string
 	}{
 		{
 			name: "successful get with all fields",
@@ -504,7 +504,6 @@ func TestSettingsUpdateRunE_DryRun(t *testing.T) {
 	output, err := captureStdout(func() error {
 		return settingsUpdateCmd.RunE(cmd, []string{})
 	})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}

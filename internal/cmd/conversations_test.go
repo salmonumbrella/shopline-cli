@@ -187,17 +187,17 @@ func TestConversationsWithMockStore(t *testing.T) {
 // conversationsMockAPIClient is a mock implementation of api.APIClient for conversations tests.
 type conversationsMockAPIClient struct {
 	api.MockClient
-	listConversationsResp      *api.ConversationsListResponse
-	listConversationsErr       error
-	getConversationResp        *api.Conversation
-	getConversationErr         error
-	createConversationResp     *api.Conversation
-	createConversationErr      error
-	deleteConversationErr      error
-	listMessagesResp           *api.ConversationMessagesListResponse
-	listMessagesErr            error
-	sendMessageResp            *api.ConversationMessage
-	sendMessageErr             error
+	listConversationsResp  *api.ConversationsListResponse
+	listConversationsErr   error
+	getConversationResp    *api.Conversation
+	getConversationErr     error
+	createConversationResp *api.Conversation
+	createConversationErr  error
+	deleteConversationErr  error
+	listMessagesResp       *api.ConversationMessagesListResponse
+	listMessagesErr        error
+	sendMessageResp        *api.ConversationMessage
+	sendMessageErr         error
 }
 
 func (m *conversationsMockAPIClient) ListConversations(ctx context.Context, opts *api.ConversationsListOptions) (*api.ConversationsListResponse, error) {
@@ -282,11 +282,11 @@ func TestConversationsListRunE(t *testing.T) {
 			mockResp: &api.ConversationsListResponse{
 				Items: []api.Conversation{
 					{
-						ID:           "conv_123",
-						CustomerName: "Alice Smith",
-						Status:       "open",
-						Channel:      "chat",
-						MessageCount: 5,
+						ID:            "conv_123",
+						CustomerName:  "Alice Smith",
+						Status:        "open",
+						Channel:       "chat",
+						MessageCount:  5,
 						LastMessageAt: time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC),
 					},
 				},

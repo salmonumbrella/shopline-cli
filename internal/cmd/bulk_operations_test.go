@@ -866,7 +866,6 @@ func TestBulkOperationsListWithFilters(t *testing.T) {
 	_ = cmd.Flags().Set("page-size", "50")
 
 	err := bulkOperationsListCmd.RunE(cmd, []string{})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 		return
@@ -939,7 +938,6 @@ func TestBulkOperationsGetWithOptionalFields(t *testing.T) {
 
 			cmd := newBulkOperationsTestCmd()
 			err := bulkOperationsGetCmd.RunE(cmd, []string{tt.mockResp.ID})
-
 			if err != nil {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -961,7 +959,6 @@ func TestBulkOperationsListEmptyResponse(t *testing.T) {
 
 	cmd := newBulkOperationsTestCmd()
 	err := bulkOperationsListCmd.RunE(cmd, []string{})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -991,7 +988,6 @@ func TestBulkOperationsListLargeFileSize(t *testing.T) {
 
 	cmd := newBulkOperationsTestCmd()
 	err := bulkOperationsListCmd.RunE(cmd, []string{})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 		return

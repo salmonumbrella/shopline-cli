@@ -7,28 +7,28 @@ import (
 
 // CheckoutSettings represents checkout configuration.
 type CheckoutSettings struct {
-	ID                      string    `json:"id"`
-	RequirePhone            bool      `json:"require_phone"`
-	RequireShippingAddress  bool      `json:"require_shipping_address"`
-	RequireBillingAddress   bool      `json:"require_billing_address"`
-	RequireCompany          bool      `json:"require_company"`
-	RequireFullName         bool      `json:"require_full_name"`
-	EnableGuestCheckout     bool      `json:"enable_guest_checkout"`
-	EnableExpressCheckout   bool      `json:"enable_express_checkout"`
-	EnableOrderNotes        bool      `json:"enable_order_notes"`
-	EnableTipping           bool      `json:"enable_tipping"`
-	TippingOptions          []float64 `json:"tipping_options"`
-	DefaultTippingOption    float64   `json:"default_tipping_option"`
-	AutoFulfillDigital      bool      `json:"auto_fulfill_digital"`
-	EnableAddressAutofill   bool      `json:"enable_address_autofill"`
-	EnableMultiCurrency     bool      `json:"enable_multi_currency"`
-	AbandonedCartEnabled    bool      `json:"abandoned_cart_enabled"`
-	AbandonedCartDelay      int       `json:"abandoned_cart_delay"`
-	TermsOfServiceURL       string    `json:"terms_of_service_url"`
-	PrivacyPolicyURL        string    `json:"privacy_policy_url"`
-	RefundPolicyURL         string    `json:"refund_policy_url"`
-	CreatedAt               time.Time `json:"created_at"`
-	UpdatedAt               time.Time `json:"updated_at"`
+	ID                     string    `json:"id"`
+	RequirePhone           bool      `json:"require_phone"`
+	RequireShippingAddress bool      `json:"require_shipping_address"`
+	RequireBillingAddress  bool      `json:"require_billing_address"`
+	RequireCompany         bool      `json:"require_company"`
+	RequireFullName        bool      `json:"require_full_name"`
+	EnableGuestCheckout    bool      `json:"enable_guest_checkout"`
+	EnableExpressCheckout  bool      `json:"enable_express_checkout"`
+	EnableOrderNotes       bool      `json:"enable_order_notes"`
+	EnableTipping          bool      `json:"enable_tipping"`
+	TippingOptions         []float64 `json:"tipping_options"`
+	DefaultTippingOption   float64   `json:"default_tipping_option"`
+	AutoFulfillDigital     bool      `json:"auto_fulfill_digital"`
+	EnableAddressAutofill  bool      `json:"enable_address_autofill"`
+	EnableMultiCurrency    bool      `json:"enable_multi_currency"`
+	AbandonedCartEnabled   bool      `json:"abandoned_cart_enabled"`
+	AbandonedCartDelay     int       `json:"abandoned_cart_delay"`
+	TermsOfServiceURL      string    `json:"terms_of_service_url"`
+	PrivacyPolicyURL       string    `json:"privacy_policy_url"`
+	RefundPolicyURL        string    `json:"refund_policy_url"`
+	CreatedAt              time.Time `json:"created_at"`
+	UpdatedAt              time.Time `json:"updated_at"`
 }
 
 // CheckoutSettingsUpdateRequest contains the request body for updating checkout settings.

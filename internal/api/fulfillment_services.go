@@ -11,20 +11,20 @@ import (
 
 // FulfillmentService represents a Shopline fulfillment service.
 type FulfillmentService struct {
-	ID                      string    `json:"id"`
-	Name                    string    `json:"name"`
-	Handle                  string    `json:"handle"`
-	CallbackURL             string    `json:"callback_url"`
-	InventoryManagement     bool      `json:"inventory_management"`
-	TrackingSupport         bool      `json:"tracking_support"`
-	RequiresShippingMethod  bool      `json:"requires_shipping_method"`
-	Format                  string    `json:"format"`
-	IncludePendingStock     bool      `json:"include_pending_stock"`
-	ServiceDiscovery        bool      `json:"service_discovery"`
-	FulfillmentOrdersOptIn  bool      `json:"fulfillment_orders_opt_in"`
-	PermitsSkuSharing       bool      `json:"permits_sku_sharing"`
-	CreatedAt               time.Time `json:"created_at"`
-	UpdatedAt               time.Time `json:"updated_at"`
+	ID                     string    `json:"id"`
+	Name                   string    `json:"name"`
+	Handle                 string    `json:"handle"`
+	CallbackURL            string    `json:"callback_url"`
+	InventoryManagement    bool      `json:"inventory_management"`
+	TrackingSupport        bool      `json:"tracking_support"`
+	RequiresShippingMethod bool      `json:"requires_shipping_method"`
+	Format                 string    `json:"format"`
+	IncludePendingStock    bool      `json:"include_pending_stock"`
+	ServiceDiscovery       bool      `json:"service_discovery"`
+	FulfillmentOrdersOptIn bool      `json:"fulfillment_orders_opt_in"`
+	PermitsSkuSharing      bool      `json:"permits_sku_sharing"`
+	CreatedAt              time.Time `json:"created_at"`
+	UpdatedAt              time.Time `json:"updated_at"`
 }
 
 // FulfillmentServicesListOptions contains options for listing fulfillment services.
@@ -44,21 +44,21 @@ type FulfillmentServicesListResponse struct {
 
 // FulfillmentServiceCreateRequest contains the request body for creating a fulfillment service.
 type FulfillmentServiceCreateRequest struct {
-	Name                    string `json:"name"`
-	CallbackURL             string `json:"callback_url"`
-	InventoryManagement     bool   `json:"inventory_management,omitempty"`
-	TrackingSupport         bool   `json:"tracking_support,omitempty"`
-	RequiresShippingMethod  bool   `json:"requires_shipping_method,omitempty"`
-	Format                  string `json:"format,omitempty"`
+	Name                   string `json:"name"`
+	CallbackURL            string `json:"callback_url"`
+	InventoryManagement    bool   `json:"inventory_management,omitempty"`
+	TrackingSupport        bool   `json:"tracking_support,omitempty"`
+	RequiresShippingMethod bool   `json:"requires_shipping_method,omitempty"`
+	Format                 string `json:"format,omitempty"`
 }
 
 // FulfillmentServiceUpdateRequest contains the request body for updating a fulfillment service.
 type FulfillmentServiceUpdateRequest struct {
-	Name                    string `json:"name,omitempty"`
-	CallbackURL             string `json:"callback_url,omitempty"`
-	InventoryManagement     *bool  `json:"inventory_management,omitempty"`
-	TrackingSupport         *bool  `json:"tracking_support,omitempty"`
-	RequiresShippingMethod  *bool  `json:"requires_shipping_method,omitempty"`
+	Name                   string `json:"name,omitempty"`
+	CallbackURL            string `json:"callback_url,omitempty"`
+	InventoryManagement    *bool  `json:"inventory_management,omitempty"`
+	TrackingSupport        *bool  `json:"tracking_support,omitempty"`
+	RequiresShippingMethod *bool  `json:"requires_shipping_method,omitempty"`
 }
 
 // ListFulfillmentServices retrieves a list of fulfillment services.

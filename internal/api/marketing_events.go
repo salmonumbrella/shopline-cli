@@ -9,24 +9,24 @@ import (
 
 // MarketingEvent represents a Shopline marketing event.
 type MarketingEvent struct {
-	ID              string    `json:"id"`
-	EventType       string    `json:"event_type"` // ad, campaign, email, social
-	MarketingType   string    `json:"marketing_type"` // cpc, display, social, search, email
-	RemoteID        string    `json:"remote_id"`
-	StartedAt       time.Time `json:"started_at"`
-	EndedAt         time.Time `json:"ended_at"`
-	ScheduledToEnd  time.Time `json:"scheduled_to_end"`
-	Budget          float64   `json:"budget"`
-	Currency        string    `json:"currency"`
-	ManageURL       string    `json:"manage_url"`
-	PreviewURL      string    `json:"preview_url"`
-	UTMCampaign     string    `json:"utm_campaign"`
-	UTMSource       string    `json:"utm_source"`
-	UTMMedium       string    `json:"utm_medium"`
-	Description     string    `json:"description"`
+	ID                string             `json:"id"`
+	EventType         string             `json:"event_type"`     // ad, campaign, email, social
+	MarketingType     string             `json:"marketing_type"` // cpc, display, social, search, email
+	RemoteID          string             `json:"remote_id"`
+	StartedAt         time.Time          `json:"started_at"`
+	EndedAt           time.Time          `json:"ended_at"`
+	ScheduledToEnd    time.Time          `json:"scheduled_to_end"`
+	Budget            float64            `json:"budget"`
+	Currency          string             `json:"currency"`
+	ManageURL         string             `json:"manage_url"`
+	PreviewURL        string             `json:"preview_url"`
+	UTMCampaign       string             `json:"utm_campaign"`
+	UTMSource         string             `json:"utm_source"`
+	UTMMedium         string             `json:"utm_medium"`
+	Description       string             `json:"description"`
 	MarketedResources []MarketedResource `json:"marketed_resources"`
-	CreatedAt       time.Time `json:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at"`
+	CreatedAt         time.Time          `json:"created_at"`
+	UpdatedAt         time.Time          `json:"updated_at"`
 }
 
 // MarketedResource represents a resource being marketed.

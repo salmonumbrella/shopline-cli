@@ -342,11 +342,11 @@ func TestThemesListRunEWithJSON(t *testing.T) {
 // TestThemesGetRunE tests the themes get command with mock API.
 func TestThemesGetRunE(t *testing.T) {
 	tests := []struct {
-		name    string
-		themeID string
+		name     string
+		themeID  string
 		mockResp *api.Theme
-		mockErr error
-		wantErr bool
+		mockErr  error
+		wantErr  bool
 	}{
 		{
 			name:    "successful get",

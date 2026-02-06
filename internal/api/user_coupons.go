@@ -9,17 +9,17 @@ import (
 
 // UserCoupon represents a coupon assigned to a user.
 type UserCoupon struct {
-	ID           string    `json:"id"`
-	UserID       string    `json:"user_id"`
-	CouponID     string    `json:"coupon_id"`
-	CouponCode   string    `json:"coupon_code"`
-	Title        string    `json:"title"`
-	DiscountType string    `json:"discount_type"`
-	DiscountValue float64  `json:"discount_value"`
-	Status       string    `json:"status"`
-	UsedAt       time.Time `json:"used_at,omitempty"`
-	ExpiresAt    time.Time `json:"expires_at"`
-	CreatedAt    time.Time `json:"created_at"`
+	ID            string    `json:"id"`
+	UserID        string    `json:"user_id"`
+	CouponID      string    `json:"coupon_id"`
+	CouponCode    string    `json:"coupon_code"`
+	Title         string    `json:"title"`
+	DiscountType  string    `json:"discount_type"`
+	DiscountValue float64   `json:"discount_value"`
+	Status        string    `json:"status"`
+	UsedAt        time.Time `json:"used_at,omitempty"`
+	ExpiresAt     time.Time `json:"expires_at"`
+	CreatedAt     time.Time `json:"created_at"`
 }
 
 // UserCouponsListOptions contains options for listing user coupons.

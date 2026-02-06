@@ -9,73 +9,73 @@ import (
 
 // CDPCustomerProfile represents a customer profile in the CDP.
 type CDPCustomerProfile struct {
-	ID                string                 `json:"id"`
-	CustomerID        string                 `json:"customer_id"`
-	Email             string                 `json:"email"`
-	Phone             string                 `json:"phone"`
-	FirstName         string                 `json:"first_name"`
-	LastName          string                 `json:"last_name"`
-	Segments          []string               `json:"segments"`
-	Tags              []string               `json:"tags"`
-	TotalOrders       int                    `json:"total_orders"`
-	TotalSpent        string                 `json:"total_spent"`
-	AverageOrderValue string                 `json:"average_order_value"`
-	LastOrderAt       *time.Time             `json:"last_order_at"`
-	FirstOrderAt      *time.Time             `json:"first_order_at"`
-	LifetimeValue     string                 `json:"lifetime_value"`
-	PredictedLTV      string                 `json:"predicted_ltv"`
-	ChurnRisk         string                 `json:"churn_risk"`
-	RFMScore          *CDPRFMScore           `json:"rfm_score"`
+	ID                string                  `json:"id"`
+	CustomerID        string                  `json:"customer_id"`
+	Email             string                  `json:"email"`
+	Phone             string                  `json:"phone"`
+	FirstName         string                  `json:"first_name"`
+	LastName          string                  `json:"last_name"`
+	Segments          []string                `json:"segments"`
+	Tags              []string                `json:"tags"`
+	TotalOrders       int                     `json:"total_orders"`
+	TotalSpent        string                  `json:"total_spent"`
+	AverageOrderValue string                  `json:"average_order_value"`
+	LastOrderAt       *time.Time              `json:"last_order_at"`
+	FirstOrderAt      *time.Time              `json:"first_order_at"`
+	LifetimeValue     string                  `json:"lifetime_value"`
+	PredictedLTV      string                  `json:"predicted_ltv"`
+	ChurnRisk         string                  `json:"churn_risk"`
+	RFMScore          *CDPRFMScore            `json:"rfm_score"`
 	Preferences       *CDPCustomerPreferences `json:"preferences"`
-	Attributes        map[string]interface{} `json:"attributes"`
-	CreatedAt         time.Time              `json:"created_at"`
-	UpdatedAt         time.Time              `json:"updated_at"`
+	Attributes        map[string]interface{}  `json:"attributes"`
+	CreatedAt         time.Time               `json:"created_at"`
+	UpdatedAt         time.Time               `json:"updated_at"`
 }
 
 // CDPRFMScore represents RFM (Recency, Frequency, Monetary) analysis.
 type CDPRFMScore struct {
-	Recency    int    `json:"recency"`
-	Frequency  int    `json:"frequency"`
-	Monetary   int    `json:"monetary"`
-	Total      int    `json:"total"`
-	Segment    string `json:"segment"`
+	Recency   int    `json:"recency"`
+	Frequency int    `json:"frequency"`
+	Monetary  int    `json:"monetary"`
+	Total     int    `json:"total"`
+	Segment   string `json:"segment"`
 }
 
 // CDPCustomerPreferences represents customer preferences.
 type CDPCustomerPreferences struct {
-	EmailMarketing bool     `json:"email_marketing"`
-	SMSMarketing   bool     `json:"sms_marketing"`
-	PushNotifications bool  `json:"push_notifications"`
-	PreferredChannel string `json:"preferred_channel"`
-	PreferredLanguage string `json:"preferred_language"`
+	EmailMarketing      bool     `json:"email_marketing"`
+	SMSMarketing        bool     `json:"sms_marketing"`
+	PushNotifications   bool     `json:"push_notifications"`
+	PreferredChannel    string   `json:"preferred_channel"`
+	PreferredLanguage   string   `json:"preferred_language"`
 	PreferredCategories []string `json:"preferred_categories"`
 }
 
 // CDPEvent represents a customer event tracked in the CDP.
 type CDPEvent struct {
-	ID          string                 `json:"id"`
-	CustomerID  string                 `json:"customer_id"`
-	SessionID   string                 `json:"session_id"`
-	EventType   string                 `json:"event_type"`
-	EventName   string                 `json:"event_name"`
-	Source      string                 `json:"source"`
-	Channel     string                 `json:"channel"`
-	Properties  map[string]interface{} `json:"properties"`
-	Timestamp   time.Time              `json:"timestamp"`
-	CreatedAt   time.Time              `json:"created_at"`
+	ID         string                 `json:"id"`
+	CustomerID string                 `json:"customer_id"`
+	SessionID  string                 `json:"session_id"`
+	EventType  string                 `json:"event_type"`
+	EventName  string                 `json:"event_name"`
+	Source     string                 `json:"source"`
+	Channel    string                 `json:"channel"`
+	Properties map[string]interface{} `json:"properties"`
+	Timestamp  time.Time              `json:"timestamp"`
+	CreatedAt  time.Time              `json:"created_at"`
 }
 
 // CDPSegment represents a customer segment in the CDP.
 type CDPSegment struct {
-	ID           string                 `json:"id"`
-	Name         string                 `json:"name"`
-	Description  string                 `json:"description"`
-	Type         string                 `json:"type"`
-	Conditions   []CDPSegmentCondition  `json:"conditions"`
+	ID            string                `json:"id"`
+	Name          string                `json:"name"`
+	Description   string                `json:"description"`
+	Type          string                `json:"type"`
+	Conditions    []CDPSegmentCondition `json:"conditions"`
 	CustomerCount int                   `json:"customer_count"`
-	Status       string                 `json:"status"`
-	CreatedAt    time.Time              `json:"created_at"`
-	UpdatedAt    time.Time              `json:"updated_at"`
+	Status        string                `json:"status"`
+	CreatedAt     time.Time             `json:"created_at"`
+	UpdatedAt     time.Time             `json:"updated_at"`
 }
 
 // CDPSegmentCondition represents a segment condition.
@@ -112,11 +112,11 @@ type CDPEventsListOptions struct {
 
 // CDPSegmentsListOptions contains options for listing CDP segments.
 type CDPSegmentsListOptions struct {
-	Page     int
-	PageSize int
-	Type     string
-	Status   string
-	SortBy   string
+	Page      int
+	PageSize  int
+	Type      string
+	Status    string
+	SortBy    string
 	SortOrder string
 }
 

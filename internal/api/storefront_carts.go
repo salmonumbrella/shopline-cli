@@ -9,34 +9,34 @@ import (
 
 // StorefrontCart represents a shopping cart in the storefront.
 type StorefrontCart struct {
-	ID             string               `json:"id"`
-	CustomerID     string               `json:"customer_id"`
-	Email          string               `json:"email"`
-	Currency       string               `json:"currency"`
-	Subtotal       string               `json:"subtotal"`
-	TotalPrice     string               `json:"total_price"`
-	TotalTax       string               `json:"total_tax"`
-	TotalDiscount  string               `json:"total_discount"`
-	ItemCount      int                  `json:"item_count"`
-	Items          []StorefrontCartItem `json:"items"`
-	AbandonedAt    *time.Time           `json:"abandoned_at"`
-	RecoveredAt    *time.Time           `json:"recovered_at"`
-	CompletedAt    *time.Time           `json:"completed_at"`
-	CreatedAt      time.Time            `json:"created_at"`
-	UpdatedAt      time.Time            `json:"updated_at"`
+	ID            string               `json:"id"`
+	CustomerID    string               `json:"customer_id"`
+	Email         string               `json:"email"`
+	Currency      string               `json:"currency"`
+	Subtotal      string               `json:"subtotal"`
+	TotalPrice    string               `json:"total_price"`
+	TotalTax      string               `json:"total_tax"`
+	TotalDiscount string               `json:"total_discount"`
+	ItemCount     int                  `json:"item_count"`
+	Items         []StorefrontCartItem `json:"items"`
+	AbandonedAt   *time.Time           `json:"abandoned_at"`
+	RecoveredAt   *time.Time           `json:"recovered_at"`
+	CompletedAt   *time.Time           `json:"completed_at"`
+	CreatedAt     time.Time            `json:"created_at"`
+	UpdatedAt     time.Time            `json:"updated_at"`
 }
 
 // StorefrontCartItem represents an item in a storefront cart.
 type StorefrontCartItem struct {
-	ID          string `json:"id"`
-	ProductID   string `json:"product_id"`
-	VariantID   string `json:"variant_id"`
-	Title       string `json:"title"`
+	ID           string `json:"id"`
+	ProductID    string `json:"product_id"`
+	VariantID    string `json:"variant_id"`
+	Title        string `json:"title"`
 	VariantTitle string `json:"variant_title"`
-	Quantity    int    `json:"quantity"`
-	Price       string `json:"price"`
-	LineTotal   string `json:"line_total"`
-	ImageURL    string `json:"image_url"`
+	Quantity     int    `json:"quantity"`
+	Price        string `json:"price"`
+	LineTotal    string `json:"line_total"`
+	ImageURL     string `json:"image_url"`
 }
 
 // StorefrontCartsListOptions contains options for listing storefront carts.
@@ -54,10 +54,10 @@ type StorefrontCartsListResponse = ListResponse[StorefrontCart]
 
 // StorefrontCartCreateRequest contains the data for creating a storefront cart.
 type StorefrontCartCreateRequest struct {
-	CustomerID string                        `json:"customer_id,omitempty"`
-	Email      string                        `json:"email,omitempty"`
-	Currency   string                        `json:"currency,omitempty"`
-	Items      []StorefrontCartItemRequest   `json:"items,omitempty"`
+	CustomerID string                      `json:"customer_id,omitempty"`
+	Email      string                      `json:"email,omitempty"`
+	Currency   string                      `json:"currency,omitempty"`
+	Items      []StorefrontCartItemRequest `json:"items,omitempty"`
 }
 
 // StorefrontCartItemRequest represents an item to add to a cart.

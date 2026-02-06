@@ -9,29 +9,29 @@ import (
 
 // Payout represents a Shopline payout.
 type Payout struct {
-	ID            string    `json:"id"`
-	Amount        string    `json:"amount"`
-	Currency      string    `json:"currency"`
-	Status        string    `json:"status"`
-	Type          string    `json:"type"`
-	BankAccount   string    `json:"bank_account"`
-	TransactionID string    `json:"transaction_id,omitempty"`
-	Fee           string    `json:"fee,omitempty"`
-	Net           string    `json:"net,omitempty"`
+	ID            string         `json:"id"`
+	Amount        string         `json:"amount"`
+	Currency      string         `json:"currency"`
+	Status        string         `json:"status"`
+	Type          string         `json:"type"`
+	BankAccount   string         `json:"bank_account"`
+	TransactionID string         `json:"transaction_id,omitempty"`
+	Fee           string         `json:"fee,omitempty"`
+	Net           string         `json:"net,omitempty"`
 	Summary       *PayoutSummary `json:"summary,omitempty"`
-	ScheduledDate *time.Time `json:"scheduled_date,omitempty"`
-	ArrivalDate   *time.Time `json:"arrival_date,omitempty"`
-	CreatedAt     time.Time  `json:"created_at"`
-	UpdatedAt     time.Time  `json:"updated_at"`
+	ScheduledDate *time.Time     `json:"scheduled_date,omitempty"`
+	ArrivalDate   *time.Time     `json:"arrival_date,omitempty"`
+	CreatedAt     time.Time      `json:"created_at"`
+	UpdatedAt     time.Time      `json:"updated_at"`
 }
 
 // PayoutSummary contains the breakdown of a payout.
 type PayoutSummary struct {
-	Sales           string `json:"sales"`
-	Refunds         string `json:"refunds"`
-	Adjustments     string `json:"adjustments"`
-	Charges         string `json:"charges"`
-	ReservedFunds   string `json:"reserved_funds"`
+	Sales         string `json:"sales"`
+	Refunds       string `json:"refunds"`
+	Adjustments   string `json:"adjustments"`
+	Charges       string `json:"charges"`
+	ReservedFunds string `json:"reserved_funds"`
 }
 
 // PayoutsListOptions contains options for listing payouts.

@@ -244,4 +244,3 @@ func (c *Client) BulkDeleteOrderItemAppMetafields(ctx context.Context, orderID s
 	}
 	return c.DeleteWithBody(ctx, fmt.Sprintf("/orders/%s/items/app_metafields/bulk", orderID), body, nil)
 }
-

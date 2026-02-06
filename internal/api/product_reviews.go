@@ -9,18 +9,18 @@ import (
 
 // ProductReview represents a Shopline product review.
 type ProductReview struct {
-	ID          string    `json:"id"`
-	ProductID   string    `json:"product_id"`
-	CustomerID  string    `json:"customer_id"`
-	CustomerName string   `json:"customer_name"`
-	Rating      int       `json:"rating"`
-	Title       string    `json:"title"`
-	Content     string    `json:"content"`
-	Status      string    `json:"status"`
-	Verified    bool      `json:"verified"`
-	HelpfulCount int      `json:"helpful_count"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID           string    `json:"id"`
+	ProductID    string    `json:"product_id"`
+	CustomerID   string    `json:"customer_id"`
+	CustomerName string    `json:"customer_name"`
+	Rating       int       `json:"rating"`
+	Title        string    `json:"title"`
+	Content      string    `json:"content"`
+	Status       string    `json:"status"`
+	Verified     bool      `json:"verified"`
+	HelpfulCount int       `json:"helpful_count"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 // ProductReviewsListOptions contains options for listing product reviews.
@@ -37,12 +37,12 @@ type ProductReviewsListResponse = ListResponse[ProductReview]
 
 // ProductReviewCreateRequest contains the data for creating a product review.
 type ProductReviewCreateRequest struct {
-	ProductID   string `json:"product_id"`
-	CustomerID  string `json:"customer_id,omitempty"`
+	ProductID    string `json:"product_id"`
+	CustomerID   string `json:"customer_id,omitempty"`
 	CustomerName string `json:"customer_name,omitempty"`
-	Rating      int    `json:"rating"`
-	Title       string `json:"title,omitempty"`
-	Content     string `json:"content"`
+	Rating       int    `json:"rating"`
+	Title        string `json:"title,omitempty"`
+	Content      string `json:"content"`
 }
 
 // ListProductReviews retrieves a list of product reviews.

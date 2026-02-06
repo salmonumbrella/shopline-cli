@@ -295,17 +295,17 @@ func TestSalesListRunE_NoProfiles(t *testing.T) {
 // salesMockAPIClient is a mock implementation of api.APIClient for sales tests.
 type salesMockAPIClient struct {
 	api.MockClient
-	listSalesResp    *api.SalesListResponse
-	listSalesErr     error
-	getSaleResp      *api.Sale
-	getSaleErr       error
-	createSaleResp   *api.Sale
-	createSaleErr    error
-	activateSaleResp *api.Sale
-	activateSaleErr  error
+	listSalesResp      *api.SalesListResponse
+	listSalesErr       error
+	getSaleResp        *api.Sale
+	getSaleErr         error
+	createSaleResp     *api.Sale
+	createSaleErr      error
+	activateSaleResp   *api.Sale
+	activateSaleErr    error
 	deactivateSaleResp *api.Sale
 	deactivateSaleErr  error
-	deleteSaleErr    error
+	deleteSaleErr      error
 }
 
 func (m *salesMockAPIClient) ListSales(ctx context.Context, opts *api.SalesListOptions) (*api.SalesListResponse, error) {
@@ -984,7 +984,6 @@ func TestSalesDeleteRunE_WithoutYesFlag(t *testing.T) {
 	// When --yes is false and no input is provided, the command should cancel
 	// Since Scanln will fail or return empty, the command should print "Cancelled."
 	err := salesDeleteCmd.RunE(cmd, []string{"sale_123"})
-
 	// The command should succeed (cancellation is not an error)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)

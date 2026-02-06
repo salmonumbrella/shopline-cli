@@ -17,13 +17,13 @@ import (
 // affiliateCampaignsMockAPIClient is a mock implementation for affiliate campaigns tests.
 type affiliateCampaignsMockAPIClient struct {
 	api.MockClient
-	listAffiliateCampaignsResp   *api.AffiliateCampaignsListResponse
-	listAffiliateCampaignsErr    error
-	getAffiliateCampaignResp     *api.AffiliateCampaign
-	getAffiliateCampaignErr      error
-	createAffiliateCampaignResp  *api.AffiliateCampaign
-	createAffiliateCampaignErr   error
-	deleteAffiliateCampaignErr   error
+	listAffiliateCampaignsResp  *api.AffiliateCampaignsListResponse
+	listAffiliateCampaignsErr   error
+	getAffiliateCampaignResp    *api.AffiliateCampaign
+	getAffiliateCampaignErr     error
+	createAffiliateCampaignResp *api.AffiliateCampaign
+	createAffiliateCampaignErr  error
+	deleteAffiliateCampaignErr  error
 }
 
 func (m *affiliateCampaignsMockAPIClient) ListAffiliateCampaigns(ctx context.Context, opts *api.AffiliateCampaignsListOptions) (*api.AffiliateCampaignsListResponse, error) {

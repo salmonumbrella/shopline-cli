@@ -856,7 +856,6 @@ func TestWarehousesDeleteRunE_ConfirmationCancelled(t *testing.T) {
 	// Since Scanln will fail or return empty in tests, the command should print "Cancelled."
 	// and return nil (no error, just cancelled)
 	err := warehousesDeleteCmd.RunE(cmd, []string{"wh_123"})
-
 	// No error expected since user "cancelled" (empty confirm != "y")
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)

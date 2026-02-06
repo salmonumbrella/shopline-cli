@@ -9,30 +9,30 @@ import (
 
 // Conversation represents a Shopline customer conversation/chat.
 type Conversation struct {
-	ID             string    `json:"id"`
-	CustomerID     string    `json:"customer_id"`
-	CustomerEmail  string    `json:"customer_email"`
-	CustomerName   string    `json:"customer_name"`
-	Subject        string    `json:"subject"`
-	Status         string    `json:"status"` // open, closed, pending
-	Channel        string    `json:"channel"` // chat, email, messenger, whatsapp
-	AssigneeID     string    `json:"assignee_id"`
-	AssigneeName   string    `json:"assignee_name"`
-	MessageCount   int       `json:"message_count"`
-	UnreadCount    int       `json:"unread_count"`
-	LastMessageAt  time.Time `json:"last_message_at"`
-	CreatedAt      time.Time `json:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at"`
+	ID            string    `json:"id"`
+	CustomerID    string    `json:"customer_id"`
+	CustomerEmail string    `json:"customer_email"`
+	CustomerName  string    `json:"customer_name"`
+	Subject       string    `json:"subject"`
+	Status        string    `json:"status"`  // open, closed, pending
+	Channel       string    `json:"channel"` // chat, email, messenger, whatsapp
+	AssigneeID    string    `json:"assignee_id"`
+	AssigneeName  string    `json:"assignee_name"`
+	MessageCount  int       `json:"message_count"`
+	UnreadCount   int       `json:"unread_count"`
+	LastMessageAt time.Time `json:"last_message_at"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 // ConversationMessage represents a message within a conversation.
 type ConversationMessage struct {
-	ID        string    `json:"id"`
-	Body      string    `json:"body"`
-	SenderID  string    `json:"sender_id"`
-	SenderType string   `json:"sender_type"` // customer, staff
-	SenderName string   `json:"sender_name"`
-	CreatedAt time.Time `json:"created_at"`
+	ID         string    `json:"id"`
+	Body       string    `json:"body"`
+	SenderID   string    `json:"sender_id"`
+	SenderType string    `json:"sender_type"` // customer, staff
+	SenderName string    `json:"sender_name"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
 // ConversationsListOptions contains options for listing conversations.

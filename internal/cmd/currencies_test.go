@@ -16,14 +16,14 @@ import (
 // currenciesMockClient is a mock implementation of api.APIClient for currencies tests.
 type currenciesMockClient struct {
 	api.MockClient
-	listCurrenciesResp  *api.CurrenciesListResponse
-	listCurrenciesErr   error
-	getCurrencyResp     *api.Currency
-	getCurrencyErr      error
-	updateCurrencyResp  *api.Currency
-	updateCurrencyErr   error
-	updateCurrencyCode  string
-	updateCurrencyReq   *api.CurrencyUpdateRequest
+	listCurrenciesResp *api.CurrenciesListResponse
+	listCurrenciesErr  error
+	getCurrencyResp    *api.Currency
+	getCurrencyErr     error
+	updateCurrencyResp *api.Currency
+	updateCurrencyErr  error
+	updateCurrencyCode string
+	updateCurrencyReq  *api.CurrencyUpdateRequest
 }
 
 func (m *currenciesMockClient) ListCurrencies(ctx context.Context) (*api.CurrenciesListResponse, error) {
@@ -487,10 +487,10 @@ func TestCurrenciesUpdateRunE(t *testing.T) {
 		wantErrContain string
 	}{
 		{
-			name:          "update enabled to true",
-			currencyCode:  "EUR",
-			setEnabled:    true,
-			enabledValue:  true,
+			name:         "update enabled to true",
+			currencyCode: "EUR",
+			setEnabled:   true,
+			enabledValue: true,
 			mockResp: &api.Currency{
 				Code:         "EUR",
 				Name:         "Euro",
@@ -501,10 +501,10 @@ func TestCurrenciesUpdateRunE(t *testing.T) {
 			},
 		},
 		{
-			name:          "update enabled to false",
-			currencyCode:  "EUR",
-			setEnabled:    true,
-			enabledValue:  false,
+			name:         "update enabled to false",
+			currencyCode: "EUR",
+			setEnabled:   true,
+			enabledValue: false,
 			mockResp: &api.Currency{
 				Code:         "EUR",
 				Name:         "Euro",
@@ -563,8 +563,8 @@ func TestCurrenciesUpdateRunE(t *testing.T) {
 			},
 		},
 		{
-			name:          "update with no flags changed",
-			currencyCode:  "EUR",
+			name:         "update with no flags changed",
+			currencyCode: "EUR",
 			mockResp: &api.Currency{
 				Code:         "EUR",
 				Name:         "Euro",

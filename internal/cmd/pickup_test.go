@@ -18,13 +18,13 @@ import (
 type pickupMockAPIClient struct {
 	api.MockClient
 
-	listPickupLocationsResp   *api.PickupListResponse
-	listPickupLocationsErr    error
-	getPickupLocationResp     *api.PickupLocation
-	getPickupLocationErr      error
-	createPickupLocationResp  *api.PickupLocation
-	createPickupLocationErr   error
-	deletePickupLocationErr   error
+	listPickupLocationsResp  *api.PickupListResponse
+	listPickupLocationsErr   error
+	getPickupLocationResp    *api.PickupLocation
+	getPickupLocationErr     error
+	createPickupLocationResp *api.PickupLocation
+	createPickupLocationErr  error
+	deletePickupLocationErr  error
 }
 
 func (m *pickupMockAPIClient) ListPickupLocations(ctx context.Context, opts *api.PickupListOptions) (*api.PickupListResponse, error) {

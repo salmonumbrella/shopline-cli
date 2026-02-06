@@ -11,16 +11,16 @@ import (
 
 // Channel represents a Shopline sales channel.
 type Channel struct {
-	ID                string    `json:"id"`
-	Name              string    `json:"name"`
-	Handle            string    `json:"handle"`
-	Type              string    `json:"type"`
-	Active            bool      `json:"active"`
-	SupportsRemoteFulfillment bool `json:"supports_remote_fulfillment"`
-	ProductCount      int       `json:"product_count"`
-	CollectionCount   int       `json:"collection_count"`
-	CreatedAt         time.Time `json:"created_at"`
-	UpdatedAt         time.Time `json:"updated_at"`
+	ID                        string    `json:"id"`
+	Name                      string    `json:"name"`
+	Handle                    string    `json:"handle"`
+	Type                      string    `json:"type"`
+	Active                    bool      `json:"active"`
+	SupportsRemoteFulfillment bool      `json:"supports_remote_fulfillment"`
+	ProductCount              int       `json:"product_count"`
+	CollectionCount           int       `json:"collection_count"`
+	CreatedAt                 time.Time `json:"created_at"`
+	UpdatedAt                 time.Time `json:"updated_at"`
 }
 
 // ChannelProduct represents a product in a channel.

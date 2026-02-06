@@ -15,7 +15,7 @@ type SmartCollection struct {
 	Title       string    `json:"title"`
 	Handle      string    `json:"handle"`
 	BodyHTML    string    `json:"body_html"`
-	SortOrder   string    `json:"sort_order"` // alpha-asc, alpha-desc, best-selling, created, created-desc, manual, price-asc, price-desc
+	SortOrder   string    `json:"sort_order"`  // alpha-asc, alpha-desc, best-selling, created, created-desc, manual, price-asc, price-desc
 	Disjunctive bool      `json:"disjunctive"` // true = any rule matches, false = all rules match
 	Rules       []Rule    `json:"rules"`
 	Published   bool      `json:"published"`

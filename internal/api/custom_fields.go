@@ -10,16 +10,16 @@ import (
 type CustomFieldType string
 
 const (
-	CustomFieldTypeText     CustomFieldType = "text"
-	CustomFieldTypeNumber   CustomFieldType = "number"
-	CustomFieldTypeDate     CustomFieldType = "date"
-	CustomFieldTypeBoolean  CustomFieldType = "boolean"
-	CustomFieldTypeSelect   CustomFieldType = "select"
-	CustomFieldTypeMulti    CustomFieldType = "multi_select"
-	CustomFieldTypeFile     CustomFieldType = "file"
-	CustomFieldTypeURL      CustomFieldType = "url"
-	CustomFieldTypeEmail    CustomFieldType = "email"
-	CustomFieldTypeJSON     CustomFieldType = "json"
+	CustomFieldTypeText    CustomFieldType = "text"
+	CustomFieldTypeNumber  CustomFieldType = "number"
+	CustomFieldTypeDate    CustomFieldType = "date"
+	CustomFieldTypeBoolean CustomFieldType = "boolean"
+	CustomFieldTypeSelect  CustomFieldType = "select"
+	CustomFieldTypeMulti   CustomFieldType = "multi_select"
+	CustomFieldTypeFile    CustomFieldType = "file"
+	CustomFieldTypeURL     CustomFieldType = "url"
+	CustomFieldTypeEmail   CustomFieldType = "email"
+	CustomFieldTypeJSON    CustomFieldType = "json"
 )
 
 // CustomFieldOwnerType represents the owner type of custom field.

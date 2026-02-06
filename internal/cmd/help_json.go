@@ -132,4 +132,3 @@ func isFlagRequired(f *pflag.Flag) bool {
 	}
 	return vals[0] == "true"
 }
-

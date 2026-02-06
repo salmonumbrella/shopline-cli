@@ -230,11 +230,11 @@ func TestMarketingEventsGetRunE(t *testing.T) {
 	fixedTime := time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC)
 
 	tests := []struct {
-		name    string
-		eventID string
-		mockResp  *api.MarketingEvent
-		mockErr   error
-		wantErr bool
+		name     string
+		eventID  string
+		mockResp *api.MarketingEvent
+		mockErr  error
+		wantErr  bool
 	}{
 		{
 			name:    "successful get with all fields",
@@ -343,10 +343,10 @@ func TestMarketingEventsCreateRunE(t *testing.T) {
 	fixedTime := time.Date(2024, 1, 15, 10, 30, 0, 0, time.UTC)
 
 	tests := []struct {
-		name    string
-		mockResp  *api.MarketingEvent
-		mockErr   error
-		wantErr bool
+		name     string
+		mockResp *api.MarketingEvent
+		mockErr  error
+		wantErr  bool
 	}{
 		{
 			name: "successful create",

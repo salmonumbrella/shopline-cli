@@ -9,13 +9,13 @@ import (
 
 // Token represents a Shopline API token.
 type Token struct {
-	ID          string    `json:"id"`
-	Title       string    `json:"title"`
-	AccessToken string    `json:"access_token,omitempty"`
-	Scopes      []string  `json:"scopes"`
+	ID          string     `json:"id"`
+	Title       string     `json:"title"`
+	AccessToken string     `json:"access_token,omitempty"`
+	Scopes      []string   `json:"scopes"`
 	ExpiresAt   *time.Time `json:"expires_at,omitempty"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
 }
 
 // TokensListOptions contains options for listing tokens.

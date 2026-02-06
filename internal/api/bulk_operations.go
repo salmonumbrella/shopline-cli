@@ -9,18 +9,18 @@ import (
 
 // BulkOperation represents a Shopline bulk operation.
 type BulkOperation struct {
-	ID             string     `json:"id"`
-	Type           string     `json:"type"`
-	Status         string     `json:"status"`
-	Query          string     `json:"query,omitempty"`
-	URL            string     `json:"url,omitempty"`
-	ErrorCode      string     `json:"error_code,omitempty"`
-	ObjectCount    int        `json:"object_count"`
-	FileSize       int64      `json:"file_size"`
-	RootObjectCount int       `json:"root_object_count"`
-	PartialDataURL string     `json:"partial_data_url,omitempty"`
-	CreatedAt      time.Time  `json:"created_at"`
-	CompletedAt    *time.Time `json:"completed_at,omitempty"`
+	ID              string     `json:"id"`
+	Type            string     `json:"type"`
+	Status          string     `json:"status"`
+	Query           string     `json:"query,omitempty"`
+	URL             string     `json:"url,omitempty"`
+	ErrorCode       string     `json:"error_code,omitempty"`
+	ObjectCount     int        `json:"object_count"`
+	FileSize        int64      `json:"file_size"`
+	RootObjectCount int        `json:"root_object_count"`
+	PartialDataURL  string     `json:"partial_data_url,omitempty"`
+	CreatedAt       time.Time  `json:"created_at"`
+	CompletedAt     *time.Time `json:"completed_at,omitempty"`
 }
 
 // BulkOperationsListOptions contains options for listing bulk operations.
@@ -47,7 +47,7 @@ type BulkOperationCreateRequest struct {
 
 // BulkOperationMutationRequest contains the request body for a mutation bulk operation.
 type BulkOperationMutationRequest struct {
-	Mutation   string `json:"mutation"`
+	Mutation         string `json:"mutation"`
 	StagedUploadPath string `json:"staged_upload_path"`
 }
 

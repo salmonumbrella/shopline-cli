@@ -279,13 +279,13 @@ func TestTaxonomiesCreateFlagTypes(t *testing.T) {
 // taxonomiesMockAPIClient is a mock implementation of api.APIClient for taxonomies tests.
 type taxonomiesMockAPIClient struct {
 	api.MockClient
-	listTaxonomiesResp  *api.TaxonomiesListResponse
-	listTaxonomiesErr   error
-	getTaxonomyResp     *api.Taxonomy
-	getTaxonomyErr      error
-	createTaxonomyResp  *api.Taxonomy
-	createTaxonomyErr   error
-	deleteTaxonomyErr   error
+	listTaxonomiesResp *api.TaxonomiesListResponse
+	listTaxonomiesErr  error
+	getTaxonomyResp    *api.Taxonomy
+	getTaxonomyErr     error
+	createTaxonomyResp *api.Taxonomy
+	createTaxonomyErr  error
+	deleteTaxonomyErr  error
 }
 
 func (m *taxonomiesMockAPIClient) ListTaxonomies(ctx context.Context, opts *api.TaxonomiesListOptions) (*api.TaxonomiesListResponse, error) {

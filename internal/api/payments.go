@@ -11,19 +11,19 @@ import (
 
 // Payment represents a Shopline payment.
 type Payment struct {
-	ID              string        `json:"id"`
-	OrderID         string        `json:"order_id"`
-	Amount          string        `json:"amount"`
-	Currency        string        `json:"currency"`
-	Status          string        `json:"status"`
-	Gateway         string        `json:"gateway"`
-	PaymentMethod   string        `json:"payment_method"`
-	TransactionID   string        `json:"transaction_id"`
-	ErrorMessage    string        `json:"error_message"`
-	CreditCard      *CreditCard   `json:"credit_card,omitempty"`
-	BillingAddress  *Address      `json:"billing_address,omitempty"`
-	CreatedAt       time.Time     `json:"created_at"`
-	UpdatedAt       time.Time     `json:"updated_at"`
+	ID             string      `json:"id"`
+	OrderID        string      `json:"order_id"`
+	Amount         string      `json:"amount"`
+	Currency       string      `json:"currency"`
+	Status         string      `json:"status"`
+	Gateway        string      `json:"gateway"`
+	PaymentMethod  string      `json:"payment_method"`
+	TransactionID  string      `json:"transaction_id"`
+	ErrorMessage   string      `json:"error_message"`
+	CreditCard     *CreditCard `json:"credit_card,omitempty"`
+	BillingAddress *Address    `json:"billing_address,omitempty"`
+	CreatedAt      time.Time   `json:"created_at"`
+	UpdatedAt      time.Time   `json:"updated_at"`
 }
 
 // CreditCard represents credit card details (masked).
@@ -36,15 +36,15 @@ type CreditCard struct {
 
 // Address represents a billing/shipping address.
 type Address struct {
-	FirstName    string `json:"first_name"`
-	LastName     string `json:"last_name"`
-	Address1     string `json:"address1"`
-	Address2     string `json:"address2"`
-	City         string `json:"city"`
-	Province     string `json:"province"`
-	Country      string `json:"country"`
-	Zip          string `json:"zip"`
-	Phone        string `json:"phone"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Address1  string `json:"address1"`
+	Address2  string `json:"address2"`
+	City      string `json:"city"`
+	Province  string `json:"province"`
+	Country   string `json:"country"`
+	Zip       string `json:"zip"`
+	Phone     string `json:"phone"`
 }
 
 // PaymentsListOptions contains options for listing payments.

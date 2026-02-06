@@ -766,7 +766,6 @@ func TestPromotionsDeleteRunE_CancelConfirmation(t *testing.T) {
 	cmd := newPromotionsTestCmd()
 
 	err := promotionsDeleteCmd.RunE(cmd, []string{"promo_123"})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -796,7 +795,6 @@ func TestPromotionsDeleteRunE_ConfirmYes(t *testing.T) {
 	cmd := newPromotionsTestCmd()
 
 	err := promotionsDeleteCmd.RunE(cmd, []string{"promo_123"})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -826,7 +824,6 @@ func TestPromotionsDeleteRunE_ConfirmUpperY(t *testing.T) {
 	cmd := newPromotionsTestCmd()
 
 	err := promotionsDeleteCmd.RunE(cmd, []string{"promo_123"})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}

@@ -11,17 +11,17 @@ import (
 
 // Shipment represents a Shopline shipment.
 type Shipment struct {
-	ID              string    `json:"id"`
-	OrderID         string    `json:"order_id"`
-	FulfillmentID   string    `json:"fulfillment_id"`
-	TrackingCompany string    `json:"tracking_company"`
-	TrackingNumber  string    `json:"tracking_number"`
-	TrackingURL     string    `json:"tracking_url"`
-	Status          string    `json:"status"`
+	ID                string    `json:"id"`
+	OrderID           string    `json:"order_id"`
+	FulfillmentID     string    `json:"fulfillment_id"`
+	TrackingCompany   string    `json:"tracking_company"`
+	TrackingNumber    string    `json:"tracking_number"`
+	TrackingURL       string    `json:"tracking_url"`
+	Status            string    `json:"status"`
 	EstimatedDelivery time.Time `json:"estimated_delivery"`
-	DeliveredAt     time.Time `json:"delivered_at"`
-	CreatedAt       time.Time `json:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at"`
+	DeliveredAt       time.Time `json:"delivered_at"`
+	CreatedAt         time.Time `json:"created_at"`
+	UpdatedAt         time.Time `json:"updated_at"`
 }
 
 // ShipmentsListOptions contains options for listing shipments.

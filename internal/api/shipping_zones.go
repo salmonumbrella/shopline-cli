@@ -11,14 +11,14 @@ import (
 
 // ShippingZone represents a Shopline shipping zone.
 type ShippingZone struct {
-	ID              string         `json:"id"`
-	Name            string         `json:"name"`
-	Countries       []ZoneCountry  `json:"countries"`
-	PriceBasedRates []ShippingRate `json:"price_based_shipping_rates"`
+	ID               string         `json:"id"`
+	Name             string         `json:"name"`
+	Countries        []ZoneCountry  `json:"countries"`
+	PriceBasedRates  []ShippingRate `json:"price_based_shipping_rates"`
 	WeightBasedRates []ShippingRate `json:"weight_based_shipping_rates"`
-	CarrierServices  []string      `json:"carrier_shipping_rate_provider_services"`
-	CreatedAt       time.Time      `json:"created_at"`
-	UpdatedAt       time.Time      `json:"updated_at"`
+	CarrierServices  []string       `json:"carrier_shipping_rate_provider_services"`
+	CreatedAt        time.Time      `json:"created_at"`
+	UpdatedAt        time.Time      `json:"updated_at"`
 }
 
 // ZoneCountry represents a country in a shipping zone.
@@ -30,13 +30,13 @@ type ZoneCountry struct {
 
 // ShippingRate represents a shipping rate.
 type ShippingRate struct {
-	ID          string  `json:"id"`
-	Name        string  `json:"name"`
-	Price       string  `json:"price"`
-	MinValue    string  `json:"min_order_subtotal,omitempty"`
-	MaxValue    string  `json:"max_order_subtotal,omitempty"`
-	MinWeight   float64 `json:"min_weight,omitempty"`
-	MaxWeight   float64 `json:"max_weight,omitempty"`
+	ID        string  `json:"id"`
+	Name      string  `json:"name"`
+	Price     string  `json:"price"`
+	MinValue  string  `json:"min_order_subtotal,omitempty"`
+	MaxValue  string  `json:"max_order_subtotal,omitempty"`
+	MinWeight float64 `json:"min_weight,omitempty"`
+	MaxWeight float64 `json:"max_weight,omitempty"`
 }
 
 // ShippingZonesListOptions contains options for listing shipping zones.

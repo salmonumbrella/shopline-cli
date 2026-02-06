@@ -382,7 +382,7 @@ func TestListReturnOrdersWithOptions(t *testing.T) {
 
 			client := NewClient("test", "token")
 			client.BaseURL = server.URL
-	client.SetUseOpenAPI(false)
+			client.SetUseOpenAPI(false)
 
 			returns, err := client.ListReturnOrders(context.Background(), tc.opts)
 			if err != nil {

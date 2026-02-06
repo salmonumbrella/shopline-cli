@@ -9,95 +9,95 @@ import (
 
 // Merchant represents a merchant/store in Shopline.
 type Merchant struct {
-	ID                string             `json:"id"`
-	Name              string             `json:"name"`
-	Handle            string             `json:"handle"`
-	Email             string             `json:"email"`
-	Phone             string             `json:"phone"`
-	Domain            string             `json:"domain"`
-	PrimaryDomain     string             `json:"primary_domain"`
-	Currency          string             `json:"currency"`
-	Timezone          string             `json:"timezone"`
-	Country           string             `json:"country"`
-	CountryCode       string             `json:"country_code"`
-	Province          string             `json:"province"`
-	City              string             `json:"city"`
-	Address1          string             `json:"address1"`
-	Address2          string             `json:"address2"`
-	Zip               string             `json:"zip"`
-	Plan              string             `json:"plan"`
-	PlanDisplayName   string             `json:"plan_display_name"`
-	ShopOwner         string             `json:"shop_owner"`
-	WeightUnit        string             `json:"weight_unit"`
-	TaxesIncluded     bool               `json:"taxes_included"`
-	TaxShipping       bool               `json:"tax_shipping"`
-	PasswordEnabled   bool               `json:"password_enabled"`
-	HasStorefront     bool               `json:"has_storefront"`
-	HasDiscounts      bool               `json:"has_discounts"`
-	HasGiftCards      bool               `json:"has_gift_cards"`
-	SetupRequired     bool               `json:"setup_required"`
-	Finances          *MerchantFinances  `json:"finances"`
-	Features          *MerchantFeatures  `json:"features"`
-	BillingAddress    *MerchantAddress   `json:"billing_address"`
-	CreatedAt         time.Time          `json:"created_at"`
-	UpdatedAt         time.Time          `json:"updated_at"`
+	ID              string            `json:"id"`
+	Name            string            `json:"name"`
+	Handle          string            `json:"handle"`
+	Email           string            `json:"email"`
+	Phone           string            `json:"phone"`
+	Domain          string            `json:"domain"`
+	PrimaryDomain   string            `json:"primary_domain"`
+	Currency        string            `json:"currency"`
+	Timezone        string            `json:"timezone"`
+	Country         string            `json:"country"`
+	CountryCode     string            `json:"country_code"`
+	Province        string            `json:"province"`
+	City            string            `json:"city"`
+	Address1        string            `json:"address1"`
+	Address2        string            `json:"address2"`
+	Zip             string            `json:"zip"`
+	Plan            string            `json:"plan"`
+	PlanDisplayName string            `json:"plan_display_name"`
+	ShopOwner       string            `json:"shop_owner"`
+	WeightUnit      string            `json:"weight_unit"`
+	TaxesIncluded   bool              `json:"taxes_included"`
+	TaxShipping     bool              `json:"tax_shipping"`
+	PasswordEnabled bool              `json:"password_enabled"`
+	HasStorefront   bool              `json:"has_storefront"`
+	HasDiscounts    bool              `json:"has_discounts"`
+	HasGiftCards    bool              `json:"has_gift_cards"`
+	SetupRequired   bool              `json:"setup_required"`
+	Finances        *MerchantFinances `json:"finances"`
+	Features        *MerchantFeatures `json:"features"`
+	BillingAddress  *MerchantAddress  `json:"billing_address"`
+	CreatedAt       time.Time         `json:"created_at"`
+	UpdatedAt       time.Time         `json:"updated_at"`
 }
 
 // MerchantFinances represents merchant financial settings.
 type MerchantFinances struct {
-	Currency             string `json:"currency"`
-	MoneyFormat          string `json:"money_format"`
-	MoneyWithCurrencyFormat string `json:"money_with_currency_format"`
-	MoneyInEmailsFormat  string `json:"money_in_emails_format"`
-	SetupRequired        bool   `json:"setup_required"`
+	Currency                     string   `json:"currency"`
+	MoneyFormat                  string   `json:"money_format"`
+	MoneyWithCurrencyFormat      string   `json:"money_with_currency_format"`
+	MoneyInEmailsFormat          string   `json:"money_in_emails_format"`
+	SetupRequired                bool     `json:"setup_required"`
 	EnabledPresentmentCurrencies []string `json:"enabled_presentment_currencies"`
 }
 
 // MerchantFeatures represents enabled merchant features.
 type MerchantFeatures struct {
-	Checkout              bool `json:"checkout"`
-	MultiLocation         bool `json:"multi_location"`
-	MultiCurrency         bool `json:"multi_currency"`
-	GiftCards             bool `json:"gift_cards"`
-	Subscriptions         bool `json:"subscriptions"`
-	BuyOnline             bool `json:"buy_online"`
-	PickupInStore         bool `json:"pickup_in_store"`
-	LocalDelivery         bool `json:"local_delivery"`
-	InternationalDomains  bool `json:"international_domains"`
+	Checkout                bool `json:"checkout"`
+	MultiLocation           bool `json:"multi_location"`
+	MultiCurrency           bool `json:"multi_currency"`
+	GiftCards               bool `json:"gift_cards"`
+	Subscriptions           bool `json:"subscriptions"`
+	BuyOnline               bool `json:"buy_online"`
+	PickupInStore           bool `json:"pickup_in_store"`
+	LocalDelivery           bool `json:"local_delivery"`
+	InternationalDomains    bool `json:"international_domains"`
 	InternationalPriceRules bool `json:"international_price_rules"`
-	Discounts             bool `json:"discounts"`
+	Discounts               bool `json:"discounts"`
 }
 
 // MerchantAddress represents a merchant's address.
 type MerchantAddress struct {
-	FirstName   string `json:"first_name"`
-	LastName    string `json:"last_name"`
-	Company     string `json:"company"`
-	Address1    string `json:"address1"`
-	Address2    string `json:"address2"`
-	City        string `json:"city"`
-	Province    string `json:"province"`
+	FirstName    string `json:"first_name"`
+	LastName     string `json:"last_name"`
+	Company      string `json:"company"`
+	Address1     string `json:"address1"`
+	Address2     string `json:"address2"`
+	City         string `json:"city"`
+	Province     string `json:"province"`
 	ProvinceCode string `json:"province_code"`
-	Country     string `json:"country"`
-	CountryCode string `json:"country_code"`
-	Zip         string `json:"zip"`
-	Phone       string `json:"phone"`
+	Country      string `json:"country"`
+	CountryCode  string `json:"country_code"`
+	Zip          string `json:"zip"`
+	Phone        string `json:"phone"`
 }
 
 // MerchantStaff represents a staff member of a merchant.
 type MerchantStaff struct {
-	ID            string    `json:"id"`
-	Email         string    `json:"email"`
-	FirstName     string    `json:"first_name"`
-	LastName      string    `json:"last_name"`
-	Phone         string    `json:"phone"`
-	Role          string    `json:"role"`
-	Permissions   []string  `json:"permissions"`
-	AccountOwner  bool      `json:"account_owner"`
-	Active        bool      `json:"active"`
-	LastLoginAt   *time.Time `json:"last_login_at"`
-	CreatedAt     time.Time `json:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at"`
+	ID           string     `json:"id"`
+	Email        string     `json:"email"`
+	FirstName    string     `json:"first_name"`
+	LastName     string     `json:"last_name"`
+	Phone        string     `json:"phone"`
+	Role         string     `json:"role"`
+	Permissions  []string   `json:"permissions"`
+	AccountOwner bool       `json:"account_owner"`
+	Active       bool       `json:"active"`
+	LastLoginAt  *time.Time `json:"last_login_at"`
+	CreatedAt    time.Time  `json:"created_at"`
+	UpdatedAt    time.Time  `json:"updated_at"`
 }
 
 // MerchantStaffListOptions contains options for listing merchant staff.

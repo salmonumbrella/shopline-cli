@@ -183,10 +183,10 @@ func TestAddAliasIfSafe(t *testing.T) {
 
 func TestNormalizeIDToken(t *testing.T) {
 	tests := []struct {
-		name    string
-		input   string
-		wantID  string
-		wantOK  bool
+		name   string
+		input  string
+		wantID string
+		wantOK bool
 	}{
 		{"formatted ID", "[order:$ord_123]", "ord_123", true},
 		{"formatted ID with prefix", "[product:$prod_456]", "prod_456", true},

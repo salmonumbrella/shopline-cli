@@ -19,31 +19,37 @@ func TestCustomerAddressesCmd(t *testing.T) {
 		t.Errorf("Expected Use to be 'customer-addresses', got %q", customerAddressesCmd.Use)
 	}
 }
+
 func TestCustomerAddressesListCmd(t *testing.T) {
 	if customerAddressesListCmd.Use != "list" {
 		t.Errorf("Expected Use to be 'list', got %q", customerAddressesListCmd.Use)
 	}
 }
+
 func TestCustomerAddressesGetCmd(t *testing.T) {
 	if customerAddressesGetCmd.Use != "get <address-id>" {
 		t.Errorf("Expected Use to be 'get <address-id>', got %q", customerAddressesGetCmd.Use)
 	}
 }
+
 func TestCustomerAddressesCreateCmd(t *testing.T) {
 	if customerAddressesCreateCmd.Use != "create" {
 		t.Errorf("Expected Use to be 'create', got %q", customerAddressesCreateCmd.Use)
 	}
 }
+
 func TestCustomerAddressesSetDefaultCmd(t *testing.T) {
 	if customerAddressesSetDefaultCmd.Use != "set-default <address-id>" {
 		t.Errorf("Expected Use, got %q", customerAddressesSetDefaultCmd.Use)
 	}
 }
+
 func TestCustomerAddressesDeleteCmd(t *testing.T) {
 	if customerAddressesDeleteCmd.Use != "delete <address-id>" {
 		t.Errorf("Expected Use, got %q", customerAddressesDeleteCmd.Use)
 	}
 }
+
 func TestCustomerAddressesListFlags(t *testing.T) {
 	flags := []string{"page", "page-size"}
 	for _, flag := range flags {
@@ -52,6 +58,7 @@ func TestCustomerAddressesListFlags(t *testing.T) {
 		}
 	}
 }
+
 func TestCustomerAddressesCreateFlags(t *testing.T) {
 	flags := []string{"first-name", "last-name", "address", "city", "country", "phone", "default"}
 	for _, flag := range flags {
@@ -60,11 +67,13 @@ func TestCustomerAddressesCreateFlags(t *testing.T) {
 		}
 	}
 }
+
 func TestCustomerAddressesPersistentFlags(t *testing.T) {
 	if customerAddressesCmd.PersistentFlags().Lookup("customer-id") == nil {
 		t.Error("Expected persistent flag 'customer-id' to be defined")
 	}
 }
+
 func TestCustomerAddressesListRunE_GetClientFails(t *testing.T) {
 	origFactory := secretsStoreFactory
 	defer func() { secretsStoreFactory = origFactory }()
@@ -78,6 +87,7 @@ func TestCustomerAddressesListRunE_GetClientFails(t *testing.T) {
 		t.Fatal("Expected error, got nil")
 	}
 }
+
 func TestCustomerAddressesGetRunE_GetClientFails(t *testing.T) {
 	origFactory := secretsStoreFactory
 	defer func() { secretsStoreFactory = origFactory }()
@@ -91,6 +101,7 @@ func TestCustomerAddressesGetRunE_GetClientFails(t *testing.T) {
 		t.Fatal("Expected error, got nil")
 	}
 }
+
 func TestCustomerAddressesCreateRunE_GetClientFails(t *testing.T) {
 	origFactory := secretsStoreFactory
 	defer func() { secretsStoreFactory = origFactory }()
@@ -111,6 +122,7 @@ func TestCustomerAddressesCreateRunE_GetClientFails(t *testing.T) {
 		t.Fatal("Expected error, got nil")
 	}
 }
+
 func TestCustomerAddressesSetDefaultRunE_GetClientFails(t *testing.T) {
 	origFactory := secretsStoreFactory
 	defer func() { secretsStoreFactory = origFactory }()
@@ -124,6 +136,7 @@ func TestCustomerAddressesSetDefaultRunE_GetClientFails(t *testing.T) {
 		t.Fatal("Expected error, got nil")
 	}
 }
+
 func TestCustomerAddressesDeleteRunE_GetClientFails(t *testing.T) {
 	origFactory := secretsStoreFactory
 	defer func() { secretsStoreFactory = origFactory }()
@@ -137,6 +150,7 @@ func TestCustomerAddressesDeleteRunE_GetClientFails(t *testing.T) {
 		t.Fatal("Expected error, got nil")
 	}
 }
+
 func TestCustomerAddressesListRunE_NoProfiles(t *testing.T) {
 	origFactory := secretsStoreFactory
 	origEnv := os.Getenv("SHOPLINE_STORE")

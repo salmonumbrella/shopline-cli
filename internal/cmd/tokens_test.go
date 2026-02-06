@@ -554,13 +554,13 @@ func TestTokensGetRunEJSON(t *testing.T) {
 // TestTokensCreateRunE tests the tokens create command execution with mock API.
 func TestTokensCreateRunE(t *testing.T) {
 	tests := []struct {
-		name        string
-		title       string
-		scopes      string
-		mockResp    *api.Token
-		mockErr     error
-		wantErr     bool
-		wantInOut   string
+		name      string
+		title     string
+		scopes    string
+		mockResp  *api.Token
+		mockErr   error
+		wantErr   bool
+		wantInOut string
 	}{
 		{
 			name:   "successful create",

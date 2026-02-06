@@ -203,7 +203,7 @@ func TestListShippingZonesWithOptions(t *testing.T) {
 
 			client := NewClient("test", "token")
 			client.BaseURL = server.URL
-	client.SetUseOpenAPI(false)
+			client.SetUseOpenAPI(false)
 
 			_, err := client.ListShippingZones(context.Background(), tc.opts)
 			if err != nil {

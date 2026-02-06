@@ -11,9 +11,9 @@ import (
 type FileStatus string
 
 const (
-	FileStatusPending   FileStatus = "pending"
-	FileStatusReady     FileStatus = "ready"
-	FileStatusFailed    FileStatus = "failed"
+	FileStatusPending    FileStatus = "pending"
+	FileStatusReady      FileStatus = "ready"
+	FileStatusFailed     FileStatus = "failed"
 	FileStatusProcessing FileStatus = "processing"
 )
 

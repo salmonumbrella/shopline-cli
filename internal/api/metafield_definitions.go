@@ -11,16 +11,16 @@ import (
 
 // MetafieldDefinition represents a Shopline metafield definition.
 type MetafieldDefinition struct {
-	ID          string    `json:"id"`
-	Name        string    `json:"name"`
-	Namespace   string    `json:"namespace"`
-	Key         string    `json:"key"`
-	Description string    `json:"description"`
-	Type        string    `json:"type"`
-	OwnerType   string    `json:"owner_type"`
+	ID          string       `json:"id"`
+	Name        string       `json:"name"`
+	Namespace   string       `json:"namespace"`
+	Key         string       `json:"key"`
+	Description string       `json:"description"`
+	Type        string       `json:"type"`
+	OwnerType   string       `json:"owner_type"`
 	Validations []Validation `json:"validations"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	CreatedAt   time.Time    `json:"created_at"`
+	UpdatedAt   time.Time    `json:"updated_at"`
 }
 
 // Validation represents a metafield validation rule.

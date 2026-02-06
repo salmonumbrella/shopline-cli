@@ -234,17 +234,17 @@ func TestDisputesListWithEnvVar(t *testing.T) {
 type disputesTestClient struct {
 	api.MockClient
 
-	listDisputesResp           *api.DisputesListResponse
-	listDisputesErr            error
-	getDisputeResp             *api.Dispute
-	getDisputeErr              error
-	submitDisputeResp          *api.Dispute
-	submitDisputeErr           error
-	acceptDisputeResp          *api.Dispute
-	acceptDisputeErr           error
-	updateDisputeEvidenceResp  *api.Dispute
-	updateDisputeEvidenceErr   error
-	updateDisputeEvidenceReq   *api.DisputeUpdateEvidenceRequest
+	listDisputesResp          *api.DisputesListResponse
+	listDisputesErr           error
+	getDisputeResp            *api.Dispute
+	getDisputeErr             error
+	submitDisputeResp         *api.Dispute
+	submitDisputeErr          error
+	acceptDisputeResp         *api.Dispute
+	acceptDisputeErr          error
+	updateDisputeEvidenceResp *api.Dispute
+	updateDisputeEvidenceErr  error
+	updateDisputeEvidenceReq  *api.DisputeUpdateEvidenceRequest
 }
 
 func (m *disputesTestClient) ListDisputes(ctx context.Context, opts *api.DisputesListOptions) (*api.DisputesListResponse, error) {
@@ -763,23 +763,23 @@ func TestDisputesAcceptRunE(t *testing.T) {
 // TestDisputesEvidenceRunE tests the disputes evidence command execution with mock API.
 func TestDisputesEvidenceRunE(t *testing.T) {
 	tests := []struct {
-		name             string
-		disputeID        string
-		customerName     string
-		customerEmail    string
-		productDesc      string
-		shippingCarrier  string
-		trackingNumber   string
-		shippingDate     string
-		mockResp         *api.Dispute
-		mockErr          error
-		wantErr          bool
+		name            string
+		disputeID       string
+		customerName    string
+		customerEmail   string
+		productDesc     string
+		shippingCarrier string
+		trackingNumber  string
+		shippingDate    string
+		mockResp        *api.Dispute
+		mockErr         error
+		wantErr         bool
 	}{
 		{
-			name:           "successful update with customer info",
-			disputeID:      "dispute_123",
-			customerName:   "John Doe",
-			customerEmail:  "john@example.com",
+			name:          "successful update with customer info",
+			disputeID:     "dispute_123",
+			customerName:  "John Doe",
+			customerEmail: "john@example.com",
 			mockResp: &api.Dispute{
 				ID:     "dispute_123",
 				Status: "needs_response",
@@ -797,14 +797,14 @@ func TestDisputesEvidenceRunE(t *testing.T) {
 			},
 		},
 		{
-			name:             "successful update with all fields",
-			disputeID:        "dispute_789",
-			customerName:     "Jane Smith",
-			customerEmail:    "jane@example.com",
-			productDesc:      "Widget XL - Blue",
-			shippingCarrier:  "FedEx",
-			trackingNumber:   "794644790200",
-			shippingDate:     "2024-02-01",
+			name:            "successful update with all fields",
+			disputeID:       "dispute_789",
+			customerName:    "Jane Smith",
+			customerEmail:   "jane@example.com",
+			productDesc:     "Widget XL - Blue",
+			shippingCarrier: "FedEx",
+			trackingNumber:  "794644790200",
+			shippingDate:    "2024-02-01",
 			mockResp: &api.Dispute{
 				ID:        "dispute_789",
 				OrderID:   "ord_789",
@@ -1110,7 +1110,6 @@ func TestDisputesSubmitCancelled(t *testing.T) {
 
 	// Since Scanln will fail or return empty, the command should print "Cancelled."
 	err := disputesSubmitCmd.RunE(cmd, []string{"dispute_123"})
-
 	// The command should succeed (cancellation is not an error)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
@@ -1136,7 +1135,6 @@ func TestDisputesAcceptCancelled(t *testing.T) {
 
 	// Since Scanln will fail or return empty, the command should print "Cancelled."
 	err := disputesAcceptCmd.RunE(cmd, []string{"dispute_123"})
-
 	// The command should succeed (cancellation is not an error)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)

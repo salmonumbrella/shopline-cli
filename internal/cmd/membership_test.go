@@ -569,11 +569,11 @@ func TestMembershipCreateRunE_WithMockAPI(t *testing.T) {
 
 func TestMembershipDeleteRunE_WithMockAPI(t *testing.T) {
 	tests := []struct {
-		name       string
-		mockClient *membershipMockClient
+		name        string
+		mockClient  *membershipMockClient
 		skipConfirm bool
-		wantErr    bool
-		errContain string
+		wantErr     bool
+		errContain  string
 	}{
 		{
 			name: "success with yes flag",
@@ -588,8 +588,8 @@ func TestMembershipDeleteRunE_WithMockAPI(t *testing.T) {
 				deleteErr: errors.New("tier not found"),
 			},
 			skipConfirm: true,
-			wantErr:    true,
-			errContain: "failed to delete membership tier",
+			wantErr:     true,
+			errContain:  "failed to delete membership tier",
 		},
 	}
 
@@ -650,7 +650,6 @@ func TestMembershipDeleteRunE_WithoutConfirmation(t *testing.T) {
 	cmd.Flags().BoolP("yes", "y", false, "")
 
 	err := membershipDeleteCmd.RunE(cmd, []string{"tier_123"})
-
 	// Should not return an error, just cancel
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)

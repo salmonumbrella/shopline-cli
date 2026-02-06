@@ -715,7 +715,6 @@ func TestFilesCreateRunE_DryRun(t *testing.T) {
 	output, err := captureStdout(func() error {
 		return filesCreateCmd.RunE(cmd, []string{})
 	})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 		return
@@ -838,7 +837,6 @@ func TestFilesDeleteRunE_DryRun(t *testing.T) {
 	output, err := captureStdout(func() error {
 		return filesDeleteCmd.RunE(cmd, []string{"file_dryrun"})
 	})
-
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 		return

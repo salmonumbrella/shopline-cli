@@ -9,19 +9,19 @@ import (
 
 // Taxonomy represents a Shopline product taxonomy/category.
 type Taxonomy struct {
-	ID          string    `json:"id"`
-	Name        string    `json:"name"`
-	Handle      string    `json:"handle"`
-	Description string    `json:"description"`
-	ParentID    string    `json:"parent_id"`
-	Level       int       `json:"level"`
-	Position    int       `json:"position"`
-	Path        string    `json:"path"`
-	FullPath    string    `json:"full_path"`
-	ProductCount int      `json:"product_count"`
-	Active      bool      `json:"active"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID           string    `json:"id"`
+	Name         string    `json:"name"`
+	Handle       string    `json:"handle"`
+	Description  string    `json:"description"`
+	ParentID     string    `json:"parent_id"`
+	Level        int       `json:"level"`
+	Position     int       `json:"position"`
+	Path         string    `json:"path"`
+	FullPath     string    `json:"full_path"`
+	ProductCount int       `json:"product_count"`
+	Active       bool      `json:"active"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 // TaxonomiesListOptions contains options for listing taxonomies.

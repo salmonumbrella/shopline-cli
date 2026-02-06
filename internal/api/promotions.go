@@ -11,20 +11,20 @@ import (
 
 // Promotion represents a Shopline promotion.
 type Promotion struct {
-	ID              string    `json:"id"`
-	Title           string    `json:"title"`
-	Description     string    `json:"description"`
-	Type            string    `json:"type"`
-	Status          string    `json:"status"`
-	DiscountType    string    `json:"discount_type"`
-	DiscountValue   float64   `json:"discount_value"`
-	MinPurchase     float64   `json:"min_purchase"`
-	UsageLimit      int       `json:"usage_limit"`
-	UsageCount      int       `json:"usage_count"`
-	StartsAt        time.Time `json:"starts_at"`
-	EndsAt          time.Time `json:"ends_at"`
-	CreatedAt       time.Time `json:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at"`
+	ID            string    `json:"id"`
+	Title         string    `json:"title"`
+	Description   string    `json:"description"`
+	Type          string    `json:"type"`
+	Status        string    `json:"status"`
+	DiscountType  string    `json:"discount_type"`
+	DiscountValue float64   `json:"discount_value"`
+	MinPurchase   float64   `json:"min_purchase"`
+	UsageLimit    int       `json:"usage_limit"`
+	UsageCount    int       `json:"usage_count"`
+	StartsAt      time.Time `json:"starts_at"`
+	EndsAt        time.Time `json:"ends_at"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 // PromotionsListOptions contains options for listing promotions.

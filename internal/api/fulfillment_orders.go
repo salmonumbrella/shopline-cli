@@ -11,26 +11,26 @@ import (
 
 // FulfillmentOrder represents a Shopline fulfillment order.
 type FulfillmentOrder struct {
-	ID                 string                   `json:"id"`
-	OrderID            string                   `json:"order_id"`
-	Status             string                   `json:"status"`
-	FulfillmentStatus  string                   `json:"fulfillment_status"`
-	AssignedLocationID string                   `json:"assigned_location_id"`
-	RequestStatus      string                   `json:"request_status"`
-	LineItems          []FulfillmentOrderItem   `json:"line_items"`
+	ID                 string                    `json:"id"`
+	OrderID            string                    `json:"order_id"`
+	Status             string                    `json:"status"`
+	FulfillmentStatus  string                    `json:"fulfillment_status"`
+	AssignedLocationID string                    `json:"assigned_location_id"`
+	RequestStatus      string                    `json:"request_status"`
+	LineItems          []FulfillmentOrderItem    `json:"line_items"`
 	DeliveryMethod     FulfillmentDeliveryMethod `json:"delivery_method"`
-	CreatedAt          time.Time                `json:"created_at"`
-	UpdatedAt          time.Time                `json:"updated_at"`
+	CreatedAt          time.Time                 `json:"created_at"`
+	UpdatedAt          time.Time                 `json:"updated_at"`
 }
 
 // FulfillmentOrderItem represents a line item in a fulfillment order.
 type FulfillmentOrderItem struct {
-	ID                   string `json:"id"`
-	LineItemID           string `json:"line_item_id"`
-	VariantID            string `json:"variant_id"`
-	Quantity             int    `json:"quantity"`
-	FulfillableQuantity  int    `json:"fulfillable_quantity"`
-	FulfilledQuantity    int    `json:"fulfilled_quantity"`
+	ID                  string `json:"id"`
+	LineItemID          string `json:"line_item_id"`
+	VariantID           string `json:"variant_id"`
+	Quantity            int    `json:"quantity"`
+	FulfillableQuantity int    `json:"fulfillable_quantity"`
+	FulfilledQuantity   int    `json:"fulfilled_quantity"`
 }
 
 // FulfillmentDeliveryMethod represents the delivery method for a fulfillment order.

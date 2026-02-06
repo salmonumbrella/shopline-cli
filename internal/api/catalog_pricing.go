@@ -9,17 +9,17 @@ import (
 
 // CatalogPricing represents B2B catalog-specific pricing.
 type CatalogPricing struct {
-	ID           string    `json:"id"`
-	CatalogID    string    `json:"catalog_id"`
-	ProductID    string    `json:"product_id"`
-	VariantID    string    `json:"variant_id"`
-	OriginalPrice float64  `json:"original_price"`
-	CatalogPrice float64   `json:"catalog_price"`
-	DiscountPct  float64   `json:"discount_pct"`
-	MinQuantity  int       `json:"min_quantity"`
-	MaxQuantity  int       `json:"max_quantity"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	ID            string    `json:"id"`
+	CatalogID     string    `json:"catalog_id"`
+	ProductID     string    `json:"product_id"`
+	VariantID     string    `json:"variant_id"`
+	OriginalPrice float64   `json:"original_price"`
+	CatalogPrice  float64   `json:"catalog_price"`
+	DiscountPct   float64   `json:"discount_pct"`
+	MinQuantity   int       `json:"min_quantity"`
+	MaxQuantity   int       `json:"max_quantity"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 // CatalogPricingListOptions contains options for listing catalog pricing.

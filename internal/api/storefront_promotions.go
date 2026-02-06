@@ -9,51 +9,51 @@ import (
 
 // StorefrontPromotion represents a promotion displayed in the storefront.
 type StorefrontPromotion struct {
-	ID               string                        `json:"id"`
-	Title            string                        `json:"title"`
-	Description      string                        `json:"description"`
-	Type             string                        `json:"type"`
-	Status           string                        `json:"status"`
-	DiscountType     string                        `json:"discount_type"`
-	DiscountValue    string                        `json:"discount_value"`
-	MinPurchase      string                        `json:"min_purchase"`
-	MaxDiscount      string                        `json:"max_discount"`
-	UsageLimit       int                           `json:"usage_limit"`
-	UsageCount       int                           `json:"usage_count"`
-	CustomerLimit    int                           `json:"customer_limit"`
-	Stackable        bool                          `json:"stackable"`
-	AutoApply        bool                          `json:"auto_apply"`
-	Code             string                        `json:"code"`
-	TargetType       string                        `json:"target_type"`
-	TargetProducts   []string                      `json:"target_products"`
-	TargetCategories []string                      `json:"target_categories"`
-	ExcludedProducts []string                      `json:"excluded_products"`
-	Banner           *StorefrontPromotionBanner    `json:"banner"`
-	Schedule         *StorefrontPromotionSchedule  `json:"schedule"`
-	StartsAt         time.Time                     `json:"starts_at"`
-	EndsAt           *time.Time                    `json:"ends_at"`
-	CreatedAt        time.Time                     `json:"created_at"`
-	UpdatedAt        time.Time                     `json:"updated_at"`
+	ID               string                       `json:"id"`
+	Title            string                       `json:"title"`
+	Description      string                       `json:"description"`
+	Type             string                       `json:"type"`
+	Status           string                       `json:"status"`
+	DiscountType     string                       `json:"discount_type"`
+	DiscountValue    string                       `json:"discount_value"`
+	MinPurchase      string                       `json:"min_purchase"`
+	MaxDiscount      string                       `json:"max_discount"`
+	UsageLimit       int                          `json:"usage_limit"`
+	UsageCount       int                          `json:"usage_count"`
+	CustomerLimit    int                          `json:"customer_limit"`
+	Stackable        bool                         `json:"stackable"`
+	AutoApply        bool                         `json:"auto_apply"`
+	Code             string                       `json:"code"`
+	TargetType       string                       `json:"target_type"`
+	TargetProducts   []string                     `json:"target_products"`
+	TargetCategories []string                     `json:"target_categories"`
+	ExcludedProducts []string                     `json:"excluded_products"`
+	Banner           *StorefrontPromotionBanner   `json:"banner"`
+	Schedule         *StorefrontPromotionSchedule `json:"schedule"`
+	StartsAt         time.Time                    `json:"starts_at"`
+	EndsAt           *time.Time                   `json:"ends_at"`
+	CreatedAt        time.Time                    `json:"created_at"`
+	UpdatedAt        time.Time                    `json:"updated_at"`
 }
 
 // StorefrontPromotionBanner represents promotion banner configuration.
 type StorefrontPromotionBanner struct {
-	Enabled     bool   `json:"enabled"`
-	Text        string `json:"text"`
-	ImageURL    string `json:"image_url"`
-	LinkURL     string `json:"link_url"`
-	Position    string `json:"position"`
+	Enabled         bool   `json:"enabled"`
+	Text            string `json:"text"`
+	ImageURL        string `json:"image_url"`
+	LinkURL         string `json:"link_url"`
+	Position        string `json:"position"`
 	BackgroundColor string `json:"background_color"`
-	TextColor   string `json:"text_color"`
+	TextColor       string `json:"text_color"`
 }
 
 // StorefrontPromotionSchedule represents promotion schedule.
 type StorefrontPromotionSchedule struct {
-	Recurring   bool     `json:"recurring"`
-	DaysOfWeek  []string `json:"days_of_week"`
-	StartTime   string   `json:"start_time"`
-	EndTime     string   `json:"end_time"`
-	Timezone    string   `json:"timezone"`
+	Recurring  bool     `json:"recurring"`
+	DaysOfWeek []string `json:"days_of_week"`
+	StartTime  string   `json:"start_time"`
+	EndTime    string   `json:"end_time"`
+	Timezone   string   `json:"timezone"`
 }
 
 // StorefrontPromotionsListOptions contains options for listing storefront promotions.

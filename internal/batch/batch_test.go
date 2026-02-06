@@ -90,7 +90,7 @@ func TestReadItems_FromFile(t *testing.T) {
 	tmpDir := t.TempDir()
 	tmpFile := filepath.Join(tmpDir, "items.json")
 	content := `[{"id": "file1"}, {"id": "file2"}]`
-	if err := os.WriteFile(tmpFile, []byte(content), 0644); err != nil {
+	if err := os.WriteFile(tmpFile, []byte(content), 0o644); err != nil {
 		t.Fatalf("Failed to write temp file: %v", err)
 	}
 

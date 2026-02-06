@@ -19,19 +19,19 @@ const (
 
 // Subscription represents a customer subscription.
 type Subscription struct {
-	ID             string             `json:"id"`
-	CustomerID     string             `json:"customer_id"`
-	ProductID      string             `json:"product_id"`
-	VariantID      string             `json:"variant_id"`
-	Status         SubscriptionStatus `json:"status"`
-	Interval       string             `json:"interval"`
-	IntervalCount  int                `json:"interval_count"`
-	Price          string             `json:"price"`
-	Currency       string             `json:"currency"`
-	NextBillingAt  time.Time          `json:"next_billing_at"`
-	CancelledAt    time.Time          `json:"cancelled_at"`
-	CreatedAt      time.Time          `json:"created_at"`
-	UpdatedAt      time.Time          `json:"updated_at"`
+	ID            string             `json:"id"`
+	CustomerID    string             `json:"customer_id"`
+	ProductID     string             `json:"product_id"`
+	VariantID     string             `json:"variant_id"`
+	Status        SubscriptionStatus `json:"status"`
+	Interval      string             `json:"interval"`
+	IntervalCount int                `json:"interval_count"`
+	Price         string             `json:"price"`
+	Currency      string             `json:"currency"`
+	NextBillingAt time.Time          `json:"next_billing_at"`
+	CancelledAt   time.Time          `json:"cancelled_at"`
+	CreatedAt     time.Time          `json:"created_at"`
+	UpdatedAt     time.Time          `json:"updated_at"`
 }
 
 // SubscriptionsListOptions contains options for listing subscriptions.

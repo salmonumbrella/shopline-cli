@@ -817,11 +817,11 @@ func TestRefundsListMultipleItems(t *testing.T) {
 					CreatedAt: time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC),
 				},
 				{
-					ID:        "ref_3",
-					OrderID:   "ord_3",
-					Status:    "completed",
-					Amount:    "30.00",
-					Currency:  "GBP",
+					ID:       "ref_3",
+					OrderID:  "ord_3",
+					Status:   "completed",
+					Amount:   "30.00",
+					Currency: "GBP",
 					LineItems: []api.RefundLineItem{
 						{LineItemID: "li_1", Quantity: 1},
 						{LineItemID: "li_2", Quantity: 2},

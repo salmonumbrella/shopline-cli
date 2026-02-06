@@ -9,32 +9,32 @@ import (
 
 // Dispute represents a Shopline payment dispute.
 type Dispute struct {
-	ID               string           `json:"id"`
-	OrderID          string           `json:"order_id"`
-	PaymentID        string           `json:"payment_id"`
-	Amount           string           `json:"amount"`
-	Currency         string           `json:"currency"`
-	Status           string           `json:"status"`
-	Reason           string           `json:"reason"`
-	NetworkReasonCode string          `json:"network_reason_code,omitempty"`
-	Evidence         *DisputeEvidence `json:"evidence,omitempty"`
-	EvidenceDueBy    *time.Time       `json:"evidence_due_by,omitempty"`
-	ResolvedAt       *time.Time       `json:"resolved_at,omitempty"`
-	CreatedAt        time.Time        `json:"created_at"`
-	UpdatedAt        time.Time        `json:"updated_at"`
+	ID                string           `json:"id"`
+	OrderID           string           `json:"order_id"`
+	PaymentID         string           `json:"payment_id"`
+	Amount            string           `json:"amount"`
+	Currency          string           `json:"currency"`
+	Status            string           `json:"status"`
+	Reason            string           `json:"reason"`
+	NetworkReasonCode string           `json:"network_reason_code,omitempty"`
+	Evidence          *DisputeEvidence `json:"evidence,omitempty"`
+	EvidenceDueBy     *time.Time       `json:"evidence_due_by,omitempty"`
+	ResolvedAt        *time.Time       `json:"resolved_at,omitempty"`
+	CreatedAt         time.Time        `json:"created_at"`
+	UpdatedAt         time.Time        `json:"updated_at"`
 }
 
 // DisputeEvidence contains evidence for a dispute.
 type DisputeEvidence struct {
-	CustomerName         string `json:"customer_name,omitempty"`
-	CustomerEmail        string `json:"customer_email,omitempty"`
-	CustomerPurchaseIP   string `json:"customer_purchase_ip,omitempty"`
-	ProductDescription   string `json:"product_description,omitempty"`
-	ShippingCarrier      string `json:"shipping_carrier,omitempty"`
+	CustomerName           string `json:"customer_name,omitempty"`
+	CustomerEmail          string `json:"customer_email,omitempty"`
+	CustomerPurchaseIP     string `json:"customer_purchase_ip,omitempty"`
+	ProductDescription     string `json:"product_description,omitempty"`
+	ShippingCarrier        string `json:"shipping_carrier,omitempty"`
 	ShippingTrackingNumber string `json:"shipping_tracking_number,omitempty"`
-	ShippingDate         string `json:"shipping_date,omitempty"`
-	RefundPolicy         string `json:"refund_policy,omitempty"`
-	UncategorizedText    string `json:"uncategorized_text,omitempty"`
+	ShippingDate           string `json:"shipping_date,omitempty"`
+	RefundPolicy           string `json:"refund_policy,omitempty"`
+	UncategorizedText      string `json:"uncategorized_text,omitempty"`
 }
 
 // DisputesListOptions contains options for listing disputes.

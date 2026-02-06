@@ -260,4 +260,3 @@ func TestOrderMetafieldsEndpoints(t *testing.T) {
 		t.Fatalf("missing requests: %v", want)
 	}
 }
-

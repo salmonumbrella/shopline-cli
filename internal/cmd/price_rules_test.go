@@ -157,13 +157,13 @@ func TestPriceRulesDeleteArgs(t *testing.T) {
 // priceRulesMockAPIClient is a mock implementation of api.APIClient for price rules tests.
 type priceRulesMockAPIClient struct {
 	api.MockClient
-	listPriceRulesResp   *api.PriceRulesListResponse
-	listPriceRulesErr    error
-	getPriceRuleResp     *api.PriceRule
-	getPriceRuleErr      error
-	createPriceRuleResp  *api.PriceRule
-	createPriceRuleErr   error
-	deletePriceRuleErr   error
+	listPriceRulesResp  *api.PriceRulesListResponse
+	listPriceRulesErr   error
+	getPriceRuleResp    *api.PriceRule
+	getPriceRuleErr     error
+	createPriceRuleResp *api.PriceRule
+	createPriceRuleErr  error
+	deletePriceRuleErr  error
 }
 
 func (m *priceRulesMockAPIClient) ListPriceRules(ctx context.Context, opts *api.PriceRulesListOptions) (*api.PriceRulesListResponse, error) {
@@ -994,7 +994,7 @@ func TestPriceRulesListRunE_AllBranches(t *testing.T) {
 					Value:             "-5.00",
 					TargetType:        "shipping_line",
 					CustomerSelection: "prerequisite",
-					UsageLimit:        0, // unlimited, should show "-"
+					UsageLimit:        0,     // unlimited, should show "-"
 					OncePerCustomer:   false, // should show "No"
 				},
 			},

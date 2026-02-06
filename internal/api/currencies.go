@@ -9,15 +9,15 @@ import (
 
 // Currency represents a Shopline currency.
 type Currency struct {
-	Code           string    `json:"code"`
-	Name           string    `json:"name"`
-	Symbol         string    `json:"symbol"`
-	Primary        bool      `json:"primary"`
-	Enabled        bool      `json:"enabled"`
-	RoundingMode   string    `json:"rounding_mode"`
-	ExchangeRate   float64   `json:"exchange_rate"`
-	AutoUpdate     bool      `json:"auto_update"`
-	UpdatedAt      time.Time `json:"updated_at"`
+	Code         string    `json:"code"`
+	Name         string    `json:"name"`
+	Symbol       string    `json:"symbol"`
+	Primary      bool      `json:"primary"`
+	Enabled      bool      `json:"enabled"`
+	RoundingMode string    `json:"rounding_mode"`
+	ExchangeRate float64   `json:"exchange_rate"`
+	AutoUpdate   bool      `json:"auto_update"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 // CurrenciesListResponse contains the list response.

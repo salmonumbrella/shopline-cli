@@ -7,10 +7,10 @@ import (
 
 // Multipass represents Shopline multipass configuration.
 type Multipass struct {
-	Enabled   bool       `json:"enabled"`
-	Secret    string     `json:"secret,omitempty"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
+	Enabled   bool      `json:"enabled"`
+	Secret    string    `json:"secret,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // MultipassToken represents a generated multipass token response.
@@ -22,9 +22,9 @@ type MultipassToken struct {
 
 // MultipassTokenRequest contains the data for generating a multipass token.
 type MultipassTokenRequest struct {
-	Email           string                 `json:"email"`
-	ReturnTo        string                 `json:"return_to,omitempty"`
-	CustomerData    map[string]interface{} `json:"customer_data,omitempty"`
+	Email        string                 `json:"email"`
+	ReturnTo     string                 `json:"return_to,omitempty"`
+	CustomerData map[string]interface{} `json:"customer_data,omitempty"`
 }
 
 // GetMultipass retrieves the multipass configuration.

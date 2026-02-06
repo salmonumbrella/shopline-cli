@@ -160,13 +160,13 @@ func TestOrderRisksListWithEnvVar(t *testing.T) {
 type orderRisksTestClient struct {
 	api.MockClient
 
-	listOrderRisksResp   *api.OrderRisksListResponse
-	listOrderRisksErr    error
-	getOrderRiskResp     *api.OrderRisk
-	getOrderRiskErr      error
-	createOrderRiskResp  *api.OrderRisk
-	createOrderRiskErr   error
-	deleteOrderRiskErr   error
+	listOrderRisksResp  *api.OrderRisksListResponse
+	listOrderRisksErr   error
+	getOrderRiskResp    *api.OrderRisk
+	getOrderRiskErr     error
+	createOrderRiskResp *api.OrderRisk
+	createOrderRiskErr  error
+	deleteOrderRiskErr  error
 }
 
 func (m *orderRisksTestClient) ListOrderRisks(ctx context.Context, orderID string, opts *api.OrderRisksListOptions) (*api.OrderRisksListResponse, error) {

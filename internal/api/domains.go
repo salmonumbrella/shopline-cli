@@ -11,11 +11,11 @@ import (
 type DomainStatus string
 
 const (
-	DomainStatusActive     DomainStatus = "active"
-	DomainStatusPending    DomainStatus = "pending"
-	DomainStatusVerifying  DomainStatus = "verifying"
-	DomainStatusFailed     DomainStatus = "failed"
-	DomainStatusExpired    DomainStatus = "expired"
+	DomainStatusActive    DomainStatus = "active"
+	DomainStatusPending   DomainStatus = "pending"
+	DomainStatusVerifying DomainStatus = "verifying"
+	DomainStatusFailed    DomainStatus = "failed"
+	DomainStatusExpired   DomainStatus = "expired"
 )
 
 // Domain represents a domain configuration.

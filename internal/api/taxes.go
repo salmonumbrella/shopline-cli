@@ -47,12 +47,12 @@ type TaxCreateRequest struct {
 
 // TaxUpdateRequest contains the request body for updating a tax.
 type TaxUpdateRequest struct {
-	Name         string   `json:"name,omitempty"`
-	Rate         *float64 `json:"rate,omitempty"`
-	Priority     int      `json:"priority,omitempty"`
-	Compound     *bool    `json:"compound,omitempty"`
-	Shipping     *bool    `json:"shipping,omitempty"`
-	Enabled      *bool    `json:"enabled,omitempty"`
+	Name     string   `json:"name,omitempty"`
+	Rate     *float64 `json:"rate,omitempty"`
+	Priority int      `json:"priority,omitempty"`
+	Compound *bool    `json:"compound,omitempty"`
+	Shipping *bool    `json:"shipping,omitempty"`
+	Enabled  *bool    `json:"enabled,omitempty"`
 }
 
 // ListTaxes retrieves a list of taxes.

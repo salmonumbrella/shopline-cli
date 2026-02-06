@@ -9,16 +9,16 @@ import (
 
 // SizeChart represents a Shopline size chart.
 type SizeChart struct {
-	ID          string          `json:"id"`
-	Name        string          `json:"name"`
-	Description string          `json:"description"`
-	Unit        string          `json:"unit"`
-	Headers     []string        `json:"headers"`
-	Rows        []SizeChartRow  `json:"rows"`
-	ProductIDs  []string        `json:"product_ids"`
-	Active      bool            `json:"active"`
-	CreatedAt   time.Time       `json:"created_at"`
-	UpdatedAt   time.Time       `json:"updated_at"`
+	ID          string         `json:"id"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	Unit        string         `json:"unit"`
+	Headers     []string       `json:"headers"`
+	Rows        []SizeChartRow `json:"rows"`
+	ProductIDs  []string       `json:"product_ids"`
+	Active      bool           `json:"active"`
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
 }
 
 // SizeChartRow represents a row in a size chart.

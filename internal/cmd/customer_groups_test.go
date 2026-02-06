@@ -19,26 +19,31 @@ func TestCustomerGroupsCmd(t *testing.T) {
 		t.Errorf("Expected Use to be 'customer-groups', got %q", customerGroupsCmd.Use)
 	}
 }
+
 func TestCustomerGroupsListCmd(t *testing.T) {
 	if customerGroupsListCmd.Use != "list" {
 		t.Errorf("Expected Use to be 'list', got %q", customerGroupsListCmd.Use)
 	}
 }
+
 func TestCustomerGroupsGetCmd(t *testing.T) {
 	if customerGroupsGetCmd.Use != "get <id>" {
 		t.Errorf("Expected Use to be 'get <id>', got %q", customerGroupsGetCmd.Use)
 	}
 }
+
 func TestCustomerGroupsCreateCmd(t *testing.T) {
 	if customerGroupsCreateCmd.Use != "create" {
 		t.Errorf("Expected Use to be 'create', got %q", customerGroupsCreateCmd.Use)
 	}
 }
+
 func TestCustomerGroupsDeleteCmd(t *testing.T) {
 	if customerGroupsDeleteCmd.Use != "delete <id>" {
 		t.Errorf("Expected Use to be 'delete <id>', got %q", customerGroupsDeleteCmd.Use)
 	}
 }
+
 func TestCustomerGroupsListFlags(t *testing.T) {
 	flags := []string{"page", "page-size"}
 	for _, flag := range flags {
@@ -47,6 +52,7 @@ func TestCustomerGroupsListFlags(t *testing.T) {
 		}
 	}
 }
+
 func TestCustomerGroupsCreateFlags(t *testing.T) {
 	flags := []string{"name", "description"}
 	for _, flag := range flags {
@@ -55,6 +61,7 @@ func TestCustomerGroupsCreateFlags(t *testing.T) {
 		}
 	}
 }
+
 func TestCustomerGroupsListRunE_GetClientFails(t *testing.T) {
 	origFactory := secretsStoreFactory
 	defer func() { secretsStoreFactory = origFactory }()
@@ -67,6 +74,7 @@ func TestCustomerGroupsListRunE_GetClientFails(t *testing.T) {
 		t.Fatal("Expected error, got nil")
 	}
 }
+
 func TestCustomerGroupsGetRunE_GetClientFails(t *testing.T) {
 	origFactory := secretsStoreFactory
 	defer func() { secretsStoreFactory = origFactory }()
@@ -79,6 +87,7 @@ func TestCustomerGroupsGetRunE_GetClientFails(t *testing.T) {
 		t.Fatal("Expected error, got nil")
 	}
 }
+
 func TestCustomerGroupsCreateRunE_GetClientFails(t *testing.T) {
 	origFactory := secretsStoreFactory
 	defer func() { secretsStoreFactory = origFactory }()
@@ -93,6 +102,7 @@ func TestCustomerGroupsCreateRunE_GetClientFails(t *testing.T) {
 		t.Fatal("Expected error, got nil")
 	}
 }
+
 func TestCustomerGroupsDeleteRunE_GetClientFails(t *testing.T) {
 	origFactory := secretsStoreFactory
 	defer func() { secretsStoreFactory = origFactory }()
@@ -105,6 +115,7 @@ func TestCustomerGroupsDeleteRunE_GetClientFails(t *testing.T) {
 		t.Fatal("Expected error, got nil")
 	}
 }
+
 func TestCustomerGroupsListRunE_NoProfiles(t *testing.T) {
 	origFactory := secretsStoreFactory
 	origEnv := os.Getenv("SHOPLINE_STORE")
