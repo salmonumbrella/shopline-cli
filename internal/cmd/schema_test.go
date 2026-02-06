@@ -69,8 +69,8 @@ func TestSchemaListResources(t *testing.T) {
 			name:         "json output",
 			outputFormat: "json",
 			wantContains: []string{
-				`"Name": "test-orders"`,
-				`"Name": "test-products"`,
+				`"name": "test-orders"`,
+				`"name": "test-products"`,
 			},
 		},
 	}
@@ -132,8 +132,8 @@ func TestSchemaShowResource(t *testing.T) {
 			resource:     "test-orders",
 			outputFormat: "json",
 			wantContains: []string{
-				`"Name": "test-orders"`,
-				`"IDPrefix": "order"`,
+				`"name": "test-orders"`,
+				`"id_prefix": "order"`,
 			},
 		},
 		{

@@ -2,11 +2,11 @@ package schema
 
 // Resource describes a CLI resource (command group).
 type Resource struct {
-	Name        string   // e.g., "orders"
-	Description string   // e.g., "Manage customer orders"
-	Commands    []string // e.g., ["list", "get", "create", "cancel"]
-	IDField     string   // e.g., "id" - primary identifier field
-	IDPrefix    string   // e.g., "order" - for [order:$id] formatting
+	Name        string   `json:"name"`                // e.g., "orders"
+	Description string   `json:"description"`         // e.g., "Manage customer orders"
+	Commands    []string `json:"commands,omitempty"`  // e.g., ["list", "get", "create", "cancel"]
+	IDField     string   `json:"id_field,omitempty"`  // e.g., "id" - primary identifier field
+	IDPrefix    string   `json:"id_prefix,omitempty"` // e.g., "order" - for [order:$id] formatting
 }
 
 // Registry holds all registered resources.
