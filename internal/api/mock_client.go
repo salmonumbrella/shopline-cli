@@ -2384,3 +2384,23 @@ func (m *MockClient) GetDeliveryTimeSlotsOpenAPI(ctx context.Context, id string)
 func (m *MockClient) UpdateDeliveryOptionStoresInfo(ctx context.Context, id string, body any) (json.RawMessage, error) {
 	return nil, m.notImplemented("UpdateDeliveryOptionStoresInfo")
 }
+
+func (m *MockClient) ListFlashPriceCampaigns(ctx context.Context, opts *FlashPriceCampaignsListOptions) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListFlashPriceCampaigns")
+}
+
+func (m *MockClient) GetFlashPriceCampaign(ctx context.Context, id string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetFlashPriceCampaign")
+}
+
+func (m *MockClient) CreateFlashPriceCampaign(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("CreateFlashPriceCampaign")
+}
+
+func (m *MockClient) UpdateFlashPriceCampaign(ctx context.Context, id string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateFlashPriceCampaign")
+}
+
+func (m *MockClient) DeleteFlashPriceCampaign(ctx context.Context, id string) error {
+	return m.notImplemented("DeleteFlashPriceCampaign")
+}

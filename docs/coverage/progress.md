@@ -26,6 +26,8 @@ go run ./cmd/shopline-coverage
 - Delivery config: `GET /delivery_options/delivery_config` (done)
 - Delivery time slots (documented): `GET /delivery_options/{delivery_option_id}/delivery_time_slots` (done)
 - Delivery stores info update: `PUT /delivery_options/{id}/stores_info` (done)
+- [x] Flash price campaigns
+- `GET/POST/GET(id)/PUT(id)/DELETE(id) /flash_price_campaigns` (done)
 - [x] Store credits
 - Customer store credits (`GET/POST /customers/{id}/store_credits`) + user credits (`GET /user_credits`, `POST /user_credits/bulk_update`) (done)
 - Member points + membership info (`/customers/membership_info`, `/customers/{id}/member_points`, `/member_point_rules`, `/member_points/bulk_update`, `/customers/{id}/membership_tier/action_logs`) (done)

@@ -103,6 +103,15 @@ func (f *Formatter) Table(headers []string, rows [][]string) {
 
 // JSON outputs data as JSON.
 func (f *Formatter) JSON(data interface{}) error {
+	// If an API returns an empty response body but we still attempt to print it as json.RawMessage,
+	// encoding/json would emit 0 bytes (invalid JSON). Normalize empty raw messages to null.
+	if rm, ok := data.(json.RawMessage); ok && len(rm) == 0 {
+		data = json.RawMessage(nil)
+	}
+	if prm, ok := data.(*json.RawMessage); ok && prm != nil && len(*prm) == 0 {
+		data = json.RawMessage(nil)
+	}
+
 	if f.itemsOnly {
 		if unwrapped, ok := unwrapItemsField(data); ok {
 			data = unwrapped

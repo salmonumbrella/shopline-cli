@@ -58,6 +58,7 @@ type APIClient interface {
 	CreateDraftOrder(ctx context.Context, req *DraftOrderCreateRequest) (*DraftOrder, error)
 	CreateFile(ctx context.Context, req *FileCreateRequest) (*File, error)
 	CreateFlashPrice(ctx context.Context, req *FlashPriceCreateRequest) (*FlashPrice, error)
+	CreateFlashPriceCampaign(ctx context.Context, body any) (json.RawMessage, error)
 	CreateFulfillmentService(ctx context.Context, req *FulfillmentServiceCreateRequest) (*FulfillmentService, error)
 	CreateGift(ctx context.Context, req *GiftCreateRequest) (*Gift, error)
 	CreateGiftCard(ctx context.Context, req *GiftCardCreateRequest) (*GiftCard, error)
@@ -151,6 +152,7 @@ type APIClient interface {
 	DeleteDraftOrder(ctx context.Context, id string) error
 	DeleteFile(ctx context.Context, id string) error
 	DeleteFlashPrice(ctx context.Context, id string) error
+	DeleteFlashPriceCampaign(ctx context.Context, id string) error
 	DeleteFulfillmentService(ctx context.Context, id string) error
 	DeleteGift(ctx context.Context, id string) error
 	DeleteGiftCard(ctx context.Context, id string) error
@@ -253,6 +255,7 @@ type APIClient interface {
 	GetDraftOrder(ctx context.Context, id string) (*DraftOrder, error)
 	GetFile(ctx context.Context, id string) (*File, error)
 	GetFlashPrice(ctx context.Context, id string) (*FlashPrice, error)
+	GetFlashPriceCampaign(ctx context.Context, id string) (json.RawMessage, error)
 	GetFulfillment(ctx context.Context, id string) (*Fulfillment, error)
 	GetFulfillmentOrder(ctx context.Context, id string) (*FulfillmentOrder, error)
 	GetFulfillmentService(ctx context.Context, id string) (*FulfillmentService, error)
@@ -459,6 +462,8 @@ type APIClient interface {
 	ListDraftOrders(ctx context.Context, opts *DraftOrdersListOptions) (*DraftOrdersListResponse, error)
 	ListFiles(ctx context.Context, opts *FilesListOptions) (*FilesListResponse, error)
 	ListFlashPrices(ctx context.Context, opts *FlashPriceListOptions) (*FlashPriceListResponse, error)
+	// Flash price campaigns (documented endpoints)
+	ListFlashPriceCampaigns(ctx context.Context, opts *FlashPriceCampaignsListOptions) (json.RawMessage, error)
 	ListFulfillmentOrders(ctx context.Context, opts *FulfillmentOrdersListOptions) (*FulfillmentOrdersListResponse, error)
 	ListFulfillments(ctx context.Context, opts *FulfillmentsListOptions) (*FulfillmentsListResponse, error)
 	ListFulfillmentServices(ctx context.Context, opts *FulfillmentServicesListOptions) (*FulfillmentServicesListResponse, error)
@@ -582,6 +587,7 @@ type APIClient interface {
 	UpdateDomain(ctx context.Context, id string, req *DomainUpdateRequest) (*Domain, error)
 	UpdateFile(ctx context.Context, id string, req *FileUpdateRequest) (*File, error)
 	UpdateFlashPrice(ctx context.Context, id string, req *FlashPriceUpdateRequest) (*FlashPrice, error)
+	UpdateFlashPriceCampaign(ctx context.Context, id string, body any) (json.RawMessage, error)
 	UpdateFulfillmentService(ctx context.Context, id string, req *FulfillmentServiceUpdateRequest) (*FulfillmentService, error)
 	UpdateLabel(ctx context.Context, id string, req *LabelUpdateRequest) (*Label, error)
 	UpdateLocalDeliveryOption(ctx context.Context, id string, req *LocalDeliveryUpdateRequest) (*LocalDeliveryOption, error)

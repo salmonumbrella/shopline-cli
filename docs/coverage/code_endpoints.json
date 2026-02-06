@@ -1191,6 +1191,31 @@
   },
   {
     "method": "GET",
+    "path": "/flash_price_campaigns",
+    "source": "internal/api/flash_price_campaigns_docs.go"
+  },
+  {
+    "method": "POST",
+    "path": "/flash_price_campaigns",
+    "source": "internal/api/flash_price_campaigns_docs.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/flash_price_campaigns/{}",
+    "source": "internal/api/flash_price_campaigns_docs.go"
+  },
+  {
+    "method": "GET",
+    "path": "/flash_price_campaigns/{}",
+    "source": "internal/api/flash_price_campaigns_docs.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/flash_price_campaigns/{}",
+    "source": "internal/api/flash_price_campaigns_docs.go"
+  },
+  {
+    "method": "GET",
     "path": "/fulfillment_orders",
     "source": "internal/api/fulfillment_orders.go"
   },

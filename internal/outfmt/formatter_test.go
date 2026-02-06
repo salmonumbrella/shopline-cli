@@ -93,6 +93,43 @@ func TestFormatterJSON(t *testing.T) {
 	}
 }
 
+func TestFormatterJSON_EmptyRawMessageOutputsNull(t *testing.T) {
+	var buf bytes.Buffer
+	f := New(&buf, FormatJSON, "never")
+
+	// An empty (non-nil) RawMessage marshals to 0 bytes, which is invalid JSON.
+	// We normalize it to null.
+	if err := f.JSON(json.RawMessage{}); err != nil {
+		t.Fatalf("JSON() returned error: %v", err)
+	}
+
+	var got any
+	if err := json.Unmarshal(buf.Bytes(), &got); err != nil {
+		t.Fatalf("Failed to parse JSON output: %v", err)
+	}
+	if got != nil {
+		t.Fatalf("expected null, got %v", got)
+	}
+}
+
+func TestFormatterJSON_EmptyRawMessagePointerOutputsNull(t *testing.T) {
+	var buf bytes.Buffer
+	f := New(&buf, FormatJSON, "never")
+
+	rm := json.RawMessage{}
+	if err := f.JSON(&rm); err != nil {
+		t.Fatalf("JSON() returned error: %v", err)
+	}
+
+	var got any
+	if err := json.Unmarshal(buf.Bytes(), &got); err != nil {
+		t.Fatalf("Failed to parse JSON output: %v", err)
+	}
+	if got != nil {
+		t.Fatalf("expected null, got %v", got)
+	}
+}
+
 func TestFormatterJSONQueryDoesNotPanicOnTypedSlice(t *testing.T) {
 	type order struct {
 		ID string `json:"id"`

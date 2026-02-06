@@ -3,8 +3,8 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 673
-- Missing in code: 39
+- Code endpoints detected: 678
+- Missing in code: 34
 - Extra in code: 404
 - Unparsed doc pages: 55
 
@@ -73,11 +73,6 @@
 - `GET /affiliate_campaigns/{}/orders` (https://open-api.docs.shoplineapp.com/reference/get_affiliate-campaigns-id-orders)
 - `GET /affiliate_campaigns/{}/summary` (https://open-api.docs.shoplineapp.com/reference/get_affiliate-campaigns-id-summary)
 - `POST /conversations/message` (https://open-api.docs.shoplineapp.com/reference/post_conversations-message)
-- `GET /flash_price_campaigns` (https://open-api.docs.shoplineapp.com/reference/get_flash-price-campaigns-1)
-- `POST /flash_price_campaigns` (https://open-api.docs.shoplineapp.com/reference/post_flash-price-campaigns-1)
-- `DELETE /flash_price_campaigns/{}` (https://open-api.docs.shoplineapp.com/reference/delete_flash-price-campaigns-id-1)
-- `GET /flash_price_campaigns/{}` (https://open-api.docs.shoplineapp.com/reference/get_flash-price-campaigns-id-1)
-- `PUT /flash_price_campaigns/{}` (https://open-api.docs.shoplineapp.com/reference/put_flash-price-campaigns-id-1)
 - `PUT /gifts/update_quantity` (https://open-api.docs.shoplineapp.com/reference/put_gifts-update-quantity-1)
 - `PUT /gifts/{}` (https://open-api.docs.shoplineapp.com/reference/put_gifts-id)
 - `GET /gifts/{}/stocks` (https://open-api.docs.shoplineapp.com/reference/get_gifts-id-stocks-1)
