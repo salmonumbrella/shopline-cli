@@ -154,7 +154,8 @@ go run ./cmd/shopline-coverage
 
 ### Phase 3: Customers + Credits + Membership/Points
 
-- [ ] Fill customer endpoints
+- [x] Customer core endpoints + CLI (list/get/search/create/update/delete + tags + subscriptions + LINE lookup)
+- [ ] Customer metafields + app_metafields
 - [ ] Ensure store credits + user credits endpoints match docs
 - [ ] CLI coverage + tests
 

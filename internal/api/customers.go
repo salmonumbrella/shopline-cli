@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -162,6 +163,9 @@ func (c *Client) DeleteCustomer(ctx context.Context, id string) error {
 
 // SearchCustomers searches for customers with query parameters.
 func (c *Client) SearchCustomers(ctx context.Context, opts *CustomerSearchOptions) (*CustomersListResponse, error) {
+	if opts == nil {
+		return nil, fmt.Errorf("search options are required")
+	}
 	path := "/customers/search" + NewQuery().
 		String("query", opts.Query).
 		String("email", opts.Email).
@@ -227,4 +231,32 @@ func (c *Client) GetCustomerPromotions(ctx context.Context, id string) (*Custome
 		return nil, err
 	}
 	return &resp, nil
+}
+
+// UpdateCustomerSubscriptions updates customer subscriptions.
+//
+// Docs: PUT /customers/{customer_id}/subscriptions
+func (c *Client) UpdateCustomerSubscriptions(ctx context.Context, customerID string, body any) (json.RawMessage, error) {
+	if strings.TrimSpace(customerID) == "" {
+		return nil, fmt.Errorf("customer id is required")
+	}
+	var resp json.RawMessage
+	if err := c.Put(ctx, fmt.Sprintf("/customers/%s/subscriptions", customerID), body, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+// GetLineCustomer retrieves a customer by LINE ID.
+//
+// Docs: GET /customers/line/{lineId}
+func (c *Client) GetLineCustomer(ctx context.Context, lineID string) (*Customer, error) {
+	if strings.TrimSpace(lineID) == "" {
+		return nil, fmt.Errorf("line id is required")
+	}
+	var customer Customer
+	if err := c.Get(ctx, fmt.Sprintf("/customers/line/%s", lineID), &customer); err != nil {
+		return nil, err
+	}
+	return &customer, nil
 }

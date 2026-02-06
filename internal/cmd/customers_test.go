@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"os"
 	"strings"
@@ -27,8 +28,15 @@ func TestCustomersCommandSetup(t *testing.T) {
 // TestCustomersSubcommands verifies all subcommands are registered
 func TestCustomersSubcommands(t *testing.T) {
 	subcommands := map[string]string{
-		"list": "List customers",
-		"get":  "Get customer details",
+		"list":          "List customers",
+		"get":           "Get customer details",
+		"search":        "Search customers",
+		"create":        "Create a customer",
+		"update":        "Update a customer",
+		"delete":        "Delete a customer",
+		"tags":          "Manage customer tags",
+		"subscriptions": "Manage customer subscriptions",
+		"line":          "Lookup customers by LINE ID",
 	}
 
 	for name, short := range subcommands {
@@ -251,10 +259,25 @@ func TestCustomersListWithValidStore(t *testing.T) {
 // customersMockAPIClient is a mock implementation of api.APIClient for customers tests.
 type customersMockAPIClient struct {
 	api.MockClient
-	listCustomersResp *api.CustomersListResponse
-	listCustomersErr  error
-	getCustomerResp   *api.Customer
-	getCustomerErr    error
+	listCustomersResp               *api.CustomersListResponse
+	listCustomersErr                error
+	getCustomerResp                 *api.Customer
+	getCustomerErr                  error
+	searchCustomersResp             *api.CustomersListResponse
+	searchCustomersErr              error
+	createCustomerResp              *api.Customer
+	createCustomerErr               error
+	updateCustomerResp              *api.Customer
+	updateCustomerErr               error
+	deleteCustomerErr               error
+	setCustomerTagsResp             *api.Customer
+	setCustomerTagsErr              error
+	updateCustomerTagsResp          *api.Customer
+	updateCustomerTagsErr           error
+	updateCustomerSubscriptionsResp json.RawMessage
+	updateCustomerSubscriptionsErr  error
+	getLineCustomerResp             *api.Customer
+	getLineCustomerErr              error
 }
 
 func (m *customersMockAPIClient) ListCustomers(ctx context.Context, opts *api.CustomersListOptions) (*api.CustomersListResponse, error) {
@@ -263,6 +286,38 @@ func (m *customersMockAPIClient) ListCustomers(ctx context.Context, opts *api.Cu
 
 func (m *customersMockAPIClient) GetCustomer(ctx context.Context, id string) (*api.Customer, error) {
 	return m.getCustomerResp, m.getCustomerErr
+}
+
+func (m *customersMockAPIClient) SearchCustomers(ctx context.Context, opts *api.CustomerSearchOptions) (*api.CustomersListResponse, error) {
+	return m.searchCustomersResp, m.searchCustomersErr
+}
+
+func (m *customersMockAPIClient) CreateCustomer(ctx context.Context, req *api.CustomerCreateRequest) (*api.Customer, error) {
+	return m.createCustomerResp, m.createCustomerErr
+}
+
+func (m *customersMockAPIClient) UpdateCustomer(ctx context.Context, id string, req *api.CustomerUpdateRequest) (*api.Customer, error) {
+	return m.updateCustomerResp, m.updateCustomerErr
+}
+
+func (m *customersMockAPIClient) DeleteCustomer(ctx context.Context, id string) error {
+	return m.deleteCustomerErr
+}
+
+func (m *customersMockAPIClient) SetCustomerTags(ctx context.Context, id string, tags []string) (*api.Customer, error) {
+	return m.setCustomerTagsResp, m.setCustomerTagsErr
+}
+
+func (m *customersMockAPIClient) UpdateCustomerTags(ctx context.Context, id string, req *api.CustomerTagsUpdateRequest) (*api.Customer, error) {
+	return m.updateCustomerTagsResp, m.updateCustomerTagsErr
+}
+
+func (m *customersMockAPIClient) UpdateCustomerSubscriptions(ctx context.Context, customerID string, body any) (json.RawMessage, error) {
+	return m.updateCustomerSubscriptionsResp, m.updateCustomerSubscriptionsErr
+}
+
+func (m *customersMockAPIClient) GetLineCustomer(ctx context.Context, lineID string) (*api.Customer, error) {
+	return m.getLineCustomerResp, m.getLineCustomerErr
 }
 
 // setupCustomersMockFactories sets up mock factories for customers tests.
@@ -537,6 +592,148 @@ func TestCustomersGetRunE(t *testing.T) {
 				t.Errorf("unexpected error: %v", err)
 			}
 		})
+	}
+}
+
+func TestCustomersSearchRunEWithJSON(t *testing.T) {
+	mockClient := &customersMockAPIClient{
+		searchCustomersResp: &api.CustomersListResponse{
+			Items:      []api.Customer{{ID: "cust_s", Email: "s@example.com"}},
+			TotalCount: 1,
+		},
+	}
+	cleanup, buf := setupCustomersMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newCustomersTestCmd()
+	_ = cmd.Flags().Set("output", "json")
+	cmd.Flags().String("q", "", "")
+	_ = cmd.Flags().Set("q", "alice")
+	cmd.Flags().String("email", "", "")
+	cmd.Flags().String("phone", "", "")
+	cmd.Flags().Int("page", 1, "")
+	cmd.Flags().Int("page-size", 20, "")
+
+	if err := customersSearchCmd.RunE(cmd, nil); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "cust_s") {
+		t.Fatalf("expected output to contain customer id, got: %s", buf.String())
+	}
+}
+
+func TestCustomersCreateRunEWithJSON(t *testing.T) {
+	mockClient := &customersMockAPIClient{
+		createCustomerResp: &api.Customer{ID: "cust_new", Email: "new@example.com"},
+	}
+	cleanup, buf := setupCustomersMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newCustomersTestCmd()
+	_ = cmd.Flags().Set("output", "json")
+	cmd.Flags().String("email", "new@example.com", "")
+	cmd.Flags().String("first-name", "New", "")
+	cmd.Flags().String("last-name", "User", "")
+	cmd.Flags().String("phone", "+1", "")
+	cmd.Flags().Bool("accepts-marketing", false, "")
+	cmd.Flags().StringSlice("tag", nil, "")
+	cmd.Flags().String("note", "", "")
+
+	if err := customersCreateCmd.RunE(cmd, nil); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "cust_new") {
+		t.Fatalf("expected output to contain customer id, got: %s", buf.String())
+	}
+}
+
+func TestCustomersUpdateRunEWithJSON(t *testing.T) {
+	mockClient := &customersMockAPIClient{
+		updateCustomerResp: &api.Customer{ID: "cust_1", Email: "u@example.com"},
+	}
+	cleanup, buf := setupCustomersMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newCustomersTestCmd()
+	_ = cmd.Flags().Set("output", "json")
+	cmd.Flags().String("email", "", "")
+	cmd.Flags().String("first-name", "", "")
+	cmd.Flags().String("last-name", "", "")
+	cmd.Flags().String("phone", "", "")
+	cmd.Flags().Bool("accepts-marketing", false, "")
+	cmd.Flags().StringSlice("tag", nil, "")
+	cmd.Flags().String("note", "", "")
+	_ = cmd.Flags().Set("first-name", "Updated")
+
+	if err := customersUpdateCmd.RunE(cmd, []string{"cust_1"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "cust_1") {
+		t.Fatalf("expected output to contain customer id, got: %s", buf.String())
+	}
+}
+
+func TestCustomersDeleteRunE(t *testing.T) {
+	mockClient := &customersMockAPIClient{}
+	cleanup, _ := setupCustomersMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newCustomersTestCmd()
+	if err := customersDeleteCmd.RunE(cmd, []string{"cust_1"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestCustomersTagsSetRunE(t *testing.T) {
+	mockClient := &customersMockAPIClient{
+		setCustomerTagsResp: &api.Customer{ID: "cust_1", Tags: []string{"a"}},
+	}
+	cleanup, buf := setupCustomersMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newCustomersTestCmd()
+	cmd.Flags().StringSlice("tag", []string{"a"}, "")
+
+	if err := customersTagsSetCmd.RunE(cmd, []string{"cust_1"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "cust_1") {
+		t.Fatalf("expected output to contain customer id, got: %s", buf.String())
+	}
+}
+
+func TestCustomersSubscriptionsUpdateRunE(t *testing.T) {
+	mockClient := &customersMockAPIClient{
+		updateCustomerSubscriptionsResp: json.RawMessage(`{"ok":true}`),
+	}
+	cleanup, buf := setupCustomersMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newCustomersTestCmd()
+	cmd.Flags().String("body", `{"k":"v"}`, "")
+	cmd.Flags().String("body-file", "", "")
+
+	if err := customersSubscriptionsUpdateCmd.RunE(cmd, []string{"cust_1"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "\"ok\"") {
+		t.Fatalf("expected output to contain ok, got: %s", buf.String())
+	}
+}
+
+func TestCustomersLineGetRunE(t *testing.T) {
+	mockClient := &customersMockAPIClient{
+		getLineCustomerResp: &api.Customer{ID: "cust_line"},
+	}
+	cleanup, buf := setupCustomersMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newCustomersTestCmd()
+	if err := customersLineGetCmd.RunE(cmd, []string{"line_123"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "cust_line") {
+		t.Fatalf("expected output to contain customer id, got: %s", buf.String())
 	}
 }
 

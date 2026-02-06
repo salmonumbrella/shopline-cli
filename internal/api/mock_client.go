@@ -185,6 +185,10 @@ func (m *MockClient) CreateCoupon(ctx context.Context, req *CouponCreateRequest)
 	return nil, m.notImplemented("CreateCoupon")
 }
 
+func (m *MockClient) CreateCustomer(ctx context.Context, req *CustomerCreateRequest) (*Customer, error) {
+	return nil, m.notImplemented("CreateCustomer")
+}
+
 func (m *MockClient) CreateCustomerAddress(ctx context.Context, customerID string, req *CustomerAddressCreateRequest) (*CustomerAddress, error) {
 	return nil, m.notImplemented("CreateCustomerAddress")
 }
@@ -483,6 +487,10 @@ func (m *MockClient) DeleteConversation(ctx context.Context, id string) error {
 
 func (m *MockClient) DeleteCoupon(ctx context.Context, id string) error {
 	return m.notImplemented("DeleteCoupon")
+}
+
+func (m *MockClient) DeleteCustomer(ctx context.Context, id string) error {
+	return m.notImplemented("DeleteCustomer")
 }
 
 func (m *MockClient) DeleteCustomerAddress(ctx context.Context, customerID, addressID string) error {
@@ -831,6 +839,10 @@ func (m *MockClient) GetCurrentBulkOperation(ctx context.Context) (*BulkOperatio
 
 func (m *MockClient) GetCustomer(ctx context.Context, id string) (*Customer, error) {
 	return nil, m.notImplemented("GetCustomer")
+}
+
+func (m *MockClient) GetLineCustomer(ctx context.Context, lineID string) (*Customer, error) {
+	return nil, m.notImplemented("GetLineCustomer")
 }
 
 func (m *MockClient) GetCustomerAddress(ctx context.Context, customerID, addressID string) (*CustomerAddress, error) {
@@ -1277,6 +1289,10 @@ func (m *MockClient) ListCustomers(ctx context.Context, opts *CustomersListOptio
 	return nil, m.notImplemented("ListCustomers")
 }
 
+func (m *MockClient) SearchCustomers(ctx context.Context, opts *CustomerSearchOptions) (*CustomersListResponse, error) {
+	return nil, m.notImplemented("SearchCustomers")
+}
+
 func (m *MockClient) ListCustomerSavedSearches(ctx context.Context, opts *CustomerSavedSearchesListOptions) (*CustomerSavedSearchesListResponse, error) {
 	return nil, m.notImplemented("ListCustomerSavedSearches")
 }
@@ -1649,6 +1665,10 @@ func (m *MockClient) SetDefaultCustomerAddress(ctx context.Context, customerID, 
 	return nil, m.notImplemented("SetDefaultCustomerAddress")
 }
 
+func (m *MockClient) SetCustomerTags(ctx context.Context, id string, tags []string) (*Customer, error) {
+	return nil, m.notImplemented("SetCustomerTags")
+}
+
 func (m *MockClient) SetInventoryLevel(ctx context.Context, req *InventoryLevelSetRequest) (*InventoryLevel, error) {
 	return nil, m.notImplemented("SetInventoryLevel")
 }
@@ -1735,6 +1755,18 @@ func (m *MockClient) UpdateCurrency(ctx context.Context, code string, req *Curre
 
 func (m *MockClient) UpdateCustomerGroup(ctx context.Context, id string, req *CustomerGroupUpdateRequest) (*CustomerGroup, error) {
 	return nil, m.notImplemented("UpdateCustomerGroup")
+}
+
+func (m *MockClient) UpdateCustomer(ctx context.Context, id string, req *CustomerUpdateRequest) (*Customer, error) {
+	return nil, m.notImplemented("UpdateCustomer")
+}
+
+func (m *MockClient) UpdateCustomerTags(ctx context.Context, id string, req *CustomerTagsUpdateRequest) (*Customer, error) {
+	return nil, m.notImplemented("UpdateCustomerTags")
+}
+
+func (m *MockClient) UpdateCustomerSubscriptions(ctx context.Context, customerID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateCustomerSubscriptions")
 }
 
 func (m *MockClient) UpdateCustomField(ctx context.Context, id string, req *CustomFieldUpdateRequest) (*CustomField, error) {

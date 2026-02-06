@@ -470,6 +470,17 @@ func TestSearchCustomersAPIError(t *testing.T) {
 	}
 }
 
+func TestSearchCustomersNilOptions(t *testing.T) {
+	client := NewClient("test", "token")
+	_, err := client.SearchCustomers(context.Background(), nil)
+	if err == nil {
+		t.Fatal("expected error for nil options, got nil")
+	}
+	if err.Error() != "search options are required" {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
 func TestUpdateCustomerTags(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
@@ -517,6 +528,60 @@ func TestUpdateCustomerTags(t *testing.T) {
 
 	if len(customer.Tags) != 2 {
 		t.Errorf("Expected 2 tags, got %d", len(customer.Tags))
+	}
+}
+
+func TestUpdateCustomerSubscriptions(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
+		}
+		if r.URL.Path != "/customers/cust_123/subscriptions" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("Failed to decode request body: %v", err)
+		}
+		if body["kind"] != "test" {
+			t.Errorf("Unexpected request body: %v", body)
+		}
+		_ = json.NewEncoder(w).Encode(map[string]any{"ok": true})
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	_, err := client.UpdateCustomerSubscriptions(context.Background(), "cust_123", map[string]any{"kind": "test"})
+	if err != nil {
+		t.Fatalf("UpdateCustomerSubscriptions failed: %v", err)
+	}
+}
+
+func TestGetLineCustomer(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("Expected GET, got %s", r.Method)
+		}
+		if r.URL.Path != "/customers/line/line_123" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+		_ = json.NewEncoder(w).Encode(Customer{ID: "cust_1", Email: "line@example.com"})
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	c, err := client.GetLineCustomer(context.Background(), "line_123")
+	if err != nil {
+		t.Fatalf("GetLineCustomer failed: %v", err)
+	}
+	if c.ID != "cust_1" {
+		t.Fatalf("unexpected id: %s", c.ID)
 	}
 }
 

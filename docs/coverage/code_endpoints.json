@@ -711,6 +711,11 @@
   },
   {
     "method": "GET",
+    "path": "/customers/line/{}",
+    "source": "internal/api/customers.go"
+  },
+  {
+    "method": "GET",
     "path": "/customers/search",
     "source": "internal/api/customers.go"
   },
@@ -777,6 +782,11 @@
   {
     "method": "PATCH",
     "path": "/customers/{}/store-credits",
+    "source": "internal/api/customers.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/customers/{}/subscriptions",
     "source": "internal/api/customers.go"
   },
   {

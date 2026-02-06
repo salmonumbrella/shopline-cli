@@ -46,6 +46,7 @@ type APIClient interface {
 	CreateCompanyCredit(ctx context.Context, req *CompanyCreditCreateRequest) (*CompanyCredit, error)
 	CreateConversation(ctx context.Context, req *ConversationCreateRequest) (*Conversation, error)
 	CreateCoupon(ctx context.Context, req *CouponCreateRequest) (*Coupon, error)
+	CreateCustomer(ctx context.Context, req *CustomerCreateRequest) (*Customer, error)
 	CreateCustomerAddress(ctx context.Context, customerID string, req *CustomerAddressCreateRequest) (*CustomerAddress, error)
 	CreateCustomerBlacklist(ctx context.Context, req *CustomerBlacklistCreateRequest) (*CustomerBlacklist, error)
 	CreateCustomerGroup(ctx context.Context, req *CustomerGroupCreateRequest) (*CustomerGroup, error)
@@ -121,6 +122,7 @@ type APIClient interface {
 	DeleteCompanyCredit(ctx context.Context, id string) error
 	DeleteConversation(ctx context.Context, id string) error
 	DeleteCoupon(ctx context.Context, id string) error
+	DeleteCustomer(ctx context.Context, id string) error
 	DeleteCustomerAddress(ctx context.Context, customerID, addressID string) error
 	DeleteCustomerBlacklist(ctx context.Context, id string) error
 	DeleteCustomerGroup(ctx context.Context, id string) error
@@ -208,6 +210,7 @@ type APIClient interface {
 	GetCurrency(ctx context.Context, code string) (*Currency, error)
 	GetCurrentBulkOperation(ctx context.Context) (*BulkOperation, error)
 	GetCustomer(ctx context.Context, id string) (*Customer, error)
+	GetLineCustomer(ctx context.Context, lineID string) (*Customer, error)
 	GetCustomerAddress(ctx context.Context, customerID, addressID string) (*CustomerAddress, error)
 	GetCustomerBlacklist(ctx context.Context, id string) (*CustomerBlacklist, error)
 	GetCustomerGroup(ctx context.Context, id string) (*CustomerGroup, error)
@@ -350,6 +353,7 @@ type APIClient interface {
 	ListCustomerBlacklist(ctx context.Context, opts *CustomerBlacklistListOptions) (*CustomerBlacklistListResponse, error)
 	ListCustomerGroups(ctx context.Context, opts *CustomerGroupsListOptions) (*CustomerGroupsListResponse, error)
 	ListCustomers(ctx context.Context, opts *CustomersListOptions) (*CustomersListResponse, error)
+	SearchCustomers(ctx context.Context, opts *CustomerSearchOptions) (*CustomersListResponse, error)
 	ListCustomerSavedSearches(ctx context.Context, opts *CustomerSavedSearchesListOptions) (*CustomerSavedSearchesListResponse, error)
 	ListCustomFields(ctx context.Context, opts *CustomFieldsListOptions) (*CustomFieldsListResponse, error)
 	ListDeliveryOptions(ctx context.Context, opts *DeliveryOptionsListOptions) (*DeliveryOptionsListResponse, error)
@@ -443,10 +447,12 @@ type APIClient interface {
 	SendConversationMessage(ctx context.Context, conversationID string, req *ConversationMessageCreateRequest) (*ConversationMessage, error)
 	SendDraftOrderInvoice(ctx context.Context, id string) error
 	SetDefaultCustomerAddress(ctx context.Context, customerID, addressID string) (*CustomerAddress, error)
+	SetCustomerTags(ctx context.Context, id string, tags []string) (*Customer, error)
 	SetInventoryLevel(ctx context.Context, req *InventoryLevelSetRequest) (*InventoryLevel, error)
 	SubmitDispute(ctx context.Context, id string) (*Dispute, error)
 	UnpublishProductFromChannel(ctx context.Context, channelID, productID string) error
 	UnpublishProductFromChannelListing(ctx context.Context, channelID, productID string) error
+	UpdateCustomer(ctx context.Context, id string, req *CustomerUpdateRequest) (*Customer, error)
 	UpdateAffiliateCampaign(ctx context.Context, id string, req *AffiliateCampaignUpdateRequest) (*AffiliateCampaign, error)
 	UpdateArticle(ctx context.Context, id string, req *ArticleUpdateRequest) (*Article, error)
 	UpdateAsset(ctx context.Context, themeID string, req *AssetUpdateRequest) (*Asset, error)
@@ -465,6 +471,8 @@ type APIClient interface {
 	UpdateCoupon(ctx context.Context, id string, req *CouponUpdateRequest) (*Coupon, error)
 	UpdateCurrency(ctx context.Context, code string, req *CurrencyUpdateRequest) (*Currency, error)
 	UpdateCustomerGroup(ctx context.Context, id string, req *CustomerGroupUpdateRequest) (*CustomerGroup, error)
+	UpdateCustomerTags(ctx context.Context, id string, req *CustomerTagsUpdateRequest) (*Customer, error)
+	UpdateCustomerSubscriptions(ctx context.Context, customerID string, body any) (json.RawMessage, error)
 	UpdateCustomField(ctx context.Context, id string, req *CustomFieldUpdateRequest) (*CustomField, error)
 	UpdateDeliveryOptionPickupStore(ctx context.Context, id string, req *PickupStoreUpdateRequest) (*DeliveryOption, error)
 	UpdateDisputeEvidence(ctx context.Context, id string, req *DisputeUpdateEvidenceRequest) (*Dispute, error)

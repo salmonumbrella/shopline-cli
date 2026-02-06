@@ -3,8 +3,8 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 577
-- Missing in code: 136
+- Code endpoints detected: 579
+- Missing in code: 134
 - Extra in code: 405
 - Unparsed doc pages: 55
 
@@ -88,7 +88,6 @@
 - `POST /conversations/message` (https://open-api.docs.shoplineapp.com/reference/post_conversations-message)
 - `GET /customer_groups/{}/customer_group_children` (https://open-api.docs.shoplineapp.com/reference/get_customer-groups-parentcustomergroupid-customer-group-children)
 - `GET /customer_groups/{}/customer_group_children/{}/customer_ids` (https://open-api.docs.shoplineapp.com/reference/get_customer-groups-parentcustomergroupid-customer-group-children-id-customer-ids)
-- `GET /customers/line/{}` (https://open-api.docs.shoplineapp.com/reference/get_customers-line-lineid)
 - `GET /customers/membership_info` (https://open-api.docs.shoplineapp.com/reference/get_customers-membership-info-1)
 - `GET /customers/{}/app_metafields` (https://open-api.docs.shoplineapp.com/reference/get_customers-customer-id-app-metafields)
 - `POST /customers/{}/app_metafields` (https://open-api.docs.shoplineapp.com/reference/post_customers-customer-id-app-metafields)
@@ -112,7 +111,6 @@
 - `PUT /customers/{}/metafields/{}` (https://open-api.docs.shoplineapp.com/reference/put_customers-customer-id-metafields-metafield-id-1)
 - `GET /customers/{}/store_credits` (https://open-api.docs.shoplineapp.com/reference/get_customers-id-store-credits-1)
 - `POST /customers/{}/store_credits` (https://open-api.docs.shoplineapp.com/reference/post_customers-id-store-credits-1)
-- `PUT /customers/{}/subscriptions` (https://open-api.docs.shoplineapp.com/reference/put_customers-customer-id-subscriptions)
 - `GET /delivery_options/delivery_config` (https://open-api.docs.shoplineapp.com/reference/get_delivery-options-delivery-config)
 - `GET /delivery_options/{}/delivery_time_slots` (https://open-api.docs.shoplineapp.com/reference/get_delivery-options-delivery-option-id-delivery-time-slots)
 - `PUT /delivery_options/{}/stores_info` (https://open-api.docs.shoplineapp.com/reference/put_delivery-options-id-stores-info-1)
