@@ -2312,3 +2312,11 @@ func (m *MockClient) BulkUpdateMerchantAppMetafields(ctx context.Context, body a
 func (m *MockClient) BulkDeleteMerchantAppMetafields(ctx context.Context, body any) error {
 	return m.notImplemented("BulkDeleteMerchantAppMetafields")
 }
+
+func (m *MockClient) GetTokenInfo(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetTokenInfo")
+}
+
+func (m *MockClient) UpdateWebhook(ctx context.Context, id string, req *WebhookUpdateRequest) (*Webhook, error) {
+	return nil, m.notImplemented("UpdateWebhook")
+}

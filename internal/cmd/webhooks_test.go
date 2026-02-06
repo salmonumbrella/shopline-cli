@@ -30,6 +30,7 @@ func TestWebhooksSubcommands(t *testing.T) {
 		"list":   "List webhooks",
 		"get":    "Get webhook details",
 		"create": "Create a webhook",
+		"update": "Update a webhook",
 		"delete": "Delete a webhook",
 	}
 
@@ -114,6 +115,31 @@ func TestWebhooksCreateRequiredFlags(t *testing.T) {
 	}
 	if addressFlag == nil {
 		t.Error("address flag not found")
+	}
+}
+
+func TestWebhooksUpdateFlags(t *testing.T) {
+	flags := []struct {
+		name         string
+		defaultValue string
+	}{
+		{"topic", ""},
+		{"address", ""},
+		{"format", ""},
+		{"api-version", ""},
+	}
+
+	for _, f := range flags {
+		t.Run(f.name, func(t *testing.T) {
+			flag := webhooksUpdateCmd.Flags().Lookup(f.name)
+			if flag == nil {
+				t.Errorf("flag %q not found", f.name)
+				return
+			}
+			if flag.DefValue != f.defaultValue {
+				t.Errorf("expected default %q, got %q", f.defaultValue, flag.DefValue)
+			}
+		})
 	}
 }
 

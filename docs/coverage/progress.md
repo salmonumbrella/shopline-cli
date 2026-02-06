@@ -29,7 +29,10 @@ go run ./cmd/shopline-coverage
 - /settings/* documented endpoints (checkout/domains/layouts/theme/users/etc.) (done)
 - [x] Merchant metafields
 - `/merchants/current/metafields` + `/merchants/current/app_metafields` (done)
-- [ ] Webhooks
+- [x] Webhooks
+- Includes `PUT /webhooks/{id}` (done)
+- [x] Token info
+- `GET /token/info` (done)
 
 ## Storefront API
 

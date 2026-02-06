@@ -3141,6 +3141,11 @@
   },
   {
     "method": "GET",
+    "path": "/token/info",
+    "source": "internal/api/token_info.go"
+  },
+  {
+    "method": "GET",
     "path": "/tokens",
     "source": "internal/api/tokens.go"
   },
@@ -3241,6 +3246,11 @@
   },
   {
     "method": "GET",
+    "path": "/webhooks/{}",
+    "source": "internal/api/webhooks.go"
+  },
+  {
+    "method": "PUT",
     "path": "/webhooks/{}",
     "source": "internal/api/webhooks.go"
   },

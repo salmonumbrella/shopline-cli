@@ -156,6 +156,75 @@ var webhooksCreateCmd = &cobra.Command{
 	},
 }
 
+var webhooksUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a webhook",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		topic, _ := cmd.Flags().GetString("topic")
+		address, _ := cmd.Flags().GetString("address")
+		format, _ := cmd.Flags().GetString("format")
+		apiVersion, _ := cmd.Flags().GetString("api-version")
+
+		if !cmd.Flags().Changed("topic") &&
+			!cmd.Flags().Changed("address") &&
+			!cmd.Flags().Changed("format") &&
+			!cmd.Flags().Changed("api-version") {
+			return fmt.Errorf("at least one field must be provided to update (topic/address/format/api-version)")
+		}
+
+		if cmd.Flags().Changed("address") {
+			if err := validateWebhookAddress(address); err != nil {
+				return err
+			}
+		}
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			fmt.Printf("[DRY-RUN] Would update webhook %s\n", args[0])
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		req := &api.WebhookUpdateRequest{}
+		if cmd.Flags().Changed("topic") {
+			req.Topic = topic
+		}
+		if cmd.Flags().Changed("address") {
+			req.Address = address
+		}
+		if cmd.Flags().Changed("format") && strings.TrimSpace(format) != "" {
+			req.Format = api.WebhookFormat(format)
+		}
+		if cmd.Flags().Changed("api-version") {
+			req.APIVersion = apiVersion
+		}
+
+		webhook, err := client.UpdateWebhook(cmd.Context(), args[0], req)
+		if err != nil {
+			return fmt.Errorf("failed to update webhook: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(webhook)
+		}
+
+		fmt.Printf("Updated webhook %s\n", webhook.ID)
+		fmt.Printf("Topic:    %s\n", webhook.Topic)
+		fmt.Printf("Address:  %s\n", webhook.Address)
+		fmt.Printf("Format:   %s\n", webhook.Format)
+
+		return nil
+	},
+}
+
 var webhooksDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a webhook",
@@ -208,12 +277,19 @@ func init() {
 	_ = webhooksCreateCmd.MarkFlagRequired("topic")
 	_ = webhooksCreateCmd.MarkFlagRequired("address")
 
+	webhooksCmd.AddCommand(webhooksUpdateCmd)
+	webhooksUpdateCmd.Flags().String("topic", "", "Webhook topic (e.g., orders/create)")
+	webhooksUpdateCmd.Flags().String("address", "", "Webhook URL")
+	webhooksUpdateCmd.Flags().String("format", "", "Payload format (json/xml)")
+	webhooksUpdateCmd.Flags().String("api-version", "", "API version for webhook payloads")
+	webhooksUpdateCmd.Flags().Bool("dry-run", false, "Preview without making changes")
+
 	webhooksCmd.AddCommand(webhooksDeleteCmd)
 
 	schema.Register(schema.Resource{
 		Name:        "webhooks",
 		Description: "Manage webhook subscriptions",
-		Commands:    []string{"list", "get", "create", "delete"},
+		Commands:    []string{"list", "get", "create", "update", "delete"},
 		IDPrefix:    "webhook",
 	})
 }

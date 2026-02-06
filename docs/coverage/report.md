@@ -3,8 +3,8 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 655
-- Missing in code: 57
+- Code endpoints detected: 657
+- Missing in code: 55
 - Extra in code: 404
 - Unparsed doc pages: 55
 
@@ -117,11 +117,9 @@
 - `POST /storefront/oauth_applications` (https://open-api.docs.shoplineapp.com/reference/post_storefront-oauth-applications)
 - `DELETE /storefront/oauth_applications/{}` (https://open-api.docs.shoplineapp.com/reference/delete_storefront-oauth-applications-id)
 - `GET /storefront/oauth_applications/{}` (https://open-api.docs.shoplineapp.com/reference/get_storefront-oauth-applications-id)
-- `GET /token/info` (https://open-api.docs.shoplineapp.com/reference/get_token-info-1)
 - `GET /user_coupons/list` (https://open-api.docs.shoplineapp.com/reference/get_user-coupons-list)
 - `POST /user_coupons/{}/claim` (https://open-api.docs.shoplineapp.com/reference/post_user-coupons-coupon-code-claim)
 - `POST /user_coupons/{}/redeem` (https://open-api.docs.shoplineapp.com/reference/post_user-coupons-couponcode-redeem)
-- `PUT /webhooks/{}` (https://open-api.docs.shoplineapp.com/reference/put_webhooks-id)
 - `DELETE /wish_list_items` (https://open-api.docs.shoplineapp.com/reference/delete_wish-list-items)
 - `GET /wish_list_items` (https://open-api.docs.shoplineapp.com/reference/get_wish-list-items)
 - `POST /wish_list_items` (https://open-api.docs.shoplineapp.com/reference/post_wish-list-items)

@@ -46,6 +46,15 @@ type WebhookCreateRequest struct {
 	APIVersion string        `json:"api_version,omitempty"`
 }
 
+// WebhookUpdateRequest contains the data for updating a webhook subscription.
+// All fields are optional; only provided fields will be sent.
+type WebhookUpdateRequest struct {
+	Address    string        `json:"address,omitempty"`
+	Topic      string        `json:"topic,omitempty"`
+	Format     WebhookFormat `json:"format,omitempty"`
+	APIVersion string        `json:"api_version,omitempty"`
+}
+
 // ListWebhooks retrieves a list of webhooks.
 func (c *Client) ListWebhooks(ctx context.Context, opts *WebhooksListOptions) (*WebhooksListResponse, error) {
 	path := "/webhooks"
@@ -88,6 +97,20 @@ func (c *Client) GetWebhook(ctx context.Context, id string) (*Webhook, error) {
 func (c *Client) CreateWebhook(ctx context.Context, req *WebhookCreateRequest) (*Webhook, error) {
 	var webhook Webhook
 	if err := c.Post(ctx, "/webhooks", req, &webhook); err != nil {
+		return nil, err
+	}
+	return &webhook, nil
+}
+
+// UpdateWebhook updates an existing webhook subscription.
+//
+// Docs: PUT /webhooks/{id}
+func (c *Client) UpdateWebhook(ctx context.Context, id string, req *WebhookUpdateRequest) (*Webhook, error) {
+	if strings.TrimSpace(id) == "" {
+		return nil, fmt.Errorf("webhook id is required")
+	}
+	var webhook Webhook
+	if err := c.Put(ctx, fmt.Sprintf("/webhooks/%s", id), req, &webhook); err != nil {
 		return nil, err
 	}
 	return &webhook, nil

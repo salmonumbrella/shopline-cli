@@ -191,6 +191,51 @@ func TestWebhooksCreate(t *testing.T) {
 	}
 }
 
+func TestWebhooksUpdate(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
+		}
+		if r.URL.Path != "/webhooks/wh_123" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+
+		var req WebhookUpdateRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			t.Fatalf("Failed to decode request: %v", err)
+		}
+		if req.Address != "https://example.com/updated" {
+			t.Errorf("Unexpected address: %s", req.Address)
+		}
+
+		webhook := Webhook{
+			ID:         "wh_123",
+			Address:    req.Address,
+			Topic:      "orders/create",
+			Format:     WebhookFormatJSON,
+			APIVersion: "2024-01",
+		}
+		_ = json.NewEncoder(w).Encode(webhook)
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	req := &WebhookUpdateRequest{
+		Address: "https://example.com/updated",
+	}
+	webhook, err := client.UpdateWebhook(context.Background(), "wh_123", req)
+	if err != nil {
+		t.Fatalf("UpdateWebhook failed: %v", err)
+	}
+
+	if webhook.Address != "https://example.com/updated" {
+		t.Errorf("Unexpected address: %s", webhook.Address)
+	}
+}
+
 func TestWebhooksDelete(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {

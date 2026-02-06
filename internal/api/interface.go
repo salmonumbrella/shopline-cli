@@ -397,6 +397,7 @@ type APIClient interface {
 	GetTaxService(ctx context.Context, id string) (*TaxService, error)
 	GetTheme(ctx context.Context, id string) (*Theme, error)
 	GetToken(ctx context.Context, id string) (*Token, error)
+	GetTokenInfo(ctx context.Context) (json.RawMessage, error)
 	GetTransaction(ctx context.Context, id string) (*Transaction, error)
 	GetUserCoupon(ctx context.Context, id string) (*UserCoupon, error)
 	GetWarehouse(ctx context.Context, id string) (*Warehouse, error)
@@ -594,6 +595,7 @@ type APIClient interface {
 	UpdateTaxService(ctx context.Context, id string, req *TaxServiceUpdateRequest) (*TaxService, error)
 	UpdateTheme(ctx context.Context, id string, req *ThemeUpdateRequest) (*Theme, error)
 	UpdateWarehouse(ctx context.Context, id string, req *WarehouseUpdateRequest) (*Warehouse, error)
+	UpdateWebhook(ctx context.Context, id string, req *WebhookUpdateRequest) (*Webhook, error)
 	VerifyDomain(ctx context.Context, id string) (*Domain, error)
 	VoidPayment(ctx context.Context, id string) (*Payment, error)
 }
