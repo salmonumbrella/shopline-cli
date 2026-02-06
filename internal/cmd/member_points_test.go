@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"os"
 	"strings"
@@ -138,6 +139,15 @@ type memberPointsTestClient struct {
 	listPointsTransactionsErr  error
 	adjustMemberPointsResp     *api.MemberPoints
 	adjustMemberPointsErr      error
+
+	getHistoryResp json.RawMessage
+	getHistoryErr  error
+	updateResp     json.RawMessage
+	updateErr      error
+	rulesResp      json.RawMessage
+	rulesErr       error
+	bulkResp       json.RawMessage
+	bulkErr        error
 }
 
 func (m *memberPointsTestClient) GetMemberPoints(ctx context.Context, customerID string) (*api.MemberPoints, error) {
@@ -150,6 +160,22 @@ func (m *memberPointsTestClient) ListPointsTransactions(ctx context.Context, cus
 
 func (m *memberPointsTestClient) AdjustMemberPoints(ctx context.Context, customerID string, points int, description string) (*api.MemberPoints, error) {
 	return m.adjustMemberPointsResp, m.adjustMemberPointsErr
+}
+
+func (m *memberPointsTestClient) GetCustomerMemberPointsHistory(ctx context.Context, customerID string) (json.RawMessage, error) {
+	return m.getHistoryResp, m.getHistoryErr
+}
+
+func (m *memberPointsTestClient) UpdateCustomerMemberPoints(ctx context.Context, customerID string, body any) (json.RawMessage, error) {
+	return m.updateResp, m.updateErr
+}
+
+func (m *memberPointsTestClient) ListMemberPointRules(ctx context.Context) (json.RawMessage, error) {
+	return m.rulesResp, m.rulesErr
+}
+
+func (m *memberPointsTestClient) BulkUpdateMemberPoints(ctx context.Context, body any) (json.RawMessage, error) {
+	return m.bulkResp, m.bulkErr
 }
 
 // setupMemberPointsTest configures mocks for member points command tests.
@@ -944,5 +970,134 @@ func TestMemberPointsAdjustRunE_LargePointValue(t *testing.T) {
 	output := stdoutBuf.String()
 	if !strings.Contains(output, "999999") {
 		t.Errorf("output should contain the adjustment amount, got: %s", output)
+	}
+}
+
+func TestMemberPointsHistoryRunE_JSON(t *testing.T) {
+	restore := setupMemberPointsTest(t)
+	defer restore()
+
+	mockClient := &memberPointsTestClient{
+		getHistoryResp: json.RawMessage(`{"items":[{"id":"h_1"}]}`),
+	}
+	clientFactory = func(handle, accessToken string) api.APIClient {
+		return mockClient
+	}
+
+	var buf bytes.Buffer
+	formatterWriter = &buf
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "json", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+	cmd.Flags().Bool("items-only", false, "")
+	cmd.Flags().String("customer-id", "cust_123", "")
+
+	if err := memberPointsHistoryCmd.RunE(cmd, []string{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !bytes.Contains(buf.Bytes(), []byte(`"h_1"`)) {
+		t.Fatalf("unexpected output: %s", buf.String())
+	}
+}
+
+func TestMemberPointsUpdateRunE_JSON(t *testing.T) {
+	restore := setupMemberPointsTest(t)
+	defer restore()
+
+	mockClient := &memberPointsTestClient{
+		updateResp: json.RawMessage(`{"ok":true}`),
+	}
+	clientFactory = func(handle, accessToken string) api.APIClient {
+		return mockClient
+	}
+
+	var buf bytes.Buffer
+	formatterWriter = &buf
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "json", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+	cmd.Flags().Bool("items-only", false, "")
+	cmd.Flags().String("customer-id", "cust_123", "")
+	cmd.Flags().String("body", "", "")
+	cmd.Flags().String("body-file", "", "")
+	cmd.Flags().Int("points", 0, "")
+	cmd.Flags().String("description", "", "")
+	_ = cmd.Flags().Set("points", "10")
+
+	if err := memberPointsUpdateCmd.RunE(cmd, []string{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !bytes.Contains(buf.Bytes(), []byte(`"ok": true`)) {
+		t.Fatalf("unexpected output: %s", buf.String())
+	}
+}
+
+func TestMemberPointsRulesListRunE_JSON(t *testing.T) {
+	restore := setupMemberPointsTest(t)
+	defer restore()
+
+	mockClient := &memberPointsTestClient{
+		rulesResp: json.RawMessage(`{"items":[{"id":"r_1"}]}`),
+	}
+	clientFactory = func(handle, accessToken string) api.APIClient {
+		return mockClient
+	}
+
+	var buf bytes.Buffer
+	formatterWriter = &buf
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "json", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+	cmd.Flags().Bool("items-only", false, "")
+
+	if err := memberPointsRulesListCmd.RunE(cmd, []string{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !bytes.Contains(buf.Bytes(), []byte(`"r_1"`)) {
+		t.Fatalf("unexpected output: %s", buf.String())
+	}
+}
+
+func TestMemberPointsBulkUpdateRunE_JSON(t *testing.T) {
+	restore := setupMemberPointsTest(t)
+	defer restore()
+
+	mockClient := &memberPointsTestClient{
+		bulkResp: json.RawMessage(`{"ok":true}`),
+	}
+	clientFactory = func(handle, accessToken string) api.APIClient {
+		return mockClient
+	}
+
+	var buf bytes.Buffer
+	formatterWriter = &buf
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "json", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+	cmd.Flags().Bool("items-only", false, "")
+	cmd.Flags().String("body", `{"items":[]}`, "")
+	cmd.Flags().String("body-file", "", "")
+
+	if err := memberPointsBulkUpdateCmd.RunE(cmd, []string{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !bytes.Contains(buf.Bytes(), []byte(`"ok": true`)) {
+		t.Fatalf("unexpected output: %s", buf.String())
 	}
 }

@@ -16,9 +16,10 @@ go run ./cmd/shopline-coverage
 - [x] Products (endpoints wired; types still partially raw for metafields/stocks)
 - [ ] Customers
 - Customers core: list/get/search/create/update/delete + tags + subscriptions + LINE lookup (done)
-- Customer metafields + app_metafields (done); credits/points pending
+- Customer metafields + app_metafields (done)
 - [x] Store credits
 - Customer store credits (`GET/POST /customers/{id}/store_credits`) + user credits (`GET /user_credits`, `POST /user_credits/bulk_update`) (done)
+- Member points + membership info (`/customers/membership_info`, `/customers/{id}/member_points`, `/member_point_rules`, `/member_points/bulk_update`, `/customers/{id}/membership_tier/action_logs`) (done)
 - [x] Channels
 - [ ] Staffs
 - [ ] Webhooks

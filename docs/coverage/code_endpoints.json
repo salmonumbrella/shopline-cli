@@ -716,6 +716,11 @@
   },
   {
     "method": "GET",
+    "path": "/customers/membership_info",
+    "source": "internal/api/member_points_openapi.go"
+  },
+  {
+    "method": "GET",
     "path": "/customers/search",
     "source": "internal/api/customers.go"
   },
@@ -798,6 +803,21 @@
     "method": "PUT",
     "path": "/customers/{}/app_metafields/{}",
     "source": "internal/api/customer_metafields.go"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/{}/member_points",
+    "source": "internal/api/member_points_openapi.go"
+  },
+  {
+    "method": "POST",
+    "path": "/customers/{}/member_points",
+    "source": "internal/api/member_points_openapi.go"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/{}/membership_tier/action_logs",
+    "source": "internal/api/member_points_openapi.go"
   },
   {
     "method": "GET",
@@ -1373,6 +1393,16 @@
     "method": "PUT",
     "path": "/medias/{}",
     "source": "internal/api/medias.go"
+  },
+  {
+    "method": "GET",
+    "path": "/member_point_rules",
+    "source": "internal/api/member_points_openapi.go"
+  },
+  {
+    "method": "POST",
+    "path": "/member_points/bulk_update",
+    "source": "internal/api/member_points_openapi.go"
   },
   {
     "method": "GET",

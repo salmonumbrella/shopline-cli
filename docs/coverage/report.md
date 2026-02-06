@@ -3,8 +3,8 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 598
-- Missing in code: 114
+- Code endpoints detected: 604
+- Missing in code: 108
 - Extra in code: 404
 - Unparsed doc pages: 55
 
@@ -88,11 +88,7 @@
 - `POST /conversations/message` (https://open-api.docs.shoplineapp.com/reference/post_conversations-message)
 - `GET /customer_groups/{}/customer_group_children` (https://open-api.docs.shoplineapp.com/reference/get_customer-groups-parentcustomergroupid-customer-group-children)
 - `GET /customer_groups/{}/customer_group_children/{}/customer_ids` (https://open-api.docs.shoplineapp.com/reference/get_customer-groups-parentcustomergroupid-customer-group-children-id-customer-ids)
-- `GET /customers/membership_info` (https://open-api.docs.shoplineapp.com/reference/get_customers-membership-info-1)
 - `GET /customers/{}/coupon_promotions` (https://open-api.docs.shoplineapp.com/reference/get_customers-customer-id-coupon-promotions)
-- `GET /customers/{}/member_points` (https://open-api.docs.shoplineapp.com/reference/get_customers-id-member-points-1)
-- `POST /customers/{}/member_points` (https://open-api.docs.shoplineapp.com/reference/post_customers-id-member-points-1)
-- `GET /customers/{}/membership_tier/action_logs` (https://open-api.docs.shoplineapp.com/reference/get_customers-id-membership-tier-action-logs-1)
 - `GET /delivery_options/delivery_config` (https://open-api.docs.shoplineapp.com/reference/get_delivery-options-delivery-config)
 - `GET /delivery_options/{}/delivery_time_slots` (https://open-api.docs.shoplineapp.com/reference/get_delivery-options-delivery-option-id-delivery-time-slots)
 - `PUT /delivery_options/{}/stores_info` (https://open-api.docs.shoplineapp.com/reference/put_delivery-options-id-stores-info-1)
@@ -107,8 +103,6 @@
 - `PUT /gifts/{}/stocks` (https://open-api.docs.shoplineapp.com/reference/put_gifts-id-stocks-1)
 - `PUT /gifts/{}/update_quantity` (https://open-api.docs.shoplineapp.com/reference/put_gifts-id-update-quantity-1)
 - `POST /media` (https://open-api.docs.shoplineapp.com/reference/post_media-1)
-- `GET /member_point_rules` (https://open-api.docs.shoplineapp.com/reference/get_member-point-rules-1)
-- `POST /member_points/bulk_update` (https://open-api.docs.shoplineapp.com/reference/post_member-points-bulk-update)
 - `GET /merchants/current/app_metafields` (https://open-api.docs.shoplineapp.com/reference/get_merchants-current-app-metafields)
 - `POST /merchants/current/app_metafields` (https://open-api.docs.shoplineapp.com/reference/post_merchants-current-app-metafields)
 - `DELETE /merchants/current/app_metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/delete_merchants-current-app-metafields-bulk)

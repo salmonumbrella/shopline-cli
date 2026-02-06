@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
@@ -23,6 +25,9 @@ var memberPointsGetCmd = &cobra.Command{
 		}
 
 		customerID, _ := cmd.Flags().GetString("customer-id")
+		if strings.TrimSpace(customerID) == "" {
+			return fmt.Errorf("customer id is required (use --customer-id)")
+		}
 
 		points, err := client.GetMemberPoints(cmd.Context(), customerID)
 		if err != nil {
@@ -56,6 +61,9 @@ var memberPointsTransactionsCmd = &cobra.Command{
 		}
 
 		customerID, _ := cmd.Flags().GetString("customer-id")
+		if strings.TrimSpace(customerID) == "" {
+			return fmt.Errorf("customer id is required (use --customer-id)")
+		}
 		page, _ := cmd.Flags().GetInt("page")
 		pageSize, _ := cmd.Flags().GetInt("page-size")
 		txnType, _ := cmd.Flags().GetString("type")
@@ -117,6 +125,9 @@ var memberPointsAdjustCmd = &cobra.Command{
 		}
 
 		customerID, _ := cmd.Flags().GetString("customer-id")
+		if strings.TrimSpace(customerID) == "" {
+			return fmt.Errorf("customer id is required (use --customer-id)")
+		}
 		points, _ := cmd.Flags().GetInt("points")
 		description, _ := cmd.Flags().GetString("description")
 
@@ -140,11 +151,117 @@ var memberPointsAdjustCmd = &cobra.Command{
 	},
 }
 
+var memberPointsHistoryCmd = &cobra.Command{
+	Use:   "history",
+	Short: "Get customer member points history (Open API)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		customerID, _ := cmd.Flags().GetString("customer-id")
+		if strings.TrimSpace(customerID) == "" {
+			return fmt.Errorf("customer id is required (use --customer-id)")
+		}
+		resp, err := client.GetCustomerMemberPointsHistory(cmd.Context(), customerID)
+		if err != nil {
+			return fmt.Errorf("failed to get member points history: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var memberPointsUpdateCmd = &cobra.Command{
+	Use:   "update",
+	Short: "Update customer member points (Open API)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		customerID, _ := cmd.Flags().GetString("customer-id")
+		if strings.TrimSpace(customerID) == "" {
+			return fmt.Errorf("customer id is required (use --customer-id)")
+		}
+
+		body, _ := cmd.Flags().GetString("body")
+		bodyFile, _ := cmd.Flags().GetString("body-file")
+
+		var req json.RawMessage
+		if strings.TrimSpace(body) != "" || strings.TrimSpace(bodyFile) != "" {
+			req, err = readJSONBodyFlags(cmd)
+			if err != nil {
+				return err
+			}
+		} else {
+			if !cmd.Flags().Changed("points") {
+				return fmt.Errorf("request body required (use --body/--body-file or provide --points)")
+			}
+			points, _ := cmd.Flags().GetInt("points")
+			description, _ := cmd.Flags().GetString("description")
+			req, err = json.Marshal(map[string]any{
+				"points":      points,
+				"description": description,
+			})
+			if err != nil {
+				return fmt.Errorf("failed to build request body: %w", err)
+			}
+		}
+
+		resp, err := client.UpdateCustomerMemberPoints(cmd.Context(), customerID, req)
+		if err != nil {
+			return fmt.Errorf("failed to update member points: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var memberPointsRulesCmd = &cobra.Command{
+	Use:   "rules",
+	Short: "Member point rules (Open API)",
+}
+
+var memberPointsRulesListCmd = &cobra.Command{
+	Use:     "list",
+	Aliases: []string{"ls"},
+	Short:   "List member point rules",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.ListMemberPointRules(cmd.Context())
+		if err != nil {
+			return fmt.Errorf("failed to list member point rules: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var memberPointsBulkUpdateCmd = &cobra.Command{
+	Use:   "bulk-update",
+	Short: "Bulk update member points (Open API) (raw JSON body)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.BulkUpdateMemberPoints(cmd.Context(), body)
+		if err != nil {
+			return fmt.Errorf("failed to bulk update member points: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(memberPointsCmd)
 
 	memberPointsCmd.PersistentFlags().String("customer-id", "", "Customer ID")
-	_ = memberPointsCmd.MarkPersistentFlagRequired("customer-id")
 
 	memberPointsCmd.AddCommand(memberPointsGetCmd)
 
@@ -157,4 +274,17 @@ func init() {
 	memberPointsAdjustCmd.Flags().Int("points", 0, "Points to add (positive) or deduct (negative)")
 	memberPointsAdjustCmd.Flags().String("description", "", "Description for the adjustment")
 	_ = memberPointsAdjustCmd.MarkFlagRequired("points")
+
+	memberPointsCmd.AddCommand(memberPointsHistoryCmd)
+
+	memberPointsCmd.AddCommand(memberPointsUpdateCmd)
+	addJSONBodyFlags(memberPointsUpdateCmd)
+	memberPointsUpdateCmd.Flags().Int("points", 0, "Points to add (positive) or deduct (negative) (ignored when --body/--body-file set)")
+	memberPointsUpdateCmd.Flags().String("description", "", "Description for the update (ignored when --body/--body-file set)")
+
+	memberPointsCmd.AddCommand(memberPointsRulesCmd)
+	memberPointsRulesCmd.AddCommand(memberPointsRulesListCmd)
+
+	memberPointsCmd.AddCommand(memberPointsBulkUpdateCmd)
+	addJSONBodyFlags(memberPointsBulkUpdateCmd)
 }

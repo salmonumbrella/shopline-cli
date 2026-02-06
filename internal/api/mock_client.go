@@ -2084,3 +2084,27 @@ func (m *MockClient) ListUserCredits(ctx context.Context, opts *UserCreditsListO
 func (m *MockClient) BulkUpdateUserCredits(ctx context.Context, body any) (json.RawMessage, error) {
 	return nil, m.notImplemented("BulkUpdateUserCredits")
 }
+
+func (m *MockClient) GetCustomersMembershipInfo(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetCustomersMembershipInfo")
+}
+
+func (m *MockClient) GetCustomerMemberPointsHistory(ctx context.Context, customerID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetCustomerMemberPointsHistory")
+}
+
+func (m *MockClient) UpdateCustomerMemberPoints(ctx context.Context, customerID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateCustomerMemberPoints")
+}
+
+func (m *MockClient) GetCustomerMembershipTierActionLogs(ctx context.Context, customerID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetCustomerMembershipTierActionLogs")
+}
+
+func (m *MockClient) ListMemberPointRules(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListMemberPointRules")
+}
+
+func (m *MockClient) BulkUpdateMemberPoints(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("BulkUpdateMemberPoints")
+}
