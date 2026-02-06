@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/outfmt"
 	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
@@ -63,7 +64,7 @@ var customersSearchCmd = &cobra.Command{
 				totalSpent = c.TotalSpent + " " + c.Currency
 			}
 			rows = append(rows, []string{
-				c.ID,
+				outfmt.FormatID("customer", c.ID),
 				c.Email,
 				name,
 				c.State,
