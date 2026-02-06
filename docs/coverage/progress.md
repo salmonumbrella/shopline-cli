@@ -35,9 +35,13 @@ go run ./cmd/shopline-coverage
 - `GET /token/info` (done)
 - [x] Storefront OAuth applications
 - `GET/POST/GET(id)/DELETE /storefront/oauth_applications` (done)
+- [x] Wish list items
+- `GET/POST/DELETE /wish_list_items` (done)
+- [x] User coupons (docs endpoints)
+- `GET /user_coupons/list` + `POST /user_coupons/{coupon_code}/claim` + `POST /user_coupons/{coupon_code}/redeem` (done)
 
 ## Storefront API
 
 - [x] Carts
 - [ ] Storefront tokens
-- [ ] Storefront OAuth applications
+- [x] Storefront OAuth applications

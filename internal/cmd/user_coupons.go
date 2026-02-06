@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
@@ -24,14 +26,16 @@ var userCouponsListCmd = &cobra.Command{
 
 		page, _ := cmd.Flags().GetInt("page")
 		pageSize, _ := cmd.Flags().GetInt("page-size")
+		promotionID, _ := cmd.Flags().GetString("promotion-id")
 		userID, _ := cmd.Flags().GetString("user-id")
 		status, _ := cmd.Flags().GetString("status")
 
 		opts := &api.UserCouponsListOptions{
-			Page:     page,
-			PageSize: pageSize,
-			UserID:   userID,
-			Status:   status,
+			Page:        page,
+			PageSize:    pageSize,
+			PromotionID: promotionID,
+			UserID:      userID,
+			Status:      status,
 		}
 
 		resp, err := client.ListUserCoupons(cmd.Context(), opts)
@@ -71,6 +75,102 @@ var userCouponsListCmd = &cobra.Command{
 		formatter.Table(headers, rows)
 		fmt.Printf("\nShowing %d of %d user coupons\n", len(resp.Items), resp.TotalCount)
 		return nil
+	},
+}
+
+var userCouponsListDocsCmd = &cobra.Command{
+	Use:     "list-docs",
+	Aliases: []string{"list-v2", "ls-docs"},
+	Short:   "List user coupons (via documented /user_coupons/list endpoint)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+
+		resp, err := client.ListUserCouponsListEndpoint(cmd.Context(), &api.UserCouponsListEndpointOptions{
+			Page:     page,
+			PageSize: pageSize,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to list user coupons: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var userCouponsClaimCmd = &cobra.Command{
+	Use:   "claim <coupon-code>",
+	Short: "Claim a user coupon (by coupon code)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		body, _ := cmd.Flags().GetString("body")
+		bodyFile, _ := cmd.Flags().GetString("body-file")
+
+		var req json.RawMessage
+		var hasBody bool
+		var err error
+		if strings.TrimSpace(body) != "" || strings.TrimSpace(bodyFile) != "" {
+			req, err = readJSONBodyFlags(cmd)
+			if err != nil {
+				return err
+			}
+			hasBody = true
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		var anyBody any
+		if hasBody {
+			anyBody = req
+		}
+		resp, err := client.ClaimUserCoupon(cmd.Context(), args[0], anyBody)
+		if err != nil {
+			return fmt.Errorf("failed to claim user coupon: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var userCouponsRedeemCmd = &cobra.Command{
+	Use:   "redeem <coupon-code>",
+	Short: "Redeem a user coupon (by coupon code)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		body, _ := cmd.Flags().GetString("body")
+		bodyFile, _ := cmd.Flags().GetString("body-file")
+
+		var req json.RawMessage
+		var hasBody bool
+		var err error
+		if strings.TrimSpace(body) != "" || strings.TrimSpace(bodyFile) != "" {
+			req, err = readJSONBodyFlags(cmd)
+			if err != nil {
+				return err
+			}
+			hasBody = true
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		var anyBody any
+		if hasBody {
+			anyBody = req
+		}
+		resp, err := client.RedeemUserCoupon(cmd.Context(), args[0], anyBody)
+		if err != nil {
+			return fmt.Errorf("failed to redeem user coupon: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
 	},
 }
 
@@ -185,8 +285,14 @@ func init() {
 	userCouponsCmd.AddCommand(userCouponsListCmd)
 	userCouponsListCmd.Flags().Int("page", 1, "Page number")
 	userCouponsListCmd.Flags().Int("page-size", 20, "Results per page")
+	userCouponsListCmd.Flags().String("promotion-id", "", "Promotion/coupon campaign ID (required for /user_coupons endpoint)")
 	userCouponsListCmd.Flags().String("user-id", "", "Filter by user ID")
 	userCouponsListCmd.Flags().String("status", "", "Filter by status (active, used, expired, revoked)")
+	_ = userCouponsListCmd.MarkFlagRequired("promotion-id")
+
+	userCouponsCmd.AddCommand(userCouponsListDocsCmd)
+	userCouponsListDocsCmd.Flags().Int("page", 1, "Page number")
+	userCouponsListDocsCmd.Flags().Int("page-size", 20, "Results per page")
 
 	userCouponsCmd.AddCommand(userCouponsGetCmd)
 
@@ -198,4 +304,10 @@ func init() {
 
 	userCouponsCmd.AddCommand(userCouponsRevokeCmd)
 	userCouponsRevokeCmd.Flags().Bool("yes", false, "Skip confirmation prompt")
+
+	userCouponsCmd.AddCommand(userCouponsClaimCmd)
+	addJSONBodyFlags(userCouponsClaimCmd)
+
+	userCouponsCmd.AddCommand(userCouponsRedeemCmd)
+	addJSONBodyFlags(userCouponsRedeemCmd)
 }

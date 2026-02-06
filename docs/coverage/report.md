@@ -3,8 +3,8 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 661
-- Missing in code: 51
+- Code endpoints detected: 667
+- Missing in code: 45
 - Extra in code: 404
 - Unparsed doc pages: 55
 
@@ -113,12 +113,6 @@
 - `PUT /product_review_comments/{}` (https://open-api.docs.shoplineapp.com/reference/put_product-review-comments-id-1)
 - `GET /promotions/coupon-center` (https://open-api.docs.shoplineapp.com/reference/get_promotions-coupon-center)
 - `POST /sales/{}/delete_products` (https://open-api.docs.shoplineapp.com/reference/post_sales-saleid-delete-products)
-- `GET /user_coupons/list` (https://open-api.docs.shoplineapp.com/reference/get_user-coupons-list)
-- `POST /user_coupons/{}/claim` (https://open-api.docs.shoplineapp.com/reference/post_user-coupons-coupon-code-claim)
-- `POST /user_coupons/{}/redeem` (https://open-api.docs.shoplineapp.com/reference/post_user-coupons-couponcode-redeem)
-- `DELETE /wish_list_items` (https://open-api.docs.shoplineapp.com/reference/delete_wish-list-items)
-- `GET /wish_list_items` (https://open-api.docs.shoplineapp.com/reference/get_wish-list-items)
-- `POST /wish_list_items` (https://open-api.docs.shoplineapp.com/reference/post_wish-list-items)
 
 ## Extra In Code
 

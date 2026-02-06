@@ -3205,6 +3205,11 @@
     "source": "internal/api/user_coupons.go"
   },
   {
+    "method": "GET",
+    "path": "/user_coupons/list",
+    "source": "internal/api/user_coupons_docs.go"
+  },
+  {
     "method": "DELETE",
     "path": "/user_coupons/{}",
     "source": "internal/api/user_coupons.go"
@@ -3213,6 +3218,16 @@
     "method": "GET",
     "path": "/user_coupons/{}",
     "source": "internal/api/user_coupons.go"
+  },
+  {
+    "method": "POST",
+    "path": "/user_coupons/{}/claim",
+    "source": "internal/api/user_coupons_docs.go"
+  },
+  {
+    "method": "POST",
+    "path": "/user_coupons/{}/redeem",
+    "source": "internal/api/user_coupons_docs.go"
   },
   {
     "method": "GET",
@@ -3273,6 +3288,21 @@
     "method": "PUT",
     "path": "/webhooks/{}",
     "source": "internal/api/webhooks.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/wish_list_items",
+    "source": "internal/api/wish_list_items.go"
+  },
+  {
+    "method": "GET",
+    "path": "/wish_list_items",
+    "source": "internal/api/wish_list_items.go"
+  },
+  {
+    "method": "POST",
+    "path": "/wish_list_items",
+    "source": "internal/api/wish_list_items.go"
   },
   {
     "method": "GET",

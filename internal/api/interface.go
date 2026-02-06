@@ -21,6 +21,7 @@ type APIClient interface {
 	AdjustInventoryLevel(ctx context.Context, req *InventoryLevelAdjustRequest) (*InventoryLevel, error)
 	AdjustMemberPoints(ctx context.Context, customerID string, points int, description string) (*MemberPoints, error)
 	AssignUserCoupon(ctx context.Context, req *UserCouponAssignRequest) (*UserCoupon, error)
+	ClaimUserCoupon(ctx context.Context, couponCode string, body any) (json.RawMessage, error)
 	CancelBulkOperation(ctx context.Context, id string) (*BulkOperation, error)
 	CancelFulfillmentOrder(ctx context.Context, id string) (*FulfillmentOrder, error)
 	CancelOrder(ctx context.Context, id string) error
@@ -118,6 +119,7 @@ type APIClient interface {
 	CreateWarehouse(ctx context.Context, req *WarehouseCreateRequest) (*Warehouse, error)
 	CreateWebhook(ctx context.Context, req *WebhookCreateRequest) (*Webhook, error)
 	CreateWishList(ctx context.Context, req *WishListCreateRequest) (*WishList, error)
+	CreateWishListItem(ctx context.Context, body any) (json.RawMessage, error)
 	DeactivateCoupon(ctx context.Context, id string) (*Coupon, error)
 	DeactivateFlashPrice(ctx context.Context, id string) (*FlashPrice, error)
 	DeactivateGift(ctx context.Context, id string) (*Gift, error)
@@ -194,6 +196,7 @@ type APIClient interface {
 	DeleteWarehouse(ctx context.Context, id string) error
 	DeleteWebhook(ctx context.Context, id string) error
 	DeleteWishList(ctx context.Context, id string) error
+	DeleteWishListItems(ctx context.Context, body any) (json.RawMessage, error)
 	DisableMultipass(ctx context.Context) error
 	EnableMultipass(ctx context.Context) (*Multipass, error)
 	GenerateMultipassToken(ctx context.Context, req *MultipassTokenRequest) (*MultipassToken, error)
@@ -513,9 +516,11 @@ type APIClient interface {
 	ListTokens(ctx context.Context, opts *TokensListOptions) (*TokensListResponse, error)
 	ListTransactions(ctx context.Context, opts *TransactionsListOptions) (*TransactionsListResponse, error)
 	ListUserCoupons(ctx context.Context, opts *UserCouponsListOptions) (*UserCouponsListResponse, error)
+	ListUserCouponsListEndpoint(ctx context.Context, opts *UserCouponsListEndpointOptions) (json.RawMessage, error)
 	ListWarehouses(ctx context.Context, opts *WarehousesListOptions) (*WarehousesListResponse, error)
 	ListWebhooks(ctx context.Context, opts *WebhooksListOptions) (*WebhooksListResponse, error)
 	ListWishLists(ctx context.Context, opts *WishListsListOptions) (*WishListsListResponse, error)
+	ListWishListItems(ctx context.Context, opts *WishListItemsListOptions) (json.RawMessage, error)
 	MoveFulfillmentOrder(ctx context.Context, id string, newLocationID string) (*FulfillmentOrder, error)
 	Post(ctx context.Context, path string, body, result interface{}) error
 	PublishProductToChannel(ctx context.Context, channelID string, req *ChannelPublishProductRequest) error
@@ -527,6 +532,7 @@ type APIClient interface {
 	RemoveProductFromCollection(ctx context.Context, id, productID string) error
 	RemoveWishListItem(ctx context.Context, wishListID, itemID string) error
 	RevokeUserCoupon(ctx context.Context, id string) error
+	RedeemUserCoupon(ctx context.Context, couponCode string, body any) (json.RawMessage, error)
 	RotateMultipassSecret(ctx context.Context) (*Multipass, error)
 	RotateStorefrontOAuthClientSecret(ctx context.Context, id string) (*StorefrontOAuthClient, error)
 	SendAbandonedCheckoutRecoveryEmail(ctx context.Context, id string) error

@@ -2336,3 +2336,27 @@ func (m *MockClient) CreateStorefrontOAuthApplication(ctx context.Context, req *
 func (m *MockClient) DeleteStorefrontOAuthApplication(ctx context.Context, id string) error {
 	return m.notImplemented("DeleteStorefrontOAuthApplication")
 }
+
+func (m *MockClient) ListWishListItems(ctx context.Context, opts *WishListItemsListOptions) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListWishListItems")
+}
+
+func (m *MockClient) CreateWishListItem(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("CreateWishListItem")
+}
+
+func (m *MockClient) DeleteWishListItems(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("DeleteWishListItems")
+}
+
+func (m *MockClient) ListUserCouponsListEndpoint(ctx context.Context, opts *UserCouponsListEndpointOptions) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListUserCouponsListEndpoint")
+}
+
+func (m *MockClient) ClaimUserCoupon(ctx context.Context, couponCode string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("ClaimUserCoupon")
+}
+
+func (m *MockClient) RedeemUserCoupon(ctx context.Context, couponCode string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("RedeemUserCoupon")
+}
