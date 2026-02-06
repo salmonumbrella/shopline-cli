@@ -64,6 +64,7 @@ var ordersListCmd = &cobra.Command{
 		to, _ := cmd.Flags().GetString("to")
 		page, _ := cmd.Flags().GetInt("page")
 		pageSize, _ := cmd.Flags().GetInt("page-size")
+		limit, _ := cmd.Flags().GetInt("limit")
 
 		opts := &api.OrdersListOptions{
 			Page:     page,
@@ -89,9 +90,58 @@ var ordersListCmd = &cobra.Command{
 			opts.Until = until
 		}
 
-		resp, err := client.ListOrders(cmd.Context(), opts)
-		if err != nil {
-			return fmt.Errorf("failed to list orders: %w", err)
+		// If --limit is set, treat it as the maximum number of orders to return.
+		// This is agent-friendly (fetches multiple pages if needed) and also works
+		// around APIs that cap/ignore page_size.
+		resp := &api.OrdersListResponse{}
+		if limit > 0 {
+			curPage := opts.Page
+			perPage := opts.PageSize
+			if perPage <= 0 || perPage > limit {
+				perPage = limit
+			}
+
+			items := make([]api.OrderSummary, 0, limit)
+			totalCount := 0
+			hasMore := false
+
+			for len(items) < limit {
+				pageOpts := *opts
+				pageOpts.Page = curPage
+				pageOpts.PageSize = perPage
+
+				pageResp, err := client.ListOrders(cmd.Context(), &pageOpts)
+				if err != nil {
+					return fmt.Errorf("failed to list orders: %w", err)
+				}
+				if totalCount == 0 {
+					totalCount = pageResp.TotalCount
+				}
+				items = append(items, pageResp.Items...)
+				hasMore = pageResp.HasMore
+
+				if !pageResp.HasMore || len(pageResp.Items) == 0 {
+					break
+				}
+				curPage++
+			}
+
+			if len(items) > limit {
+				items = items[:limit]
+				hasMore = true
+			}
+
+			resp.Items = items
+			resp.Page = opts.Page
+			resp.PageSize = perPage
+			resp.TotalCount = totalCount
+			resp.HasMore = hasMore
+		} else {
+			r, err := client.ListOrders(cmd.Context(), opts)
+			if err != nil {
+				return fmt.Errorf("failed to list orders: %w", err)
+			}
+			resp = r
 		}
 
 		formatter := getFormatter(cmd)
@@ -115,7 +165,11 @@ var ordersListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d orders\n", len(resp.Items), resp.TotalCount)
+		if resp.TotalCount > 0 {
+			fmt.Printf("\nShowing %d of %d orders\n", len(resp.Items), resp.TotalCount)
+		} else {
+			fmt.Printf("\nShowing %d orders\n", len(resp.Items))
+		}
 		return nil
 	},
 }

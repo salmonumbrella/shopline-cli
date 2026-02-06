@@ -109,7 +109,15 @@ func normalizeIDFlags(cmd *cobra.Command) error {
 }
 
 func applyLimitToPageSize(cmd *cobra.Command) error {
-	if cmd == nil || !cmd.Flags().Changed("limit") {
+	if cmd == nil {
+		return nil
+	}
+
+	limitFlag := cmd.Flags().Lookup("limit")
+	if limitFlag == nil {
+		limitFlag = cmd.InheritedFlags().Lookup("limit")
+	}
+	if limitFlag == nil || !limitFlag.Changed {
 		return nil
 	}
 	limit, _ := cmd.Flags().GetInt("limit")

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -22,8 +23,10 @@ type mockAPIClient struct {
 	api.MockClient // embed base mock for unimplemented methods
 
 	// Configurable return values for specific methods
-	listOrdersResp *api.OrdersListResponse
-	listOrdersErr  error
+	listOrdersResp   *api.OrdersListResponse
+	listOrdersErr    error
+	listOrdersByPage map[int]*api.OrdersListResponse
+	listOrdersCalls  []*api.OrdersListOptions
 
 	getOrderResp *api.Order
 	getOrderErr  error
@@ -32,6 +35,15 @@ type mockAPIClient struct {
 }
 
 func (m *mockAPIClient) ListOrders(ctx context.Context, opts *api.OrdersListOptions) (*api.OrdersListResponse, error) {
+	if opts != nil {
+		cp := *opts
+		m.listOrdersCalls = append(m.listOrdersCalls, &cp)
+		if m.listOrdersByPage != nil {
+			if resp, ok := m.listOrdersByPage[opts.Page]; ok {
+				return resp, m.listOrdersErr
+			}
+		}
+	}
 	return m.listOrdersResp, m.listOrdersErr
 }
 
@@ -780,6 +792,69 @@ func TestOrdersListRunE(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestOrdersListRunELimitPaginates(t *testing.T) {
+	page1 := &api.OrdersListResponse{
+		Items:      make([]api.OrderSummary, 24),
+		TotalCount: 100,
+		HasMore:    true,
+	}
+	for i := range page1.Items {
+		page1.Items[i] = api.OrderSummary{ID: "ord_p1_" + strconv.Itoa(i)}
+	}
+
+	page2 := &api.OrdersListResponse{
+		Items:      make([]api.OrderSummary, 24),
+		TotalCount: 100,
+		HasMore:    false,
+	}
+	for i := range page2.Items {
+		page2.Items[i] = api.OrderSummary{ID: "ord_p2_" + strconv.Itoa(i)}
+	}
+
+	mockClient := &mockAPIClient{
+		listOrdersByPage: map[int]*api.OrdersListResponse{
+			1: page1,
+			2: page2,
+		},
+	}
+	cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+	defer cleanup()
+
+	var buf bytes.Buffer
+	formatterWriter = &buf
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "json", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+	cmd.Flags().String("status", "", "")
+	cmd.Flags().Int("page", 1, "")
+	cmd.Flags().Int("page-size", 20, "")
+	cmd.Flags().Int("limit", 0, "")
+	_ = cmd.Flags().Set("limit", "30")
+
+	if err := ordersListCmd.RunE(cmd, []string{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if len(mockClient.listOrdersCalls) < 2 {
+		t.Fatalf("expected at least 2 ListOrders calls, got %d", len(mockClient.listOrdersCalls))
+	}
+	if mockClient.listOrdersCalls[0].Page != 1 || mockClient.listOrdersCalls[1].Page != 2 {
+		t.Fatalf("expected calls for pages 1 and 2, got %+v", mockClient.listOrdersCalls)
+	}
+
+	var resp api.OrdersListResponse
+	if err := json.Unmarshal(buf.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to unmarshal JSON output: %v", err)
+	}
+	if len(resp.Items) != 30 {
+		t.Fatalf("expected 30 items, got %d", len(resp.Items))
 	}
 }
 

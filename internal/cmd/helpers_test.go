@@ -370,6 +370,32 @@ func TestApplyLimitToPageSize(t *testing.T) {
 			t.Errorf("page-size should be 0, got %d", ps)
 		}
 	})
+
+	t.Run("persistent limit sets page-size", func(t *testing.T) {
+		root := &cobra.Command{Use: "root"}
+		root.PersistentFlags().Int("limit", 0, "")
+
+		child := &cobra.Command{
+			Use: "child",
+			RunE: func(cmd *cobra.Command, args []string) error {
+				if err := applyLimitToPageSize(cmd); err != nil {
+					return err
+				}
+				ps, _ := cmd.Flags().GetInt("page-size")
+				if ps != 5 {
+					t.Fatalf("page-size should be 5, got %d", ps)
+				}
+				return nil
+			},
+		}
+		child.Flags().Int("page-size", 20, "")
+		root.AddCommand(child)
+
+		root.SetArgs([]string{"child", "--limit", "5"})
+		if err := root.Execute(); err != nil {
+			t.Fatalf("execute failed: %v", err)
+		}
+	})
 }
 
 // ---------------------------------------------------------------------------
