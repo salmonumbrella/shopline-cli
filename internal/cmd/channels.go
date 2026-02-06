@@ -24,6 +24,7 @@ var channelsListCmd = &cobra.Command{
 
 		page, _ := cmd.Flags().GetInt("page")
 		pageSize, _ := cmd.Flags().GetInt("page-size")
+		limit, _ := cmd.Flags().GetInt("limit")
 
 		opts := &api.ChannelsListOptions{
 			Page:     page,
@@ -35,9 +36,55 @@ var channelsListCmd = &cobra.Command{
 			opts.Active = &active
 		}
 
-		resp, err := client.ListChannels(cmd.Context(), opts)
-		if err != nil {
-			return fmt.Errorf("failed to list channels: %w", err)
+		resp := &api.ChannelsListResponse{}
+		if limit > 0 {
+			curPage := opts.Page
+			perPage := opts.PageSize
+			if perPage <= 0 || perPage > limit {
+				perPage = limit
+			}
+
+			items := make([]api.Channel, 0, limit)
+			totalCount := 0
+			hasMore := false
+
+			for len(items) < limit {
+				pageOpts := *opts
+				pageOpts.Page = curPage
+				pageOpts.PageSize = perPage
+
+				pageResp, err := client.ListChannels(cmd.Context(), &pageOpts)
+				if err != nil {
+					return fmt.Errorf("failed to list channels: %w", err)
+				}
+				if totalCount == 0 {
+					totalCount = pageResp.TotalCount
+				}
+				items = append(items, pageResp.Items...)
+				hasMore = pageResp.HasMore
+
+				if !pageResp.HasMore || len(pageResp.Items) == 0 {
+					break
+				}
+				curPage++
+			}
+
+			if len(items) > limit {
+				items = items[:limit]
+				hasMore = true
+			}
+
+			resp.Items = items
+			resp.Page = opts.Page
+			resp.PageSize = perPage
+			resp.TotalCount = totalCount
+			resp.HasMore = hasMore
+		} else {
+			r, err := client.ListChannels(cmd.Context(), opts)
+			if err != nil {
+				return fmt.Errorf("failed to list channels: %w", err)
+			}
+			resp = r
 		}
 
 		formatter := getFormatter(cmd)

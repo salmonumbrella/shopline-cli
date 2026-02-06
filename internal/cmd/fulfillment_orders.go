@@ -26,6 +26,7 @@ var fulfillmentOrdersListCmd = &cobra.Command{
 		pageSize, _ := cmd.Flags().GetInt("page-size")
 		status, _ := cmd.Flags().GetString("status")
 		orderID, _ := cmd.Flags().GetString("order-id")
+		limit, _ := cmd.Flags().GetInt("limit")
 
 		opts := &api.FulfillmentOrdersListOptions{
 			Page:     page,
@@ -34,9 +35,55 @@ var fulfillmentOrdersListCmd = &cobra.Command{
 			OrderID:  orderID,
 		}
 
-		resp, err := client.ListFulfillmentOrders(cmd.Context(), opts)
-		if err != nil {
-			return fmt.Errorf("failed to list fulfillment orders: %w", err)
+		resp := &api.FulfillmentOrdersListResponse{}
+		if limit > 0 {
+			curPage := opts.Page
+			perPage := opts.PageSize
+			if perPage <= 0 || perPage > limit {
+				perPage = limit
+			}
+
+			items := make([]api.FulfillmentOrder, 0, limit)
+			totalCount := 0
+			hasMore := false
+
+			for len(items) < limit {
+				pageOpts := *opts
+				pageOpts.Page = curPage
+				pageOpts.PageSize = perPage
+
+				pageResp, err := client.ListFulfillmentOrders(cmd.Context(), &pageOpts)
+				if err != nil {
+					return fmt.Errorf("failed to list fulfillment orders: %w", err)
+				}
+				if totalCount == 0 {
+					totalCount = pageResp.TotalCount
+				}
+				items = append(items, pageResp.Items...)
+				hasMore = pageResp.HasMore
+
+				if !pageResp.HasMore || len(pageResp.Items) == 0 {
+					break
+				}
+				curPage++
+			}
+
+			if len(items) > limit {
+				items = items[:limit]
+				hasMore = true
+			}
+
+			resp.Items = items
+			resp.Page = opts.Page
+			resp.PageSize = perPage
+			resp.TotalCount = totalCount
+			resp.HasMore = hasMore
+		} else {
+			r, err := client.ListFulfillmentOrders(cmd.Context(), opts)
+			if err != nil {
+				return fmt.Errorf("failed to list fulfillment orders: %w", err)
+			}
+			resp = r
 		}
 
 		formatter := getFormatter(cmd)
