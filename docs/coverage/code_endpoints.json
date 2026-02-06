@@ -2176,6 +2176,36 @@
   },
   {
     "method": "GET",
+    "path": "/pos/purchase_orders",
+    "source": "internal/api/pos_purchase_orders_docs.go"
+  },
+  {
+    "method": "POST",
+    "path": "/pos/purchase_orders",
+    "source": "internal/api/pos_purchase_orders_docs.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/pos/purchase_orders/bulk_delete",
+    "source": "internal/api/pos_purchase_orders_docs.go"
+  },
+  {
+    "method": "GET",
+    "path": "/pos/purchase_orders/{}",
+    "source": "internal/api/pos_purchase_orders_docs.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/pos/purchase_orders/{}",
+    "source": "internal/api/pos_purchase_orders_docs.go"
+  },
+  {
+    "method": "POST",
+    "path": "/pos/purchase_orders/{}/child",
+    "source": "internal/api/pos_purchase_orders_docs.go"
+  },
+  {
+    "method": "GET",
     "path": "/price_rules",
     "source": "internal/api/price_rules.go"
   },

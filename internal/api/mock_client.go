@@ -321,6 +321,14 @@ func (m *MockClient) CreatePurchaseOrder(ctx context.Context, req *PurchaseOrder
 	return nil, m.notImplemented("CreatePurchaseOrder")
 }
 
+func (m *MockClient) CreatePOSPurchaseOrder(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("CreatePOSPurchaseOrder")
+}
+
+func (m *MockClient) CreatePOSPurchaseOrderChild(ctx context.Context, id string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("CreatePOSPurchaseOrderChild")
+}
+
 func (m *MockClient) CreateRedirect(ctx context.Context, req *RedirectCreateRequest) (*Redirect, error) {
 	return nil, m.notImplemented("CreateRedirect")
 }
@@ -1057,6 +1065,10 @@ func (m *MockClient) GetPurchaseOrder(ctx context.Context, id string) (*Purchase
 	return nil, m.notImplemented("GetPurchaseOrder")
 }
 
+func (m *MockClient) GetPOSPurchaseOrder(ctx context.Context, id string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetPOSPurchaseOrder")
+}
+
 func (m *MockClient) GetRedirect(ctx context.Context, id string) (*Redirect, error) {
 	return nil, m.notImplemented("GetRedirect")
 }
@@ -1505,6 +1517,10 @@ func (m *MockClient) ListPurchaseOrders(ctx context.Context, opts *PurchaseOrder
 	return nil, m.notImplemented("ListPurchaseOrders")
 }
 
+func (m *MockClient) ListPOSPurchaseOrders(ctx context.Context, opts *POSPurchaseOrdersListOptions) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListPOSPurchaseOrders")
+}
+
 func (m *MockClient) ListRedirects(ctx context.Context, opts *RedirectsListOptions) (*RedirectsListResponse, error) {
 	return nil, m.notImplemented("ListRedirects")
 }
@@ -1835,6 +1851,14 @@ func (m *MockClient) UpdateGiftStocks(ctx context.Context, id string, body any) 
 
 func (m *MockClient) UpdateGiftsQuantityBySKU(ctx context.Context, sku string, quantity int) error {
 	return m.notImplemented("UpdateGiftsQuantityBySKU")
+}
+
+func (m *MockClient) UpdatePOSPurchaseOrder(ctx context.Context, id string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdatePOSPurchaseOrder")
+}
+
+func (m *MockClient) BulkDeletePOSPurchaseOrders(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("BulkDeletePOSPurchaseOrders")
 }
 
 func (m *MockClient) UpdateLabel(ctx context.Context, id string, req *LabelUpdateRequest) (*Label, error) {

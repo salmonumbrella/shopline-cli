@@ -3,8 +3,8 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 694
-- Missing in code: 14
+- Code endpoints detected: 700
+- Missing in code: 8
 - Extra in code: 400
 - Unparsed doc pages: 55
 
@@ -68,12 +68,6 @@
 
 ## Missing In Code
 
-- `GET /pos/purchase_orders` (https://open-api.docs.shoplineapp.com/reference/get_pos-purchase-orders)
-- `POST /pos/purchase_orders` (https://open-api.docs.shoplineapp.com/reference/post_pos-purchase-orders)
-- `PUT /pos/purchase_orders/bulk_delete` (https://open-api.docs.shoplineapp.com/reference/put_pos-purchase-orders-bulk-delete)
-- `GET /pos/purchase_orders/{}` (https://open-api.docs.shoplineapp.com/reference/get_pos-purchase-orders-purchaseorderid)
-- `PUT /pos/purchase_orders/{}` (https://open-api.docs.shoplineapp.com/reference/put_pos-purchase-orders-purchaseorderid)
-- `POST /pos/purchase_orders/{}/child` (https://open-api.docs.shoplineapp.com/reference/post_pos-purchase-orders-purchaseorderid-child)
 - `GET /product_review_comments` (https://open-api.docs.shoplineapp.com/reference/get_product-review-comments-1)
 - `POST /product_review_comments` (https://open-api.docs.shoplineapp.com/reference/post_product-review-comments-1)
 - `DELETE /product_review_comments/bulk` (https://open-api.docs.shoplineapp.com/reference/delete_product-review-comments-bulk-1)

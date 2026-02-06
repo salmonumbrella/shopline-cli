@@ -66,6 +66,8 @@ go run ./cmd/shopline-coverage
 - `POST /conversations/message` (done)
 - [x] Gifts (docs endpoints)
 - `PUT /gifts/{id}` + `PUT /gifts/{id}/update_quantity` + `PUT /gifts/update_quantity` + `GET/PUT /gifts/{id}/stocks` (done)
+- [x] POS purchase orders (docs endpoints)
+- `GET/POST /pos/purchase_orders` + `GET/PUT /pos/purchase_orders/{id}` + `PUT /pos/purchase_orders/bulk_delete` + `POST /pos/purchase_orders/{id}/child` (done)
 
 ## Storefront API
 
