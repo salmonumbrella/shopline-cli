@@ -297,6 +297,10 @@ type APIClient interface {
 	BulkCreateCustomerAppMetafields(ctx context.Context, customerID string, body any) error
 	BulkUpdateCustomerAppMetafields(ctx context.Context, customerID string, body any) error
 	BulkDeleteCustomerAppMetafields(ctx context.Context, customerID string, body any) error
+
+	// Customer store credits (nested endpoints under /customers/{id}/...)
+	GetCustomerStoreCredits(ctx context.Context, customerID string) (json.RawMessage, error)
+	CreateCustomerStoreCredits(ctx context.Context, customerID string, body any) (json.RawMessage, error)
 	GetOrderRisk(ctx context.Context, orderID, riskID string) (*OrderRisk, error)
 	GetPage(ctx context.Context, id string) (*Page, error)
 	GetPayment(ctx context.Context, id string) (*Payment, error)
@@ -433,6 +437,7 @@ type APIClient interface {
 	ListSmartCollections(ctx context.Context, opts *SmartCollectionsListOptions) (*SmartCollectionsListResponse, error)
 	ListStaffs(ctx context.Context, opts *StaffsListOptions) (*StaffsListResponse, error)
 	ListStoreCredits(ctx context.Context, opts *StoreCreditsListOptions) (*StoreCreditsListResponse, error)
+	ListUserCredits(ctx context.Context, opts *UserCreditsListOptions) (json.RawMessage, error)
 	ListStorefrontCarts(ctx context.Context, opts *StorefrontCartsListOptions) (*StorefrontCartsListResponse, error)
 	ListStorefrontOAuthClients(ctx context.Context, opts *StorefrontOAuthClientsListOptions) (*StorefrontOAuthClientsListResponse, error)
 	ListStorefrontProducts(ctx context.Context, opts *StorefrontProductsListOptions) (*StorefrontProductsListResponse, error)
@@ -493,6 +498,7 @@ type APIClient interface {
 	UpdateCustomerGroup(ctx context.Context, id string, req *CustomerGroupUpdateRequest) (*CustomerGroup, error)
 	UpdateCustomerTags(ctx context.Context, id string, req *CustomerTagsUpdateRequest) (*Customer, error)
 	UpdateCustomerSubscriptions(ctx context.Context, customerID string, body any) (json.RawMessage, error)
+	BulkUpdateUserCredits(ctx context.Context, body any) (json.RawMessage, error)
 	UpdateCustomField(ctx context.Context, id string, req *CustomFieldUpdateRequest) (*CustomField, error)
 	UpdateDeliveryOptionPickupStore(ctx context.Context, id string, req *PickupStoreUpdateRequest) (*DeliveryOption, error)
 	UpdateDisputeEvidence(ctx context.Context, id string, req *DisputeUpdateEvidenceRequest) (*Dispute, error)

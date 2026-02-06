@@ -860,9 +860,14 @@
     "source": "internal/api/customers.go"
   },
   {
-    "method": "PATCH",
-    "path": "/customers/{}/store-credits",
-    "source": "internal/api/customers.go"
+    "method": "GET",
+    "path": "/customers/{}/store_credits",
+    "source": "internal/api/customer_store_credits.go"
+  },
+  {
+    "method": "POST",
+    "path": "/customers/{}/store_credits",
+    "source": "internal/api/customer_store_credits.go"
   },
   {
     "method": "PUT",
@@ -2898,6 +2903,16 @@
     "method": "GET",
     "path": "/user_coupons/{}",
     "source": "internal/api/user_coupons.go"
+  },
+  {
+    "method": "GET",
+    "path": "/user_credits",
+    "source": "internal/api/user_credits.go"
+  },
+  {
+    "method": "POST",
+    "path": "/user_credits/bulk_update",
+    "source": "internal/api/user_credits.go"
   },
   {
     "method": "GET",

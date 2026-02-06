@@ -757,10 +757,10 @@ func TestSetCustomerTagsAPIError(t *testing.T) {
 
 func TestUpdateCustomerStoreCredits(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPatch {
-			t.Errorf("Expected PATCH, got %s", r.Method)
+		if r.Method != http.MethodPost {
+			t.Errorf("Expected POST, got %s", r.Method)
 		}
-		if r.URL.Path != "/customers/cust_123/store-credits" {
+		if r.URL.Path != "/customers/cust_123/store_credits" {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
 		}
 
@@ -802,6 +802,12 @@ func TestUpdateCustomerStoreCredits(t *testing.T) {
 
 func TestUpdateCustomerStoreCreditsNegativeAmount(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("Expected POST, got %s", r.Method)
+		}
+		if r.URL.Path != "/customers/cust_123/store_credits" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
 		var req CustomerStoreCreditUpdateRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			t.Fatalf("Failed to decode request body: %v", err)

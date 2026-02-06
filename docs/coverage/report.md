@@ -3,9 +3,9 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 595
-- Missing in code: 118
-- Extra in code: 405
+- Code endpoints detected: 598
+- Missing in code: 114
+- Extra in code: 404
 - Unparsed doc pages: 55
 
 ## Unparsed Doc Pages
@@ -93,8 +93,6 @@
 - `GET /customers/{}/member_points` (https://open-api.docs.shoplineapp.com/reference/get_customers-id-member-points-1)
 - `POST /customers/{}/member_points` (https://open-api.docs.shoplineapp.com/reference/post_customers-id-member-points-1)
 - `GET /customers/{}/membership_tier/action_logs` (https://open-api.docs.shoplineapp.com/reference/get_customers-id-membership-tier-action-logs-1)
-- `GET /customers/{}/store_credits` (https://open-api.docs.shoplineapp.com/reference/get_customers-id-store-credits-1)
-- `POST /customers/{}/store_credits` (https://open-api.docs.shoplineapp.com/reference/post_customers-id-store-credits-1)
 - `GET /delivery_options/delivery_config` (https://open-api.docs.shoplineapp.com/reference/get_delivery-options-delivery-config)
 - `GET /delivery_options/{}/delivery_time_slots` (https://open-api.docs.shoplineapp.com/reference/get_delivery-options-delivery-option-id-delivery-time-slots)
 - `PUT /delivery_options/{}/stores_info` (https://open-api.docs.shoplineapp.com/reference/put_delivery-options-id-stores-info-1)
@@ -180,8 +178,6 @@
 - `GET /user_coupons/list` (https://open-api.docs.shoplineapp.com/reference/get_user-coupons-list)
 - `POST /user_coupons/{}/claim` (https://open-api.docs.shoplineapp.com/reference/post_user-coupons-coupon-code-claim)
 - `POST /user_coupons/{}/redeem` (https://open-api.docs.shoplineapp.com/reference/post_user-coupons-couponcode-redeem)
-- `GET /user_credits` (https://open-api.docs.shoplineapp.com/reference/get_user-credits-1)
-- `POST /user_credits/bulk_update` (https://open-api.docs.shoplineapp.com/reference/post_user-credits-bulk-update)
 - `PUT /webhooks/{}` (https://open-api.docs.shoplineapp.com/reference/put_webhooks-id)
 - `DELETE /wish_list_items` (https://open-api.docs.shoplineapp.com/reference/delete_wish-list-items)
 - `GET /wish_list_items` (https://open-api.docs.shoplineapp.com/reference/get_wish-list-items)
@@ -302,7 +298,6 @@
 - `GET /customers/{}/points` (internal/api/member_points.go)
 - `POST /customers/{}/points/adjust` (internal/api/member_points.go)
 - `GET /customers/{}/points/transactions` (internal/api/member_points.go)
-- `PATCH /customers/{}/store-credits` (internal/api/customers.go)
 - `PUT /delivery_options/{}/pickup_store` (internal/api/delivery_options.go)
 - `GET /delivery_options/{}/time_slots` (internal/api/delivery_options.go)
 - `GET /discount_codes` (internal/api/discount_codes.go)

@@ -17,7 +17,8 @@ go run ./cmd/shopline-coverage
 - [ ] Customers
 - Customers core: list/get/search/create/update/delete + tags + subscriptions + LINE lookup (done)
 - Customer metafields + app_metafields (done); credits/points pending
-- [ ] Store credits
+- [x] Store credits
+- Customer store credits (`GET/POST /customers/{id}/store_credits`) + user credits (`GET /user_credits`, `POST /user_credits/bulk_update`) (done)
 - [x] Channels
 - [ ] Staffs
 - [ ] Webhooks

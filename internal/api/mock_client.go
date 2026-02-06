@@ -2068,3 +2068,19 @@ func (m *MockClient) BulkUpdateCustomerAppMetafields(ctx context.Context, custom
 func (m *MockClient) BulkDeleteCustomerAppMetafields(ctx context.Context, customerID string, body any) error {
 	return m.notImplemented("BulkDeleteCustomerAppMetafields")
 }
+
+func (m *MockClient) GetCustomerStoreCredits(ctx context.Context, customerID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetCustomerStoreCredits")
+}
+
+func (m *MockClient) CreateCustomerStoreCredits(ctx context.Context, customerID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("CreateCustomerStoreCredits")
+}
+
+func (m *MockClient) ListUserCredits(ctx context.Context, opts *UserCreditsListOptions) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListUserCredits")
+}
+
+func (m *MockClient) BulkUpdateUserCredits(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("BulkUpdateUserCredits")
+}

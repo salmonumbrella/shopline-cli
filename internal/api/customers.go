@@ -215,7 +215,8 @@ func (c *Client) UpdateCustomerStoreCredits(ctx context.Context, id string, amou
 	}
 	req := &CustomerStoreCreditUpdateRequest{Amount: amount, Reason: reason}
 	var customer Customer
-	if err := c.Patch(ctx, fmt.Sprintf("/customers/%s/store-credits", id), req, &customer); err != nil {
+	// Docs: POST /customers/{id}/store_credits
+	if err := c.Post(ctx, fmt.Sprintf("/customers/%s/store_credits", id), req, &customer); err != nil {
 		return nil, err
 	}
 	return &customer, nil

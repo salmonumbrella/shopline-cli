@@ -39,6 +39,7 @@ func TestCustomersSubcommands(t *testing.T) {
 		"line":           "Lookup customers by LINE ID",
 		"metafields":     "Manage customer metafields",
 		"app-metafields": "Manage customer app metafields",
+		"store-credits":  "Manage customer store credits",
 	}
 
 	for name, short := range subcommands {
