@@ -4,6 +4,7 @@
 1. `shopline schema` or `shopline schema list` (add `--output json` for structured output)
 2. `shopline schema get <resource>` (add `--output json` for structured output)
 3. `shopline help --json`
+   - Use `shopline help --json --deep` for the full command tree in one call
 
 ## ID Conventions
 - Text tables show IDs as `[resource:$id]` (copy/pasteable).

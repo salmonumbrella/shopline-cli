@@ -29,6 +29,7 @@ This plan is the living checklist for bringing `shopline-cli` to:
 - Fast discovery:
   - `schema list/show` for resource schemas
   - `help --json` for machine-readable CLI help
+  - `help --json --deep` for a single-call full command tree
 - Stable machine output:
   - JSON output is consistent across list/get
   - Avoid `null` collections where iteration is common (prefer `[]`)
