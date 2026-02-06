@@ -24,7 +24,7 @@ type firecrawlPage struct {
 
 func main() {
 	var (
-		docsDir = flag.String("docs-pages", "docs/shopline-openapi/pages/reference", "directory containing firecrawl page .json files")
+		docsDir = flag.String("docs-pages", "docs/shopline-openapi/pages_md/reference", "directory containing Shopline /reference/*.md pages (or firecrawl .json)")
 		outDir  = flag.String("out", "docs/coverage", "output directory for coverage artifacts")
 	)
 	flag.Parse()
@@ -79,28 +79,45 @@ func loadDocEndpoints(root string) ([]coverage.Endpoint, []string, error) {
 		if d.IsDir() {
 			return nil
 		}
-		if !strings.HasSuffix(path, ".json") {
+
+		switch {
+		case strings.HasSuffix(path, ".md"):
+			raw, err := os.ReadFile(path)
+			if err != nil {
+				return err
+			}
+			ep, ok := coverage.ParseEndpointFromDocMarkdown(string(raw))
+			if !ok {
+				unparsed = append(unparsed, path)
+				return nil
+			}
+			ep.DocURL = inferDocURLFromPath(path)
+			ep.Source = path
+			eps = append(eps, ep)
+			return nil
+
+		case strings.HasSuffix(path, ".json"):
+			raw, err := os.ReadFile(path)
+			if err != nil {
+				return err
+			}
+			var page firecrawlPage
+			if err := json.Unmarshal(raw, &page); err != nil {
+				return fmt.Errorf("parse %s: %w", path, err)
+			}
+
+			ep, ok := coverage.ParseEndpointFromDocMarkdown(page.Markdown)
+			if !ok {
+				unparsed = append(unparsed, path)
+				return nil
+			}
+			ep.DocURL = page.Metadata.SourceURL
+			ep.Source = path
+			eps = append(eps, ep)
+			return nil
+		default:
 			return nil
 		}
-
-		raw, err := os.ReadFile(path)
-		if err != nil {
-			return err
-		}
-		var page firecrawlPage
-		if err := json.Unmarshal(raw, &page); err != nil {
-			return fmt.Errorf("parse %s: %w", path, err)
-		}
-
-		ep, ok := coverage.ParseEndpointFromDocMarkdown(page.Markdown)
-		if !ok {
-			unparsed = append(unparsed, path)
-			return nil
-		}
-		ep.DocURL = page.Metadata.SourceURL
-		ep.Source = path
-		eps = append(eps, ep)
-		return nil
 	})
 	if err != nil {
 		return nil, nil, err
@@ -109,6 +126,17 @@ func loadDocEndpoints(root string) ([]coverage.Endpoint, []string, error) {
 	sort.Slice(eps, func(i, j int) bool { return eps[i].Key() < eps[j].Key() })
 	sort.Strings(unparsed)
 	return eps, unparsed, nil
+}
+
+func inferDocURLFromPath(path string) string {
+	p := filepath.ToSlash(path)
+	i := strings.Index(p, "/reference/")
+	if i < 0 {
+		return ""
+	}
+	rel := p[i+1:] // "reference/..."
+	rel = strings.TrimSuffix(rel, ".md")
+	return "https://open-api.docs.shoplineapp.com/" + rel
 }
 
 func uniqByKey(in []coverage.Endpoint) []coverage.Endpoint {

@@ -31,6 +31,7 @@ man/
 scripts/*
 !scripts/download_shopline_openapi_docs.py
 !scripts/extract_shopline_openapi_urls.py
+!scripts/download_shopline_reference_md.py
 
 # Planning/temporary files
 breaking_changes_plan/

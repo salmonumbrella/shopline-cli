@@ -9,8 +9,11 @@ This plan is the living checklist for bringing `shopline-cli` to:
 
 - Shopline Open API reference (mirrored locally via Firecrawl)
   - URL lists: `docs/shopline-openapi/urls_endpoints.txt`, `docs/shopline-openapi/urls_non_endpoints.txt`
-  - Local mirror fetch: `scripts/download_shopline_openapi_docs.py`
-    - Important: default now uses `onlyMainContent=false` so endpoint URL + method are present for coverage indexing.
+  - Local mirror fetch (preferred): `scripts/download_shopline_reference_md.py`
+    - Uses the official ReadMe plaintext route: `/reference/<slug>.md`
+    - This embeds an OpenAPI JSON snippet we can parse reliably for coverage indexing.
+  - Local mirror fetch (optional fallback): `scripts/download_shopline_openapi_docs.py` (Firecrawl)
+    - Useful when troubleshooting or scraping non-reference pages.
 
 ## Current Status (Snapshot)
 
@@ -133,8 +136,8 @@ Tests:
 Run it locally:
 
 ```bash
-# Refresh docs mirror (full pages; required for endpoint URL + method parsing)
-./scripts/download_shopline_openapi_docs.py --urls docs/shopline-openapi/urls_endpoints.txt --force
+# Refresh docs mirror (preferred; official ReadMe plaintext for each reference page)
+./scripts/download_shopline_reference_md.py --urls docs/shopline-openapi/urls_endpoints.txt --force
 
 # Generate coverage report
 go run ./cmd/shopline-coverage

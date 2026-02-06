@@ -1,6 +1,6 @@
 # Shopline Open API Docs Mirror (Local)
 
-This folder holds URL lists and (optionally) a locally mirrored plaintext/markdown copy of Shopline's Open API documentation, fetched via the `firecrawl` CLI.
+This folder holds URL lists and (optionally) a locally mirrored plaintext copy of Shopline's Open API documentation.
 
 ## What’s Tracked
 
@@ -10,9 +10,27 @@ This folder holds URL lists and (optionally) a locally mirrored plaintext/markdo
 
 The bulk downloaded corpus is intentionally **not committed** (it’s large and changes often).
 
-## Download / Refresh
+## Download / Refresh (Preferred: Official `*.md`)
 
-Download endpoint docs as markdown + raw JSON responses:
+ReadMe exposes an official plaintext export for each API reference page:
+
+- `https://open-api.docs.shoplineapp.com/reference/<slug>.md`
+
+Download endpoint pages as plaintext markdown (local-only):
+
+```bash
+./scripts/download_shopline_reference_md.py --urls docs/shopline-openapi/urls_endpoints.txt
+```
+
+Outputs go to:
+
+- `docs/shopline-openapi/pages_md/reference/*.md`
+
+## Download / Refresh (Optional: Firecrawl)
+
+If you want the browser-rendered reference pages scraped (e.g. for non-reference pages or troubleshooting), you can still use Firecrawl.
+
+Download endpoint docs as Firecrawl markdown + raw JSON responses:
 
 ```bash
 ./scripts/download_shopline_openapi_docs.py --urls docs/shopline-openapi/urls_endpoints.txt
