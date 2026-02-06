@@ -2404,3 +2404,31 @@ func (m *MockClient) UpdateFlashPriceCampaign(ctx context.Context, id string, bo
 func (m *MockClient) DeleteFlashPriceCampaign(ctx context.Context, id string) error {
 	return m.notImplemented("DeleteFlashPriceCampaign")
 }
+
+func (m *MockClient) GetMerchantByID(ctx context.Context, merchantID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetMerchantByID")
+}
+
+func (m *MockClient) GenerateMerchantExpressLink(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("GenerateMerchantExpressLink")
+}
+
+func (m *MockClient) GetMultipassSecret(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetMultipassSecret")
+}
+
+func (m *MockClient) CreateMultipassSecret(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("CreateMultipassSecret")
+}
+
+func (m *MockClient) ListMultipassLinkings(ctx context.Context, customerIDs []string) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListMultipassLinkings")
+}
+
+func (m *MockClient) UpdateMultipassCustomerLinking(ctx context.Context, customerID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateMultipassCustomerLinking")
+}
+
+func (m *MockClient) DeleteMultipassCustomerLinking(ctx context.Context, customerID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("DeleteMultipassCustomerLinking")
+}

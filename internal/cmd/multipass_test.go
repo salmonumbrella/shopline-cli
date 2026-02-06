@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"os"
 	"strings"
@@ -27,11 +28,14 @@ func TestMultipassCmdStructure(t *testing.T) {
 // TestMultipassSubcommands verifies all subcommands are registered.
 func TestMultipassSubcommands(t *testing.T) {
 	subcommands := map[string]string{
-		"status":  "Get multipass configuration status",
-		"enable":  "Enable multipass authentication",
-		"disable": "Disable multipass authentication",
-		"rotate":  "Rotate multipass secret",
-		"token":   "Generate a multipass login token",
+		"status":    "Get multipass configuration status",
+		"enable":    "Enable multipass authentication",
+		"disable":   "Disable multipass authentication",
+		"rotate":    "Rotate multipass secret",
+		"token":     "Generate a multipass login token",
+		"secret":    "Manage multipass secret (documented endpoints)",
+		"linkings":  "Manage multipass linking records (documented endpoints)",
+		"customers": "Manage multipass customer linkings (documented endpoints)",
 	}
 
 	for name, short := range subcommands {
@@ -250,6 +254,17 @@ type multipassMockAPIClient struct {
 	rotateMultipassSecretErr   error
 	generateMultipassTokenResp *api.MultipassToken
 	generateMultipassTokenErr  error
+
+	getMultipassSecretResp    json.RawMessage
+	getMultipassSecretErr     error
+	createMultipassSecretResp json.RawMessage
+	createMultipassSecretErr  error
+	listMultipassLinkingsResp json.RawMessage
+	listMultipassLinkingsErr  error
+	updateCustomerLinkingResp json.RawMessage
+	updateCustomerLinkingErr  error
+	deleteCustomerLinkingResp json.RawMessage
+	deleteCustomerLinkingErr  error
 }
 
 func (m *multipassMockAPIClient) GetMultipass(ctx context.Context) (*api.Multipass, error) {
@@ -270,6 +285,26 @@ func (m *multipassMockAPIClient) RotateMultipassSecret(ctx context.Context) (*ap
 
 func (m *multipassMockAPIClient) GenerateMultipassToken(ctx context.Context, req *api.MultipassTokenRequest) (*api.MultipassToken, error) {
 	return m.generateMultipassTokenResp, m.generateMultipassTokenErr
+}
+
+func (m *multipassMockAPIClient) GetMultipassSecret(ctx context.Context) (json.RawMessage, error) {
+	return m.getMultipassSecretResp, m.getMultipassSecretErr
+}
+
+func (m *multipassMockAPIClient) CreateMultipassSecret(ctx context.Context, body any) (json.RawMessage, error) {
+	return m.createMultipassSecretResp, m.createMultipassSecretErr
+}
+
+func (m *multipassMockAPIClient) ListMultipassLinkings(ctx context.Context, customerIDs []string) (json.RawMessage, error) {
+	return m.listMultipassLinkingsResp, m.listMultipassLinkingsErr
+}
+
+func (m *multipassMockAPIClient) UpdateMultipassCustomerLinking(ctx context.Context, customerID string, body any) (json.RawMessage, error) {
+	return m.updateCustomerLinkingResp, m.updateCustomerLinkingErr
+}
+
+func (m *multipassMockAPIClient) DeleteMultipassCustomerLinking(ctx context.Context, customerID string) (json.RawMessage, error) {
+	return m.deleteCustomerLinkingResp, m.deleteCustomerLinkingErr
 }
 
 // setupMultipassMockFactories sets up mock factories for multipass tests.
@@ -311,8 +346,16 @@ func newMultipassTestCmd() *cobra.Command {
 	cmd.Flags().String("output", "", "")
 	cmd.Flags().String("color", "never", "")
 	cmd.Flags().String("query", "", "")
+	cmd.Flags().Bool("items-only", false, "")
 	cmd.Flags().Bool("dry-run", false, "")
 	cmd.Flags().Bool("yes", true, "")
+	return cmd
+}
+
+func newMultipassTestCmdWithBodyFlags() *cobra.Command {
+	cmd := newMultipassTestCmd()
+	cmd.Flags().String("body", "", "")
+	cmd.Flags().String("body-file", "", "")
 	return cmd
 }
 
@@ -488,6 +531,85 @@ func TestMultipassEnableRunEWithJSON(t *testing.T) {
 	output := buf.String()
 	if !strings.Contains(output, "secret") {
 		t.Errorf("JSON output should contain 'secret', got: %s", output)
+	}
+}
+
+func TestMultipassSecretGetRunE_WithMockAPI(t *testing.T) {
+	mockClient := &multipassMockAPIClient{
+		getMultipassSecretResp: json.RawMessage(`{"secret":"s"}`),
+	}
+	cleanup, _ := setupMultipassMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newMultipassTestCmd()
+	_ = cmd.Flags().Set("output", "json")
+
+	if err := multipassSecretGetCmd.RunE(cmd, []string{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestMultipassSecretCreateRunE_NoBody_WithMockAPI(t *testing.T) {
+	mockClient := &multipassMockAPIClient{
+		createMultipassSecretResp: json.RawMessage(`{"secret":"new"}`),
+	}
+	cleanup, _ := setupMultipassMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newMultipassTestCmdWithBodyFlags()
+	_ = cmd.Flags().Set("output", "json")
+
+	if err := multipassSecretCreateCmd.RunE(cmd, []string{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestMultipassLinkingsListRunE_WithMockAPI(t *testing.T) {
+	mockClient := &multipassMockAPIClient{
+		listMultipassLinkingsResp: json.RawMessage(`{"items":[]}`),
+	}
+	cleanup, _ := setupMultipassMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newMultipassTestCmd()
+	_ = cmd.Flags().Set("output", "json")
+	cmd.Flags().StringSlice("customer-id", nil, "")
+	_ = cmd.Flags().Set("customer-id", "cust_1")
+
+	if err := multipassLinkingsListCmd.RunE(cmd, []string{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestMultipassCustomersLinkRunE_WithMockAPI(t *testing.T) {
+	mockClient := &multipassMockAPIClient{
+		updateCustomerLinkingResp: json.RawMessage(`{"updated":true}`),
+	}
+	cleanup, _ := setupMultipassMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newMultipassTestCmdWithBodyFlags()
+	_ = cmd.Flags().Set("output", "json")
+	_ = cmd.Flags().Set("body", `{"ok":true}`)
+
+	if err := multipassCustomersLinkCmd.RunE(cmd, []string{"cust_123"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestMultipassCustomersUnlinkRunE_WithMockAPI(t *testing.T) {
+	mockClient := &multipassMockAPIClient{
+		deleteCustomerLinkingResp: json.RawMessage(`{"deleted":true}`),
+	}
+	cleanup, _ := setupMultipassMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newMultipassTestCmd()
+	_ = cmd.Flags().Set("output", "json")
+	_ = cmd.Flags().Set("yes", "true")
+
+	if err := multipassCustomersUnlinkCmd.RunE(cmd, []string{"cust_123"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
 	}
 }
 

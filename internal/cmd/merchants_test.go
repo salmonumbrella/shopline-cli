@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"os"
 	"strings"
@@ -24,6 +25,11 @@ type merchantsMockAPIClient struct {
 	listMerchantStaffErr  error
 	getMerchantStaffResp  *api.MerchantStaff
 	getMerchantStaffErr   error
+
+	getMerchantByIDResp     json.RawMessage
+	getMerchantByIDErr      error
+	generateExpressLinkResp json.RawMessage
+	generateExpressLinkErr  error
 }
 
 func (m *merchantsMockAPIClient) GetMerchant(ctx context.Context) (*api.Merchant, error) {
@@ -36,6 +42,14 @@ func (m *merchantsMockAPIClient) ListMerchantStaff(ctx context.Context, opts *ap
 
 func (m *merchantsMockAPIClient) GetMerchantStaff(ctx context.Context, id string) (*api.MerchantStaff, error) {
 	return m.getMerchantStaffResp, m.getMerchantStaffErr
+}
+
+func (m *merchantsMockAPIClient) GetMerchantByID(ctx context.Context, merchantID string) (json.RawMessage, error) {
+	return m.getMerchantByIDResp, m.getMerchantByIDErr
+}
+
+func (m *merchantsMockAPIClient) GenerateMerchantExpressLink(ctx context.Context, body any) (json.RawMessage, error) {
+	return m.generateExpressLinkResp, m.generateExpressLinkErr
 }
 
 // setupMerchantsMockFactories configures factories for merchants command tests.
@@ -78,8 +92,10 @@ func TestMerchantsCommandSetup(t *testing.T) {
 // TestMerchantsSubcommands verifies all subcommands are registered
 func TestMerchantsSubcommands(t *testing.T) {
 	subcommands := map[string]string{
-		"get":   "Get current merchant details",
-		"staff": "Manage merchant staff",
+		"get":          "Get current merchant details",
+		"get-by-id":    "Get merchant details by id (documented endpoint; raw JSON)",
+		"staff":        "Manage merchant staff",
+		"express-link": "Generate express cart link (documented endpoint)",
 	}
 
 	for name, short := range subcommands {
@@ -98,6 +114,49 @@ func TestMerchantsSubcommands(t *testing.T) {
 				t.Errorf("subcommand %q not found", name)
 			}
 		})
+	}
+}
+
+func TestMerchantsGetByIDRunE_WithMockAPI(t *testing.T) {
+	mockClient := &merchantsMockAPIClient{
+		getMerchantByIDResp: json.RawMessage(`{"id":"m_123"}`),
+	}
+	cleanup := setupMerchantsMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "json", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+	cmd.Flags().Bool("items-only", false, "")
+
+	if err := merchantsGetByIDCmd.RunE(cmd, []string{"m_123"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestMerchantsExpressLinkGenerateRunE_WithMockAPI(t *testing.T) {
+	mockClient := &merchantsMockAPIClient{
+		generateExpressLinkResp: json.RawMessage(`{"url":"https://example.com/express"}`),
+	}
+	cleanup := setupMerchantsMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "json", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+	cmd.Flags().Bool("items-only", false, "")
+	cmd.Flags().Bool("dry-run", false, "")
+	cmd.Flags().String("body", `{"ok":true}`, "")
+	cmd.Flags().String("body-file", "", "")
+
+	if err := merchantsExpressLinkGenerateCmd.RunE(cmd, []string{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
 	}
 }
 

@@ -1,10 +1,13 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -209,6 +212,164 @@ var multipassTokenCmd = &cobra.Command{
 	},
 }
 
+// Documented multipass endpoints
+
+var multipassSecretCmd = &cobra.Command{
+	Use:   "secret",
+	Short: "Manage multipass secret (documented endpoints)",
+}
+
+var multipassSecretGetCmd = &cobra.Command{
+	Use:   "get",
+	Short: "Get multipass secret",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.GetMultipassSecret(cmd.Context())
+		if err != nil {
+			return fmt.Errorf("failed to get multipass secret: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var multipassSecretCreateCmd = &cobra.Command{
+	Use:     "create",
+	Aliases: []string{"new"},
+	Short:   "Create multipass secret (may return existing secret)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		// Optional body (docs don't require it).
+		body, _ := cmd.Flags().GetString("body")
+		bodyFile, _ := cmd.Flags().GetString("body-file")
+
+		var req json.RawMessage
+		var hasBody bool
+		var err error
+		if strings.TrimSpace(body) != "" || strings.TrimSpace(bodyFile) != "" {
+			req, err = readJSONBodyFlags(cmd)
+			if err != nil {
+				return err
+			}
+			hasBody = true
+		}
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintln(formatterWriter, "[DRY-RUN] Would create multipass secret")
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		var anyBody any
+		if hasBody {
+			anyBody = req
+		}
+
+		resp, err := client.CreateMultipassSecret(cmd.Context(), anyBody)
+		if err != nil {
+			return fmt.Errorf("failed to create multipass secret: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var multipassLinkingsCmd = &cobra.Command{
+	Use:   "linkings",
+	Short: "Manage multipass linking records (documented endpoints)",
+}
+
+var multipassLinkingsListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List active multipass linkings (raw JSON)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		customerIDs, _ := cmd.Flags().GetStringSlice("customer-id")
+		resp, err := client.ListMultipassLinkings(cmd.Context(), customerIDs)
+		if err != nil {
+			return fmt.Errorf("failed to list multipass linkings: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var multipassCustomersCmd = &cobra.Command{
+	Use:   "customers",
+	Short: "Manage multipass customer linkings (documented endpoints)",
+}
+
+var multipassCustomersLinkCmd = &cobra.Command{
+	Use:   "link <customer-id>",
+	Short: "Update customer's multipass linking (raw JSON body)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintln(formatterWriter, "[DRY-RUN] Would update multipass linking")
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.UpdateMultipassCustomerLinking(cmd.Context(), args[0], body)
+		if err != nil {
+			return fmt.Errorf("failed to update multipass linking: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var multipassCustomersUnlinkCmd = &cobra.Command{
+	Use:     "unlink <customer-id>",
+	Aliases: []string{"delete", "del", "rm"},
+	Short:   "Delete customer's multipass linking (marks inactive)",
+	Args:    cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		yes, _ := cmd.Flags().GetBool("yes")
+		if !yes {
+			fmt.Printf("Delete multipass linking for customer %s? [y/N] ", args[0])
+			var confirm string
+			_, _ = fmt.Scanln(&confirm)
+			if confirm != "y" && confirm != "Y" {
+				fmt.Println("Cancelled.")
+				return nil
+			}
+		}
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintln(formatterWriter, "[DRY-RUN] Would delete multipass linking")
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.DeleteMultipassCustomerLinking(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to delete multipass linking: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(multipassCmd)
 
@@ -224,4 +385,25 @@ func init() {
 	multipassTokenCmd.Flags().String("email", "", "Customer email address")
 	multipassTokenCmd.Flags().String("return-to", "", "URL to redirect after login")
 	_ = multipassTokenCmd.MarkFlagRequired("email")
+
+	// Documented endpoints
+	multipassCmd.AddCommand(multipassSecretCmd)
+	multipassSecretCmd.AddCommand(multipassSecretGetCmd)
+	multipassSecretCmd.AddCommand(multipassSecretCreateCmd)
+	addJSONBodyFlags(multipassSecretCreateCmd)
+
+	multipassCmd.AddCommand(multipassLinkingsCmd)
+	multipassLinkingsCmd.AddCommand(multipassLinkingsListCmd)
+	multipassLinkingsListCmd.Flags().StringSlice("customer-id", nil, "Customer id filter (repeatable)")
+
+	multipassCmd.AddCommand(multipassCustomersCmd)
+	multipassCustomersCmd.AddCommand(multipassCustomersLinkCmd)
+	addJSONBodyFlags(multipassCustomersLinkCmd)
+	multipassCustomersCmd.AddCommand(multipassCustomersUnlinkCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "multipass",
+		Description: "Manage multipass authentication",
+		Commands:    []string{"status", "enable", "disable", "rotate", "token", "secret", "linkings", "customers"},
+	})
 }

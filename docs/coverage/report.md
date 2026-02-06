@@ -3,8 +3,8 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 678
-- Missing in code: 34
+- Code endpoints detected: 685
+- Missing in code: 27
 - Extra in code: 404
 - Unparsed doc pages: 55
 
@@ -79,13 +79,6 @@
 - `PUT /gifts/{}/stocks` (https://open-api.docs.shoplineapp.com/reference/put_gifts-id-stocks-1)
 - `PUT /gifts/{}/update_quantity` (https://open-api.docs.shoplineapp.com/reference/put_gifts-id-update-quantity-1)
 - `POST /media` (https://open-api.docs.shoplineapp.com/reference/post_media-1)
-- `POST /merchants/generate_express_link` (https://open-api.docs.shoplineapp.com/reference/post_merchants-generate-express-link)
-- `GET /merchants/{}` (https://open-api.docs.shoplineapp.com/reference/get_merchants-merchant-id-1)
-- `DELETE /multipass/customers/{}/linkings` (https://open-api.docs.shoplineapp.com/reference/delete_multipass-customers-customer-id-linkings)
-- `POST /multipass/customers/{}/linkings` (https://open-api.docs.shoplineapp.com/reference/post_multipass-customers-customer-id-linkings)
-- `GET /multipass/linkings` (https://open-api.docs.shoplineapp.com/reference/get_multipass-linkings)
-- `GET /multipass/secret` (https://open-api.docs.shoplineapp.com/reference/get_multipass-secret)
-- `POST /multipass/secret` (https://open-api.docs.shoplineapp.com/reference/post_multipass-secret)
 - `GET /pos/purchase_orders` (https://open-api.docs.shoplineapp.com/reference/get_pos-purchase-orders)
 - `POST /pos/purchase_orders` (https://open-api.docs.shoplineapp.com/reference/post_pos-purchase-orders)
 - `PUT /pos/purchase_orders/bulk_delete` (https://open-api.docs.shoplineapp.com/reference/put_pos-purchase-orders-bulk-delete)

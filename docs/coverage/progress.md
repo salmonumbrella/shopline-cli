@@ -40,12 +40,16 @@ go run ./cmd/shopline-coverage
 - /settings/* documented endpoints (checkout/domains/layouts/theme/users/etc.) (done)
 - [x] Merchant metafields
 - `/merchants/current/metafields` + `/merchants/current/app_metafields` (done)
+- [x] Merchants (documented endpoints)
+- `GET /merchants/{merchant_id}` + `POST /merchants/generate_express_link` (done)
 - [x] Webhooks
 - Includes `PUT /webhooks/{id}` (done)
 - [x] Token info
 - `GET /token/info` (done)
 - [x] Storefront OAuth applications
 - `GET/POST/GET(id)/DELETE /storefront/oauth_applications` (done)
+- [x] Multipass (documented endpoints)
+- `GET/POST /multipass/secret` + `GET /multipass/linkings` + `POST/DELETE /multipass/customers/{customer_id}/linkings` (done)
 - [x] Wish list items
 - `GET/POST/DELETE /wish_list_items` (done)
 - [x] User coupons (docs endpoints)

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -199,6 +200,58 @@ var merchantsStaffGetCmd = &cobra.Command{
 	},
 }
 
+// Documented merchant endpoints
+
+var merchantsGetByIDCmd = &cobra.Command{
+	Use:   "get-by-id <merchant-id>",
+	Short: "Get merchant details by id (documented endpoint; raw JSON)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.GetMerchantByID(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to get merchant by id: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var merchantsExpressLinkCmd = &cobra.Command{
+	Use:   "express-link",
+	Short: "Generate express cart link (documented endpoint)",
+}
+
+var merchantsExpressLinkGenerateCmd = &cobra.Command{
+	Use:     "generate",
+	Aliases: []string{"create", "new"},
+	Short:   "Generate merchant's express cart link (raw JSON body)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintln(formatterWriter, "[DRY-RUN] Would generate express cart link")
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.GenerateMerchantExpressLink(cmd.Context(), body)
+		if err != nil {
+			return fmt.Errorf("failed to generate express link: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(merchantsCmd)
 
@@ -213,4 +266,18 @@ func init() {
 	merchantsStaffListCmd.Flags().Int("page-size", 20, "Results per page")
 
 	merchantsStaffCmd.AddCommand(merchantsStaffGetCmd)
+
+	// Documented endpoints
+	merchantsCmd.AddCommand(merchantsGetByIDCmd)
+
+	merchantsCmd.AddCommand(merchantsExpressLinkCmd)
+	merchantsExpressLinkCmd.AddCommand(merchantsExpressLinkGenerateCmd)
+	addJSONBodyFlags(merchantsExpressLinkGenerateCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "merchants",
+		Description: "View merchant information",
+		Commands:    []string{"get", "get-by-id", "staff", "metafields", "app-metafields", "express-link"},
+		IDPrefix:    "merchant",
+	})
 }
