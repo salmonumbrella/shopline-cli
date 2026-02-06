@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -96,9 +98,54 @@ var shopSettingsCmd = &cobra.Command{
 	},
 }
 
+var shopSettingsUpdateCmd = &cobra.Command{
+	Use:   "update",
+	Short: "Update shop settings",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintln(outWriter(cmd), "[DRY-RUN] Would update shop settings")
+			return nil
+		}
+
+		var req api.ShopSettingsUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		settings, err := client.UpdateShopSettings(cmd.Context(), &req)
+		if err != nil {
+			return fmt.Errorf("failed to update shop settings: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(settings)
+		}
+
+		_, _ = fmt.Fprintln(outWriter(cmd), "Updated shop settings")
+		return nil
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(shopCmd)
 
 	shopCmd.AddCommand(shopInfoCmd)
 	shopCmd.AddCommand(shopSettingsCmd)
+	shopSettingsCmd.AddCommand(shopSettingsUpdateCmd)
+	addJSONBodyFlags(shopSettingsUpdateCmd)
+	shopSettingsUpdateCmd.Flags().Bool("dry-run", false, "Show what would be updated without making changes")
+
+	schema.Register(schema.Resource{
+		Name:        "shop",
+		Description: "Manage shop settings",
+		Commands:    []string{"info", "settings"},
+	})
 }

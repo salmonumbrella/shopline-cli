@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -167,6 +168,46 @@ var taxonomiesCreateCmd = &cobra.Command{
 	},
 }
 
+var taxonomiesUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a taxonomy",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update taxonomy %s\n", args[0])
+			return nil
+		}
+
+		var req api.TaxonomyUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		taxonomy, err := client.UpdateTaxonomy(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update taxonomy: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(taxonomy)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated taxonomy %s\n", taxonomy.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:   %s\n", taxonomy.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle: %s\n", taxonomy.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Active: %t\n", taxonomy.Active)
+		return nil
+	},
+}
+
 var taxonomiesDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a taxonomy",
@@ -217,5 +258,16 @@ func init() {
 	taxonomiesCreateCmd.Flags().Bool("active", true, "Taxonomy active status")
 	_ = taxonomiesCreateCmd.MarkFlagRequired("name")
 
+	taxonomiesCmd.AddCommand(taxonomiesUpdateCmd)
+	addJSONBodyFlags(taxonomiesUpdateCmd)
+	taxonomiesUpdateCmd.Flags().Bool("dry-run", false, "Show what would be updated without making changes")
+
 	taxonomiesCmd.AddCommand(taxonomiesDeleteCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "taxonomies",
+		Description: "Manage product taxonomies/categories",
+		Commands:    []string{"list", "get", "create", "update", "delete"},
+		IDPrefix:    "taxonomy",
+	})
 }

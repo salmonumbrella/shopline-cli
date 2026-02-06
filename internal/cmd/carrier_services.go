@@ -153,6 +153,43 @@ var carrierServicesCreateCmd = &cobra.Command{
 	},
 }
 
+var carrierServicesUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a carrier service",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update carrier service %s\n", args[0])
+			return nil
+		}
+
+		var req api.CarrierServiceUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		cs, err := client.UpdateCarrierService(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update carrier service: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(cs)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated carrier service %s\n", cs.ID)
+		return nil
+	},
+}
+
 var carrierServicesDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a carrier service",
@@ -201,6 +238,9 @@ func init() {
 	carrierServicesCreateCmd.Flags().String("type", "api", "Carrier service type (api, legacy)")
 	_ = carrierServicesCreateCmd.MarkFlagRequired("name")
 	_ = carrierServicesCreateCmd.MarkFlagRequired("callback-url")
+
+	carrierServicesCmd.AddCommand(carrierServicesUpdateCmd)
+	addJSONBodyFlags(carrierServicesUpdateCmd)
 
 	carrierServicesCmd.AddCommand(carrierServicesDeleteCmd)
 	carrierServicesDeleteCmd.Flags().Bool("yes", false, "Skip confirmation prompt")

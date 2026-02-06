@@ -113,6 +113,47 @@ var fulfillmentOrdersListCmd = &cobra.Command{
 	},
 }
 
+var fulfillmentOrdersOrderCmd = &cobra.Command{
+	Use:   "order <order-id>",
+	Short: "List fulfillment orders for an order",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.ListOrderFulfillmentOrders(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to list order fulfillment orders: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		headers := []string{"ID", "ORDER ID", "STATUS", "FULFILLMENT STATUS", "LOCATION", "ITEMS", "CREATED"}
+		var rows [][]string
+		for _, fo := range resp.Items {
+			rows = append(rows, []string{
+				fo.ID,
+				fo.OrderID,
+				fo.Status,
+				fo.FulfillmentStatus,
+				fo.AssignedLocationID,
+				fmt.Sprintf("%d", len(fo.LineItems)),
+				fo.CreatedAt.Format("2006-01-02 15:04"),
+			})
+		}
+
+		formatter.Table(headers, rows)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d fulfillment orders for order %s\n", len(resp.Items), args[0])
+		return nil
+	},
+}
+
 var fulfillmentOrdersGetCmd = &cobra.Command{
 	Use:   "get <id>",
 	Short: "Get fulfillment order details",
@@ -249,6 +290,8 @@ func init() {
 	fulfillmentOrdersListCmd.Flags().Int("page-size", 20, "Results per page")
 	fulfillmentOrdersListCmd.Flags().String("status", "", "Filter by status")
 	fulfillmentOrdersListCmd.Flags().String("order-id", "", "Filter by order ID")
+
+	fulfillmentOrdersCmd.AddCommand(fulfillmentOrdersOrderCmd)
 
 	fulfillmentOrdersCmd.AddCommand(fulfillmentOrdersGetCmd)
 

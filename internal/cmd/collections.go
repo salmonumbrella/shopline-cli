@@ -146,6 +146,98 @@ var collectionsCreateCmd = &cobra.Command{
 	},
 }
 
+var collectionsUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a collection",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update collection %s\n", args[0])
+			return nil
+		}
+
+		var req api.CollectionUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		collection, err := client.UpdateCollection(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update collection: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(collection)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated collection %s\n", collection.ID)
+		return nil
+	},
+}
+
+var collectionsAddProductsCmd = &cobra.Command{
+	Use:   "add-products <collection-id>",
+	Short: "Add products to a collection",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		productIDs, _ := cmd.Flags().GetStringSlice("product-id")
+		if len(productIDs) == 0 {
+			return fmt.Errorf("at least one --product-id is required")
+		}
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would add %d products to collection %s\n", len(productIDs), args[0])
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		if err := client.AddProductsToCollection(cmd.Context(), args[0], productIDs); err != nil {
+			return fmt.Errorf("failed to add products to collection: %w", err)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Added %d products to collection %s\n", len(productIDs), args[0])
+		return nil
+	},
+}
+
+var collectionsRemoveProductCmd = &cobra.Command{
+	Use:   "remove-product <collection-id> <product-id>",
+	Short: "Remove a product from a collection",
+	Args:  cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would remove product %s from collection %s\n", args[1], args[0])
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		if err := client.RemoveProductFromCollection(cmd.Context(), args[0], args[1]); err != nil {
+			return fmt.Errorf("failed to remove product from collection: %w", err)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Removed product %s from collection %s\n", args[1], args[0])
+		return nil
+	},
+}
+
 var collectionsDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a collection",
@@ -194,12 +286,20 @@ func init() {
 	collectionsCreateCmd.Flags().String("sort-order", "", "Product sort order (alpha-asc, alpha-desc, best-selling, etc)")
 	_ = collectionsCreateCmd.MarkFlagRequired("title")
 
+	collectionsCmd.AddCommand(collectionsUpdateCmd)
+	addJSONBodyFlags(collectionsUpdateCmd)
+
+	collectionsCmd.AddCommand(collectionsAddProductsCmd)
+	collectionsAddProductsCmd.Flags().StringSlice("product-id", nil, "Product IDs to add (repeatable)")
+
+	collectionsCmd.AddCommand(collectionsRemoveProductCmd)
+
 	collectionsCmd.AddCommand(collectionsDeleteCmd)
 
 	schema.Register(schema.Resource{
 		Name:        "collections",
 		Description: "Manage product collections",
-		Commands:    []string{"list", "get", "create", "delete"},
+		Commands:    []string{"list", "get", "create", "update", "add-products", "remove-product", "delete"},
 		IDPrefix:    "collection",
 	})
 }

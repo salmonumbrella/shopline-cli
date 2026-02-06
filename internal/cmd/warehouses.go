@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -166,6 +167,45 @@ var warehousesCreateCmd = &cobra.Command{
 	},
 }
 
+var warehousesUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a warehouse",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update warehouse %s\n", args[0])
+			return nil
+		}
+
+		var req api.WarehouseUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		warehouse, err := client.UpdateWarehouse(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update warehouse: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(warehouse)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated warehouse %s\n", warehouse.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name: %s\n", warehouse.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Code: %s\n", warehouse.Code)
+		return nil
+	},
+}
+
 var warehousesDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a warehouse",
@@ -218,5 +258,16 @@ func init() {
 	_ = warehousesCreateCmd.MarkFlagRequired("city")
 	_ = warehousesCreateCmd.MarkFlagRequired("country")
 
+	warehousesCmd.AddCommand(warehousesUpdateCmd)
+	addJSONBodyFlags(warehousesUpdateCmd)
+	warehousesUpdateCmd.Flags().Bool("dry-run", false, "Show what would be updated without making changes")
+
 	warehousesCmd.AddCommand(warehousesDeleteCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "warehouses",
+		Description: "Manage warehouses",
+		Commands:    []string{"list", "get", "create", "update", "delete"},
+		IDPrefix:    "warehouse",
+	})
 }

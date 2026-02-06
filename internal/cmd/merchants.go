@@ -15,6 +15,43 @@ var merchantsCmd = &cobra.Command{
 	Short: "View merchant information",
 }
 
+var merchantsListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List merchants",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.ListMerchants(cmd.Context())
+		if err != nil {
+			return fmt.Errorf("failed to list merchants: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		headers := []string{"ID", "NAME", "HANDLE", "DOMAIN", "CREATED"}
+		var rows [][]string
+		for _, m := range resp {
+			rows = append(rows, []string{
+				m.ID,
+				m.Name,
+				m.Handle,
+				m.Domain,
+				m.CreatedAt.Format("2006-01-02 15:04"),
+			})
+		}
+		formatter.Table(headers, rows)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d merchants\n", len(resp))
+		return nil
+	},
+}
+
 var merchantsGetCmd = &cobra.Command{
 	Use:   "get",
 	Short: "Get current merchant details",
@@ -255,6 +292,7 @@ var merchantsExpressLinkGenerateCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(merchantsCmd)
 
+	merchantsCmd.AddCommand(merchantsListCmd)
 	merchantsCmd.AddCommand(merchantsGetCmd)
 
 	// Staff subcommands
@@ -277,7 +315,7 @@ func init() {
 	schema.Register(schema.Resource{
 		Name:        "merchants",
 		Description: "View merchant information",
-		Commands:    []string{"get", "get-by-id", "staff", "metafields", "app-metafields", "express-link"},
+		Commands:    []string{"list", "get", "get-by-id", "staff", "metafields", "app-metafields", "express-link"},
 		IDPrefix:    "merchant",
 	})
 }

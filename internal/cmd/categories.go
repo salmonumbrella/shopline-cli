@@ -141,6 +141,43 @@ var categoriesCreateCmd = &cobra.Command{
 	},
 }
 
+var categoriesUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a category",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update category %s\n", args[0])
+			return nil
+		}
+
+		var req api.CategoryUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		category, err := client.UpdateCategory(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update category: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(category)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated category %s\n", category.ID)
+		return nil
+	},
+}
+
 var categoriesDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a category",
@@ -187,6 +224,9 @@ func init() {
 	categoriesCreateCmd.Flags().String("description", "", "Category description")
 	categoriesCreateCmd.Flags().String("parent-id", "", "Parent category ID")
 	_ = categoriesCreateCmd.MarkFlagRequired("title")
+
+	categoriesCmd.AddCommand(categoriesUpdateCmd)
+	addJSONBodyFlags(categoriesUpdateCmd)
 
 	categoriesCmd.AddCommand(categoriesDeleteCmd)
 }

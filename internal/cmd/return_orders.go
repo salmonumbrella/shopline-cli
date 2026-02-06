@@ -151,6 +151,79 @@ var returnOrdersGetCmd = &cobra.Command{
 	},
 }
 
+var returnOrdersCreateCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create a return order",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintln(outWriter(cmd), "[DRY-RUN] Would create return order")
+			return nil
+		}
+
+		var req api.ReturnOrderCreateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		ret, err := client.CreateReturnOrder(cmd.Context(), &req)
+		if err != nil {
+			return fmt.Errorf("failed to create return order: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(ret)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created return order %s (status: %s)\n", ret.ID, ret.Status)
+		return nil
+	},
+}
+
+var returnOrdersUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a return order",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update return order %s\n", args[0])
+			return nil
+		}
+
+		var req api.ReturnOrderUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		ret, err := client.UpdateReturnOrder(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update return order: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(ret)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated return order %s (status: %s)\n", ret.ID, ret.Status)
+		return nil
+	},
+}
+
 var returnOrdersCancelCmd = &cobra.Command{
 	Use:   "cancel <id>",
 	Short: "Cancel a return order",
@@ -235,6 +308,10 @@ func init() {
 	returnOrdersListCmd.Flags().Int("page-size", 20, "Results per page")
 
 	returnOrdersCmd.AddCommand(returnOrdersGetCmd)
+	returnOrdersCmd.AddCommand(returnOrdersCreateCmd)
+	addJSONBodyFlags(returnOrdersCreateCmd)
+	returnOrdersCmd.AddCommand(returnOrdersUpdateCmd)
+	addJSONBodyFlags(returnOrdersUpdateCmd)
 	returnOrdersCmd.AddCommand(returnOrdersCancelCmd)
 	returnOrdersCmd.AddCommand(returnOrdersCompleteCmd)
 	returnOrdersCmd.AddCommand(returnOrdersReceiveCmd)
@@ -242,7 +319,7 @@ func init() {
 	schema.Register(schema.Resource{
 		Name:        "return-orders",
 		Description: "Manage return orders",
-		Commands:    []string{"list", "get", "cancel", "complete", "receive"},
+		Commands:    []string{"list", "get", "create", "update", "cancel", "complete", "receive"},
 		IDPrefix:    "return",
 	})
 }

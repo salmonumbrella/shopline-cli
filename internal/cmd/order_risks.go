@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -146,6 +147,44 @@ var orderRisksCreateCmd = &cobra.Command{
 	},
 }
 
+var orderRisksUpdateCmd = &cobra.Command{
+	Use:   "update <order-id> <risk-id>",
+	Short: "Update an order risk assessment",
+	Args:  cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update risk %s for order %s\n", args[1], args[0])
+			return nil
+		}
+
+		var req api.OrderRiskUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		risk, err := client.UpdateOrderRisk(cmd.Context(), args[0], args[1], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update order risk: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(risk)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated risk %s for order %s\n", risk.ID, risk.OrderID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Score: %.2f, Recommendation: %s\n", risk.Score, risk.Recommendation)
+		return nil
+	},
+}
+
 var orderRisksDeleteCmd = &cobra.Command{
 	Use:   "delete <order-id> <risk-id>",
 	Short: "Delete an order risk assessment",
@@ -195,5 +234,16 @@ func init() {
 	_ = orderRisksCreateCmd.MarkFlagRequired("score")
 	_ = orderRisksCreateCmd.MarkFlagRequired("recommendation")
 
+	orderRisksCmd.AddCommand(orderRisksUpdateCmd)
+	addJSONBodyFlags(orderRisksUpdateCmd)
+	orderRisksUpdateCmd.Flags().Bool("dry-run", false, "Show what would be updated without making changes")
+
 	orderRisksCmd.AddCommand(orderRisksDeleteCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "order-risks",
+		Description: "Manage order risk assessments",
+		Commands:    []string{"list", "get", "create", "update", "delete"},
+		IDPrefix:    "order_risk",
+	})
 }

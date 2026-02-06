@@ -177,6 +177,40 @@ var bulkOperationsQueryCmd = &cobra.Command{
 	},
 }
 
+var bulkOperationsMutationCmd = &cobra.Command{
+	Use:   "mutation",
+	Short: "Create a bulk mutation operation",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		mutation, _ := cmd.Flags().GetString("graphql")
+		stagedUploadPath, _ := cmd.Flags().GetString("staged-upload-path")
+
+		req := &api.BulkOperationMutationRequest{
+			Mutation:         mutation,
+			StagedUploadPath: stagedUploadPath,
+		}
+
+		op, err := client.CreateBulkMutation(cmd.Context(), req)
+		if err != nil {
+			return fmt.Errorf("failed to create bulk mutation: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(op)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created bulk mutation %s\n", op.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status: %s\n", op.Status)
+		return nil
+	},
+}
+
 var bulkOperationsCancelCmd = &cobra.Command{
 	Use:   "cancel <id>",
 	Short: "Cancel a bulk operation",
@@ -233,6 +267,12 @@ func init() {
 	bulkOperationsCmd.AddCommand(bulkOperationsQueryCmd)
 	bulkOperationsQueryCmd.Flags().String("graphql", "", "GraphQL query to execute for bulk operation")
 	_ = bulkOperationsQueryCmd.MarkFlagRequired("graphql")
+
+	bulkOperationsCmd.AddCommand(bulkOperationsMutationCmd)
+	bulkOperationsMutationCmd.Flags().String("graphql", "", "GraphQL mutation to execute for bulk operation")
+	_ = bulkOperationsMutationCmd.MarkFlagRequired("graphql")
+	bulkOperationsMutationCmd.Flags().String("staged-upload-path", "", "Staged upload path for the mutation payload (e.g. tmp/bulk-mutation.jsonl)")
+	_ = bulkOperationsMutationCmd.MarkFlagRequired("staged-upload-path")
 
 	bulkOperationsCmd.AddCommand(bulkOperationsCancelCmd)
 }

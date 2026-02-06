@@ -114,6 +114,43 @@ var refundsGetCmd = &cobra.Command{
 	},
 }
 
+var refundsCreateCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create a refund",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintln(outWriter(cmd), "[DRY-RUN] Would create refund")
+			return nil
+		}
+
+		var req api.RefundCreateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		refund, err := client.CreateRefund(cmd.Context(), &req)
+		if err != nil {
+			return fmt.Errorf("failed to create refund: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(refund)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created refund %s (status: %s)\n", refund.ID, refund.Status)
+		return nil
+	},
+}
+
 var refundsOrderCmd = &cobra.Command{
 	Use:   "order <order-id>",
 	Short: "List refunds for an order",
@@ -168,12 +205,14 @@ func init() {
 	refundsListCmd.Flags().Int("page-size", 20, "Results per page")
 
 	refundsCmd.AddCommand(refundsGetCmd)
+	refundsCmd.AddCommand(refundsCreateCmd)
+	addJSONBodyFlags(refundsCreateCmd)
 	refundsCmd.AddCommand(refundsOrderCmd)
 
 	schema.Register(schema.Resource{
 		Name:        "refunds",
 		Description: "Manage order refunds",
-		Commands:    []string{"list", "get", "order"},
+		Commands:    []string{"list", "get", "create", "order"},
 		IDPrefix:    "refund",
 	})
 }

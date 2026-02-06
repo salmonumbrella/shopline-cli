@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -152,6 +153,46 @@ var metafieldDefinitionsCreateCmd = &cobra.Command{
 	},
 }
 
+var metafieldDefinitionsUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a metafield definition",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update metafield definition %s\n", args[0])
+			return nil
+		}
+
+		var req api.MetafieldDefinitionUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		def, err := client.UpdateMetafieldDefinition(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update metafield definition: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(def)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated metafield definition %s\n", def.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:      %s\n", def.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Namespace: %s\n", def.Namespace)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Key:       %s\n", def.Key)
+		return nil
+	},
+}
+
 var metafieldDefinitionsDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a metafield definition",
@@ -206,5 +247,16 @@ func init() {
 	_ = metafieldDefinitionsCreateCmd.MarkFlagRequired("type")
 	_ = metafieldDefinitionsCreateCmd.MarkFlagRequired("owner-type")
 
+	metafieldDefinitionsCmd.AddCommand(metafieldDefinitionsUpdateCmd)
+	addJSONBodyFlags(metafieldDefinitionsUpdateCmd)
+	metafieldDefinitionsUpdateCmd.Flags().Bool("dry-run", false, "Show what would be updated without making changes")
+
 	metafieldDefinitionsCmd.AddCommand(metafieldDefinitionsDeleteCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "metafield-definitions",
+		Description: "Manage metafield definitions",
+		Commands:    []string{"list", "get", "create", "update", "delete"},
+		IDPrefix:    "metafield_definition",
+	})
 }

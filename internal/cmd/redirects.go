@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -137,6 +138,45 @@ var redirectsCreateCmd = &cobra.Command{
 	},
 }
 
+var redirectsUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a redirect",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update redirect %s\n", args[0])
+			return nil
+		}
+
+		var req api.RedirectUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		redirect, err := client.UpdateRedirect(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update redirect: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(redirect)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated redirect %s\n", redirect.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Path:   %s\n", redirect.Path)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Target: %s\n", redirect.Target)
+		return nil
+	},
+}
+
 var redirectsDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a redirect",
@@ -185,6 +225,17 @@ func init() {
 	_ = redirectsCreateCmd.MarkFlagRequired("path")
 	_ = redirectsCreateCmd.MarkFlagRequired("target")
 
+	redirectsCmd.AddCommand(redirectsUpdateCmd)
+	addJSONBodyFlags(redirectsUpdateCmd)
+	redirectsUpdateCmd.Flags().Bool("dry-run", false, "Show what would be updated without making changes")
+
 	redirectsCmd.AddCommand(redirectsDeleteCmd)
 	redirectsDeleteCmd.Flags().Bool("yes", false, "Skip confirmation prompt")
+
+	schema.Register(schema.Resource{
+		Name:        "redirects",
+		Description: "Manage URL redirects",
+		Commands:    []string{"list", "get", "create", "update", "delete"},
+		IDPrefix:    "redirect",
+	})
 }

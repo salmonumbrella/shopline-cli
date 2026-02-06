@@ -168,6 +168,43 @@ var conversationsCreateCmd = &cobra.Command{
 	},
 }
 
+var conversationsUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a conversation",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update conversation %s\n", args[0])
+			return nil
+		}
+
+		var req api.ConversationUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		conversation, err := client.UpdateConversation(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update conversation: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(conversation)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated conversation %s (status: %s)\n", conversation.ID, conversation.Status)
+		return nil
+	},
+}
+
 var conversationsDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a conversation",
@@ -332,6 +369,9 @@ func init() {
 	conversationsCreateCmd.Flags().String("subject", "", "Conversation subject")
 	conversationsCreateCmd.Flags().String("message", "", "Initial message")
 	_ = conversationsCreateCmd.MarkFlagRequired("customer-id")
+
+	conversationsCmd.AddCommand(conversationsUpdateCmd)
+	addJSONBodyFlags(conversationsUpdateCmd)
 
 	conversationsCmd.AddCommand(conversationsDeleteCmd)
 	conversationsDeleteCmd.Flags().Bool("yes", false, "Skip confirmation prompt")

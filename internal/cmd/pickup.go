@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -197,6 +198,43 @@ var pickupCreateCmd = &cobra.Command{
 	},
 }
 
+var pickupUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a pickup location",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update pickup location %s\n", args[0])
+			return nil
+		}
+
+		var req api.PickupUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		location, err := client.UpdatePickupLocation(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update pickup location: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(location)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated pickup location %s: %s\n", location.ID, location.Name)
+		return nil
+	},
+}
+
 var pickupDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a pickup location",
@@ -256,5 +294,16 @@ func init() {
 	_ = pickupCreateCmd.MarkFlagRequired("city")
 	_ = pickupCreateCmd.MarkFlagRequired("country")
 
+	pickupCmd.AddCommand(pickupUpdateCmd)
+	addJSONBodyFlags(pickupUpdateCmd)
+	pickupUpdateCmd.Flags().Bool("dry-run", false, "Show what would be updated without making changes")
+
 	pickupCmd.AddCommand(pickupDeleteCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "pickup",
+		Description: "Manage store pickup locations",
+		Commands:    []string{"list", "get", "create", "update", "delete"},
+		IDPrefix:    "pickup_location",
+	})
 }

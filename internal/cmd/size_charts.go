@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -163,6 +164,46 @@ var sizeChartsCreateCmd = &cobra.Command{
 	},
 }
 
+var sizeChartsUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a size chart",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update size chart %s\n", args[0])
+			return nil
+		}
+
+		var req api.SizeChartUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		sizeChart, err := client.UpdateSizeChart(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update size chart: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(sizeChart)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated size chart %s\n", sizeChart.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:   %s\n", sizeChart.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Unit:   %s\n", sizeChart.Unit)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Active: %t\n", sizeChart.Active)
+		return nil
+	},
+}
+
 var sizeChartsDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a size chart",
@@ -210,5 +251,16 @@ func init() {
 	sizeChartsCreateCmd.Flags().Bool("active", true, "Size chart active status")
 	_ = sizeChartsCreateCmd.MarkFlagRequired("name")
 
+	sizeChartsCmd.AddCommand(sizeChartsUpdateCmd)
+	addJSONBodyFlags(sizeChartsUpdateCmd)
+	sizeChartsUpdateCmd.Flags().Bool("dry-run", false, "Show what would be updated without making changes")
+
 	sizeChartsCmd.AddCommand(sizeChartsDeleteCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "size-charts",
+		Description: "Manage size charts",
+		Commands:    []string{"list", "get", "create", "update", "delete"},
+		IDPrefix:    "size_chart",
+	})
 }

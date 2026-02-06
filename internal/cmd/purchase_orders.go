@@ -128,6 +128,42 @@ var purchaseOrdersGetCmd = &cobra.Command{
 	},
 }
 
+var purchaseOrdersCreateCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create a purchase order",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintln(outWriter(cmd), "[DRY-RUN] Would create purchase order")
+			return nil
+		}
+
+		var req api.PurchaseOrderCreateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		po, err := client.CreatePurchaseOrder(cmd.Context(), &req)
+		if err != nil {
+			return fmt.Errorf("failed to create purchase order: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(po)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created purchase order %s (status: %s)\n", po.ID, po.Status)
+		return nil
+	},
+}
+
 var purchaseOrdersReceiveCmd = &cobra.Command{
 	Use:   "receive <id>",
 	Short: "Mark a purchase order as received",
@@ -220,6 +256,8 @@ func init() {
 	purchaseOrdersListCmd.Flags().String("warehouse-id", "", "Filter by warehouse ID")
 
 	purchaseOrdersCmd.AddCommand(purchaseOrdersGetCmd)
+	purchaseOrdersCmd.AddCommand(purchaseOrdersCreateCmd)
+	addJSONBodyFlags(purchaseOrdersCreateCmd)
 	purchaseOrdersCmd.AddCommand(purchaseOrdersReceiveCmd)
 	purchaseOrdersCmd.AddCommand(purchaseOrdersCancelCmd)
 	purchaseOrdersCmd.AddCommand(purchaseOrdersDeleteCmd)

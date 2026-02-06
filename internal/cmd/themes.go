@@ -144,6 +144,45 @@ var themesCreateCmd = &cobra.Command{
 	},
 }
 
+var themesUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a theme",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update theme %s\n", args[0])
+			return nil
+		}
+
+		var req api.ThemeUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		theme, err := client.UpdateTheme(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update theme: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(theme)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated theme %s\n", theme.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name: %s\n", theme.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Role: %s\n", theme.Role)
+		return nil
+	},
+}
+
 var themesDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a theme",
@@ -196,12 +235,16 @@ func init() {
 	themesCreateCmd.Flags().String("src", "", "URL to theme zip file")
 	_ = themesCreateCmd.MarkFlagRequired("name")
 
+	themesCmd.AddCommand(themesUpdateCmd)
+	addJSONBodyFlags(themesUpdateCmd)
+	themesUpdateCmd.Flags().Bool("dry-run", false, "Show what would be updated without making changes")
+
 	themesCmd.AddCommand(themesDeleteCmd)
 
 	schema.Register(schema.Resource{
 		Name:        "themes",
 		Description: "Manage themes",
-		Commands:    []string{"list", "get", "create", "delete"},
+		Commands:    []string{"list", "get", "create", "update", "delete"},
 		IDPrefix:    "theme",
 	})
 }

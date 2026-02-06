@@ -1,53 +1,8 @@
 # Shopline CLI API Coverage (APIClient -> internal/cmd)
 
 - APIClient methods: 625
-- Covered by internal/cmd: 583
-- Missing in internal/cmd: 42
-
-## Missing
-
-- `AddProductsToCollection`
-- `CreateBulkMutation`
-- `CreateDraftOrder`
-- `CreatePromotion`
-- `CreatePurchaseOrder`
-- `CreateRefund`
-- `CreateReturnOrder`
-- `ListMerchants`
-- `ListOrderFulfillmentOrders`
-- `RemoveProductFromCollection`
-- `UpdateAffiliateCampaign`
-- `UpdateArticle`
-- `UpdateBlog`
-- `UpdateCarrierService`
-- `UpdateCategory`
-- `UpdateChannel`
-- `UpdateCollection`
-- `UpdateConversation`
-- `UpdateCoupon`
-- `UpdateCustomerGroup`
-- `UpdateFile`
-- `UpdateFulfillmentService`
-- `UpdateLabel`
-- `UpdateLocalDeliveryOption`
-- `UpdateLocation`
-- `UpdateMarketingEvent`
-- `UpdateMedia`
-- `UpdateMetafield`
-- `UpdateMetafieldDefinition`
-- `UpdateOrderRisk`
-- `UpdatePage`
-- `UpdatePickupLocation`
-- `UpdatePriceRule`
-- `UpdateRedirect`
-- `UpdateReturnOrder`
-- `UpdateScriptTag`
-- `UpdateShopSettings`
-- `UpdateSizeChart`
-- `UpdateSmartCollection`
-- `UpdateTaxonomy`
-- `UpdateTheme`
-- `UpdateWarehouse`
+- Covered by internal/cmd: 625
+- Missing in internal/cmd: 0
 
 ## Covered
 
@@ -58,6 +13,7 @@
 - `ActivatePromotion`
 - `ActivateSale`
 - `AddCartItems`
+- `AddProductsToCollection`
 - `AddWishListItem`
 - `AdjustCompanyCredit`
 - `AdjustInventory`
@@ -115,6 +71,7 @@
 - `CreateAffiliateCampaign`
 - `CreateArticle`
 - `CreateBlog`
+- `CreateBulkMutation`
 - `CreateBulkQuery`
 - `CreateCarrierService`
 - `CreateCatalogPricing`
@@ -138,6 +95,7 @@
 - `CreateCustomerStoreCredits`
 - `CreateDiscountCode`
 - `CreateDomain`
+- `CreateDraftOrder`
 - `CreateFile`
 - `CreateFlashPrice`
 - `CreateFlashPriceCampaign`
@@ -169,7 +127,11 @@
 - `CreateProductReview`
 - `CreateProductReviewComment`
 - `CreateProductSubscription`
+- `CreatePromotion`
+- `CreatePurchaseOrder`
 - `CreateRedirect`
+- `CreateRefund`
+- `CreateReturnOrder`
 - `CreateSale`
 - `CreateScriptTag`
 - `CreateSellingPlan`
@@ -505,12 +467,14 @@
 - `ListMerchantAppMetafields`
 - `ListMerchantMetafields`
 - `ListMerchantStaff`
+- `ListMerchants`
 - `ListMetafieldDefinitions`
 - `ListMetafields`
 - `ListMultipassLinkings`
 - `ListOperationLogs`
 - `ListOrderAppMetafields`
 - `ListOrderAttributions`
+- `ListOrderFulfillmentOrders`
 - `ListOrderItemAppMetafields`
 - `ListOrderItemMetafields`
 - `ListOrderMetafields`
@@ -576,6 +540,7 @@
 - `ReceiveReturnOrder`
 - `RedeemUserCoupon`
 - `RefundPayment`
+- `RemoveProductFromCollection`
 - `RemoveWishListItem`
 - `RevokeUserCoupon`
 - `RotateMultipassSecret`
@@ -590,17 +555,27 @@
 - `SubmitDispute`
 - `UnpublishProductFromChannel`
 - `UnpublishProductFromChannelListing`
+- `UpdateAffiliateCampaign`
+- `UpdateArticle`
 - `UpdateAsset`
+- `UpdateBlog`
+- `UpdateCarrierService`
 - `UpdateCartItems`
 - `UpdateCatalogPricing`
+- `UpdateCategory`
+- `UpdateChannel`
 - `UpdateChannelProductListing`
 - `UpdateChannelProductPrice`
 - `UpdateCheckoutSettings`
+- `UpdateCollection`
 - `UpdateCompanyCatalog`
+- `UpdateConversation`
+- `UpdateCoupon`
 - `UpdateCurrency`
 - `UpdateCustomField`
 - `UpdateCustomer`
 - `UpdateCustomerAppMetafield`
+- `UpdateCustomerGroup`
 - `UpdateCustomerMemberPoints`
 - `UpdateCustomerMetafield`
 - `UpdateCustomerSubscriptions`
@@ -609,28 +584,50 @@
 - `UpdateDeliveryOptionStoresInfo`
 - `UpdateDisputeEvidence`
 - `UpdateDomain`
+- `UpdateFile`
 - `UpdateFlashPrice`
 - `UpdateFlashPriceCampaign`
+- `UpdateFulfillmentService`
 - `UpdateGift`
 - `UpdateGiftQuantity`
 - `UpdateGiftStocks`
 - `UpdateGiftsQuantityBySKU`
+- `UpdateLabel`
+- `UpdateLocalDeliveryOption`
+- `UpdateLocation`
+- `UpdateMarketingEvent`
+- `UpdateMedia`
 - `UpdateMerchantAppMetafield`
 - `UpdateMerchantMetafield`
+- `UpdateMetafield`
+- `UpdateMetafieldDefinition`
 - `UpdateMultipassCustomerLinking`
 - `UpdateOrderAppMetafield`
 - `UpdateOrderMetafield`
+- `UpdateOrderRisk`
 - `UpdatePOSPurchaseOrder`
+- `UpdatePage`
+- `UpdatePickupLocation`
+- `UpdatePriceRule`
 - `UpdateProductReviewComment`
+- `UpdateRedirect`
+- `UpdateReturnOrder`
+- `UpdateScriptTag`
 - `UpdateSettings`
 - `UpdateSettingsDomains`
 - `UpdateSettingsLayoutsDraft`
 - `UpdateSettingsThemeDraft`
 - `UpdateShipment`
+- `UpdateShopSettings`
+- `UpdateSizeChart`
+- `UpdateSmartCollection`
 - `UpdateStaff`
 - `UpdateStorefrontOAuthClient`
 - `UpdateTax`
 - `UpdateTaxService`
+- `UpdateTaxonomy`
+- `UpdateTheme`
+- `UpdateWarehouse`
 - `UpdateWebhook`
 - `VerifyDomain`
 - `VoidPayment`

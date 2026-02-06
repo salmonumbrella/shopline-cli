@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -174,6 +175,46 @@ var mediasCreateCmd = &cobra.Command{
 	},
 }
 
+var mediasUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a media",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update media %s\n", args[0])
+			return nil
+		}
+
+		var req api.MediaUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		media, err := client.UpdateMedia(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update media: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(media)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated media %s\n", media.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product ID: %s\n", media.ProductID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Type:       %s\n", media.MediaType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Src:        %s\n", media.Src)
+		return nil
+	},
+}
+
 var mediasDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a media",
@@ -233,5 +274,16 @@ func init() {
 	mediasCreateCmd.Flags().String("external-url", "", "External URL for external_video type")
 	_ = mediasCreateCmd.MarkFlagRequired("product-id")
 
+	mediasCmd.AddCommand(mediasUpdateCmd)
+	addJSONBodyFlags(mediasUpdateCmd)
+	mediasUpdateCmd.Flags().Bool("dry-run", false, "Show what would be updated without making changes")
+
 	mediasCmd.AddCommand(mediasDeleteCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "medias",
+		Description: "Manage product media files",
+		Commands:    []string{"list", "get", "create", "update", "delete"},
+		IDPrefix:    "media",
+	})
 }

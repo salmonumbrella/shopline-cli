@@ -154,6 +154,45 @@ var locationsCreateCmd = &cobra.Command{
 	},
 }
 
+var locationsUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a location",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update location %s\n", args[0])
+			return nil
+		}
+
+		var req api.LocationUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		location, err := client.UpdateLocation(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update location: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(location)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated location %s\n", location.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:    %s\n", location.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Address: %s, %s, %s\n", location.Address1, location.City, location.Country)
+		return nil
+	},
+}
+
 var locationsDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a location",
@@ -204,12 +243,16 @@ func init() {
 	_ = locationsCreateCmd.MarkFlagRequired("city")
 	_ = locationsCreateCmd.MarkFlagRequired("country")
 
+	locationsCmd.AddCommand(locationsUpdateCmd)
+	addJSONBodyFlags(locationsUpdateCmd)
+	locationsUpdateCmd.Flags().Bool("dry-run", false, "Show what would be updated without making changes")
+
 	locationsCmd.AddCommand(locationsDeleteCmd)
 
 	schema.Register(schema.Resource{
 		Name:        "locations",
 		Description: "Manage store locations",
-		Commands:    []string{"list", "get", "create", "delete"},
+		Commands:    []string{"list", "get", "create", "update", "delete"},
 		IDPrefix:    "location",
 	})
 }

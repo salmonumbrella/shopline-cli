@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -188,6 +189,45 @@ var marketingEventsCreateCmd = &cobra.Command{
 	},
 }
 
+var marketingEventsUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a marketing event",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update marketing event %s\n", args[0])
+			return nil
+		}
+
+		var req api.MarketingEventUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		event, err := client.UpdateMarketingEvent(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update marketing event: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(event)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated marketing event %s\n", event.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Event Type:     %s\n", event.EventType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Marketing Type: %s\n", event.MarketingType)
+		return nil
+	},
+}
+
 var marketingEventsDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a marketing event",
@@ -242,6 +282,17 @@ func init() {
 	_ = marketingEventsCreateCmd.MarkFlagRequired("event-type")
 	_ = marketingEventsCreateCmd.MarkFlagRequired("marketing-type")
 
+	marketingEventsCmd.AddCommand(marketingEventsUpdateCmd)
+	addJSONBodyFlags(marketingEventsUpdateCmd)
+	marketingEventsUpdateCmd.Flags().Bool("dry-run", false, "Show what would be updated without making changes")
+
 	marketingEventsCmd.AddCommand(marketingEventsDeleteCmd)
 	marketingEventsDeleteCmd.Flags().Bool("yes", false, "Skip confirmation prompt")
+
+	schema.Register(schema.Resource{
+		Name:        "marketing-events",
+		Description: "Manage marketing event tracking",
+		Commands:    []string{"list", "get", "create", "update", "delete"},
+		IDPrefix:    "marketing_event",
+	})
 }

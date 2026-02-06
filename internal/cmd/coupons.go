@@ -206,6 +206,43 @@ var couponsCreateCmd = &cobra.Command{
 	},
 }
 
+var couponsUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a coupon",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update coupon %s\n", args[0])
+			return nil
+		}
+
+		var req api.CouponUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		coupon, err := client.UpdateCoupon(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update coupon: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(coupon)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated coupon %s (status: %s)\n", coupon.ID, coupon.Status)
+		return nil
+	},
+}
+
 var couponsActivateCmd = &cobra.Command{
 	Use:   "activate <id>",
 	Short: "Activate a coupon",
@@ -299,6 +336,9 @@ func init() {
 	_ = couponsCreateCmd.MarkFlagRequired("discount-type")
 	_ = couponsCreateCmd.MarkFlagRequired("discount-value")
 
+	couponsCmd.AddCommand(couponsUpdateCmd)
+	addJSONBodyFlags(couponsUpdateCmd)
+
 	couponsCmd.AddCommand(couponsActivateCmd)
 	couponsCmd.AddCommand(couponsDeactivateCmd)
 
@@ -308,7 +348,7 @@ func init() {
 	schema.Register(schema.Resource{
 		Name:        "coupons",
 		Description: "Manage coupons",
-		Commands:    []string{"list", "get", "lookup", "create", "activate", "deactivate", "delete"},
+		Commands:    []string{"list", "get", "lookup", "create", "update", "activate", "deactivate", "delete"},
 		IDPrefix:    "coupon",
 	})
 }

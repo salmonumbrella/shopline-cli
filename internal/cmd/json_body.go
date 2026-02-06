@@ -54,3 +54,14 @@ func readJSONBodyFlags(cmd *cobra.Command) (json.RawMessage, error) {
 	}
 	return json.RawMessage(b), nil
 }
+
+func readJSONBodyFlagsInto(cmd *cobra.Command, v any) error {
+	raw, err := readJSONBodyFlags(cmd)
+	if err != nil {
+		return err
+	}
+	if err := json.Unmarshal(raw, v); err != nil {
+		return fmt.Errorf("invalid JSON body for request: %w", err)
+	}
+	return nil
+}

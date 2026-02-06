@@ -123,6 +123,42 @@ var promotionsGetCmd = &cobra.Command{
 	},
 }
 
+var promotionsCreateCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create a promotion",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintln(outWriter(cmd), "[DRY-RUN] Would create promotion")
+			return nil
+		}
+
+		var req api.PromotionCreateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		promotion, err := client.CreatePromotion(cmd.Context(), &req)
+		if err != nil {
+			return fmt.Errorf("failed to create promotion: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(promotion)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created promotion %s (status: %s)\n", promotion.ID, promotion.Status)
+		return nil
+	},
+}
+
 var promotionsActivateCmd = &cobra.Command{
 	Use:   "activate <id>",
 	Short: "Activate a promotion",
@@ -219,6 +255,8 @@ func init() {
 	promotionsListCmd.Flags().Int("page-size", 20, "Results per page")
 
 	promotionsCmd.AddCommand(promotionsGetCmd)
+	promotionsCmd.AddCommand(promotionsCreateCmd)
+	addJSONBodyFlags(promotionsCreateCmd)
 	promotionsCmd.AddCommand(promotionsActivateCmd)
 	promotionsCmd.AddCommand(promotionsDeactivateCmd)
 	promotionsCmd.AddCommand(promotionsDeleteCmd)

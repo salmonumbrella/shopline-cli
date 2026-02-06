@@ -162,6 +162,43 @@ var articlesCreateCmd = &cobra.Command{
 	},
 }
 
+var articlesUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update an article",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update article %s\n", args[0])
+			return nil
+		}
+
+		var req api.ArticleUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		article, err := client.UpdateArticle(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update article: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(article)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated article %s\n", article.ID)
+		return nil
+	},
+}
+
 var articlesDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete an article",
@@ -213,6 +250,9 @@ func init() {
 	_ = articlesCreateCmd.MarkFlagRequired("blog-id")
 	_ = articlesCreateCmd.MarkFlagRequired("title")
 	_ = articlesCreateCmd.MarkFlagRequired("body")
+
+	articlesCmd.AddCommand(articlesUpdateCmd)
+	addJSONBodyFlags(articlesUpdateCmd)
 
 	articlesCmd.AddCommand(articlesDeleteCmd)
 }

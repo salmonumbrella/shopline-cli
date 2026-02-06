@@ -143,6 +143,43 @@ var blogsCreateCmd = &cobra.Command{
 	},
 }
 
+var blogsUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a blog",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update blog %s\n", args[0])
+			return nil
+		}
+
+		var req api.BlogUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		blog, err := client.UpdateBlog(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update blog: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(blog)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated blog %s\n", blog.ID)
+		return nil
+	},
+}
+
 var blogsDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a blog",
@@ -188,6 +225,9 @@ func init() {
 	blogsCreateCmd.Flags().String("handle", "", "URL handle (auto-generated if not provided)")
 	blogsCreateCmd.Flags().String("commentable", "moderate", "Comment setting (no, moderate, yes)")
 	_ = blogsCreateCmd.MarkFlagRequired("title")
+
+	blogsCmd.AddCommand(blogsUpdateCmd)
+	addJSONBodyFlags(blogsUpdateCmd)
 
 	blogsCmd.AddCommand(blogsDeleteCmd)
 	blogsDeleteCmd.Flags().Bool("yes", false, "Skip confirmation prompt")

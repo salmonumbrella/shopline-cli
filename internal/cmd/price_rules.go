@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -145,6 +146,43 @@ var priceRulesCreateCmd = &cobra.Command{
 	},
 }
 
+var priceRulesUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a price rule",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update price rule %s\n", args[0])
+			return nil
+		}
+
+		var req api.PriceRuleUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		priceRule, err := client.UpdatePriceRule(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update price rule: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(priceRule)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated price rule %s (%s)\n", priceRule.ID, priceRule.Title)
+		return nil
+	},
+}
+
 var priceRulesDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a price rule",
@@ -192,5 +230,16 @@ func init() {
 	_ = priceRulesCreateCmd.MarkFlagRequired("value-type")
 	_ = priceRulesCreateCmd.MarkFlagRequired("value")
 
+	priceRulesCmd.AddCommand(priceRulesUpdateCmd)
+	addJSONBodyFlags(priceRulesUpdateCmd)
+	priceRulesUpdateCmd.Flags().Bool("dry-run", false, "Show what would be updated without making changes")
+
 	priceRulesCmd.AddCommand(priceRulesDeleteCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "price-rules",
+		Description: "Manage price rules",
+		Commands:    []string{"list", "get", "create", "update", "delete"},
+		IDPrefix:    "price_rule",
+	})
 }

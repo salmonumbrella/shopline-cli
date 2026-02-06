@@ -190,6 +190,47 @@ var channelsCreateCmd = &cobra.Command{
 	},
 }
 
+var channelsUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a sales channel",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update channel %s\n", args[0])
+			return nil
+		}
+
+		var req api.ChannelUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		channel, err := client.UpdateChannel(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update channel: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(channel)
+		}
+
+		out := outWriter(cmd)
+		_, _ = fmt.Fprintf(out, "Updated channel %s\n", channel.ID)
+		_, _ = fmt.Fprintf(out, "Name:   %s\n", channel.Name)
+		_, _ = fmt.Fprintf(out, "Handle: %s\n", channel.Handle)
+		_, _ = fmt.Fprintf(out, "Type:   %s\n", channel.Type)
+		return nil
+	},
+}
+
 var channelsDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a sales channel",
@@ -318,6 +359,9 @@ func init() {
 	channelsCreateCmd.Flags().String("type", "", "Channel type (online_store, point_of_sale, mobile, etc.)")
 	_ = channelsCreateCmd.MarkFlagRequired("name")
 	_ = channelsCreateCmd.MarkFlagRequired("type")
+
+	channelsCmd.AddCommand(channelsUpdateCmd)
+	addJSONBodyFlags(channelsUpdateCmd)
 
 	channelsCmd.AddCommand(channelsDeleteCmd)
 

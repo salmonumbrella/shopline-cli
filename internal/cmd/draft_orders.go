@@ -168,6 +168,42 @@ var draftOrdersDeleteCmd = &cobra.Command{
 	},
 }
 
+var draftOrdersCreateCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create a draft order",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintln(outWriter(cmd), "[DRY-RUN] Would create draft order")
+			return nil
+		}
+
+		var req api.DraftOrderCreateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		draftOrder, err := client.CreateDraftOrder(cmd.Context(), &req)
+		if err != nil {
+			return fmt.Errorf("failed to create draft order: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(draftOrder)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created draft order %s (status: %s)\n", draftOrder.ID, draftOrder.Status)
+		return nil
+	},
+}
+
 var draftOrdersCompleteCmd = &cobra.Command{
 	Use:   "complete <id>",
 	Short: "Complete a draft order (convert to order)",
@@ -230,6 +266,10 @@ func init() {
 	draftOrdersListCmd.Flags().Int("page-size", 20, "Results per page")
 
 	draftOrdersCmd.AddCommand(draftOrdersGetCmd)
+
+	draftOrdersCmd.AddCommand(draftOrdersCreateCmd)
+	addJSONBodyFlags(draftOrdersCreateCmd)
+
 	draftOrdersCmd.AddCommand(draftOrdersDeleteCmd)
 	draftOrdersCmd.AddCommand(draftOrdersCompleteCmd)
 	draftOrdersCmd.AddCommand(draftOrdersSendInvoiceCmd)
@@ -237,7 +277,7 @@ func init() {
 	schema.Register(schema.Resource{
 		Name:        "draft-orders",
 		Description: "Manage draft orders",
-		Commands:    []string{"list", "get", "delete", "complete", "send-invoice"},
+		Commands:    []string{"list", "get", "create", "delete", "complete", "send-invoice"},
 		IDPrefix:    "draft_order",
 	})
 }

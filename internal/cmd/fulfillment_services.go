@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -154,6 +155,45 @@ var fulfillmentServicesCreateCmd = &cobra.Command{
 	},
 }
 
+var fulfillmentServicesUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a fulfillment service",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update fulfillment service %s\n", args[0])
+			return nil
+		}
+
+		var req api.FulfillmentServiceUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		fs, err := client.UpdateFulfillmentService(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update fulfillment service: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(fs)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated fulfillment service %s\n", fs.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:         %s\n", fs.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Callback URL: %s\n", fs.CallbackURL)
+		return nil
+	},
+}
+
 var fulfillmentServicesDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a fulfillment service",
@@ -203,5 +243,16 @@ func init() {
 	_ = fulfillmentServicesCreateCmd.MarkFlagRequired("name")
 	_ = fulfillmentServicesCreateCmd.MarkFlagRequired("callback-url")
 
+	fulfillmentServicesCmd.AddCommand(fulfillmentServicesUpdateCmd)
+	addJSONBodyFlags(fulfillmentServicesUpdateCmd)
+	fulfillmentServicesUpdateCmd.Flags().Bool("dry-run", false, "Show what would be updated without making changes")
+
 	fulfillmentServicesCmd.AddCommand(fulfillmentServicesDeleteCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "fulfillment-services",
+		Description: "Manage fulfillment services",
+		Commands:    []string{"list", "get", "create", "update", "delete"},
+		IDPrefix:    "fulfillment_service",
+	})
 }

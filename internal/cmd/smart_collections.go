@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -165,6 +166,46 @@ var smartCollectionsCreateCmd = &cobra.Command{
 	},
 }
 
+var smartCollectionsUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a smart collection",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update smart collection %s\n", args[0])
+			return nil
+		}
+
+		var req api.SmartCollectionUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		collection, err := client.UpdateSmartCollection(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update smart collection: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(collection)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated smart collection %s\n", collection.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:  %s\n", collection.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle: %s\n", collection.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Rules:  %d\n", len(collection.Rules))
+		return nil
+	},
+}
+
 var smartCollectionsDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a smart collection",
@@ -215,5 +256,16 @@ func init() {
 	_ = smartCollectionsCreateCmd.MarkFlagRequired("title")
 	_ = smartCollectionsCreateCmd.MarkFlagRequired("rules")
 
+	smartCollectionsCmd.AddCommand(smartCollectionsUpdateCmd)
+	addJSONBodyFlags(smartCollectionsUpdateCmd)
+	smartCollectionsUpdateCmd.Flags().Bool("dry-run", false, "Show what would be updated without making changes")
+
 	smartCollectionsCmd.AddCommand(smartCollectionsDeleteCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "smart-collections",
+		Description: "Manage smart collections (auto-populated based on rules)",
+		Commands:    []string{"list", "get", "create", "update", "delete"},
+		IDPrefix:    "smart_collection",
+	})
 }

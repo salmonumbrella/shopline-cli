@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -179,6 +180,43 @@ var localDeliveryCreateCmd = &cobra.Command{
 	},
 }
 
+var localDeliveryUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a local delivery option",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update local delivery option %s\n", args[0])
+			return nil
+		}
+
+		var req api.LocalDeliveryUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		option, err := client.UpdateLocalDeliveryOption(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update local delivery option: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(option)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated local delivery option %s: %s\n", option.ID, option.Name)
+		return nil
+	},
+}
+
 var localDeliveryDeleteCmd = &cobra.Command{
 	Use:   "delete <id>",
 	Short: "Delete a local delivery option",
@@ -230,5 +268,16 @@ func init() {
 	_ = localDeliveryCreateCmd.MarkFlagRequired("name")
 	_ = localDeliveryCreateCmd.MarkFlagRequired("price")
 
+	localDeliveryCmd.AddCommand(localDeliveryUpdateCmd)
+	addJSONBodyFlags(localDeliveryUpdateCmd)
+	localDeliveryUpdateCmd.Flags().Bool("dry-run", false, "Show what would be updated without making changes")
+
 	localDeliveryCmd.AddCommand(localDeliveryDeleteCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "local-delivery",
+		Description: "Manage local delivery options",
+		Commands:    []string{"list", "get", "create", "update", "delete"},
+		IDPrefix:    "local_delivery_option",
+	})
 }
