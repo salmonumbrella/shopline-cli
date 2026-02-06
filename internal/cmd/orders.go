@@ -563,7 +563,14 @@ func getFormatter(cmd *cobra.Command) *outfmt.Formatter {
 		format = outfmt.FormatJSON
 	}
 
-	f := outfmt.New(formatterWriter, format, colorMode)
+	w := formatterWriter
+	// In real CLI execution, cobra's OutOrStdout may be configured (tests, piping, etc).
+	// Keep formatterWriter override for unit tests, but otherwise prefer cmd.OutOrStdout.
+	if formatterWriter == os.Stdout && cmd != nil && cmd.OutOrStdout() != nil {
+		w = cmd.OutOrStdout()
+	}
+
+	f := outfmt.New(w, format, colorMode)
 	if prefix := idPrefixForCommand(cmd); prefix != "" {
 		f = f.WithIDPrefix(prefix)
 	}
