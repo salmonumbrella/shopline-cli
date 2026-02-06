@@ -220,15 +220,27 @@ func (c *Client) do(ctx context.Context, method, path string, body, result inter
 		// Handle server errors
 		if resp.StatusCode >= 500 {
 			c.recordFailure()
+			var serverBody []byte
+			if attempt >= maxRetries-1 || method != http.MethodGet {
+				serverBody, _ = io.ReadAll(io.LimitReader(resp.Body, 512))
+			}
 			resp.Body.Close() //nolint:errcheck
 			if method == http.MethodGet && attempt < maxRetries-1 {
 				c.logf("api server error status=%d attempt=%d", resp.StatusCode, attempt+1)
 				time.Sleep(time.Second)
 				continue
 			}
+			msg := http.StatusText(resp.StatusCode)
+			if len(serverBody) > 0 && !bytes.Contains(serverBody, []byte("<html")) && !bytes.Contains(serverBody, []byte("<HTML")) {
+				snippet := string(serverBody)
+				if runes := []rune(snippet); len(runes) > 200 {
+					snippet = string(runes[:200]) + "..."
+				}
+				msg += ": " + snippet
+			}
 			return &APIError{
-				Code:    "SERVER_ERROR",
-				Message: "Internal server error",
+				Code:    fmt.Sprintf("HTTP_%d", resp.StatusCode),
+				Message: msg,
 				Status:  resp.StatusCode,
 			}
 		}
@@ -238,15 +250,24 @@ func (c *Client) do(ctx context.Context, method, path string, body, result inter
 		// Handle client errors
 		if resp.StatusCode >= 400 {
 			var apiErr APIError
-			if err := json.NewDecoder(resp.Body).Decode(&apiErr); err != nil {
-				resp.Body.Close() //nolint:errcheck
+			bodyBytes, _ := io.ReadAll(io.LimitReader(resp.Body, 512))
+			resp.Body.Close() //nolint:errcheck
+
+			if err := json.Unmarshal(bodyBytes, &apiErr); err != nil {
+				msg := http.StatusText(resp.StatusCode)
+				if len(bodyBytes) > 0 && !bytes.Contains(bodyBytes, []byte("<html")) && !bytes.Contains(bodyBytes, []byte("<HTML")) {
+					snippet := string(bodyBytes)
+					if runes := []rune(snippet); len(runes) > 200 {
+						snippet = string(runes[:200]) + "..."
+					}
+					msg += ": " + snippet
+				}
 				return &APIError{
-					Code:    "UNKNOWN_ERROR",
-					Message: "Failed to decode error response",
+					Code:    fmt.Sprintf("HTTP_%d", resp.StatusCode),
+					Message: msg,
 					Status:  resp.StatusCode,
 				}
 			}
-			resp.Body.Close() //nolint:errcheck
 			apiErr.Status = resp.StatusCode
 			return &apiErr
 		}

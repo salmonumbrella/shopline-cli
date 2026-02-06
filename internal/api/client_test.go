@@ -496,8 +496,8 @@ func TestClient4xxErrorDecodeFailure(t *testing.T) {
 	if !ok {
 		t.Fatalf("Expected APIError, got %T: %v", err, err)
 	}
-	if apiErr.Code != "UNKNOWN_ERROR" {
-		t.Errorf("Expected code UNKNOWN_ERROR, got %s", apiErr.Code)
+	if apiErr.Code != "HTTP_400" {
+		t.Errorf("Expected code HTTP_400, got %s", apiErr.Code)
 	}
 }
 
@@ -525,8 +525,8 @@ func TestClientServerError(t *testing.T) {
 	if !ok {
 		t.Fatalf("Expected APIError, got %T: %v", err, err)
 	}
-	if apiErr.Code != "SERVER_ERROR" {
-		t.Errorf("Expected code SERVER_ERROR, got %s", apiErr.Code)
+	if apiErr.Code != "HTTP_500" {
+		t.Errorf("Expected code HTTP_500, got %s", apiErr.Code)
 	}
 
 	// GET should retry on 500
@@ -799,4 +799,61 @@ func TestDebugLoggerFromEnvOutput(t *testing.T) {
 
 		// Both should complete without error - the test passes if no panic
 	})
+}
+
+func TestClientHTMLErrorResponse(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html")
+		w.WriteHeader(http.StatusNotFound)
+		_, _ = w.Write([]byte("<html><body>Not Found</body></html>"))
+	}))
+	defer server.Close()
+
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	err := client.Get(context.Background(), "/test", nil)
+	if err == nil {
+		t.Fatal("Expected error, got nil")
+	}
+
+	apiErr, ok := err.(*APIError)
+	if !ok {
+		t.Fatalf("Expected APIError, got %T: %v", err, err)
+	}
+	if apiErr.Status != 404 {
+		t.Errorf("Expected status 404, got %d", apiErr.Status)
+	}
+	if apiErr.Code != "HTTP_404" {
+		t.Errorf("Expected code HTTP_404, got %s", apiErr.Code)
+	}
+	if apiErr.Message != "Not Found" {
+		t.Errorf("Expected message 'Not Found', got %s", apiErr.Message)
+	}
+}
+
+func TestClientPlainTextErrorResponse(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadGateway)
+		_, _ = w.Write([]byte("upstream timeout"))
+	}))
+	defer server.Close()
+
+	client := NewClient("test-handle", "test-token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	err := client.Get(context.Background(), "/test", nil)
+	apiErr, ok := err.(*APIError)
+	if !ok {
+		t.Fatalf("Expected APIError, got %T: %v", err, err)
+	}
+	if apiErr.Code != "HTTP_502" {
+		t.Errorf("Expected code HTTP_502, got %s", apiErr.Code)
+	}
+	// For non-HTML bodies, include the body snippet in the message
+	if apiErr.Message != "Bad Gateway: upstream timeout" {
+		t.Errorf("Expected message 'Bad Gateway: upstream timeout', got: %s", apiErr.Message)
+	}
 }
