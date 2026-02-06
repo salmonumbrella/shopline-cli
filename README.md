@@ -656,20 +656,34 @@ shopline completion powershell >> $PROFILE
 
 ## Development
 
-After cloning, install git hooks:
+### Prerequisites
+
+Install [lefthook](https://github.com/evilmartians/lefthook) for git hooks:
 
 ```bash
-make setup
+brew install lefthook    # macOS
+# or: go install github.com/evilmartians/lefthook@latest
 ```
 
-This installs pre-commit and pre-push hooks for linting and testing.
+### Setup
+
+```bash
+make setup       # Install dev tools (golangci-lint, gofumpt, goimports)
+lefthook install # Install git hooks
+```
+
+Lefthook runs automatically on:
+- **pre-commit**: `golangci-lint` (lint) + `gofumpt` (format check) in parallel
+- **pre-push**: `go test -race ./...` (full test suite with race detector)
+
+### Build & Test
 
 ```bash
 make build    # Build binary
-make test     # Run tests
+make test     # Run tests with race detector
 make lint     # Run linter
 make fmt      # Format code
-make ci       # Run all checks
+make ci       # Run all checks (fmt-check + lint + test)
 ```
 
 ## License

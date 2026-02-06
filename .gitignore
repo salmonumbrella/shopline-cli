@@ -38,13 +38,5 @@ breaking_changes_plan/
 BREAKING_CHANGES_PLAN.md
 PLAN.md
 digest.txt
-docs/*
-!docs/plan.md
-!docs/shopline-openapi/
-# Keep only lightweight index files in git; keep the mirrored doc corpus local.
-docs/shopline-openapi/*
-!docs/shopline-openapi/README.md
-!docs/shopline-openapi/urls.txt
-!docs/shopline-openapi/urls_endpoints.txt
-!docs/shopline-openapi/urls_non_endpoints.txt
+docs/
 .goreleaser.yaml.tmp
