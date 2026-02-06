@@ -47,9 +47,10 @@ var helpCmd = &cobra.Command{
 		}
 
 		jsonOut, _ := cmd.Flags().GetBool("json")
+		deep, _ := cmd.Flags().GetBool("deep")
 		outputFormat, _ := cmd.Flags().GetString("output")
 		if jsonOut || outputFormat == "json" {
-			return printHelpJSON(cmd, target)
+			return printHelpJSON(cmd, target, deep)
 		}
 
 		return target.Help()
@@ -58,16 +59,17 @@ var helpCmd = &cobra.Command{
 
 func init() {
 	helpCmd.Flags().Bool("json", false, "Output help as JSON")
+	helpCmd.Flags().Bool("deep", false, "For JSON help, include nested subcommands recursively")
 }
 
-func printHelpJSON(cmd *cobra.Command, target *cobra.Command) error {
-	info := buildHelpCommand(target)
+func printHelpJSON(cmd *cobra.Command, target *cobra.Command, deep bool) error {
+	info := buildHelpCommand(target, deep)
 	enc := json.NewEncoder(cmd.OutOrStdout())
 	enc.SetIndent("", "  ")
 	return enc.Encode(info)
 }
 
-func buildHelpCommand(cmd *cobra.Command) helpCommand {
+func buildHelpCommand(cmd *cobra.Command, deep bool) helpCommand {
 	info := helpCommand{
 		Name:       cmd.Name(),
 		Use:        cmd.Use,
@@ -83,12 +85,16 @@ func buildHelpCommand(cmd *cobra.Command) helpCommand {
 		if sub.Hidden {
 			continue
 		}
-		info.Subcommands = append(info.Subcommands, helpCommand{
-			Name:    sub.Name(),
-			Use:     sub.Use,
-			Short:   sub.Short,
-			Aliases: append([]string{}, sub.Aliases...),
-		})
+		if deep {
+			info.Subcommands = append(info.Subcommands, buildHelpCommand(sub, deep))
+		} else {
+			info.Subcommands = append(info.Subcommands, helpCommand{
+				Name:    sub.Name(),
+				Use:     sub.Use,
+				Short:   sub.Short,
+				Aliases: append([]string{}, sub.Aliases...),
+			})
+		}
 	}
 
 	sort.Slice(info.Flags, func(i, j int) bool { return info.Flags[i].Name < info.Flags[j].Name })

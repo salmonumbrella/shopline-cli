@@ -20,7 +20,7 @@ func TestBuildHelpCommand(t *testing.T) {
 			Example: "shopline orders list",
 		}
 
-		info := buildHelpCommand(cmd)
+		info := buildHelpCommand(cmd, false)
 
 		if info.Name != "orders" {
 			t.Errorf("Name = %q, want 'orders'", info.Name)
@@ -48,7 +48,7 @@ func TestBuildHelpCommand(t *testing.T) {
 			Deprecated: "use new-cmd instead",
 		}
 
-		info := buildHelpCommand(cmd)
+		info := buildHelpCommand(cmd, false)
 		if info.Deprecated != "use new-cmd instead" {
 			t.Errorf("Deprecated = %q, want 'use new-cmd instead'", info.Deprecated)
 		}
@@ -62,7 +62,7 @@ func TestBuildHelpCommand(t *testing.T) {
 			&cobra.Command{Use: "middle", Short: "M cmd"},
 		)
 
-		info := buildHelpCommand(parent)
+		info := buildHelpCommand(parent, false)
 
 		if len(info.Subcommands) != 3 {
 			t.Fatalf("expected 3 subcommands, got %d", len(info.Subcommands))
@@ -87,7 +87,7 @@ func TestBuildHelpCommand(t *testing.T) {
 		hidden := &cobra.Command{Use: "hidden", Short: "Hidden cmd", Hidden: true}
 		parent.AddCommand(visible, hidden)
 
-		info := buildHelpCommand(parent)
+		info := buildHelpCommand(parent, false)
 
 		if len(info.Subcommands) != 1 {
 			t.Fatalf("expected 1 visible subcommand, got %d", len(info.Subcommands))
@@ -103,7 +103,7 @@ func TestBuildHelpCommand(t *testing.T) {
 		cmd.Flags().IntP("count", "c", 10, "Item count")
 		cmd.Flags().Bool("verbose", false, "Verbose output")
 
-		info := buildHelpCommand(cmd)
+		info := buildHelpCommand(cmd, false)
 
 		if len(info.Flags) < 3 {
 			t.Fatalf("expected at least 3 flags, got %d", len(info.Flags))
@@ -123,7 +123,7 @@ func TestBuildHelpCommand(t *testing.T) {
 		child := &cobra.Command{Use: "orders", Aliases: []string{"ord", "o"}}
 		parent.AddCommand(child)
 
-		info := buildHelpCommand(parent)
+		info := buildHelpCommand(parent, false)
 
 		if len(info.Subcommands) != 1 {
 			t.Fatalf("expected 1 subcommand, got %d", len(info.Subcommands))
@@ -145,13 +145,29 @@ func TestBuildHelpCommand(t *testing.T) {
 
 	t.Run("empty command", func(t *testing.T) {
 		cmd := &cobra.Command{Use: "empty"}
-		info := buildHelpCommand(cmd)
+		info := buildHelpCommand(cmd, false)
 
 		if info.Name != "empty" {
 			t.Errorf("Name = %q, want 'empty'", info.Name)
 		}
 		if len(info.Subcommands) != 0 {
 			t.Errorf("expected no subcommands, got %d", len(info.Subcommands))
+		}
+	})
+
+	t.Run("deep includes nested subcommands", func(t *testing.T) {
+		root := &cobra.Command{Use: "root"}
+		parent := &cobra.Command{Use: "parent"}
+		child := &cobra.Command{Use: "child", Short: "Child cmd"}
+		parent.AddCommand(child)
+		root.AddCommand(parent)
+
+		info := buildHelpCommand(root, true)
+		if len(info.Subcommands) != 1 || info.Subcommands[0].Name != "parent" {
+			t.Fatalf("unexpected top-level subcommands: %+v", info.Subcommands)
+		}
+		if len(info.Subcommands[0].Subcommands) != 1 || info.Subcommands[0].Subcommands[0].Name != "child" {
+			t.Fatalf("expected nested child subcommand, got %+v", info.Subcommands[0].Subcommands)
 		}
 	})
 }
