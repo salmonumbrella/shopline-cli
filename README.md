@@ -116,6 +116,10 @@ shopline orders cancel <orderId> [--reason <reason>]
 shopline orders close <orderId>
 shopline orders reopen <orderId>
 
+shopline order-attribution get <orderId>
+shopline order-risks list --order-id <id>
+shopline order-risks create --order-id <id> --data '{...}'
+
 shopline draft-orders list
 shopline draft-orders get <draftOrderId>
 shopline draft-orders create --data '{...}'
@@ -128,6 +132,9 @@ shopline fulfillments create --order-id <id> --tracking-number <num> ...
 shopline fulfillment-orders list [--order-id <id>]
 shopline fulfillment-orders get <fulfillmentOrderId>
 
+shopline fulfillment-services list
+shopline fulfillment-services create --name <name> ...
+
 shopline refunds list [--order-id <id>]
 shopline refunds get <refundId>
 shopline refunds create --order-id <id> --amount <n> ...
@@ -137,6 +144,13 @@ shopline return-orders get <returnOrderId>
 
 shopline shipments list
 shopline shipments get <shipmentId>
+
+shopline abandoned-checkouts list
+shopline abandoned-checkouts get <checkoutId>
+shopline abandoned-checkouts send-recovery <checkoutId>
+
+shopline carts prepare
+shopline carts exchange
 ```
 
 ### Products & Catalog
@@ -154,15 +168,35 @@ shopline collections create --title <title> ...
 shopline collections update <collectionId> [--title <title>]
 shopline collections delete <collectionId>
 
+shopline smart-collections list
+shopline smart-collections create --title <title> --rules '{...}'
+
 shopline categories list
 shopline categories get <categoryId>
 
+shopline taxonomies list
+shopline taxonomies create --name <name> ...
+
 shopline product-listings list
 shopline product-reviews list [--product-id <id>]
+shopline product-review-comments create --review-id <id> --data '{...}'
 shopline product-subscriptions list
+
+shopline addon-products list
+shopline addon-products create --data '{...}'
+
+shopline tags list
+shopline tags create --name <name>
+
+shopline labels list
+shopline labels create --name <name> ...
+
+shopline size-charts list
+shopline size-charts create --data '{...}'
 
 shopline medias list [--product-id <id>]
 shopline medias upload <productId> --file <path>
+shopline media create-image --data '{...}'
 ```
 
 ### Inventory & Warehouses
@@ -192,6 +226,7 @@ shopline purchase-orders get <purchaseOrderId>
 ```bash
 shopline customers list [--email <email>]
 shopline customers get <customerId>
+shopline customers search --query <term>
 shopline customers create --email <email> --first-name <name> ...
 shopline customers update <customerId> [--email <email>]
 shopline customers delete <customerId>
@@ -202,12 +237,36 @@ shopline customer-addresses get <customerId> <addressId>
 shopline customer-groups list
 shopline customer-groups get <groupId>
 
+shopline customer-blacklist list
+shopline customer-blacklist create --data '{...}'
+
+shopline customer-saved-searches list
+shopline customer-saved-searches create --name <name> --query <q>
+
 shopline member-points list [--customer-id <id>]
 shopline member-points adjust <customerId> --points <n>
 
 shopline membership list
 shopline store-credits list [--customer-id <id>]
+
+shopline user-coupons list
+shopline user-coupons assign --coupon-id <id> --user-id <id>
+shopline user-coupons redeem --code <code>
+
+shopline user-credits list
+shopline user-credits bulk-update --data '{...}'
+
 shopline wish-lists list [--customer-id <id>]
+shopline wish-list-items list --wish-list-id <id>
+shopline wish-list-items create --wish-list-id <id> --product-id <id>
+
+shopline subscriptions list
+shopline subscriptions get <subscriptionId>
+shopline subscriptions create --data '{...}'
+
+shopline conversations list
+shopline conversations get <conversationId>
+shopline conversations send <conversationId> --message <text>
 ```
 
 ### Pricing & Promotions
@@ -229,11 +288,16 @@ shopline promotions get <promotionId>
 
 shopline sales list
 shopline flash-price list
+shopline flash-price-campaigns list
+shopline flash-price-campaigns create --data '{...}'
 shopline gifts list
 
 shopline gift-cards list
 shopline gift-cards get <giftCardId>
 shopline gift-cards create --initial-value <n> --currency <c> ...
+
+shopline selling-plans list
+shopline selling-plans create --data '{...}'
 ```
 
 ### Shipping & Delivery
@@ -245,6 +309,10 @@ shopline shipping-zones create --name <name> --countries <codes> ...
 
 shopline carrier-services list
 shopline carrier-services get <carrierId>
+
+shopline delivery-options list
+shopline delivery-options get <optionId>
+shopline delivery-options time-slots <optionId>
 
 shopline local-delivery list
 shopline pickup list
@@ -267,6 +335,7 @@ shopline disputes get <disputeId>
 
 shopline balance get
 shopline taxes list
+shopline tax-services list
 shopline currencies list
 ```
 
@@ -319,12 +388,15 @@ shopline storefront-promotions list
 shopline storefront-carts list
 shopline storefront-tokens list
 shopline storefront-oauth list
+shopline storefront-oauth-applications list
+shopline storefront-oauth-applications create --data '{...}'
 ```
 
 ### Store Settings
 
 ```bash
-shopline shop get                               # Get shop info
+shopline shop info                              # Get shop info
+shopline shop settings                          # Get shop settings
 shopline settings list                          # List all settings
 shopline checkout-settings get                  # Get checkout settings
 
@@ -335,6 +407,10 @@ shopline metafields create --namespace <ns> --key <key> --value <v> ...
 shopline metafield-definitions list
 shopline custom-fields list
 shopline script-tags list
+
+shopline token info                             # Get current access token info
+shopline tokens list                            # List API tokens
+shopline tokens create --data '{...}'
 ```
 
 ### Staff & Operations
@@ -344,6 +420,12 @@ shopline staffs list
 shopline staffs get <staffId>
 
 shopline merchants get
+
+shopline multipass status
+shopline multipass enable
+shopline multipass disable
+shopline multipass token --email <email>
+shopline multipass rotate
 
 shopline operation-logs list [--from <date>] [--to <date>]
 ```
@@ -356,6 +438,48 @@ shopline webhooks get <webhookId>
 shopline webhooks create --topic orders/create --address https://example.com/hook
 shopline webhooks update <webhookId> [--address <url>]
 shopline webhooks delete <webhookId>
+```
+
+### Marketing & Campaigns
+
+```bash
+shopline affiliate-campaigns list
+shopline affiliate-campaigns get <campaignId>
+shopline affiliate-campaigns create --data '{...}'
+
+shopline marketing-events list
+shopline marketing-events create --data '{...}'
+```
+
+### B2B / Company
+
+```bash
+shopline company-catalogs list
+shopline company-catalogs create --data '{...}'
+
+shopline company-credits list
+shopline company-credits adjust --company-id <id> --amount <n>
+
+shopline catalog-pricing list
+shopline catalog-pricing create --data '{...}'
+```
+
+### Customer Data Platform (CDP)
+
+```bash
+shopline cdp profiles list
+shopline cdp profiles get <profileId>
+shopline cdp events list
+shopline cdp events get <eventId>
+shopline cdp segments list
+shopline cdp segments get <segmentId>
+```
+
+### Point of Sale
+
+```bash
+shopline pos purchase-orders list
+shopline pos purchase-orders get <orderId>
 ```
 
 ### Bulk Operations
