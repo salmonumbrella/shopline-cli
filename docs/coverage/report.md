@@ -3,8 +3,8 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 667
-- Missing in code: 45
+- Code endpoints detected: 670
+- Missing in code: 42
 - Extra in code: 404
 - Unparsed doc pages: 55
 
@@ -73,9 +73,6 @@
 - `GET /affiliate_campaigns/{}/orders` (https://open-api.docs.shoplineapp.com/reference/get_affiliate-campaigns-id-orders)
 - `GET /affiliate_campaigns/{}/summary` (https://open-api.docs.shoplineapp.com/reference/get_affiliate-campaigns-id-summary)
 - `POST /conversations/message` (https://open-api.docs.shoplineapp.com/reference/post_conversations-message)
-- `GET /customer_groups/{}/customer_group_children` (https://open-api.docs.shoplineapp.com/reference/get_customer-groups-parentcustomergroupid-customer-group-children)
-- `GET /customer_groups/{}/customer_group_children/{}/customer_ids` (https://open-api.docs.shoplineapp.com/reference/get_customer-groups-parentcustomergroupid-customer-group-children-id-customer-ids)
-- `GET /customers/{}/coupon_promotions` (https://open-api.docs.shoplineapp.com/reference/get_customers-customer-id-coupon-promotions)
 - `GET /delivery_options/delivery_config` (https://open-api.docs.shoplineapp.com/reference/get_delivery-options-delivery-config)
 - `GET /delivery_options/{}/delivery_time_slots` (https://open-api.docs.shoplineapp.com/reference/get_delivery-options-delivery-option-id-delivery-time-slots)
 - `PUT /delivery_options/{}/stores_info` (https://open-api.docs.shoplineapp.com/reference/put_delivery-options-id-stores-info-1)

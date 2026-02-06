@@ -741,6 +741,16 @@
   },
   {
     "method": "GET",
+    "path": "/customer_groups/{}/customer_group_children",
+    "source": "internal/api/customer_groups.go"
+  },
+  {
+    "method": "GET",
+    "path": "/customer_groups/{}/customer_group_children/{}/customer_ids",
+    "source": "internal/api/customer_groups.go"
+  },
+  {
+    "method": "GET",
     "path": "/customer_groups/{}/customer_ids",
     "source": "internal/api/customer_groups.go"
   },
@@ -868,6 +878,11 @@
     "method": "PUT",
     "path": "/customers/{}/app_metafields/{}",
     "source": "internal/api/customer_metafields.go"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/{}/coupon_promotions",
+    "source": "internal/api/customers.go"
   },
   {
     "method": "GET",

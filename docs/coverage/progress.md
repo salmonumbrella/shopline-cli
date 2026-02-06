@@ -17,6 +17,10 @@ go run ./cmd/shopline-coverage
 - [x] Customers
 - Customers core: list/get/search/create/update/delete + tags + subscriptions + LINE lookup (done)
 - Customer metafields + app_metafields (done)
+- Customer coupon promotions (`GET /customers/{id}/coupon_promotions`) (done)
+- [x] Customer groups
+- Customer groups core: list/get/create/delete (done)
+- Customer group children: `GET /customer_groups/{parent_id}/customer_group_children` + `GET /customer_groups/{parent_id}/customer_group_children/{id}/customer_ids` (done)
 - [x] Store credits
 - Customer store credits (`GET/POST /customers/{id}/store_credits`) + user credits (`GET /user_credits`, `POST /user_credits/bulk_update`) (done)
 - Member points + membership info (`/customers/membership_info`, `/customers/{id}/member_points`, `/member_point_rules`, `/member_points/bulk_update`, `/customers/{id}/membership_tier/action_logs`) (done)

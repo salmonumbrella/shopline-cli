@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"strconv"
@@ -147,6 +148,34 @@ func (c *Client) GetCustomerGroupIDs(ctx context.Context, groupID string) (*Cust
 	}
 	var resp CustomerGroupIDsResponse
 	if err := c.Get(ctx, fmt.Sprintf("/customer_groups/%s/customer_ids", groupID), &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+// GetCustomerGroupChildren retrieves child customer groups of a customer group.
+//
+// Docs: GET /customer_groups/{parentCustomerGroupId}/customer_group_children
+func (c *Client) GetCustomerGroupChildren(ctx context.Context, parentGroupID string) (json.RawMessage, error) {
+	if strings.TrimSpace(parentGroupID) == "" {
+		return nil, fmt.Errorf("customer group id is required")
+	}
+	var resp json.RawMessage
+	if err := c.Get(ctx, fmt.Sprintf("/customer_groups/%s/customer_group_children", parentGroupID), &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+// GetCustomerGroupChildCustomerIDs retrieves customer IDs in a child customer group of a parent group.
+//
+// Docs: GET /customer_groups/{parentCustomerGroupId}/customer_group_children/{id}/customer_ids
+func (c *Client) GetCustomerGroupChildCustomerIDs(ctx context.Context, parentGroupID, childGroupID string) (*CustomerGroupIDsResponse, error) {
+	if strings.TrimSpace(parentGroupID) == "" || strings.TrimSpace(childGroupID) == "" {
+		return nil, fmt.Errorf("customer group id is required")
+	}
+	var resp CustomerGroupIDsResponse
+	if err := c.Get(ctx, fmt.Sprintf("/customer_groups/%s/customer_group_children/%s/customer_ids", parentGroupID, childGroupID), &resp); err != nil {
 		return nil, err
 	}
 	return &resp, nil

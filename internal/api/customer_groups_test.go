@@ -557,3 +557,88 @@ func TestGetCustomerGroupIDsLargeGroup(t *testing.T) {
 		t.Errorf("Expected total count 100, got %d", resp.TotalCount)
 	}
 }
+
+func TestGetCustomerGroupChildren(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("Expected GET, got %s", r.Method)
+		}
+		if r.URL.Path != "/customer_groups/grp_parent/customer_group_children" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"items": []map[string]any{
+				{"id": "grp_child_1", "name": "Child 1"},
+				{"id": "grp_child_2", "name": "Child 2"},
+			},
+		})
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	raw, err := client.GetCustomerGroupChildren(context.Background(), "grp_parent")
+	if err != nil {
+		t.Fatalf("GetCustomerGroupChildren failed: %v", err)
+	}
+
+	var got map[string]any
+	if err := json.Unmarshal(raw, &got); err != nil {
+		t.Fatalf("failed to unmarshal raw response: %v", err)
+	}
+	if _, ok := got["items"]; !ok {
+		t.Fatalf("expected items key in response, got %v", got)
+	}
+}
+
+func TestGetCustomerGroupChildCustomerIDs(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("Expected GET, got %s", r.Method)
+		}
+		if r.URL.Path != "/customer_groups/grp_parent/customer_group_children/grp_child/customer_ids" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+
+		resp := CustomerGroupIDsResponse{
+			CustomerIDs: []string{"cust_1", "cust_2"},
+			TotalCount:  2,
+		}
+		_ = json.NewEncoder(w).Encode(resp)
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	resp, err := client.GetCustomerGroupChildCustomerIDs(context.Background(), "grp_parent", "grp_child")
+	if err != nil {
+		t.Fatalf("GetCustomerGroupChildCustomerIDs failed: %v", err)
+	}
+	if len(resp.CustomerIDs) != 2 {
+		t.Errorf("Expected 2 customer IDs, got %d", len(resp.CustomerIDs))
+	}
+	if resp.TotalCount != 2 {
+		t.Errorf("Expected total count 2, got %d", resp.TotalCount)
+	}
+}
+
+func TestGetCustomerGroupChildrenEmptyID(t *testing.T) {
+	client := NewClient("test", "token")
+	_, err := client.GetCustomerGroupChildren(context.Background(), "   ")
+	if err == nil {
+		t.Fatal("Expected error, got nil")
+	}
+}
+
+func TestGetCustomerGroupChildCustomerIDsEmptyID(t *testing.T) {
+	client := NewClient("test", "token")
+	_, err := client.GetCustomerGroupChildCustomerIDs(context.Background(), "grp_parent", " ")
+	if err == nil {
+		t.Fatal("Expected error, got nil")
+	}
+}

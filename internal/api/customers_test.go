@@ -983,3 +983,66 @@ func TestGetCustomerPromotionsAPIError(t *testing.T) {
 		t.Error("Expected error for API error response, got nil")
 	}
 }
+
+func TestGetCustomerCouponPromotions(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("Expected GET, got %s", r.Method)
+		}
+		if r.URL.Path != "/customers/cust_123/coupon_promotions" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"items": []map[string]any{
+				{"id": "promo_coupon_1"},
+			},
+		})
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	raw, err := client.GetCustomerCouponPromotions(context.Background(), "cust_123")
+	if err != nil {
+		t.Fatalf("GetCustomerCouponPromotions failed: %v", err)
+	}
+
+	var got map[string]any
+	if err := json.Unmarshal(raw, &got); err != nil {
+		t.Fatalf("failed to unmarshal raw response: %v", err)
+	}
+	if _, ok := got["items"]; !ok {
+		t.Fatalf("expected items key in response, got %v", got)
+	}
+}
+
+func TestGetCustomerCouponPromotionsEmptyID(t *testing.T) {
+	client := NewClient("test", "token")
+	_, err := client.GetCustomerCouponPromotions(context.Background(), " ")
+	if err == nil {
+		t.Fatal("Expected error, got nil")
+	}
+	if err.Error() != "customer id is required" {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestGetCustomerCouponPromotionsAPIError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "customer not found"})
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	_, err := client.GetCustomerCouponPromotions(context.Background(), "nonexistent")
+	if err == nil {
+		t.Error("Expected error for API error response, got nil")
+	}
+}

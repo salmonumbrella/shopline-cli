@@ -2360,3 +2360,15 @@ func (m *MockClient) ClaimUserCoupon(ctx context.Context, couponCode string, bod
 func (m *MockClient) RedeemUserCoupon(ctx context.Context, couponCode string, body any) (json.RawMessage, error) {
 	return nil, m.notImplemented("RedeemUserCoupon")
 }
+
+func (m *MockClient) GetCustomerCouponPromotions(ctx context.Context, id string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetCustomerCouponPromotions")
+}
+
+func (m *MockClient) GetCustomerGroupChildren(ctx context.Context, parentGroupID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetCustomerGroupChildren")
+}
+
+func (m *MockClient) GetCustomerGroupChildCustomerIDs(ctx context.Context, parentGroupID, childGroupID string) (*CustomerGroupIDsResponse, error) {
+	return nil, m.notImplemented("GetCustomerGroupChildCustomerIDs")
+}

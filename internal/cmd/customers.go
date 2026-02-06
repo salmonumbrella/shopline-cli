@@ -451,6 +451,23 @@ var customersLineGetCmd = &cobra.Command{
 	},
 }
 
+var customersCouponPromotionsCmd = &cobra.Command{
+	Use:   "coupon-promotions <customer-id>",
+	Short: "Get coupon promotions available to a customer (raw JSON)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.GetCustomerCouponPromotions(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to get customer coupon promotions: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
 func formatCustomerCreditBalance(customer *api.Customer) string {
 	if customer == nil || customer.CreditBalance == nil {
 		return "N/A"
@@ -536,10 +553,12 @@ func init() {
 	customersCmd.AddCommand(customersLineCmd)
 	customersLineCmd.AddCommand(customersLineGetCmd)
 
+	customersCmd.AddCommand(customersCouponPromotionsCmd)
+
 	schema.Register(schema.Resource{
 		Name:        "customers",
 		Description: "Manage customer accounts",
-		Commands:    []string{"list", "get", "search", "create", "update", "delete", "tags", "subscriptions", "line", "metafields", "app-metafields", "store-credits", "membership-info", "membership-tier"},
+		Commands:    []string{"list", "get", "search", "create", "update", "delete", "tags", "subscriptions", "line", "coupon-promotions", "metafields", "app-metafields", "store-credits", "membership-info", "membership-tier"},
 		IDPrefix:    "customer",
 	})
 }

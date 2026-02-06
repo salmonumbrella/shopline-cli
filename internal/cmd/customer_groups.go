@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -165,6 +166,61 @@ var customerGroupsDeleteCmd = &cobra.Command{
 	},
 }
 
+var customerGroupsChildrenCmd = &cobra.Command{
+	Use:   "children",
+	Short: "Work with child customer groups (documented endpoints)",
+}
+
+var customerGroupsChildrenListCmd = &cobra.Command{
+	Use:   "list <parent-id>",
+	Short: "List child customer groups of a parent group (raw JSON)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.GetCustomerGroupChildren(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to list customer group children: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var customerGroupsChildrenCustomerIDsCmd = &cobra.Command{
+	Use:   "customer-ids <parent-id> <child-id>",
+	Short: "Get customer IDs in a child customer group",
+	Args:  cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.GetCustomerGroupChildCustomerIDs(cmd.Context(), args[0], args[1])
+		if err != nil {
+			return fmt.Errorf("failed to get customer ids for child customer group: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		formatter = formatter.WithIDPrefix("customer")
+		headers := []string{"ID"}
+		rows := make([][]string, 0, len(resp.CustomerIDs))
+		for _, id := range resp.CustomerIDs {
+			rows = append(rows, []string{id})
+		}
+		formatter.Table(headers, rows)
+		fmt.Printf("\nShowing %d of %d customers\n", len(resp.CustomerIDs), resp.TotalCount)
+		return nil
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(customerGroupsCmd)
 
@@ -180,4 +236,15 @@ func init() {
 	_ = customerGroupsCreateCmd.MarkFlagRequired("name")
 
 	customerGroupsCmd.AddCommand(customerGroupsDeleteCmd)
+
+	customerGroupsCmd.AddCommand(customerGroupsChildrenCmd)
+	customerGroupsChildrenCmd.AddCommand(customerGroupsChildrenListCmd)
+	customerGroupsChildrenCmd.AddCommand(customerGroupsChildrenCustomerIDsCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "customer-groups",
+		Description: "Manage customer groups",
+		Commands:    []string{"list", "get", "create", "delete", "children"},
+		IDPrefix:    "customer_group",
+	})
 }

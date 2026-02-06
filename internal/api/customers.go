@@ -234,6 +234,20 @@ func (c *Client) GetCustomerPromotions(ctx context.Context, id string) (*Custome
 	return &resp, nil
 }
 
+// GetCustomerCouponPromotions retrieves coupon promotions available to a customer.
+//
+// Docs: GET /customers/{customer_id}/coupon_promotions
+func (c *Client) GetCustomerCouponPromotions(ctx context.Context, id string) (json.RawMessage, error) {
+	if strings.TrimSpace(id) == "" {
+		return nil, fmt.Errorf("customer id is required")
+	}
+	var resp json.RawMessage
+	if err := c.Get(ctx, fmt.Sprintf("/customers/%s/coupon_promotions", id), &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
 // UpdateCustomerSubscriptions updates customer subscriptions.
 //
 // Docs: PUT /customers/{customer_id}/subscriptions
