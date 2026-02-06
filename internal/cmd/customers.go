@@ -74,7 +74,7 @@ var customersSearchCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d customers\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d customers\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -144,7 +144,7 @@ var customersListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d customers\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d customers\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -179,20 +179,21 @@ var customersGetCmd = &cobra.Command{
 			name += customer.LastName
 		}
 
-		fmt.Printf("Customer ID:      %s\n", customer.ID)
-		fmt.Printf("Email:            %s\n", customer.Email)
-		fmt.Printf("Name:             %s\n", name)
-		fmt.Printf("Phone:            %s\n", customer.Phone)
-		fmt.Printf("State:            %s\n", customer.State)
-		fmt.Printf("Accepts Marketing: %t\n", customer.AcceptsMarketing)
-		fmt.Printf("Credit Balance:   %s\n", formatCustomerCreditBalance(customer))
-		fmt.Printf("Subscriptions:    %s\n", formatCustomerSubscriptions(customer))
-		fmt.Printf("Orders Count:     %d\n", customer.OrdersCount)
-		fmt.Printf("Total Spent:      %s %s\n", customer.TotalSpent, customer.Currency)
-		fmt.Printf("Tags:             %s\n", customer.Tags)
-		fmt.Printf("Note:             %s\n", customer.Note)
-		fmt.Printf("Created:          %s\n", customer.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:          %s\n", customer.UpdatedAt.Format(time.RFC3339))
+		out := outWriter(cmd)
+		_, _ = fmt.Fprintf(out, "Customer ID:      %s\n", customer.ID)
+		_, _ = fmt.Fprintf(out, "Email:            %s\n", customer.Email)
+		_, _ = fmt.Fprintf(out, "Name:             %s\n", name)
+		_, _ = fmt.Fprintf(out, "Phone:            %s\n", customer.Phone)
+		_, _ = fmt.Fprintf(out, "State:            %s\n", customer.State)
+		_, _ = fmt.Fprintf(out, "Accepts Marketing: %t\n", customer.AcceptsMarketing)
+		_, _ = fmt.Fprintf(out, "Credit Balance:   %s\n", formatCustomerCreditBalance(customer))
+		_, _ = fmt.Fprintf(out, "Subscriptions:    %s\n", formatCustomerSubscriptions(customer))
+		_, _ = fmt.Fprintf(out, "Orders Count:     %d\n", customer.OrdersCount)
+		_, _ = fmt.Fprintf(out, "Total Spent:      %s %s\n", customer.TotalSpent, customer.Currency)
+		_, _ = fmt.Fprintf(out, "Tags:             %s\n", customer.Tags)
+		_, _ = fmt.Fprintf(out, "Note:             %s\n", customer.Note)
+		_, _ = fmt.Fprintf(out, "Created:          %s\n", customer.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(out, "Updated:          %s\n", customer.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }

@@ -317,9 +317,9 @@ var ordersListCmd = &cobra.Command{
 
 		formatter.Table(headers, rows)
 		if resp.TotalCount > 0 {
-			fmt.Printf("\nShowing %d of %d orders\n", len(resp.Items), resp.TotalCount)
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d orders\n", len(resp.Items), resp.TotalCount)
 		} else {
-			fmt.Printf("\nShowing %d orders\n", len(resp.Items))
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d orders\n", len(resp.Items))
 		}
 		return nil
 	},
@@ -398,16 +398,17 @@ var ordersGetCmd = &cobra.Command{
 			return formatter.JSON(order)
 		}
 
-		fmt.Printf("Order ID:       %s\n", order.ID)
-		fmt.Printf("Order Number:   %s\n", order.OrderNumber)
-		fmt.Printf("Status:         %s\n", order.Status)
-		fmt.Printf("Payment:        %s\n", order.PaymentStatus)
-		fmt.Printf("Fulfillment:    %s\n", order.FulfillStatus)
-		fmt.Printf("Total:          %s %s\n", order.TotalPrice, order.Currency)
-		fmt.Printf("Customer:       %s <%s>\n", order.CustomerName, order.CustomerEmail)
-		fmt.Printf("Created:        %s\n", order.CreatedAt.Format(time.RFC3339))
+		out := outWriter(cmd)
+		_, _ = fmt.Fprintf(out, "Order ID:       %s\n", order.ID)
+		_, _ = fmt.Fprintf(out, "Order Number:   %s\n", order.OrderNumber)
+		_, _ = fmt.Fprintf(out, "Status:         %s\n", order.Status)
+		_, _ = fmt.Fprintf(out, "Payment:        %s\n", order.PaymentStatus)
+		_, _ = fmt.Fprintf(out, "Fulfillment:    %s\n", order.FulfillStatus)
+		_, _ = fmt.Fprintf(out, "Total:          %s %s\n", order.TotalPrice, order.Currency)
+		_, _ = fmt.Fprintf(out, "Customer:       %s <%s>\n", order.CustomerName, order.CustomerEmail)
+		_, _ = fmt.Fprintf(out, "Created:        %s\n", order.CreatedAt.Format(time.RFC3339))
 		if len(order.LineItems) > 0 {
-			fmt.Printf("\nLine items:\n")
+			_, _ = fmt.Fprintln(out, "\nLine items:")
 			for _, li := range order.LineItems {
 				title := li.Title
 				if title == "" {
@@ -418,20 +419,20 @@ var ordersGetCmd = &cobra.Command{
 					vendor = li.Product.Vendor
 				}
 				if vendor != "" {
-					fmt.Printf("  %dx %s (%s)\n", li.Quantity, title, vendor)
+					_, _ = fmt.Fprintf(out, "  %dx %s (%s)\n", li.Quantity, title, vendor)
 				} else {
-					fmt.Printf("  %dx %s\n", li.Quantity, title)
+					_, _ = fmt.Fprintf(out, "  %dx %s\n", li.Quantity, title)
 				}
 			}
 		}
 		if order.Customer != nil {
-			fmt.Printf("\nExpanded customer:\n")
-			fmt.Printf("  ID:    %s\n", order.Customer.ID)
+			_, _ = fmt.Fprintln(out, "\nExpanded customer:")
+			_, _ = fmt.Fprintf(out, "  ID:    %s\n", order.Customer.ID)
 			if order.Customer.Email != "" {
-				fmt.Printf("  Email: %s\n", order.Customer.Email)
+				_, _ = fmt.Fprintf(out, "  Email: %s\n", order.Customer.Email)
 			}
 			if order.Customer.Phone != "" {
-				fmt.Printf("  Phone: %s\n", order.Customer.Phone)
+				_, _ = fmt.Fprintf(out, "  Phone: %s\n", order.Customer.Phone)
 			}
 		}
 		return nil
