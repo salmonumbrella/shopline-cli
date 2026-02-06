@@ -177,6 +177,7 @@ go run ./cmd/shopline-coverage
 - [x] Agent-friendly improvements: `--json`, `--jq`, `--fields` presets + help JSON compatibility keys
 - [x] Convert remaining text output to use Cobra writers (remove direct fmt.Printf/Println)
 - [x] Add CLI API coverage report (APIClient methods -> internal/cmd references): `make cli-coverage` (writes `docs/coverage/cli_api_report.*`)
+- [x] Add a CI guard test to keep CLI API coverage at 100% (`internal/cmd/cli_api_coverage_test.go`)
 
 ## Tracking
 
