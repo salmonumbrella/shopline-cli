@@ -1401,7 +1401,17 @@
   },
   {
     "method": "POST",
-    "path": "/orders/bulk-execute-shipment",
+    "path": "/orders/archived_orders",
+    "source": "internal/api/orders.go"
+  },
+  {
+    "method": "PATCH",
+    "path": "/orders/execute_shipment",
+    "source": "internal/api/orders.go"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/label",
     "source": "internal/api/orders.go"
   },
   {
@@ -1411,13 +1421,68 @@
   },
   {
     "method": "GET",
+    "path": "/orders/tags",
+    "source": "internal/api/orders.go"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/transactions",
+    "source": "internal/api/orders.go"
+  },
+  {
+    "method": "GET",
     "path": "/orders/{}",
     "source": "internal/api/orders.go"
   },
   {
-    "method": "PUT",
+    "method": "PATCH",
     "path": "/orders/{}",
     "source": "internal/api/orders.go"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/{}/action_logs",
+    "source": "internal/api/orders.go"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/{}/app_metafields",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/orders/{}/app_metafields",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/orders/{}/app_metafields/bulk",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/orders/{}/app_metafields/bulk",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/orders/{}/app_metafields/bulk",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/orders/{}/app_metafields/{}",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/{}/app_metafields/{}",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/orders/{}/app_metafields/{}",
+    "source": "internal/api/order_metafields.go"
   },
   {
     "method": "GET",
@@ -1425,7 +1490,7 @@
     "source": "internal/api/order_attribution.go"
   },
   {
-    "method": "POST",
+    "method": "PATCH",
     "path": "/orders/{}/cancel",
     "source": "internal/api/orders.go"
   },
@@ -1441,7 +1506,7 @@
   },
   {
     "method": "PATCH",
-    "path": "/orders/{}/delivery-status",
+    "path": "/orders/{}/execute_shipment",
     "source": "internal/api/orders.go"
   },
   {
@@ -1450,8 +1515,98 @@
     "source": "internal/api/fulfillment_orders.go"
   },
   {
+    "method": "GET",
+    "path": "/orders/{}/items/app_metafields",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/orders/{}/items/app_metafields/bulk",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/orders/{}/items/app_metafields/bulk",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/orders/{}/items/app_metafields/bulk",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/{}/items/metafields",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/orders/{}/items/metafields/bulk",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/orders/{}/items/metafields/bulk",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/orders/{}/items/metafields/bulk",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/orders/{}/messages",
+    "source": "internal/api/orders.go"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/{}/metafields",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/orders/{}/metafields",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/orders/{}/metafields/bulk",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/orders/{}/metafields/bulk",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/orders/{}/metafields/bulk",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/orders/{}/metafields/{}",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/{}/metafields/{}",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/orders/{}/metafields/{}",
+    "source": "internal/api/order_metafields.go"
+  },
+  {
     "method": "PATCH",
-    "path": "/orders/{}/payment-status",
+    "path": "/orders/{}/order_delivery_status",
+    "source": "internal/api/orders.go"
+  },
+  {
+    "method": "PATCH",
+    "path": "/orders/{}/order_payment_status",
     "source": "internal/api/orders.go"
   },
   {

@@ -1,0 +1,651 @@
+package cmd
+
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"os"
+	"strings"
+
+	"github.com/spf13/cobra"
+)
+
+func readJSONBodyFlags(cmd *cobra.Command) (json.RawMessage, error) {
+	body, _ := cmd.Flags().GetString("body")
+	bodyFile, _ := cmd.Flags().GetString("body-file")
+	if strings.TrimSpace(body) != "" && strings.TrimSpace(bodyFile) != "" {
+		return nil, fmt.Errorf("only one of --body or --body-file may be set")
+	}
+	if strings.TrimSpace(body) == "" && strings.TrimSpace(bodyFile) == "" {
+		return nil, fmt.Errorf("request body required (use --body, --body -, or --body-file)")
+	}
+
+	var b []byte
+	var err error
+	if strings.TrimSpace(bodyFile) != "" {
+		b, err = os.ReadFile(bodyFile)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read --body-file: %w", err)
+		}
+	} else if strings.TrimSpace(body) == "-" {
+		b, err = io.ReadAll(cmd.InOrStdin())
+		if err != nil {
+			return nil, fmt.Errorf("failed to read stdin: %w", err)
+		}
+	} else {
+		b = []byte(body)
+	}
+
+	var tmp any
+	if err := json.Unmarshal(b, &tmp); err != nil {
+		return nil, fmt.Errorf("invalid JSON body: %w", err)
+	}
+	return json.RawMessage(b), nil
+}
+
+// ============================
+// orders metafields (non-app)
+// ============================
+
+var ordersMetafieldsCmd = &cobra.Command{
+	Use:   "metafields",
+	Short: "Manage order metafields",
+}
+
+var ordersMetafieldsListCmd = &cobra.Command{
+	Use:   "list <order-id>",
+	Short: "List metafields attached to an order",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.ListOrderMetafields(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to list order metafields: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var ordersMetafieldsGetCmd = &cobra.Command{
+	Use:   "get <order-id> <metafield-id>",
+	Short: "Get a specific order metafield",
+	Args:  cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.GetOrderMetafield(cmd.Context(), args[0], args[1])
+		if err != nil {
+			return fmt.Errorf("failed to get order metafield: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var ordersMetafieldsCreateCmd = &cobra.Command{
+	Use:   "create <order-id>",
+	Short: "Create an order metafield",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.CreateOrderMetafield(cmd.Context(), args[0], body)
+		if err != nil {
+			return fmt.Errorf("failed to create order metafield: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var ordersMetafieldsUpdateCmd = &cobra.Command{
+	Use:   "update <order-id> <metafield-id>",
+	Short: "Update an order metafield",
+	Args:  cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.UpdateOrderMetafield(cmd.Context(), args[0], args[1], body)
+		if err != nil {
+			return fmt.Errorf("failed to update order metafield: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var ordersMetafieldsDeleteCmd = &cobra.Command{
+	Use:   "delete <order-id> <metafield-id>",
+	Short: "Delete an order metafield",
+	Args:  cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		yes, _ := cmd.Flags().GetBool("yes")
+		if !yes {
+			fmt.Printf("Delete order metafield %s for order %s? [y/N] ", args[1], args[0])
+			var confirm string
+			_, _ = fmt.Scanln(&confirm)
+			if confirm != "y" && confirm != "Y" {
+				fmt.Println("Cancelled.")
+				return nil
+			}
+		}
+		if err := client.DeleteOrderMetafield(cmd.Context(), args[0], args[1]); err != nil {
+			return fmt.Errorf("failed to delete order metafield: %w", err)
+		}
+		fmt.Printf("Deleted order metafield %s (order %s)\n", args[1], args[0])
+		return nil
+	},
+}
+
+var ordersMetafieldsBulkCreateCmd = &cobra.Command{
+	Use:   "bulk-create <order-id>",
+	Short: "Bulk create order metafields",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+		if err := client.BulkCreateOrderMetafields(cmd.Context(), args[0], body); err != nil {
+			return fmt.Errorf("failed to bulk create order metafields: %w", err)
+		}
+		fmt.Println("OK")
+		return nil
+	},
+}
+
+var ordersMetafieldsBulkUpdateCmd = &cobra.Command{
+	Use:   "bulk-update <order-id>",
+	Short: "Bulk update order metafields",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+		if err := client.BulkUpdateOrderMetafields(cmd.Context(), args[0], body); err != nil {
+			return fmt.Errorf("failed to bulk update order metafields: %w", err)
+		}
+		fmt.Println("OK")
+		return nil
+	},
+}
+
+var ordersMetafieldsBulkDeleteCmd = &cobra.Command{
+	Use:   "bulk-delete <order-id>",
+	Short: "Bulk delete order metafields",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+		if err := client.BulkDeleteOrderMetafields(cmd.Context(), args[0], body); err != nil {
+			return fmt.Errorf("failed to bulk delete order metafields: %w", err)
+		}
+		fmt.Println("OK")
+		return nil
+	},
+}
+
+// ============================
+// orders app-metafields (app)
+// ============================
+
+var ordersAppMetafieldsCmd = &cobra.Command{
+	Use:   "app-metafields",
+	Short: "Manage order app metafields",
+}
+
+var ordersAppMetafieldsListCmd = &cobra.Command{
+	Use:   "list <order-id>",
+	Short: "List app metafields attached to an order",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.ListOrderAppMetafields(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to list order app metafields: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var ordersAppMetafieldsGetCmd = &cobra.Command{
+	Use:   "get <order-id> <metafield-id>",
+	Short: "Get a specific order app metafield",
+	Args:  cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.GetOrderAppMetafield(cmd.Context(), args[0], args[1])
+		if err != nil {
+			return fmt.Errorf("failed to get order app metafield: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var ordersAppMetafieldsCreateCmd = &cobra.Command{
+	Use:   "create <order-id>",
+	Short: "Create an order app metafield",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.CreateOrderAppMetafield(cmd.Context(), args[0], body)
+		if err != nil {
+			return fmt.Errorf("failed to create order app metafield: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var ordersAppMetafieldsUpdateCmd = &cobra.Command{
+	Use:   "update <order-id> <metafield-id>",
+	Short: "Update an order app metafield",
+	Args:  cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.UpdateOrderAppMetafield(cmd.Context(), args[0], args[1], body)
+		if err != nil {
+			return fmt.Errorf("failed to update order app metafield: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var ordersAppMetafieldsDeleteCmd = &cobra.Command{
+	Use:   "delete <order-id> <metafield-id>",
+	Short: "Delete an order app metafield",
+	Args:  cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		yes, _ := cmd.Flags().GetBool("yes")
+		if !yes {
+			fmt.Printf("Delete order app metafield %s for order %s? [y/N] ", args[1], args[0])
+			var confirm string
+			_, _ = fmt.Scanln(&confirm)
+			if confirm != "y" && confirm != "Y" {
+				fmt.Println("Cancelled.")
+				return nil
+			}
+		}
+		if err := client.DeleteOrderAppMetafield(cmd.Context(), args[0], args[1]); err != nil {
+			return fmt.Errorf("failed to delete order app metafield: %w", err)
+		}
+		fmt.Printf("Deleted order app metafield %s (order %s)\n", args[1], args[0])
+		return nil
+	},
+}
+
+var ordersAppMetafieldsBulkCreateCmd = &cobra.Command{
+	Use:   "bulk-create <order-id>",
+	Short: "Bulk create order app metafields",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+		if err := client.BulkCreateOrderAppMetafields(cmd.Context(), args[0], body); err != nil {
+			return fmt.Errorf("failed to bulk create order app metafields: %w", err)
+		}
+		fmt.Println("OK")
+		return nil
+	},
+}
+
+var ordersAppMetafieldsBulkUpdateCmd = &cobra.Command{
+	Use:   "bulk-update <order-id>",
+	Short: "Bulk update order app metafields",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+		if err := client.BulkUpdateOrderAppMetafields(cmd.Context(), args[0], body); err != nil {
+			return fmt.Errorf("failed to bulk update order app metafields: %w", err)
+		}
+		fmt.Println("OK")
+		return nil
+	},
+}
+
+var ordersAppMetafieldsBulkDeleteCmd = &cobra.Command{
+	Use:   "bulk-delete <order-id>",
+	Short: "Bulk delete order app metafields",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+		if err := client.BulkDeleteOrderAppMetafields(cmd.Context(), args[0], body); err != nil {
+			return fmt.Errorf("failed to bulk delete order app metafields: %w", err)
+		}
+		fmt.Println("OK")
+		return nil
+	},
+}
+
+// ==================================
+// orders item-metafields (non-app)
+// ==================================
+
+var ordersItemMetafieldsCmd = &cobra.Command{
+	Use:   "item-metafields",
+	Short: "Manage order item metafields",
+}
+
+var ordersItemMetafieldsListCmd = &cobra.Command{
+	Use:   "list <order-id>",
+	Short: "List metafields attached to order items of an order",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.ListOrderItemMetafields(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to list order item metafields: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var ordersItemMetafieldsBulkCreateCmd = &cobra.Command{
+	Use:   "bulk-create <order-id>",
+	Short: "Bulk create order item metafields",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+		if err := client.BulkCreateOrderItemMetafields(cmd.Context(), args[0], body); err != nil {
+			return fmt.Errorf("failed to bulk create order item metafields: %w", err)
+		}
+		fmt.Println("OK")
+		return nil
+	},
+}
+
+var ordersItemMetafieldsBulkUpdateCmd = &cobra.Command{
+	Use:   "bulk-update <order-id>",
+	Short: "Bulk update order item metafields",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+		if err := client.BulkUpdateOrderItemMetafields(cmd.Context(), args[0], body); err != nil {
+			return fmt.Errorf("failed to bulk update order item metafields: %w", err)
+		}
+		fmt.Println("OK")
+		return nil
+	},
+}
+
+var ordersItemMetafieldsBulkDeleteCmd = &cobra.Command{
+	Use:   "bulk-delete <order-id>",
+	Short: "Bulk delete order item metafields",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+		if err := client.BulkDeleteOrderItemMetafields(cmd.Context(), args[0], body); err != nil {
+			return fmt.Errorf("failed to bulk delete order item metafields: %w", err)
+		}
+		fmt.Println("OK")
+		return nil
+	},
+}
+
+// ==================================
+// orders item app-metafields (app)
+// ==================================
+
+var ordersItemAppMetafieldsCmd = &cobra.Command{
+	Use:   "item-app-metafields",
+	Short: "Manage order item app metafields",
+}
+
+var ordersItemAppMetafieldsListCmd = &cobra.Command{
+	Use:   "list <order-id>",
+	Short: "List app metafields attached to order items of an order",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.ListOrderItemAppMetafields(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to list order item app metafields: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var ordersItemAppMetafieldsBulkCreateCmd = &cobra.Command{
+	Use:   "bulk-create <order-id>",
+	Short: "Bulk create order item app metafields",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+		if err := client.BulkCreateOrderItemAppMetafields(cmd.Context(), args[0], body); err != nil {
+			return fmt.Errorf("failed to bulk create order item app metafields: %w", err)
+		}
+		fmt.Println("OK")
+		return nil
+	},
+}
+
+var ordersItemAppMetafieldsBulkUpdateCmd = &cobra.Command{
+	Use:   "bulk-update <order-id>",
+	Short: "Bulk update order item app metafields",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+		if err := client.BulkUpdateOrderItemAppMetafields(cmd.Context(), args[0], body); err != nil {
+			return fmt.Errorf("failed to bulk update order item app metafields: %w", err)
+		}
+		fmt.Println("OK")
+		return nil
+	},
+}
+
+var ordersItemAppMetafieldsBulkDeleteCmd = &cobra.Command{
+	Use:   "bulk-delete <order-id>",
+	Short: "Bulk delete order item app metafields",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+		if err := client.BulkDeleteOrderItemAppMetafields(cmd.Context(), args[0], body); err != nil {
+			return fmt.Errorf("failed to bulk delete order item app metafields: %w", err)
+		}
+		fmt.Println("OK")
+		return nil
+	},
+}
+
+func init() {
+	// orders metafields
+	ordersCmd.AddCommand(ordersMetafieldsCmd)
+	ordersMetafieldsCmd.AddCommand(ordersMetafieldsListCmd)
+	ordersMetafieldsCmd.AddCommand(ordersMetafieldsGetCmd)
+	ordersMetafieldsCmd.AddCommand(ordersMetafieldsCreateCmd)
+	ordersMetafieldsCmd.AddCommand(ordersMetafieldsUpdateCmd)
+	ordersMetafieldsCmd.AddCommand(ordersMetafieldsDeleteCmd)
+	ordersMetafieldsCmd.AddCommand(ordersMetafieldsBulkCreateCmd)
+	ordersMetafieldsCmd.AddCommand(ordersMetafieldsBulkUpdateCmd)
+	ordersMetafieldsCmd.AddCommand(ordersMetafieldsBulkDeleteCmd)
+
+	for _, c := range []*cobra.Command{
+		ordersMetafieldsCreateCmd,
+		ordersMetafieldsUpdateCmd,
+		ordersMetafieldsBulkCreateCmd,
+		ordersMetafieldsBulkUpdateCmd,
+		ordersMetafieldsBulkDeleteCmd,
+	} {
+		c.Flags().String("body", "", "JSON request body (use '-' to read stdin)")
+		c.Flags().String("body-file", "", "Path to JSON file for request body")
+	}
+
+	// orders app-metafields
+	ordersCmd.AddCommand(ordersAppMetafieldsCmd)
+	ordersAppMetafieldsCmd.AddCommand(ordersAppMetafieldsListCmd)
+	ordersAppMetafieldsCmd.AddCommand(ordersAppMetafieldsGetCmd)
+	ordersAppMetafieldsCmd.AddCommand(ordersAppMetafieldsCreateCmd)
+	ordersAppMetafieldsCmd.AddCommand(ordersAppMetafieldsUpdateCmd)
+	ordersAppMetafieldsCmd.AddCommand(ordersAppMetafieldsDeleteCmd)
+	ordersAppMetafieldsCmd.AddCommand(ordersAppMetafieldsBulkCreateCmd)
+	ordersAppMetafieldsCmd.AddCommand(ordersAppMetafieldsBulkUpdateCmd)
+	ordersAppMetafieldsCmd.AddCommand(ordersAppMetafieldsBulkDeleteCmd)
+
+	for _, c := range []*cobra.Command{
+		ordersAppMetafieldsCreateCmd,
+		ordersAppMetafieldsUpdateCmd,
+		ordersAppMetafieldsBulkCreateCmd,
+		ordersAppMetafieldsBulkUpdateCmd,
+		ordersAppMetafieldsBulkDeleteCmd,
+	} {
+		c.Flags().String("body", "", "JSON request body (use '-' to read stdin)")
+		c.Flags().String("body-file", "", "Path to JSON file for request body")
+	}
+
+	// orders item-metafields
+	ordersCmd.AddCommand(ordersItemMetafieldsCmd)
+	ordersItemMetafieldsCmd.AddCommand(ordersItemMetafieldsListCmd)
+	ordersItemMetafieldsCmd.AddCommand(ordersItemMetafieldsBulkCreateCmd)
+	ordersItemMetafieldsCmd.AddCommand(ordersItemMetafieldsBulkUpdateCmd)
+	ordersItemMetafieldsCmd.AddCommand(ordersItemMetafieldsBulkDeleteCmd)
+
+	for _, c := range []*cobra.Command{
+		ordersItemMetafieldsBulkCreateCmd,
+		ordersItemMetafieldsBulkUpdateCmd,
+		ordersItemMetafieldsBulkDeleteCmd,
+	} {
+		c.Flags().String("body", "", "JSON request body (use '-' to read stdin)")
+		c.Flags().String("body-file", "", "Path to JSON file for request body")
+	}
+
+	// orders item-app-metafields
+	ordersCmd.AddCommand(ordersItemAppMetafieldsCmd)
+	ordersItemAppMetafieldsCmd.AddCommand(ordersItemAppMetafieldsListCmd)
+	ordersItemAppMetafieldsCmd.AddCommand(ordersItemAppMetafieldsBulkCreateCmd)
+	ordersItemAppMetafieldsCmd.AddCommand(ordersItemAppMetafieldsBulkUpdateCmd)
+	ordersItemAppMetafieldsCmd.AddCommand(ordersItemAppMetafieldsBulkDeleteCmd)
+
+	for _, c := range []*cobra.Command{
+		ordersItemAppMetafieldsBulkCreateCmd,
+		ordersItemAppMetafieldsBulkUpdateCmd,
+		ordersItemAppMetafieldsBulkDeleteCmd,
+	} {
+		c.Flags().String("body", "", "JSON request body (use '-' to read stdin)")
+		c.Flags().String("body-file", "", "Path to JSON file for request body")
+	}
+}
+

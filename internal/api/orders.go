@@ -268,7 +268,8 @@ func (c *Client) CancelOrder(ctx context.Context, id string) error {
 	if strings.TrimSpace(id) == "" {
 		return fmt.Errorf("order id is required")
 	}
-	return c.Post(ctx, fmt.Sprintf("/orders/%s/cancel", id), nil, nil)
+	// Docs: PATCH /orders/{orderId}/cancel
+	return c.Patch(ctx, fmt.Sprintf("/orders/%s/cancel", id), nil, nil)
 }
 
 // OrderSearchOptions contains options for searching orders.
@@ -401,6 +402,16 @@ func (c *Client) ListArchivedOrders(ctx context.Context, opts *ArchivedOrdersLis
 	return &resp, nil
 }
 
+// CreateArchivedOrdersReport creates an archived orders report.
+// Docs: POST /orders/archived_orders
+func (c *Client) CreateArchivedOrdersReport(ctx context.Context, body any) (json.RawMessage, error) {
+	var resp json.RawMessage
+	if err := c.Post(ctx, "/orders/archived_orders", body, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
 // CreateOrder creates a new order.
 func (c *Client) CreateOrder(ctx context.Context, req *OrderCreateRequest) (*Order, error) {
 	var order Order
@@ -416,7 +427,8 @@ func (c *Client) UpdateOrder(ctx context.Context, id string, req *OrderUpdateReq
 		return nil, fmt.Errorf("order id is required")
 	}
 	var order Order
-	if err := c.Put(ctx, fmt.Sprintf("/orders/%s", id), req, &order); err != nil {
+	// Docs: PATCH /orders/{id}
+	if err := c.Patch(ctx, fmt.Sprintf("/orders/%s", id), req, &order); err != nil {
 		return nil, err
 	}
 	return &order, nil
@@ -442,7 +454,8 @@ func (c *Client) UpdateOrderDeliveryStatus(ctx context.Context, id string, statu
 	}
 	req := &OrderDeliveryStatusUpdateRequest{DeliveryStatus: status}
 	var order Order
-	if err := c.Patch(ctx, fmt.Sprintf("/orders/%s/delivery-status", id), req, &order); err != nil {
+	// Docs: PATCH /orders/{id}/order_delivery_status
+	if err := c.Patch(ctx, fmt.Sprintf("/orders/%s/order_delivery_status", id), req, &order); err != nil {
 		return nil, err
 	}
 	return &order, nil
@@ -455,7 +468,8 @@ func (c *Client) UpdateOrderPaymentStatus(ctx context.Context, id string, status
 	}
 	req := &OrderPaymentStatusUpdateRequest{PaymentStatus: status}
 	var order Order
-	if err := c.Patch(ctx, fmt.Sprintf("/orders/%s/payment-status", id), req, &order); err != nil {
+	// Docs: PATCH /orders/{id}/order_payment_status
+	if err := c.Patch(ctx, fmt.Sprintf("/orders/%s/order_payment_status", id), req, &order); err != nil {
 		return nil, err
 	}
 	return &order, nil
@@ -509,8 +523,78 @@ func (c *Client) BulkExecuteShipment(ctx context.Context, orderIDs []string) (*B
 	}
 	req := &BulkShipmentRequest{OrderIDs: orderIDs}
 	var resp BulkShipmentResponse
-	if err := c.Post(ctx, "/orders/bulk-execute-shipment", req, &resp); err != nil {
+	// Docs: PATCH /orders/execute_shipment
+	if err := c.Patch(ctx, "/orders/execute_shipment", req, &resp); err != nil {
 		return nil, err
 	}
 	return &resp, nil
+}
+
+// ExecuteShipment executes shipment for a single order.
+// Docs: PATCH /orders/{id}/execute_shipment
+func (c *Client) ExecuteShipment(ctx context.Context, id string, body any) (json.RawMessage, error) {
+	if strings.TrimSpace(id) == "" {
+		return nil, fmt.Errorf("order id is required")
+	}
+	var resp json.RawMessage
+	if err := c.Patch(ctx, fmt.Sprintf("/orders/%s/execute_shipment", id), body, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+// GetOrderLabels retrieves delivery labels for order IDs.
+// Docs: GET /orders/label
+func (c *Client) GetOrderLabels(ctx context.Context, opts any) (json.RawMessage, error) {
+	var resp json.RawMessage
+	if err := c.Get(ctx, "/orders/label", &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+// ListOrderTags retrieves all order tags.
+// Docs: GET /orders/tags
+func (c *Client) ListOrderTags(ctx context.Context) (json.RawMessage, error) {
+	var resp json.RawMessage
+	if err := c.Get(ctx, "/orders/tags", &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+// GetOrderTransactions retrieves order transaction info for order IDs.
+// Docs: GET /orders/transactions
+func (c *Client) GetOrderTransactions(ctx context.Context, opts any) (json.RawMessage, error) {
+	var resp json.RawMessage
+	if err := c.Get(ctx, "/orders/transactions", &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+// GetOrderActionLogs retrieves action logs for an order.
+// Docs: GET /orders/{id}/action_logs
+func (c *Client) GetOrderActionLogs(ctx context.Context, id string) (json.RawMessage, error) {
+	if strings.TrimSpace(id) == "" {
+		return nil, fmt.Errorf("order id is required")
+	}
+	var resp json.RawMessage
+	if err := c.Get(ctx, fmt.Sprintf("/orders/%s/action_logs", id), &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+// PostOrderMessage creates an order message.
+// Docs: POST /orders/{id}/messages
+func (c *Client) PostOrderMessage(ctx context.Context, id string, body any) (json.RawMessage, error) {
+	if strings.TrimSpace(id) == "" {
+		return nil, fmt.Errorf("order id is required")
+	}
+	var resp json.RawMessage
+	if err := c.Post(ctx, fmt.Sprintf("/orders/%s/messages", id), body, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
 }

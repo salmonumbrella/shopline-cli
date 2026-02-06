@@ -139,9 +139,9 @@ go run ./cmd/shopline-coverage
 
 ### Phase 1: Orders + Order Items + Metafields (Complete the Core Commerce Loop)
 
-- [ ] Ensure all orders endpoints from docs exist in `internal/api/orders.go`
-- [ ] Add missing order item metafields endpoints
-- [ ] Add CLI commands for those endpoints
+- [x] Ensure all orders endpoints from docs exist in `internal/api/orders.go`
+- [x] Add missing order item metafields endpoints
+- [x] Add CLI commands for those endpoints
 
 ### Phase 2: Products + Inventory + Pricing
 

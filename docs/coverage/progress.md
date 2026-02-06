@@ -11,8 +11,8 @@ go run ./cmd/shopline-coverage
 
 ## Open API
 
-- [ ] Orders
-- [ ] Order metafields
+- [x] Orders
+- [x] Order metafields
 - [x] Products (endpoints wired; types still partially raw for metafields/stocks)
 - [ ] Customers
 - [ ] Store credits

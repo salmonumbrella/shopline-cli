@@ -389,7 +389,7 @@ func init() {
 	schema.Register(schema.Resource{
 		Name:        "orders",
 		Description: "Manage customer orders",
-		Commands:    []string{"list", "get", "cancel"},
+		Commands:    []string{"list", "get", "cancel", "metafields", "app-metafields", "item-metafields", "item-app-metafields"},
 		IDPrefix:    "order",
 	})
 }

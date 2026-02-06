@@ -173,8 +173,8 @@ func TestOrdersListWithOptions(t *testing.T) {
 
 func TestCancelOrder(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			t.Errorf("Expected POST, got %s", r.Method)
+		if r.Method != http.MethodPatch {
+			t.Errorf("Expected PATCH, got %s", r.Method)
 		}
 		if r.URL.Path != "/orders/ord_123/cancel" {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
@@ -351,6 +351,32 @@ func TestListArchivedOrders(t *testing.T) {
 	}
 }
 
+func TestCreateArchivedOrdersReport(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("Expected POST, got %s", r.Method)
+		}
+		if r.URL.Path != "/orders/archived_orders" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"status":"ok"}`))
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	resp, err := client.CreateArchivedOrdersReport(context.Background(), json.RawMessage(`{"from":"2026-01-01"}`))
+	if err != nil {
+		t.Fatalf("CreateArchivedOrdersReport failed: %v", err)
+	}
+	if string(resp) == "" {
+		t.Fatalf("expected response, got empty")
+	}
+}
+
 func TestListArchivedOrdersAPIError(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -454,8 +480,8 @@ func TestCreateOrderAPIError(t *testing.T) {
 
 func TestUpdateOrder(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPut {
-			t.Errorf("Expected PUT, got %s", r.Method)
+		if r.Method != http.MethodPatch {
+			t.Errorf("Expected PATCH, got %s", r.Method)
 		}
 		if r.URL.Path != "/orders/ord_123" {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
@@ -626,7 +652,7 @@ func TestUpdateOrderDeliveryStatus(t *testing.T) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("Expected PATCH, got %s", r.Method)
 		}
-		if r.URL.Path != "/orders/ord_123/delivery-status" {
+		if r.URL.Path != "/orders/ord_123/order_delivery_status" {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
 		}
 
@@ -708,7 +734,7 @@ func TestUpdateOrderPaymentStatus(t *testing.T) {
 		if r.Method != http.MethodPatch {
 			t.Errorf("Expected PATCH, got %s", r.Method)
 		}
-		if r.URL.Path != "/orders/ord_123/payment-status" {
+		if r.URL.Path != "/orders/ord_123/order_payment_status" {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
 		}
 
@@ -1073,10 +1099,10 @@ func TestSplitOrderAPIError(t *testing.T) {
 
 func TestBulkExecuteShipment(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			t.Errorf("Expected POST, got %s", r.Method)
+		if r.Method != http.MethodPatch {
+			t.Errorf("Expected PATCH, got %s", r.Method)
 		}
-		if r.URL.Path != "/orders/bulk-execute-shipment" {
+		if r.URL.Path != "/orders/execute_shipment" {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
 		}
 

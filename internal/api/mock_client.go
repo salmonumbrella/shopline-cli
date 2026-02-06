@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 )
 
@@ -1861,3 +1862,98 @@ func (m *MockClient) VoidPayment(ctx context.Context, id string) (*Payment, erro
 	return nil, m.notImplemented("VoidPayment")
 }
 
+func (m *MockClient) ListOrderMetafields(ctx context.Context, orderID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListOrderMetafields")
+}
+
+func (m *MockClient) GetOrderMetafield(ctx context.Context, orderID, metafieldID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetOrderMetafield")
+}
+
+func (m *MockClient) CreateOrderMetafield(ctx context.Context, orderID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("CreateOrderMetafield")
+}
+
+func (m *MockClient) UpdateOrderMetafield(ctx context.Context, orderID, metafieldID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateOrderMetafield")
+}
+
+func (m *MockClient) DeleteOrderMetafield(ctx context.Context, orderID, metafieldID string) error {
+	return m.notImplemented("DeleteOrderMetafield")
+}
+
+func (m *MockClient) BulkCreateOrderMetafields(ctx context.Context, orderID string, body any) error {
+	return m.notImplemented("BulkCreateOrderMetafields")
+}
+
+func (m *MockClient) BulkUpdateOrderMetafields(ctx context.Context, orderID string, body any) error {
+	return m.notImplemented("BulkUpdateOrderMetafields")
+}
+
+func (m *MockClient) BulkDeleteOrderMetafields(ctx context.Context, orderID string, body any) error {
+	return m.notImplemented("BulkDeleteOrderMetafields")
+}
+
+func (m *MockClient) ListOrderAppMetafields(ctx context.Context, orderID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListOrderAppMetafields")
+}
+
+func (m *MockClient) GetOrderAppMetafield(ctx context.Context, orderID, metafieldID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetOrderAppMetafield")
+}
+
+func (m *MockClient) CreateOrderAppMetafield(ctx context.Context, orderID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("CreateOrderAppMetafield")
+}
+
+func (m *MockClient) UpdateOrderAppMetafield(ctx context.Context, orderID, metafieldID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateOrderAppMetafield")
+}
+
+func (m *MockClient) DeleteOrderAppMetafield(ctx context.Context, orderID, metafieldID string) error {
+	return m.notImplemented("DeleteOrderAppMetafield")
+}
+
+func (m *MockClient) BulkCreateOrderAppMetafields(ctx context.Context, orderID string, body any) error {
+	return m.notImplemented("BulkCreateOrderAppMetafields")
+}
+
+func (m *MockClient) BulkUpdateOrderAppMetafields(ctx context.Context, orderID string, body any) error {
+	return m.notImplemented("BulkUpdateOrderAppMetafields")
+}
+
+func (m *MockClient) BulkDeleteOrderAppMetafields(ctx context.Context, orderID string, body any) error {
+	return m.notImplemented("BulkDeleteOrderAppMetafields")
+}
+
+func (m *MockClient) ListOrderItemMetafields(ctx context.Context, orderID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListOrderItemMetafields")
+}
+
+func (m *MockClient) BulkCreateOrderItemMetafields(ctx context.Context, orderID string, body any) error {
+	return m.notImplemented("BulkCreateOrderItemMetafields")
+}
+
+func (m *MockClient) BulkUpdateOrderItemMetafields(ctx context.Context, orderID string, body any) error {
+	return m.notImplemented("BulkUpdateOrderItemMetafields")
+}
+
+func (m *MockClient) BulkDeleteOrderItemMetafields(ctx context.Context, orderID string, body any) error {
+	return m.notImplemented("BulkDeleteOrderItemMetafields")
+}
+
+func (m *MockClient) ListOrderItemAppMetafields(ctx context.Context, orderID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListOrderItemAppMetafields")
+}
+
+func (m *MockClient) BulkCreateOrderItemAppMetafields(ctx context.Context, orderID string, body any) error {
+	return m.notImplemented("BulkCreateOrderItemAppMetafields")
+}
+
+func (m *MockClient) BulkUpdateOrderItemAppMetafields(ctx context.Context, orderID string, body any) error {
+	return m.notImplemented("BulkUpdateOrderItemAppMetafields")
+}
+
+func (m *MockClient) BulkDeleteOrderItemAppMetafields(ctx context.Context, orderID string, body any) error {
+	return m.notImplemented("BulkDeleteOrderItemAppMetafields")
+}

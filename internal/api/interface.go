@@ -1,6 +1,9 @@
 package api
 
-import "context"
+import (
+	"context"
+	"encoding/json"
+)
 
 // APIClient defines the interface for Shopline API operations.
 // This interface is implemented by *Client and can be mocked for testing.
@@ -238,6 +241,37 @@ type APIClient interface {
 	GetOperationLog(ctx context.Context, id string) (*OperationLog, error)
 	GetOrder(ctx context.Context, id string) (*Order, error)
 	GetOrderAttribution(ctx context.Context, orderID string) (*OrderAttribution, error)
+	// Order metafields (nested endpoints under /orders/{id}/...)
+	ListOrderMetafields(ctx context.Context, orderID string) (json.RawMessage, error)
+	GetOrderMetafield(ctx context.Context, orderID, metafieldID string) (json.RawMessage, error)
+	CreateOrderMetafield(ctx context.Context, orderID string, body any) (json.RawMessage, error)
+	UpdateOrderMetafield(ctx context.Context, orderID, metafieldID string, body any) (json.RawMessage, error)
+	DeleteOrderMetafield(ctx context.Context, orderID, metafieldID string) error
+	BulkCreateOrderMetafields(ctx context.Context, orderID string, body any) error
+	BulkUpdateOrderMetafields(ctx context.Context, orderID string, body any) error
+	BulkDeleteOrderMetafields(ctx context.Context, orderID string, body any) error
+
+	// Order app metafields (nested endpoints under /orders/{id}/...)
+	ListOrderAppMetafields(ctx context.Context, orderID string) (json.RawMessage, error)
+	GetOrderAppMetafield(ctx context.Context, orderID, metafieldID string) (json.RawMessage, error)
+	CreateOrderAppMetafield(ctx context.Context, orderID string, body any) (json.RawMessage, error)
+	UpdateOrderAppMetafield(ctx context.Context, orderID, metafieldID string, body any) (json.RawMessage, error)
+	DeleteOrderAppMetafield(ctx context.Context, orderID, metafieldID string) error
+	BulkCreateOrderAppMetafields(ctx context.Context, orderID string, body any) error
+	BulkUpdateOrderAppMetafields(ctx context.Context, orderID string, body any) error
+	BulkDeleteOrderAppMetafields(ctx context.Context, orderID string, body any) error
+
+	// Order item metafields (nested endpoints under /orders/{id}/items/...)
+	ListOrderItemMetafields(ctx context.Context, orderID string) (json.RawMessage, error)
+	BulkCreateOrderItemMetafields(ctx context.Context, orderID string, body any) error
+	BulkUpdateOrderItemMetafields(ctx context.Context, orderID string, body any) error
+	BulkDeleteOrderItemMetafields(ctx context.Context, orderID string, body any) error
+
+	// Order item app metafields (nested endpoints under /orders/{id}/items/...)
+	ListOrderItemAppMetafields(ctx context.Context, orderID string) (json.RawMessage, error)
+	BulkCreateOrderItemAppMetafields(ctx context.Context, orderID string, body any) error
+	BulkUpdateOrderItemAppMetafields(ctx context.Context, orderID string, body any) error
+	BulkDeleteOrderItemAppMetafields(ctx context.Context, orderID string, body any) error
 	GetOrderRisk(ctx context.Context, orderID, riskID string) (*OrderRisk, error)
 	GetPage(ctx context.Context, id string) (*Page, error)
 	GetPayment(ctx context.Context, id string) (*Payment, error)

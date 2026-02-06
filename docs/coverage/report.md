@@ -3,9 +3,9 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 542
-- Missing in code: 178
-- Extra in code: 412
+- Code endpoints detected: 573
+- Missing in code: 142
+- Extra in code: 407
 - Unparsed doc pages: 55
 
 ## Unparsed Doc Pages
@@ -158,42 +158,6 @@
 - `GET /multipass/linkings` (https://open-api.docs.shoplineapp.com/reference/get_multipass-linkings)
 - `GET /multipass/secret` (https://open-api.docs.shoplineapp.com/reference/get_multipass-secret)
 - `POST /multipass/secret` (https://open-api.docs.shoplineapp.com/reference/post_multipass-secret)
-- `POST /orders/archived_orders` (https://open-api.docs.shoplineapp.com/reference/post_orders-archived-orders)
-- `PATCH /orders/execute_shipment` (https://open-api.docs.shoplineapp.com/reference/patch_orders-execute-shipment-1)
-- `GET /orders/label` (https://open-api.docs.shoplineapp.com/reference/get_orders-label-1)
-- `GET /orders/tags` (https://open-api.docs.shoplineapp.com/reference/get_orders-tags-1)
-- `GET /orders/transactions` (https://open-api.docs.shoplineapp.com/reference/get_orders-transactions-1)
-- `PATCH /orders/{}` (https://open-api.docs.shoplineapp.com/reference/patch_orders-id-1)
-- `GET /orders/{}/action_logs` (https://open-api.docs.shoplineapp.com/reference/get_orders-id-action-logs-1)
-- `GET /orders/{}/app_metafields` (https://open-api.docs.shoplineapp.com/reference/get_orders-order-id-app-metafields)
-- `POST /orders/{}/app_metafields` (https://open-api.docs.shoplineapp.com/reference/post_orders-order-id-app-metafields)
-- `DELETE /orders/{}/app_metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/delete_orders-order-id-app-metafields-bulk)
-- `POST /orders/{}/app_metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/post_orders-order-id-app-metafields-bulk)
-- `PUT /orders/{}/app_metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/put_orders-order-id-app-metafields-bulk)
-- `DELETE /orders/{}/app_metafields/{}` (https://open-api.docs.shoplineapp.com/reference/delete_orders-order-id-app-metafields-metafield-id)
-- `GET /orders/{}/app_metafields/{}` (https://open-api.docs.shoplineapp.com/reference/get_orders-order-id-app-metafields-metafield-id)
-- `PUT /orders/{}/app_metafields/{}` (https://open-api.docs.shoplineapp.com/reference/put_orders-order-id-app-metafields-metafield-id)
-- `PATCH /orders/{}/cancel` (https://open-api.docs.shoplineapp.com/reference/patch_orders-orderid-cancel)
-- `PATCH /orders/{}/execute_shipment` (https://open-api.docs.shoplineapp.com/reference/patch_orders-id-execute-shipment-1)
-- `GET /orders/{}/items/app_metafields` (https://open-api.docs.shoplineapp.com/reference/get_orders-order-id-items-app-metafields)
-- `DELETE /orders/{}/items/app_metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/delete_orders-order-id-items-app-metafields-bulk)
-- `POST /orders/{}/items/app_metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/post_orders-order-id-items-app-metafields-bulk)
-- `PUT /orders/{}/items/app_metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/put_orders-order-id-items-app-metafields-bulk)
-- `GET /orders/{}/items/metafields` (https://open-api.docs.shoplineapp.com/reference/get_orders-order-id-items-metafields)
-- `DELETE /orders/{}/items/metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/delete_orders-order-id-items-metafields-bulk)
-- `POST /orders/{}/items/metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/post_orders-order-id-items-metafields-bulk)
-- `PUT /orders/{}/items/metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/put_orders-order-id-items-metafields-bulk)
-- `POST /orders/{}/messages` (https://open-api.docs.shoplineapp.com/reference/post_orders-id-messages-1)
-- `GET /orders/{}/metafields` (https://open-api.docs.shoplineapp.com/reference/get_orders-order-id-metafields-1)
-- `POST /orders/{}/metafields` (https://open-api.docs.shoplineapp.com/reference/post_orders-order-id-metafields-1)
-- `DELETE /orders/{}/metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/delete_orders-order-id-metafields-bulk-1)
-- `POST /orders/{}/metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/post_orders-order-id-metafields-bulk-1)
-- `PUT /orders/{}/metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/put_orders-order-id-metafields-bulk-1)
-- `DELETE /orders/{}/metafields/{}` (https://open-api.docs.shoplineapp.com/reference/delete_orders-order-id-metafields-metafield-id-1)
-- `GET /orders/{}/metafields/{}` (https://open-api.docs.shoplineapp.com/reference/get_orders-order-id-metafields-metafield-id-1)
-- `PUT /orders/{}/metafields/{}` (https://open-api.docs.shoplineapp.com/reference/put_orders-order-id-metafields-metafield-id-1)
-- `PATCH /orders/{}/order_delivery_status` (https://open-api.docs.shoplineapp.com/reference/patch_orders-id-order-delivery-status-1)
-- `PATCH /orders/{}/order_payment_status` (https://open-api.docs.shoplineapp.com/reference/patch_orders-id-order-payment-status-1)
 - `GET /pos/purchase_orders` (https://open-api.docs.shoplineapp.com/reference/get_pos-purchase-orders)
 - `POST /pos/purchase_orders` (https://open-api.docs.shoplineapp.com/reference/post_pos-purchase-orders)
 - `PUT /pos/purchase_orders/bulk_delete` (https://open-api.docs.shoplineapp.com/reference/put_pos-purchase-orders-bulk-delete)
@@ -482,15 +446,10 @@
 - `GET /operation_logs/{}` (internal/api/operation_logs.go)
 - `GET /order_attributions` (internal/api/order_attribution.go)
 - `GET /orders/archived` (internal/api/orders.go)
-- `POST /orders/bulk-execute-shipment` (internal/api/orders.go)
-- `PUT /orders/{}` (internal/api/orders.go)
 - `GET /orders/{}/attribution` (internal/api/order_attribution.go)
-- `POST /orders/{}/cancel` (internal/api/orders.go)
 - `GET /orders/{}/delivery` (internal/api/order_delivery.go)
 - `PUT /orders/{}/delivery` (internal/api/order_delivery.go)
-- `PATCH /orders/{}/delivery-status` (internal/api/orders.go)
 - `GET /orders/{}/fulfillment_orders` (internal/api/fulfillment_orders.go)
-- `PATCH /orders/{}/payment-status` (internal/api/orders.go)
 - `GET /orders/{}/payments` (internal/api/payments.go)
 - `GET /orders/{}/refunds` (internal/api/refunds.go)
 - `GET /orders/{}/risks` (internal/api/order_risks.go)
