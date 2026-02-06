@@ -3,8 +3,8 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 670
-- Missing in code: 42
+- Code endpoints detected: 673
+- Missing in code: 39
 - Extra in code: 404
 - Unparsed doc pages: 55
 
@@ -73,9 +73,6 @@
 - `GET /affiliate_campaigns/{}/orders` (https://open-api.docs.shoplineapp.com/reference/get_affiliate-campaigns-id-orders)
 - `GET /affiliate_campaigns/{}/summary` (https://open-api.docs.shoplineapp.com/reference/get_affiliate-campaigns-id-summary)
 - `POST /conversations/message` (https://open-api.docs.shoplineapp.com/reference/post_conversations-message)
-- `GET /delivery_options/delivery_config` (https://open-api.docs.shoplineapp.com/reference/get_delivery-options-delivery-config)
-- `GET /delivery_options/{}/delivery_time_slots` (https://open-api.docs.shoplineapp.com/reference/get_delivery-options-delivery-option-id-delivery-time-slots)
-- `PUT /delivery_options/{}/stores_info` (https://open-api.docs.shoplineapp.com/reference/put_delivery-options-id-stores-info-1)
 - `GET /flash_price_campaigns` (https://open-api.docs.shoplineapp.com/reference/get_flash-price-campaigns-1)
 - `POST /flash_price_campaigns` (https://open-api.docs.shoplineapp.com/reference/post_flash-price-campaigns-1)
 - `DELETE /flash_price_campaigns/{}` (https://open-api.docs.shoplineapp.com/reference/delete_flash-price-campaigns-id-1)

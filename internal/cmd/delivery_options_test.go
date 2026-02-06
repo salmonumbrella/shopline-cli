@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"testing"
 	"time"
@@ -24,6 +25,14 @@ type deliveryOptionsAPIClient struct {
 	listDeliveryTimeSlotsErr       error
 	updateDeliveryOptionPickupResp *api.DeliveryOption
 	updateDeliveryOptionPickupErr  error
+
+	getDeliveryConfigResp        json.RawMessage
+	getDeliveryConfigErr         error
+	getDeliveryTimeSlotsOpenResp json.RawMessage
+	getDeliveryTimeSlotsOpenErr  error
+	updateDeliveryStoresInfoResp json.RawMessage
+	updateDeliveryStoresInfoErr  error
+	lastUpdateStoresInfoBody     json.RawMessage
 }
 
 func (m *deliveryOptionsAPIClient) ListDeliveryOptions(ctx context.Context, opts *api.DeliveryOptionsListOptions) (*api.DeliveryOptionsListResponse, error) {
@@ -42,14 +51,32 @@ func (m *deliveryOptionsAPIClient) UpdateDeliveryOptionPickupStore(ctx context.C
 	return m.updateDeliveryOptionPickupResp, m.updateDeliveryOptionPickupErr
 }
 
+func (m *deliveryOptionsAPIClient) GetDeliveryConfig(ctx context.Context, opts *api.DeliveryConfigOptions) (json.RawMessage, error) {
+	return m.getDeliveryConfigResp, m.getDeliveryConfigErr
+}
+
+func (m *deliveryOptionsAPIClient) GetDeliveryTimeSlotsOpenAPI(ctx context.Context, id string) (json.RawMessage, error) {
+	return m.getDeliveryTimeSlotsOpenResp, m.getDeliveryTimeSlotsOpenErr
+}
+
+func (m *deliveryOptionsAPIClient) UpdateDeliveryOptionStoresInfo(ctx context.Context, id string, body any) (json.RawMessage, error) {
+	if b, ok := body.(json.RawMessage); ok {
+		m.lastUpdateStoresInfoBody = b
+	}
+	return m.updateDeliveryStoresInfoResp, m.updateDeliveryStoresInfoErr
+}
+
 func TestDeliveryOptionsCommandStructure(t *testing.T) {
 	subcommands := deliveryOptionsCmd.Commands()
 
 	expectedCmds := map[string]bool{
-		"list":          false,
-		"get":           false,
-		"time-slots":    false,
-		"update-pickup": false,
+		"list":                false,
+		"get":                 false,
+		"time-slots":          false,
+		"delivery-time-slots": false,
+		"update-pickup":       false,
+		"config":              false,
+		"stores-info":         false,
 	}
 
 	for _, cmd := range subcommands {
@@ -569,5 +596,154 @@ func TestDeliveryOptionsCommandSetup(t *testing.T) {
 	}
 	if deliveryOptionsCmd.Short != "Manage delivery options" {
 		t.Errorf("expected Short 'Manage delivery options', got %q", deliveryOptionsCmd.Short)
+	}
+}
+
+func TestDeliveryOptionsStoresInfoUpdateFlags(t *testing.T) {
+	flags := []string{"body", "body-file"}
+	for _, flagName := range flags {
+		if deliveryOptionsStoresInfoUpdateCmd.Flags().Lookup(flagName) == nil {
+			t.Errorf("Expected flag %q not found on stores-info update command", flagName)
+		}
+	}
+}
+
+func TestDeliveryOptionsConfigGetRunE_WithMockAPI(t *testing.T) {
+	origClientFactory := clientFactory
+	origSecretsFactory := secretsStoreFactory
+	origWriter := formatterWriter
+	defer func() {
+		clientFactory = origClientFactory
+		secretsStoreFactory = origSecretsFactory
+		formatterWriter = origWriter
+	}()
+
+	secretsStoreFactory = func() (CredentialStore, error) {
+		return &mockStore{
+			names: []string{"test"},
+			creds: map[string]*secrets.StoreCredentials{
+				"test": {Handle: "test", AccessToken: "token"},
+			},
+		}, nil
+	}
+
+	mockClient := &deliveryOptionsAPIClient{
+		getDeliveryConfigResp: json.RawMessage(`{"ok":true}`),
+	}
+	clientFactory = func(handle, accessToken string) api.APIClient {
+		return mockClient
+	}
+
+	var buf bytes.Buffer
+	formatterWriter = &buf
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "json", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+	cmd.Flags().Bool("items-only", false, "")
+	cmd.Flags().String("type", "shipping", "")
+	cmd.Flags().String("delivery-option-id", "", "")
+
+	if err := deliveryOptionsConfigGetCmd.RunE(cmd, []string{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !bytes.Contains(buf.Bytes(), []byte(`"ok": true`)) {
+		t.Fatalf("expected ok=true in output, got %q", buf.String())
+	}
+}
+
+func TestDeliveryOptionsDeliveryTimeSlotsRunE_WithMockAPI(t *testing.T) {
+	origClientFactory := clientFactory
+	origSecretsFactory := secretsStoreFactory
+	origWriter := formatterWriter
+	defer func() {
+		clientFactory = origClientFactory
+		secretsStoreFactory = origSecretsFactory
+		formatterWriter = origWriter
+	}()
+
+	secretsStoreFactory = func() (CredentialStore, error) {
+		return &mockStore{
+			names: []string{"test"},
+			creds: map[string]*secrets.StoreCredentials{
+				"test": {Handle: "test", AccessToken: "token"},
+			},
+		}, nil
+	}
+
+	mockClient := &deliveryOptionsAPIClient{
+		getDeliveryTimeSlotsOpenResp: json.RawMessage(`{"items":[]}`),
+	}
+	clientFactory = func(handle, accessToken string) api.APIClient {
+		return mockClient
+	}
+
+	var buf bytes.Buffer
+	formatterWriter = &buf
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "json", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+	cmd.Flags().Bool("items-only", false, "")
+
+	if err := deliveryOptionsDeliveryTimeSlotsCmd.RunE(cmd, []string{"do_123"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !bytes.Contains(buf.Bytes(), []byte(`"items": []`)) {
+		t.Fatalf("expected items in output, got %q", buf.String())
+	}
+}
+
+func TestDeliveryOptionsStoresInfoUpdateRunE_WithMockAPI(t *testing.T) {
+	origClientFactory := clientFactory
+	origSecretsFactory := secretsStoreFactory
+	origWriter := formatterWriter
+	defer func() {
+		clientFactory = origClientFactory
+		secretsStoreFactory = origSecretsFactory
+		formatterWriter = origWriter
+	}()
+
+	secretsStoreFactory = func() (CredentialStore, error) {
+		return &mockStore{
+			names: []string{"test"},
+			creds: map[string]*secrets.StoreCredentials{
+				"test": {Handle: "test", AccessToken: "token"},
+			},
+		}, nil
+	}
+
+	mockClient := &deliveryOptionsAPIClient{
+		updateDeliveryStoresInfoResp: json.RawMessage(`{"updated":true}`),
+	}
+	clientFactory = func(handle, accessToken string) api.APIClient {
+		return mockClient
+	}
+
+	var buf bytes.Buffer
+	formatterWriter = &buf
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "json", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+	cmd.Flags().Bool("items-only", false, "")
+	cmd.Flags().Bool("dry-run", false, "")
+	cmd.Flags().String("body", `{"stores":[]}`, "")
+	cmd.Flags().String("body-file", "", "")
+
+	if err := deliveryOptionsStoresInfoUpdateCmd.RunE(cmd, []string{"do_123"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !bytes.Contains(buf.Bytes(), []byte(`"updated": true`)) {
+		t.Fatalf("expected updated=true in output, got %q", buf.String())
+	}
+	if len(mockClient.lastUpdateStoresInfoBody) == 0 {
+		t.Fatalf("expected request body to be captured, got empty")
 	}
 }

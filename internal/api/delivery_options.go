@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -64,6 +65,14 @@ type PickupStoreUpdateRequest struct {
 	Phone     string `json:"phone,omitempty"`
 }
 
+// DeliveryConfigOptions contains options for retrieving delivery config.
+type DeliveryConfigOptions struct {
+	// Type is required by the API (observed in production); e.g. "store_pickup".
+	Type string
+	// DeliveryOptionID is required for some types (e.g. store pickup).
+	DeliveryOptionID string
+}
+
 // ListDeliveryOptions retrieves a list of delivery options.
 func (c *Client) ListDeliveryOptions(ctx context.Context, opts *DeliveryOptionsListOptions) (*DeliveryOptionsListResponse, error) {
 	path := "/delivery_options" + NewQuery().
@@ -123,4 +132,53 @@ func (c *Client) ListDeliveryTimeSlots(ctx context.Context, id string, opts *Del
 		return nil, err
 	}
 	return &resp, nil
+}
+
+// GetDeliveryConfig retrieves the delivery configuration (documented endpoint).
+//
+// Docs: GET /delivery_options/delivery_config?type=...
+func (c *Client) GetDeliveryConfig(ctx context.Context, opts *DeliveryConfigOptions) (json.RawMessage, error) {
+	if opts == nil {
+		return nil, fmt.Errorf("delivery config options are required")
+	}
+	if strings.TrimSpace(opts.Type) == "" {
+		return nil, fmt.Errorf("type is required")
+	}
+	var resp json.RawMessage
+	path := "/delivery_options/delivery_config" + NewQuery().
+		String("type", opts.Type).
+		String("delivery_option_id", opts.DeliveryOptionID).
+		Build()
+	if err := c.Get(ctx, path, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+// GetDeliveryTimeSlotsOpenAPI retrieves delivery time slots via the documented endpoint.
+//
+// Docs: GET /delivery_options/{delivery_option_id}/delivery_time_slots
+func (c *Client) GetDeliveryTimeSlotsOpenAPI(ctx context.Context, id string) (json.RawMessage, error) {
+	if strings.TrimSpace(id) == "" {
+		return nil, fmt.Errorf("delivery option id is required")
+	}
+	var resp json.RawMessage
+	if err := c.Get(ctx, fmt.Sprintf("/delivery_options/%s/delivery_time_slots", id), &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+// UpdateDeliveryOptionStoresInfo updates store pickup stores info (documented endpoint).
+//
+// Docs: PUT /delivery_options/{id}/stores_info
+func (c *Client) UpdateDeliveryOptionStoresInfo(ctx context.Context, id string, body any) (json.RawMessage, error) {
+	if strings.TrimSpace(id) == "" {
+		return nil, fmt.Errorf("delivery option id is required")
+	}
+	var resp json.RawMessage
+	if err := c.Put(ctx, fmt.Sprintf("/delivery_options/%s/stores_info", id), body, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
 }

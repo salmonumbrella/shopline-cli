@@ -21,6 +21,11 @@ go run ./cmd/shopline-coverage
 - [x] Customer groups
 - Customer groups core: list/get/create/delete (done)
 - Customer group children: `GET /customer_groups/{parent_id}/customer_group_children` + `GET /customer_groups/{parent_id}/customer_group_children/{id}/customer_ids` (done)
+- [x] Delivery options
+- Delivery options core: list/get (done)
+- Delivery config: `GET /delivery_options/delivery_config` (done)
+- Delivery time slots (documented): `GET /delivery_options/{delivery_option_id}/delivery_time_slots` (done)
+- Delivery stores info update: `PUT /delivery_options/{id}/stores_info` (done)
 - [x] Store credits
 - Customer store credits (`GET/POST /customers/{id}/store_credits`) + user credits (`GET /user_credits`, `POST /user_credits/bulk_update`) (done)
 - Member points + membership info (`/customers/membership_info`, `/customers/{id}/member_points`, `/member_point_rules`, `/member_points/bulk_update`, `/customers/{id}/membership_tier/action_logs`) (done)

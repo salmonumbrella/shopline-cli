@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -200,6 +201,82 @@ var deliveryOptionsUpdatePickupCmd = &cobra.Command{
 	},
 }
 
+var deliveryOptionsConfigCmd = &cobra.Command{
+	Use:   "config",
+	Short: "Manage delivery config (documented endpoint)",
+}
+
+var deliveryOptionsConfigGetCmd = &cobra.Command{
+	Use:   "get",
+	Short: "Get delivery config (via /delivery_options/delivery_config)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		optType, _ := cmd.Flags().GetString("type")
+		deliveryOptionID, _ := cmd.Flags().GetString("delivery-option-id")
+		resp, err := client.GetDeliveryConfig(cmd.Context(), &api.DeliveryConfigOptions{
+			Type:             optType,
+			DeliveryOptionID: deliveryOptionID,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to get delivery config: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var deliveryOptionsDeliveryTimeSlotsCmd = &cobra.Command{
+	Use:   "delivery-time-slots <id>",
+	Short: "Get delivery time slots (documented endpoint; raw JSON)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.GetDeliveryTimeSlotsOpenAPI(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to get delivery time slots: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var deliveryOptionsStoresInfoCmd = &cobra.Command{
+	Use:   "stores-info",
+	Short: "Manage store pickup store info (documented endpoint)",
+}
+
+var deliveryOptionsStoresInfoUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update delivery option stores info (raw JSON body)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintln(formatterWriter, "[DRY-RUN] Would update delivery option stores info")
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.UpdateDeliveryOptionStoresInfo(cmd.Context(), args[0], body)
+		if err != nil {
+			return fmt.Errorf("failed to update delivery option stores info: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(deliveryOptionsCmd)
 
@@ -223,4 +300,23 @@ func init() {
 	deliveryOptionsUpdatePickupCmd.Flags().String("address", "", "Store address")
 	deliveryOptionsUpdatePickupCmd.Flags().String("phone", "", "Store phone")
 	_ = deliveryOptionsUpdatePickupCmd.MarkFlagRequired("store-id")
+
+	deliveryOptionsCmd.AddCommand(deliveryOptionsConfigCmd)
+	deliveryOptionsConfigCmd.AddCommand(deliveryOptionsConfigGetCmd)
+	deliveryOptionsConfigGetCmd.Flags().String("type", "", "Delivery option type (required by API)")
+	deliveryOptionsConfigGetCmd.Flags().String("delivery-option-id", "", "Delivery option id (required for some types, e.g. store pickup)")
+	_ = deliveryOptionsConfigGetCmd.MarkFlagRequired("type")
+
+	deliveryOptionsCmd.AddCommand(deliveryOptionsDeliveryTimeSlotsCmd)
+
+	deliveryOptionsCmd.AddCommand(deliveryOptionsStoresInfoCmd)
+	deliveryOptionsStoresInfoCmd.AddCommand(deliveryOptionsStoresInfoUpdateCmd)
+	addJSONBodyFlags(deliveryOptionsStoresInfoUpdateCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "delivery-options",
+		Description: "Manage delivery options",
+		Commands:    []string{"list", "get", "time-slots", "delivery-time-slots", "update-pickup", "config", "stores-info"},
+		IDPrefix:    "delivery_option",
+	})
 }

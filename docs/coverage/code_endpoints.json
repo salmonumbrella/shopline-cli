@@ -991,12 +991,27 @@
   },
   {
     "method": "GET",
+    "path": "/delivery_options/delivery_config",
+    "source": "internal/api/delivery_options.go"
+  },
+  {
+    "method": "GET",
     "path": "/delivery_options/{}",
+    "source": "internal/api/delivery_options.go"
+  },
+  {
+    "method": "GET",
+    "path": "/delivery_options/{}/delivery_time_slots",
     "source": "internal/api/delivery_options.go"
   },
   {
     "method": "PUT",
     "path": "/delivery_options/{}/pickup_store",
+    "source": "internal/api/delivery_options.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/delivery_options/{}/stores_info",
     "source": "internal/api/delivery_options.go"
   },
   {

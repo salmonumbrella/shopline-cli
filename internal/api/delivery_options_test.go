@@ -285,3 +285,142 @@ func TestListDeliveryTimeSlotsEmptyID(t *testing.T) {
 		})
 	}
 }
+
+func TestGetDeliveryConfig(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("Expected GET, got %s", r.Method)
+		}
+		if r.URL.Path != "/delivery_options/delivery_config" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+		if r.URL.Query().Get("type") != "shipping" {
+			t.Errorf("Expected type=shipping, got %s", r.URL.Query().Get("type"))
+		}
+		_ = json.NewEncoder(w).Encode(map[string]any{"ok": true})
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	raw, err := client.GetDeliveryConfig(context.Background(), &DeliveryConfigOptions{Type: "shipping"})
+	if err != nil {
+		t.Fatalf("GetDeliveryConfig failed: %v", err)
+	}
+	var got map[string]any
+	if err := json.Unmarshal(raw, &got); err != nil {
+		t.Fatalf("failed to unmarshal raw response: %v", err)
+	}
+	if got["ok"] != true {
+		t.Fatalf("expected ok=true, got %v", got["ok"])
+	}
+}
+
+func TestGetDeliveryConfigEmptyType(t *testing.T) {
+	client := NewClient("test", "token")
+	_, err := client.GetDeliveryConfig(context.Background(), &DeliveryConfigOptions{Type: " "})
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+	if err.Error() != "type is required" {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestGetDeliveryConfigNilOptions(t *testing.T) {
+	client := NewClient("test", "token")
+	_, err := client.GetDeliveryConfig(context.Background(), nil)
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+	if err.Error() != "delivery config options are required" {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestGetDeliveryTimeSlotsOpenAPI(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("Expected GET, got %s", r.Method)
+		}
+		if r.URL.Path != "/delivery_options/do_123/delivery_time_slots" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+		_ = json.NewEncoder(w).Encode(map[string]any{"items": []any{}})
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	raw, err := client.GetDeliveryTimeSlotsOpenAPI(context.Background(), "do_123")
+	if err != nil {
+		t.Fatalf("GetDeliveryTimeSlotsOpenAPI failed: %v", err)
+	}
+	var got map[string]any
+	if err := json.Unmarshal(raw, &got); err != nil {
+		t.Fatalf("failed to unmarshal raw response: %v", err)
+	}
+	if _, ok := got["items"]; !ok {
+		t.Fatalf("expected items key in response, got %v", got)
+	}
+}
+
+func TestGetDeliveryTimeSlotsOpenAPIEmptyID(t *testing.T) {
+	client := NewClient("test", "token")
+	_, err := client.GetDeliveryTimeSlotsOpenAPI(context.Background(), " ")
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+	if err.Error() != "delivery option id is required" {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestUpdateDeliveryOptionStoresInfo(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
+		}
+		if r.URL.Path != "/delivery_options/do_123/stores_info" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+		var body map[string]any
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		if body["stores"] == nil {
+			t.Fatalf("expected stores in body, got %v", body)
+		}
+		_ = json.NewEncoder(w).Encode(map[string]any{"updated": true})
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	raw, err := client.UpdateDeliveryOptionStoresInfo(context.Background(), "do_123", map[string]any{"stores": []any{}})
+	if err != nil {
+		t.Fatalf("UpdateDeliveryOptionStoresInfo failed: %v", err)
+	}
+	var got map[string]any
+	if err := json.Unmarshal(raw, &got); err != nil {
+		t.Fatalf("failed to unmarshal raw response: %v", err)
+	}
+	if got["updated"] != true {
+		t.Fatalf("expected updated=true, got %v", got["updated"])
+	}
+}
+
+func TestUpdateDeliveryOptionStoresInfoEmptyID(t *testing.T) {
+	client := NewClient("test", "token")
+	_, err := client.UpdateDeliveryOptionStoresInfo(context.Background(), " ", map[string]any{})
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+	if err.Error() != "delivery option id is required" {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}

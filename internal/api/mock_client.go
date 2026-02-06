@@ -2372,3 +2372,15 @@ func (m *MockClient) GetCustomerGroupChildren(ctx context.Context, parentGroupID
 func (m *MockClient) GetCustomerGroupChildCustomerIDs(ctx context.Context, parentGroupID, childGroupID string) (*CustomerGroupIDsResponse, error) {
 	return nil, m.notImplemented("GetCustomerGroupChildCustomerIDs")
 }
+
+func (m *MockClient) GetDeliveryConfig(ctx context.Context, opts *DeliveryConfigOptions) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetDeliveryConfig")
+}
+
+func (m *MockClient) GetDeliveryTimeSlotsOpenAPI(ctx context.Context, id string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetDeliveryTimeSlotsOpenAPI")
+}
+
+func (m *MockClient) UpdateDeliveryOptionStoresInfo(ctx context.Context, id string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateDeliveryOptionStoresInfo")
+}
