@@ -16,7 +16,7 @@ go run ./cmd/shopline-coverage
 - [x] Products (endpoints wired; types still partially raw for metafields/stocks)
 - [ ] Customers
 - [ ] Store credits
-- [ ] Channels
+- [x] Channels
 - [ ] Staffs
 - [ ] Webhooks
 
