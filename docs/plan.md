@@ -172,7 +172,7 @@ go run ./cmd/shopline-coverage
 ### Phase 5: Everything Else + Polish
 
 - [x] Agent-friendly improvements: `--json`, `--jq`, `--fields` presets + help JSON compatibility keys
-- [ ] Convert remaining text output to use Cobra writers (remove direct fmt.Printf/Println)
+- [x] Convert remaining text output to use Cobra writers (remove direct fmt.Printf/Println)
 - [x] Add CLI API coverage report (APIClient methods -> internal/cmd references): `make cli-coverage` (writes `docs/coverage/cli_api_report.*`)
 
 ## Tracking

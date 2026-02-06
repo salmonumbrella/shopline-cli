@@ -65,7 +65,7 @@ var companyCreditsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d company credits\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d company credits\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -92,15 +92,15 @@ var companyCreditsGetCmd = &cobra.Command{
 			return formatter.JSON(credit)
 		}
 
-		fmt.Printf("Credit ID:       %s\n", credit.ID)
-		fmt.Printf("Company ID:      %s\n", credit.CompanyID)
-		fmt.Printf("Company Name:    %s\n", credit.CompanyName)
-		fmt.Printf("Credit Balance:  %.2f %s\n", credit.CreditBalance, credit.Currency)
-		fmt.Printf("Credit Limit:    %.2f %s\n", credit.CreditLimit, credit.Currency)
-		fmt.Printf("Available:       %.2f %s\n", credit.CreditLimit-credit.CreditBalance, credit.Currency)
-		fmt.Printf("Status:          %s\n", credit.Status)
-		fmt.Printf("Created:         %s\n", credit.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:         %s\n", credit.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Credit ID:       %s\n", credit.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Company ID:      %s\n", credit.CompanyID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Company Name:    %s\n", credit.CompanyName)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Credit Balance:  %.2f %s\n", credit.CreditBalance, credit.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Credit Limit:    %.2f %s\n", credit.CreditLimit, credit.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Available:       %.2f %s\n", credit.CreditLimit-credit.CreditBalance, credit.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:          %s\n", credit.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:         %s\n", credit.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:         %s\n", credit.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -136,7 +136,7 @@ var companyCreditsCreateCmd = &cobra.Command{
 			return formatter.JSON(credit)
 		}
 
-		fmt.Printf("Created company credit %s (limit: %.2f %s)\n", credit.ID, credit.CreditLimit, credit.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created company credit %s (limit: %.2f %s)\n", credit.ID, credit.CreditLimit, credit.Currency)
 		return nil
 	},
 }
@@ -173,7 +173,7 @@ var companyCreditsAdjustCmd = &cobra.Command{
 			return formatter.JSON(credit)
 		}
 
-		fmt.Printf("Adjusted credit %s by %.2f (new balance: %.2f)\n", credit.ID, amount, credit.CreditBalance)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Adjusted credit %s by %.2f (new balance: %.2f)\n", credit.ID, amount, credit.CreditBalance)
 		return nil
 	},
 }
@@ -222,7 +222,7 @@ var companyCreditsTransactionsCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d transactions\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d transactions\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -239,11 +239,11 @@ var companyCreditsDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete company credit %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete company credit %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -252,7 +252,7 @@ var companyCreditsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete company credit: %w", err)
 		}
 
-		fmt.Printf("Deleted company credit %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted company credit %s\n", args[0])
 		return nil
 	},
 }

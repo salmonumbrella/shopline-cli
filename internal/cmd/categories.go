@@ -62,7 +62,7 @@ var categoriesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d categories\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d categories\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -89,14 +89,14 @@ var categoriesGetCmd = &cobra.Command{
 			return formatter.JSON(category)
 		}
 
-		fmt.Printf("Category ID:    %s\n", category.ID)
-		fmt.Printf("Title:          %s\n", category.Title)
-		fmt.Printf("Handle:         %s\n", category.Handle)
-		fmt.Printf("Description:    %s\n", category.Description)
-		fmt.Printf("Parent ID:      %s\n", category.ParentID)
-		fmt.Printf("Position:       %d\n", category.Position)
-		fmt.Printf("Created:        %s\n", category.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:        %s\n", category.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Category ID:    %s\n", category.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:          %s\n", category.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle:         %s\n", category.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:    %s\n", category.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Parent ID:      %s\n", category.ParentID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Position:       %d\n", category.Position)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", category.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:        %s\n", category.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -134,9 +134,9 @@ var categoriesCreateCmd = &cobra.Command{
 			return formatter.JSON(category)
 		}
 
-		fmt.Printf("Created category %s\n", category.ID)
-		fmt.Printf("Title:  %s\n", category.Title)
-		fmt.Printf("Handle: %s\n", category.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created category %s\n", category.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:  %s\n", category.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle: %s\n", category.Handle)
 		return nil
 	},
 }
@@ -153,11 +153,11 @@ var categoriesDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete category %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete category %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -166,7 +166,7 @@ var categoriesDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete category: %w", err)
 		}
 
-		fmt.Printf("Deleted category %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted category %s\n", args[0])
 		return nil
 	},
 }

@@ -41,12 +41,12 @@ var memberPointsGetCmd = &cobra.Command{
 			return formatter.JSON(points)
 		}
 
-		fmt.Printf("Customer ID:      %s\n", points.CustomerID)
-		fmt.Printf("Total Points:     %d\n", points.TotalPoints)
-		fmt.Printf("Available Points: %d\n", points.AvailablePoints)
-		fmt.Printf("Pending Points:   %d\n", points.PendingPoints)
-		fmt.Printf("Expired Points:   %d\n", points.ExpiredPoints)
-		fmt.Printf("Updated:          %s\n", points.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer ID:      %s\n", points.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Total Points:     %d\n", points.TotalPoints)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Available Points: %d\n", points.AvailablePoints)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Pending Points:   %d\n", points.PendingPoints)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Expired Points:   %d\n", points.ExpiredPoints)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:          %s\n", points.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -110,7 +110,7 @@ var memberPointsTransactionsCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d transactions\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d transactions\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -143,10 +143,10 @@ var memberPointsAdjustCmd = &cobra.Command{
 			return formatter.JSON(result)
 		}
 
-		fmt.Printf("Adjusted points by %+d\n", points)
-		fmt.Printf("New Balance:\n")
-		fmt.Printf("  Total Points:     %d\n", result.TotalPoints)
-		fmt.Printf("  Available Points: %d\n", result.AvailablePoints)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Adjusted points by %+d\n", points)
+		_, _ = fmt.Fprintf(outWriter(cmd), "New Balance:\n")
+		_, _ = fmt.Fprintf(outWriter(cmd), "  Total Points:     %d\n", result.TotalPoints)
+		_, _ = fmt.Fprintf(outWriter(cmd), "  Available Points: %d\n", result.AvailablePoints)
 		return nil
 	},
 }

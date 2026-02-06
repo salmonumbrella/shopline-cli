@@ -102,18 +102,18 @@ var customersMetafieldsDeleteCmd = &cobra.Command{
 		}
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete customer metafield %s for customer %s? [y/N] ", args[1], args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete customer metafield %s for customer %s? [y/N] ", args[1], args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
 		if err := client.DeleteCustomerMetafield(cmd.Context(), args[0], args[1]); err != nil {
 			return fmt.Errorf("failed to delete customer metafield: %w", err)
 		}
-		fmt.Printf("Deleted customer metafield %s (customer %s)\n", args[1], args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted customer metafield %s (customer %s)\n", args[1], args[0])
 		return nil
 	},
 }
@@ -134,7 +134,7 @@ var customersMetafieldsBulkCreateCmd = &cobra.Command{
 		if err := client.BulkCreateCustomerMetafields(cmd.Context(), args[0], body); err != nil {
 			return fmt.Errorf("failed to bulk create customer metafields: %w", err)
 		}
-		fmt.Println("OK")
+		_, _ = fmt.Fprintln(outWriter(cmd), "OK")
 		return nil
 	},
 }
@@ -155,7 +155,7 @@ var customersMetafieldsBulkUpdateCmd = &cobra.Command{
 		if err := client.BulkUpdateCustomerMetafields(cmd.Context(), args[0], body); err != nil {
 			return fmt.Errorf("failed to bulk update customer metafields: %w", err)
 		}
-		fmt.Println("OK")
+		_, _ = fmt.Fprintln(outWriter(cmd), "OK")
 		return nil
 	},
 }
@@ -176,7 +176,7 @@ var customersMetafieldsBulkDeleteCmd = &cobra.Command{
 		if err := client.BulkDeleteCustomerMetafields(cmd.Context(), args[0], body); err != nil {
 			return fmt.Errorf("failed to bulk delete customer metafields: %w", err)
 		}
-		fmt.Println("OK")
+		_, _ = fmt.Fprintln(outWriter(cmd), "OK")
 		return nil
 	},
 }
@@ -277,18 +277,18 @@ var customersAppMetafieldsDeleteCmd = &cobra.Command{
 		}
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete customer app metafield %s for customer %s? [y/N] ", args[1], args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete customer app metafield %s for customer %s? [y/N] ", args[1], args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
 		if err := client.DeleteCustomerAppMetafield(cmd.Context(), args[0], args[1]); err != nil {
 			return fmt.Errorf("failed to delete customer app metafield: %w", err)
 		}
-		fmt.Printf("Deleted customer app metafield %s (customer %s)\n", args[1], args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted customer app metafield %s (customer %s)\n", args[1], args[0])
 		return nil
 	},
 }
@@ -309,7 +309,7 @@ var customersAppMetafieldsBulkCreateCmd = &cobra.Command{
 		if err := client.BulkCreateCustomerAppMetafields(cmd.Context(), args[0], body); err != nil {
 			return fmt.Errorf("failed to bulk create customer app metafields: %w", err)
 		}
-		fmt.Println("OK")
+		_, _ = fmt.Fprintln(outWriter(cmd), "OK")
 		return nil
 	},
 }
@@ -330,7 +330,7 @@ var customersAppMetafieldsBulkUpdateCmd = &cobra.Command{
 		if err := client.BulkUpdateCustomerAppMetafields(cmd.Context(), args[0], body); err != nil {
 			return fmt.Errorf("failed to bulk update customer app metafields: %w", err)
 		}
-		fmt.Println("OK")
+		_, _ = fmt.Fprintln(outWriter(cmd), "OK")
 		return nil
 	},
 }
@@ -351,7 +351,7 @@ var customersAppMetafieldsBulkDeleteCmd = &cobra.Command{
 		if err := client.BulkDeleteCustomerAppMetafields(cmd.Context(), args[0], body); err != nil {
 			return fmt.Errorf("failed to bulk delete customer app metafields: %w", err)
 		}
-		fmt.Println("OK")
+		_, _ = fmt.Fprintln(outWriter(cmd), "OK")
 		return nil
 	},
 }

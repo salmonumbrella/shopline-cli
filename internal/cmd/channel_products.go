@@ -70,7 +70,7 @@ var channelProductsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d product listings in channel %s\n", len(resp.Items), resp.TotalCount, args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d product listings in channel %s\n", len(resp.Items), resp.TotalCount, args[0])
 		return nil
 	},
 }
@@ -97,25 +97,25 @@ var channelProductsGetCmd = &cobra.Command{
 			return formatter.JSON(listing)
 		}
 
-		fmt.Printf("Listing ID:    %s\n", listing.ID)
-		fmt.Printf("Product ID:    %s\n", listing.ProductID)
-		fmt.Printf("Channel ID:    %s\n", listing.ChannelID)
-		fmt.Printf("Title:         %s\n", listing.Title)
-		fmt.Printf("Handle:        %s\n", listing.Handle)
-		fmt.Printf("Status:        %s\n", listing.Status)
-		fmt.Printf("Published:     %t\n", listing.Published)
-		fmt.Printf("Available:     %t\n", listing.AvailableForSale)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Listing ID:    %s\n", listing.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product ID:    %s\n", listing.ProductID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Channel ID:    %s\n", listing.ChannelID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:         %s\n", listing.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle:        %s\n", listing.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:        %s\n", listing.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Published:     %t\n", listing.Published)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Available:     %t\n", listing.AvailableForSale)
 		if listing.PublishedAt != nil {
-			fmt.Printf("Published At:  %s\n", listing.PublishedAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Published At:  %s\n", listing.PublishedAt.Format(time.RFC3339))
 		}
 		if len(listing.Variants) > 0 {
-			fmt.Printf("Variants:      %d\n", len(listing.Variants))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Variants:      %d\n", len(listing.Variants))
 			for _, v := range listing.Variants {
-				fmt.Printf("  - %s: %s (%s, qty: %d)\n", v.VariantID, v.Title, v.Price, v.InventoryQuantity)
+				_, _ = fmt.Fprintf(outWriter(cmd), "  - %s: %s (%s, qty: %d)\n", v.VariantID, v.Title, v.Price, v.InventoryQuantity)
 			}
 		}
-		fmt.Printf("Created:       %s\n", listing.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:       %s\n", listing.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:       %s\n", listing.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:       %s\n", listing.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -146,8 +146,8 @@ var channelProductsPublishCmd = &cobra.Command{
 			return formatter.JSON(listing)
 		}
 
-		fmt.Printf("Published product %s to channel %s\n", listing.ProductID, listing.ChannelID)
-		fmt.Printf("Listing ID: %s\n", listing.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Published product %s to channel %s\n", listing.ProductID, listing.ChannelID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Listing ID: %s\n", listing.ID)
 		return nil
 	},
 }
@@ -164,11 +164,11 @@ var channelProductsUnpublishCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Unpublish product %s from channel %s? [y/N] ", args[1], args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Unpublish product %s from channel %s? [y/N] ", args[1], args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -177,7 +177,7 @@ var channelProductsUnpublishCmd = &cobra.Command{
 			return fmt.Errorf("failed to unpublish product: %w", err)
 		}
 
-		fmt.Printf("Unpublished product %s from channel %s\n", args[1], args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Unpublished product %s from channel %s\n", args[1], args[0])
 		return nil
 	},
 }
@@ -216,9 +216,9 @@ var channelProductsUpdateCmd = &cobra.Command{
 			return formatter.JSON(listing)
 		}
 
-		fmt.Printf("Updated product listing %s\n", listing.ID)
-		fmt.Printf("Published: %t\n", listing.Published)
-		fmt.Printf("Available: %t\n", listing.AvailableForSale)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated product listing %s\n", listing.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Published: %t\n", listing.Published)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Available: %t\n", listing.AvailableForSale)
 		return nil
 	},
 }

@@ -65,7 +65,7 @@ var wishListItemsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete wish list items? (use --yes to confirm)\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete wish list items? (use --yes to confirm)\n")
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {

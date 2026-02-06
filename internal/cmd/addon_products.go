@@ -64,7 +64,7 @@ var addonProductsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d addon products\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d addon products\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -91,17 +91,17 @@ var addonProductsGetCmd = &cobra.Command{
 			return formatter.JSON(addonProduct)
 		}
 
-		fmt.Printf("Addon Product ID:  %s\n", addonProduct.ID)
-		fmt.Printf("Title:             %s\n", addonProduct.Title)
-		fmt.Printf("Product ID:        %s\n", addonProduct.ProductID)
-		fmt.Printf("Variant ID:        %s\n", addonProduct.VariantID)
-		fmt.Printf("Price:             %s %s\n", addonProduct.Price, addonProduct.Currency)
-		fmt.Printf("Quantity:          %d\n", addonProduct.Quantity)
-		fmt.Printf("Position:          %d\n", addonProduct.Position)
-		fmt.Printf("Status:            %s\n", addonProduct.Status)
-		fmt.Printf("Description:       %s\n", addonProduct.Description)
-		fmt.Printf("Created:           %s\n", addonProduct.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:           %s\n", addonProduct.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Addon Product ID:  %s\n", addonProduct.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:             %s\n", addonProduct.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product ID:        %s\n", addonProduct.ProductID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Variant ID:        %s\n", addonProduct.VariantID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Price:             %s %s\n", addonProduct.Price, addonProduct.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Quantity:          %d\n", addonProduct.Quantity)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Position:          %d\n", addonProduct.Position)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:            %s\n", addonProduct.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:       %s\n", addonProduct.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:           %s\n", addonProduct.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:           %s\n", addonProduct.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -120,7 +120,7 @@ var addonProductsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create addon product '%s' for product %s\n", title, productID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create addon product '%s' for product %s\n", title, productID)
 			return nil
 		}
 
@@ -151,10 +151,10 @@ var addonProductsCreateCmd = &cobra.Command{
 			return formatter.JSON(addonProduct)
 		}
 
-		fmt.Printf("Created addon product %s\n", addonProduct.ID)
-		fmt.Printf("Title:       %s\n", addonProduct.Title)
-		fmt.Printf("Product ID:  %s\n", addonProduct.ProductID)
-		fmt.Printf("Price:       %s %s\n", addonProduct.Price, addonProduct.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created addon product %s\n", addonProduct.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:       %s\n", addonProduct.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product ID:  %s\n", addonProduct.ProductID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Price:       %s %s\n", addonProduct.Price, addonProduct.Currency)
 
 		return nil
 	},
@@ -167,7 +167,7 @@ var addonProductsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete addon product %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete addon product %s\n", args[0])
 			return nil
 		}
 
@@ -180,7 +180,7 @@ var addonProductsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete addon product: %w", err)
 		}
 
-		fmt.Printf("Deleted addon product %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted addon product %s\n", args[0])
 		return nil
 	},
 }

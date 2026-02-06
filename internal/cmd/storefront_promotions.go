@@ -79,7 +79,7 @@ var storefrontPromotionsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d promotions\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d promotions\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -113,46 +113,46 @@ var storefrontPromotionsGetCmd = &cobra.Command{
 			return formatter.JSON(promo)
 		}
 
-		fmt.Printf("Promotion ID:    %s\n", promo.ID)
-		fmt.Printf("Title:           %s\n", promo.Title)
-		fmt.Printf("Description:     %s\n", promo.Description)
-		fmt.Printf("Type:            %s\n", promo.Type)
-		fmt.Printf("Status:          %s\n", promo.Status)
-		fmt.Printf("Discount Type:   %s\n", promo.DiscountType)
-		fmt.Printf("Discount Value:  %s\n", promo.DiscountValue)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Promotion ID:    %s\n", promo.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:           %s\n", promo.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:     %s\n", promo.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Type:            %s\n", promo.Type)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:          %s\n", promo.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Discount Type:   %s\n", promo.DiscountType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Discount Value:  %s\n", promo.DiscountValue)
 		if promo.Code != "" {
-			fmt.Printf("Code:            %s\n", promo.Code)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Code:            %s\n", promo.Code)
 		}
 		if promo.MinPurchase != "" {
-			fmt.Printf("Min Purchase:    %s\n", promo.MinPurchase)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Min Purchase:    %s\n", promo.MinPurchase)
 		}
 		if promo.MaxDiscount != "" {
-			fmt.Printf("Max Discount:    %s\n", promo.MaxDiscount)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Max Discount:    %s\n", promo.MaxDiscount)
 		}
-		fmt.Printf("Usage:           %d", promo.UsageCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Usage:           %d", promo.UsageCount)
 		if promo.UsageLimit > 0 {
-			fmt.Printf(" / %d", promo.UsageLimit)
+			_, _ = fmt.Fprintf(outWriter(cmd), " / %d", promo.UsageLimit)
 		}
-		fmt.Println()
+		_, _ = fmt.Fprintln(outWriter(cmd))
 		if promo.CustomerLimit > 0 {
-			fmt.Printf("Customer Limit:  %d per customer\n", promo.CustomerLimit)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Customer Limit:  %d per customer\n", promo.CustomerLimit)
 		}
-		fmt.Printf("Stackable:       %v\n", promo.Stackable)
-		fmt.Printf("Auto Apply:      %v\n", promo.AutoApply)
-		fmt.Printf("Target Type:     %s\n", promo.TargetType)
-		fmt.Printf("Starts At:       %s\n", promo.StartsAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Stackable:       %v\n", promo.Stackable)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Auto Apply:      %v\n", promo.AutoApply)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Target Type:     %s\n", promo.TargetType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Starts At:       %s\n", promo.StartsAt.Format(time.RFC3339))
 		if promo.EndsAt != nil {
-			fmt.Printf("Ends At:         %s\n", promo.EndsAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Ends At:         %s\n", promo.EndsAt.Format(time.RFC3339))
 		} else {
-			fmt.Printf("Ends At:         No end date\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "Ends At:         No end date\n")
 		}
-		fmt.Printf("Created:         %s\n", promo.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:         %s\n", promo.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:         %s\n", promo.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:         %s\n", promo.UpdatedAt.Format(time.RFC3339))
 
 		if promo.Banner != nil && promo.Banner.Enabled {
-			fmt.Printf("\nBanner:\n")
-			fmt.Printf("  Text:          %s\n", promo.Banner.Text)
-			fmt.Printf("  Position:      %s\n", promo.Banner.Position)
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nBanner:\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Text:          %s\n", promo.Banner.Text)
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Position:      %s\n", promo.Banner.Position)
 		}
 
 		return nil

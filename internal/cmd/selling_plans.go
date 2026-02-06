@@ -75,7 +75,7 @@ var sellingPlansListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d selling plans\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d selling plans\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -102,20 +102,20 @@ var sellingPlansGetCmd = &cobra.Command{
 			return formatter.JSON(plan)
 		}
 
-		fmt.Printf("Selling Plan ID:     %s\n", plan.ID)
-		fmt.Printf("Name:                %s\n", plan.Name)
-		fmt.Printf("Description:         %s\n", plan.Description)
-		fmt.Printf("Billing Policy:      %s\n", plan.BillingPolicy)
-		fmt.Printf("Delivery Policy:     %s\n", plan.DeliveryPolicy)
-		fmt.Printf("Frequency:           %s\n", plan.Frequency)
-		fmt.Printf("Frequency Interval:  %d\n", plan.FrequencyInterval)
-		fmt.Printf("Trial Days:          %d\n", plan.TrialDays)
-		fmt.Printf("Discount Type:       %s\n", plan.DiscountType)
-		fmt.Printf("Discount Value:      %s\n", plan.DiscountValue)
-		fmt.Printf("Status:              %s\n", plan.Status)
-		fmt.Printf("Position:            %d\n", plan.Position)
-		fmt.Printf("Created:             %s\n", plan.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:             %s\n", plan.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Selling Plan ID:     %s\n", plan.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:                %s\n", plan.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:         %s\n", plan.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Billing Policy:      %s\n", plan.BillingPolicy)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Delivery Policy:     %s\n", plan.DeliveryPolicy)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Frequency:           %s\n", plan.Frequency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Frequency Interval:  %d\n", plan.FrequencyInterval)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Trial Days:          %d\n", plan.TrialDays)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Discount Type:       %s\n", plan.DiscountType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Discount Value:      %s\n", plan.DiscountValue)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:              %s\n", plan.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Position:            %d\n", plan.Position)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:             %s\n", plan.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:             %s\n", plan.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -137,7 +137,7 @@ var sellingPlansCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create selling plan '%s' with %s frequency\n", name, frequency)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create selling plan '%s' with %s frequency\n", name, frequency)
 			return nil
 		}
 
@@ -171,10 +171,10 @@ var sellingPlansCreateCmd = &cobra.Command{
 			return formatter.JSON(plan)
 		}
 
-		fmt.Printf("Created selling plan %s\n", plan.ID)
-		fmt.Printf("Name:       %s\n", plan.Name)
-		fmt.Printf("Frequency:  %s\n", plan.Frequency)
-		fmt.Printf("Status:     %s\n", plan.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created selling plan %s\n", plan.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:       %s\n", plan.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Frequency:  %s\n", plan.Frequency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:     %s\n", plan.Status)
 
 		return nil
 	},
@@ -187,7 +187,7 @@ var sellingPlansDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete selling plan %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete selling plan %s\n", args[0])
 			return nil
 		}
 
@@ -200,7 +200,7 @@ var sellingPlansDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete selling plan: %w", err)
 		}
 
-		fmt.Printf("Deleted selling plan %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted selling plan %s\n", args[0])
 		return nil
 	},
 }

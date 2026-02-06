@@ -78,7 +78,7 @@ var discountCodesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d discount codes\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d discount codes\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -105,29 +105,29 @@ var discountCodesGetCmd = &cobra.Command{
 			return formatter.JSON(discountCode)
 		}
 
-		fmt.Printf("Discount Code ID: %s\n", discountCode.ID)
-		fmt.Printf("Code:             %s\n", discountCode.Code)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Discount Code ID: %s\n", discountCode.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Code:             %s\n", discountCode.Code)
 		if discountCode.PriceRuleID != "" {
-			fmt.Printf("Price Rule ID:    %s\n", discountCode.PriceRuleID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Price Rule ID:    %s\n", discountCode.PriceRuleID)
 		}
-		fmt.Printf("Discount Type:    %s\n", discountCode.DiscountType)
-		fmt.Printf("Discount Value:   %.2f\n", discountCode.DiscountValue)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Discount Type:    %s\n", discountCode.DiscountType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Discount Value:   %.2f\n", discountCode.DiscountValue)
 		if discountCode.MinPurchase > 0 {
-			fmt.Printf("Min Purchase:     %.2f\n", discountCode.MinPurchase)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Min Purchase:     %.2f\n", discountCode.MinPurchase)
 		}
-		fmt.Printf("Usage:            %d", discountCode.UsageCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Usage:            %d", discountCode.UsageCount)
 		if discountCode.UsageLimit > 0 {
-			fmt.Printf(" / %d", discountCode.UsageLimit)
+			_, _ = fmt.Fprintf(outWriter(cmd), " / %d", discountCode.UsageLimit)
 		}
-		fmt.Println()
-		fmt.Printf("Status:           %s\n", discountCode.Status)
+		_, _ = fmt.Fprintln(outWriter(cmd))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:           %s\n", discountCode.Status)
 		if !discountCode.StartsAt.IsZero() {
-			fmt.Printf("Starts At:        %s\n", discountCode.StartsAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Starts At:        %s\n", discountCode.StartsAt.Format(time.RFC3339))
 		}
 		if !discountCode.EndsAt.IsZero() {
-			fmt.Printf("Ends At:          %s\n", discountCode.EndsAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Ends At:          %s\n", discountCode.EndsAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:          %s\n", discountCode.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:          %s\n", discountCode.CreatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -154,10 +154,10 @@ var discountCodesLookupCmd = &cobra.Command{
 			return formatter.JSON(discountCode)
 		}
 
-		fmt.Printf("Discount Code ID: %s\n", discountCode.ID)
-		fmt.Printf("Code:             %s\n", discountCode.Code)
-		fmt.Printf("Discount:         %.2f (%s)\n", discountCode.DiscountValue, discountCode.DiscountType)
-		fmt.Printf("Status:           %s\n", discountCode.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Discount Code ID: %s\n", discountCode.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Code:             %s\n", discountCode.Code)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Discount:         %.2f (%s)\n", discountCode.DiscountValue, discountCode.DiscountType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:           %s\n", discountCode.Status)
 		return nil
 	},
 }
@@ -217,7 +217,7 @@ var discountCodesCreateCmd = &cobra.Command{
 			return formatter.JSON(discountCode)
 		}
 
-		fmt.Printf("Created discount code %s (code: %s)\n", discountCode.ID, discountCode.Code)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created discount code %s (code: %s)\n", discountCode.ID, discountCode.Code)
 		return nil
 	},
 }
@@ -234,11 +234,11 @@ var discountCodesDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete discount code %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete discount code %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -247,7 +247,7 @@ var discountCodesDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete discount code: %w", err)
 		}
 
-		fmt.Printf("Deleted discount code %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted discount code %s\n", args[0])
 		return nil
 	},
 }

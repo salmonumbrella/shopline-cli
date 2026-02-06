@@ -76,7 +76,7 @@ var flashPriceListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d flash prices\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d flash prices\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -103,30 +103,30 @@ var flashPriceGetCmd = &cobra.Command{
 			return formatter.JSON(flashPrice)
 		}
 
-		fmt.Printf("Flash Price ID:  %s\n", flashPrice.ID)
-		fmt.Printf("Product ID:      %s\n", flashPrice.ProductID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Flash Price ID:  %s\n", flashPrice.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product ID:      %s\n", flashPrice.ProductID)
 		if flashPrice.VariantID != "" {
-			fmt.Printf("Variant ID:      %s\n", flashPrice.VariantID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Variant ID:      %s\n", flashPrice.VariantID)
 		}
-		fmt.Printf("Original Price:  %.2f\n", flashPrice.OriginalPrice)
-		fmt.Printf("Flash Price:     %.2f\n", flashPrice.FlashPrice)
-		fmt.Printf("Discount:        %.0f%%\n", flashPrice.DiscountPct)
-		fmt.Printf("Sold:            %d", flashPrice.QuantitySold)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Original Price:  %.2f\n", flashPrice.OriginalPrice)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Flash Price:     %.2f\n", flashPrice.FlashPrice)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Discount:        %.0f%%\n", flashPrice.DiscountPct)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Sold:            %d", flashPrice.QuantitySold)
 		if flashPrice.Quantity > 0 {
-			fmt.Printf(" / %d", flashPrice.Quantity)
+			_, _ = fmt.Fprintf(outWriter(cmd), " / %d", flashPrice.Quantity)
 		}
-		fmt.Println()
+		_, _ = fmt.Fprintln(outWriter(cmd))
 		if flashPrice.LimitPerUser > 0 {
-			fmt.Printf("Limit Per User:  %d\n", flashPrice.LimitPerUser)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Limit Per User:  %d\n", flashPrice.LimitPerUser)
 		}
-		fmt.Printf("Status:          %s\n", flashPrice.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:          %s\n", flashPrice.Status)
 		if !flashPrice.StartsAt.IsZero() {
-			fmt.Printf("Starts At:       %s\n", flashPrice.StartsAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Starts At:       %s\n", flashPrice.StartsAt.Format(time.RFC3339))
 		}
 		if !flashPrice.EndsAt.IsZero() {
-			fmt.Printf("Ends At:         %s\n", flashPrice.EndsAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Ends At:         %s\n", flashPrice.EndsAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:         %s\n", flashPrice.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:         %s\n", flashPrice.CreatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -184,7 +184,7 @@ var flashPriceCreateCmd = &cobra.Command{
 			return formatter.JSON(fp)
 		}
 
-		fmt.Printf("Created flash price %s for product %s (price: %.2f)\n", fp.ID, fp.ProductID, fp.FlashPrice)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created flash price %s for product %s (price: %.2f)\n", fp.ID, fp.ProductID, fp.FlashPrice)
 		return nil
 	},
 }
@@ -204,7 +204,7 @@ var flashPriceActivateCmd = &cobra.Command{
 			return fmt.Errorf("failed to activate flash price: %w", err)
 		}
 
-		fmt.Printf("Activated flash price %s (status: %s)\n", flashPrice.ID, flashPrice.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Activated flash price %s (status: %s)\n", flashPrice.ID, flashPrice.Status)
 		return nil
 	},
 }
@@ -224,7 +224,7 @@ var flashPriceDeactivateCmd = &cobra.Command{
 			return fmt.Errorf("failed to deactivate flash price: %w", err)
 		}
 
-		fmt.Printf("Deactivated flash price %s (status: %s)\n", flashPrice.ID, flashPrice.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deactivated flash price %s (status: %s)\n", flashPrice.ID, flashPrice.Status)
 		return nil
 	},
 }
@@ -284,7 +284,7 @@ var flashPriceUpdateCmd = &cobra.Command{
 			return formatter.JSON(fp)
 		}
 
-		fmt.Printf("Updated flash price %s (price: %.2f)\n", fp.ID, fp.FlashPrice)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated flash price %s (price: %.2f)\n", fp.ID, fp.FlashPrice)
 		return nil
 	},
 }
@@ -301,11 +301,11 @@ var flashPriceDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete flash price %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete flash price %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -314,7 +314,7 @@ var flashPriceDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete flash price: %w", err)
 		}
 
-		fmt.Printf("Deleted flash price %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted flash price %s\n", args[0])
 		return nil
 	},
 }

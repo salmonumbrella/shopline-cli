@@ -59,7 +59,7 @@ var orderRisksListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d risks for order %s\n", len(resp.Items), resp.TotalCount, args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d risks for order %s\n", len(resp.Items), resp.TotalCount, args[0])
 		return nil
 	},
 }
@@ -86,18 +86,18 @@ var orderRisksGetCmd = &cobra.Command{
 			return formatter.JSON(risk)
 		}
 
-		fmt.Printf("Risk ID:         %s\n", risk.ID)
-		fmt.Printf("Order ID:        %s\n", risk.OrderID)
-		fmt.Printf("Score:           %.2f\n", risk.Score)
-		fmt.Printf("Recommendation:  %s\n", risk.Recommendation)
-		fmt.Printf("Source:          %s\n", risk.Source)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Risk ID:         %s\n", risk.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Order ID:        %s\n", risk.OrderID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Score:           %.2f\n", risk.Score)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Recommendation:  %s\n", risk.Recommendation)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Source:          %s\n", risk.Source)
 		if risk.Message != "" {
-			fmt.Printf("Message:         %s\n", risk.Message)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Message:         %s\n", risk.Message)
 		}
-		fmt.Printf("Display:         %t\n", risk.Display)
-		fmt.Printf("Cause Cancel:    %t\n", risk.CauseCancel)
-		fmt.Printf("Created:         %s\n", risk.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:         %s\n", risk.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Display:         %t\n", risk.Display)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Cause Cancel:    %t\n", risk.CauseCancel)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:         %s\n", risk.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:         %s\n", risk.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -140,8 +140,8 @@ var orderRisksCreateCmd = &cobra.Command{
 			return formatter.JSON(risk)
 		}
 
-		fmt.Printf("Created risk %s for order %s\n", risk.ID, args[0])
-		fmt.Printf("Score: %.2f, Recommendation: %s\n", risk.Score, risk.Recommendation)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created risk %s for order %s\n", risk.ID, args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Score: %.2f, Recommendation: %s\n", risk.Score, risk.Recommendation)
 		return nil
 	},
 }
@@ -158,11 +158,11 @@ var orderRisksDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete risk %s from order %s? [y/N] ", args[1], args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete risk %s from order %s? [y/N] ", args[1], args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -171,7 +171,7 @@ var orderRisksDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete order risk: %w", err)
 		}
 
-		fmt.Printf("Deleted risk %s from order %s.\n", args[1], args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted risk %s from order %s.\n", args[1], args[0])
 		return nil
 	},
 }

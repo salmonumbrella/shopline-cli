@@ -65,7 +65,7 @@ var fulfillmentServicesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d fulfillment services\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d fulfillment services\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -92,16 +92,16 @@ var fulfillmentServicesGetCmd = &cobra.Command{
 			return formatter.JSON(fs)
 		}
 
-		fmt.Printf("ID:                      %s\n", fs.ID)
-		fmt.Printf("Name:                    %s\n", fs.Name)
-		fmt.Printf("Handle:                  %s\n", fs.Handle)
-		fmt.Printf("Callback URL:            %s\n", fs.CallbackURL)
-		fmt.Printf("Inventory Management:    %v\n", fs.InventoryManagement)
-		fmt.Printf("Tracking Support:        %v\n", fs.TrackingSupport)
-		fmt.Printf("Requires Shipping Method: %v\n", fs.RequiresShippingMethod)
-		fmt.Printf("Format:                  %s\n", fs.Format)
-		fmt.Printf("Created:                 %s\n", fs.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:                 %s\n", fs.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "ID:                      %s\n", fs.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:                    %s\n", fs.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle:                  %s\n", fs.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Callback URL:            %s\n", fs.CallbackURL)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Inventory Management:    %v\n", fs.InventoryManagement)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tracking Support:        %v\n", fs.TrackingSupport)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Requires Shipping Method: %v\n", fs.RequiresShippingMethod)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Format:                  %s\n", fs.Format)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:                 %s\n", fs.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:                 %s\n", fs.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -118,7 +118,7 @@ var fulfillmentServicesCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create fulfillment service %q with callback URL %s\n", name, callbackURL)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create fulfillment service %q with callback URL %s\n", name, callbackURL)
 			return nil
 		}
 
@@ -146,9 +146,9 @@ var fulfillmentServicesCreateCmd = &cobra.Command{
 			return formatter.JSON(fs)
 		}
 
-		fmt.Printf("Created fulfillment service %s\n", fs.ID)
-		fmt.Printf("Name:         %s\n", fs.Name)
-		fmt.Printf("Callback URL: %s\n", fs.CallbackURL)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created fulfillment service %s\n", fs.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:         %s\n", fs.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Callback URL: %s\n", fs.CallbackURL)
 
 		return nil
 	},
@@ -163,12 +163,12 @@ var fulfillmentServicesDeleteCmd = &cobra.Command{
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete fulfillment service %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete fulfillment service %s\n", args[0])
 			return nil
 		}
 
 		if !yes {
-			fmt.Printf("Are you sure you want to delete fulfillment service %s? Use --yes to confirm.\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete fulfillment service %s? Use --yes to confirm.\n", args[0])
 			return nil
 		}
 
@@ -181,7 +181,7 @@ var fulfillmentServicesDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete fulfillment service: %w", err)
 		}
 
-		fmt.Printf("Deleted fulfillment service %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted fulfillment service %s\n", args[0])
 		return nil
 	},
 }

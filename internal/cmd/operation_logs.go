@@ -99,7 +99,7 @@ var operationLogsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d operation logs\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d operation logs\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -126,36 +126,36 @@ var operationLogsGetCmd = &cobra.Command{
 			return formatter.JSON(log)
 		}
 
-		fmt.Printf("Operation Log ID: %s\n", log.ID)
-		fmt.Printf("Action:           %s\n", log.Action)
-		fmt.Printf("Resource Type:    %s\n", log.ResourceType)
-		fmt.Printf("Resource ID:      %s\n", log.ResourceID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Operation Log ID: %s\n", log.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Action:           %s\n", log.Action)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Resource Type:    %s\n", log.ResourceType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Resource ID:      %s\n", log.ResourceID)
 		if log.ResourceName != "" {
-			fmt.Printf("Resource Name:    %s\n", log.ResourceName)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Resource Name:    %s\n", log.ResourceName)
 		}
-		fmt.Println()
-		fmt.Printf("User ID:          %s\n", log.UserID)
-		fmt.Printf("User Email:       %s\n", log.UserEmail)
+		_, _ = fmt.Fprintln(outWriter(cmd))
+		_, _ = fmt.Fprintf(outWriter(cmd), "User ID:          %s\n", log.UserID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "User Email:       %s\n", log.UserEmail)
 		if log.UserName != "" {
-			fmt.Printf("User Name:        %s\n", log.UserName)
+			_, _ = fmt.Fprintf(outWriter(cmd), "User Name:        %s\n", log.UserName)
 		}
-		fmt.Printf("IP Address:       %s\n", log.IPAddress)
+		_, _ = fmt.Fprintf(outWriter(cmd), "IP Address:       %s\n", log.IPAddress)
 		if log.UserAgent != "" {
-			fmt.Printf("User Agent:       %s\n", log.UserAgent)
+			_, _ = fmt.Fprintf(outWriter(cmd), "User Agent:       %s\n", log.UserAgent)
 		}
-		fmt.Printf("Created:          %s\n", log.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:          %s\n", log.CreatedAt.Format(time.RFC3339))
 
 		if len(log.Changes) > 0 {
-			fmt.Printf("\nChanges:\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nChanges:\n")
 			for field, change := range log.Changes {
-				fmt.Printf("  %s: %v -> %v\n", field, change.From, change.To)
+				_, _ = fmt.Fprintf(outWriter(cmd), "  %s: %v -> %v\n", field, change.From, change.To)
 			}
 		}
 
 		if len(log.Metadata) > 0 {
-			fmt.Printf("\nMetadata:\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nMetadata:\n")
 			for key, value := range log.Metadata {
-				fmt.Printf("  %s: %s\n", key, value)
+				_, _ = fmt.Fprintf(outWriter(cmd), "  %s: %s\n", key, value)
 			}
 		}
 

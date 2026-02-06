@@ -60,7 +60,7 @@ var inventoryLevelsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d inventory levels\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d inventory levels\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -87,14 +87,14 @@ var inventoryLevelsGetCmd = &cobra.Command{
 			return formatter.JSON(level)
 		}
 
-		fmt.Printf("ID:              %s\n", level.ID)
-		fmt.Printf("Inventory Item:  %s\n", level.InventoryItemID)
-		fmt.Printf("Location:        %s\n", level.LocationID)
-		fmt.Printf("Available:       %d\n", level.Available)
-		fmt.Printf("Reserved:        %d\n", level.Reserved)
-		fmt.Printf("Incoming:        %d\n", level.Incoming)
-		fmt.Printf("On Hand:         %d\n", level.OnHand)
-		fmt.Printf("Updated:         %s\n", level.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "ID:              %s\n", level.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Inventory Item:  %s\n", level.InventoryItemID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Location:        %s\n", level.LocationID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Available:       %d\n", level.Available)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Reserved:        %d\n", level.Reserved)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Incoming:        %d\n", level.Incoming)
+		_, _ = fmt.Fprintf(outWriter(cmd), "On Hand:         %d\n", level.OnHand)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:         %s\n", level.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -130,9 +130,9 @@ var inventoryLevelsAdjustCmd = &cobra.Command{
 			return formatter.JSON(level)
 		}
 
-		fmt.Printf("Adjusted inventory level %s\n", level.ID)
-		fmt.Printf("Available: %d\n", level.Available)
-		fmt.Printf("On Hand:   %d\n", level.OnHand)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Adjusted inventory level %s\n", level.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Available: %d\n", level.Available)
+		_, _ = fmt.Fprintf(outWriter(cmd), "On Hand:   %d\n", level.OnHand)
 		return nil
 	},
 }
@@ -168,9 +168,9 @@ var inventoryLevelsSetCmd = &cobra.Command{
 			return formatter.JSON(level)
 		}
 
-		fmt.Printf("Set inventory level %s\n", level.ID)
-		fmt.Printf("Available: %d\n", level.Available)
-		fmt.Printf("On Hand:   %d\n", level.OnHand)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Set inventory level %s\n", level.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Available: %d\n", level.Available)
+		_, _ = fmt.Fprintf(outWriter(cmd), "On Hand:   %d\n", level.OnHand)
 		return nil
 	},
 }

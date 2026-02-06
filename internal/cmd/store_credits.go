@@ -63,7 +63,7 @@ var storeCreditsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d store credits\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d store credits\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -95,14 +95,14 @@ var storeCreditsGetCmd = &cobra.Command{
 			expiresAt = credit.ExpiresAt.Format(time.RFC3339)
 		}
 
-		fmt.Printf("Credit ID:    %s\n", credit.ID)
-		fmt.Printf("Customer ID:  %s\n", credit.CustomerID)
-		fmt.Printf("Amount:       %s %s\n", credit.Amount, credit.Currency)
-		fmt.Printf("Balance:      %s %s\n", credit.Balance, credit.Currency)
-		fmt.Printf("Description:  %s\n", credit.Description)
-		fmt.Printf("Expires:      %s\n", expiresAt)
-		fmt.Printf("Created:      %s\n", credit.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:      %s\n", credit.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Credit ID:    %s\n", credit.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer ID:  %s\n", credit.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Amount:       %s %s\n", credit.Amount, credit.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Balance:      %s %s\n", credit.Balance, credit.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:  %s\n", credit.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Expires:      %s\n", expiresAt)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:      %s\n", credit.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:      %s\n", credit.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -119,7 +119,7 @@ var storeCreditsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create store credit: customer=%s, amount=%s %s\n", customerID, amount, currency)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create store credit: customer=%s, amount=%s %s\n", customerID, amount, currency)
 			return nil
 		}
 
@@ -147,9 +147,9 @@ var storeCreditsCreateCmd = &cobra.Command{
 			return formatter.JSON(credit)
 		}
 
-		fmt.Printf("Created store credit: %s\n", credit.ID)
-		fmt.Printf("Customer: %s\n", credit.CustomerID)
-		fmt.Printf("Amount:   %s %s\n", credit.Amount, credit.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created store credit: %s\n", credit.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer: %s\n", credit.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Amount:   %s %s\n", credit.Amount, credit.Currency)
 
 		return nil
 	},
@@ -162,7 +162,7 @@ var storeCreditsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete store credit: %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete store credit: %s\n", args[0])
 			return nil
 		}
 
@@ -175,7 +175,7 @@ var storeCreditsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete store credit: %w", err)
 		}
 
-		fmt.Printf("Deleted store credit: %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted store credit: %s\n", args[0])
 		return nil
 	},
 }

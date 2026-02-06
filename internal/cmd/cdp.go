@@ -79,7 +79,7 @@ var cdpProfilesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d profiles\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d profiles\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -106,45 +106,45 @@ var cdpProfilesGetCmd = &cobra.Command{
 			return formatter.JSON(profile)
 		}
 
-		fmt.Printf("Profile ID:       %s\n", profile.ID)
-		fmt.Printf("Customer ID:      %s\n", profile.CustomerID)
-		fmt.Printf("Email:            %s\n", profile.Email)
-		fmt.Printf("Phone:            %s\n", profile.Phone)
-		fmt.Printf("Name:             %s %s\n", profile.FirstName, profile.LastName)
-		fmt.Printf("Total Orders:     %d\n", profile.TotalOrders)
-		fmt.Printf("Total Spent:      %s\n", profile.TotalSpent)
-		fmt.Printf("Avg Order Value:  %s\n", profile.AverageOrderValue)
-		fmt.Printf("Lifetime Value:   %s\n", profile.LifetimeValue)
-		fmt.Printf("Predicted LTV:    %s\n", profile.PredictedLTV)
-		fmt.Printf("Churn Risk:       %s\n", profile.ChurnRisk)
-		fmt.Printf("Segments:         %s\n", strings.Join(profile.Segments, ", "))
-		fmt.Printf("Tags:             %s\n", strings.Join(profile.Tags, ", "))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Profile ID:       %s\n", profile.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer ID:      %s\n", profile.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Email:            %s\n", profile.Email)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Phone:            %s\n", profile.Phone)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:             %s %s\n", profile.FirstName, profile.LastName)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Total Orders:     %d\n", profile.TotalOrders)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Total Spent:      %s\n", profile.TotalSpent)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Avg Order Value:  %s\n", profile.AverageOrderValue)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Lifetime Value:   %s\n", profile.LifetimeValue)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Predicted LTV:    %s\n", profile.PredictedLTV)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Churn Risk:       %s\n", profile.ChurnRisk)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Segments:         %s\n", strings.Join(profile.Segments, ", "))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tags:             %s\n", strings.Join(profile.Tags, ", "))
 
 		if profile.RFMScore != nil {
-			fmt.Printf("\nRFM Analysis:\n")
-			fmt.Printf("  Recency:        %d\n", profile.RFMScore.Recency)
-			fmt.Printf("  Frequency:      %d\n", profile.RFMScore.Frequency)
-			fmt.Printf("  Monetary:       %d\n", profile.RFMScore.Monetary)
-			fmt.Printf("  Total Score:    %d\n", profile.RFMScore.Total)
-			fmt.Printf("  Segment:        %s\n", profile.RFMScore.Segment)
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nRFM Analysis:\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Recency:        %d\n", profile.RFMScore.Recency)
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Frequency:      %d\n", profile.RFMScore.Frequency)
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Monetary:       %d\n", profile.RFMScore.Monetary)
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Total Score:    %d\n", profile.RFMScore.Total)
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Segment:        %s\n", profile.RFMScore.Segment)
 		}
 
 		if profile.Preferences != nil {
-			fmt.Printf("\nPreferences:\n")
-			fmt.Printf("  Email Marketing:  %v\n", profile.Preferences.EmailMarketing)
-			fmt.Printf("  SMS Marketing:    %v\n", profile.Preferences.SMSMarketing)
-			fmt.Printf("  Push Notifications: %v\n", profile.Preferences.PushNotifications)
-			fmt.Printf("  Preferred Channel: %s\n", profile.Preferences.PreferredChannel)
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nPreferences:\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Email Marketing:  %v\n", profile.Preferences.EmailMarketing)
+			_, _ = fmt.Fprintf(outWriter(cmd), "  SMS Marketing:    %v\n", profile.Preferences.SMSMarketing)
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Push Notifications: %v\n", profile.Preferences.PushNotifications)
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Preferred Channel: %s\n", profile.Preferences.PreferredChannel)
 		}
 
 		if profile.FirstOrderAt != nil {
-			fmt.Printf("\nFirst Order:      %s\n", profile.FirstOrderAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nFirst Order:      %s\n", profile.FirstOrderAt.Format(time.RFC3339))
 		}
 		if profile.LastOrderAt != nil {
-			fmt.Printf("Last Order:       %s\n", profile.LastOrderAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Last Order:       %s\n", profile.LastOrderAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:          %s\n", profile.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:          %s\n", profile.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:          %s\n", profile.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:          %s\n", profile.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -212,7 +212,7 @@ var cdpEventsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d events\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d events\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -239,20 +239,20 @@ var cdpEventsGetCmd = &cobra.Command{
 			return formatter.JSON(event)
 		}
 
-		fmt.Printf("Event ID:     %s\n", event.ID)
-		fmt.Printf("Customer ID:  %s\n", event.CustomerID)
-		fmt.Printf("Session ID:   %s\n", event.SessionID)
-		fmt.Printf("Event Type:   %s\n", event.EventType)
-		fmt.Printf("Event Name:   %s\n", event.EventName)
-		fmt.Printf("Source:       %s\n", event.Source)
-		fmt.Printf("Channel:      %s\n", event.Channel)
-		fmt.Printf("Timestamp:    %s\n", event.Timestamp.Format(time.RFC3339))
-		fmt.Printf("Created:      %s\n", event.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Event ID:     %s\n", event.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer ID:  %s\n", event.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Session ID:   %s\n", event.SessionID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Event Type:   %s\n", event.EventType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Event Name:   %s\n", event.EventName)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Source:       %s\n", event.Source)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Channel:      %s\n", event.Channel)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Timestamp:    %s\n", event.Timestamp.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:      %s\n", event.CreatedAt.Format(time.RFC3339))
 
 		if len(event.Properties) > 0 {
-			fmt.Printf("\nProperties:\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nProperties:\n")
 			for k, v := range event.Properties {
-				fmt.Printf("  %s: %v\n", k, v)
+				_, _ = fmt.Fprintf(outWriter(cmd), "  %s: %v\n", k, v)
 			}
 		}
 
@@ -317,7 +317,7 @@ var cdpSegmentsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d segments\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d segments\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -344,19 +344,19 @@ var cdpSegmentsGetCmd = &cobra.Command{
 			return formatter.JSON(segment)
 		}
 
-		fmt.Printf("Segment ID:      %s\n", segment.ID)
-		fmt.Printf("Name:            %s\n", segment.Name)
-		fmt.Printf("Description:     %s\n", segment.Description)
-		fmt.Printf("Type:            %s\n", segment.Type)
-		fmt.Printf("Status:          %s\n", segment.Status)
-		fmt.Printf("Customer Count:  %d\n", segment.CustomerCount)
-		fmt.Printf("Created:         %s\n", segment.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:         %s\n", segment.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Segment ID:      %s\n", segment.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:            %s\n", segment.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:     %s\n", segment.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Type:            %s\n", segment.Type)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:          %s\n", segment.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer Count:  %d\n", segment.CustomerCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:         %s\n", segment.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:         %s\n", segment.UpdatedAt.Format(time.RFC3339))
 
 		if len(segment.Conditions) > 0 {
-			fmt.Printf("\nConditions:\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nConditions:\n")
 			for i, c := range segment.Conditions {
-				fmt.Printf("  %d. %s %s %v\n", i+1, c.Field, c.Operator, c.Value)
+				_, _ = fmt.Fprintf(outWriter(cmd), "  %d. %s %s %v\n", i+1, c.Field, c.Operator, c.Value)
 			}
 		}
 

@@ -57,7 +57,7 @@ var scriptTagsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d script tags\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d script tags\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -84,12 +84,12 @@ var scriptTagsGetCmd = &cobra.Command{
 			return formatter.JSON(tag)
 		}
 
-		fmt.Printf("ID:            %s\n", tag.ID)
-		fmt.Printf("Src:           %s\n", tag.Src)
-		fmt.Printf("Event:         %s\n", tag.Event)
-		fmt.Printf("Display Scope: %s\n", tag.DisplayScope)
-		fmt.Printf("Created:       %s\n", tag.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:       %s\n", tag.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "ID:            %s\n", tag.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Src:           %s\n", tag.Src)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Event:         %s\n", tag.Event)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Display Scope: %s\n", tag.DisplayScope)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:       %s\n", tag.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:       %s\n", tag.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -125,10 +125,10 @@ var scriptTagsCreateCmd = &cobra.Command{
 			return formatter.JSON(tag)
 		}
 
-		fmt.Printf("Created script tag %s\n", tag.ID)
-		fmt.Printf("Src:           %s\n", tag.Src)
-		fmt.Printf("Event:         %s\n", tag.Event)
-		fmt.Printf("Display Scope: %s\n", tag.DisplayScope)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created script tag %s\n", tag.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Src:           %s\n", tag.Src)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Event:         %s\n", tag.Event)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Display Scope: %s\n", tag.DisplayScope)
 
 		return nil
 	},
@@ -146,17 +146,17 @@ var scriptTagsDeleteCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[dry-run] Would delete script tag %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[dry-run] Would delete script tag %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete script tag %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete script tag %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -165,7 +165,7 @@ var scriptTagsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete script tag: %w", err)
 		}
 
-		fmt.Printf("Deleted script tag %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted script tag %s\n", args[0])
 		return nil
 	},
 }

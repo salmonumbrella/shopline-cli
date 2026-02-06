@@ -73,7 +73,7 @@ var giftsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d gifts\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d gifts\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -100,31 +100,31 @@ var giftsGetCmd = &cobra.Command{
 			return formatter.JSON(gift)
 		}
 
-		fmt.Printf("Gift ID:         %s\n", gift.ID)
-		fmt.Printf("Title:           %s\n", gift.Title)
-		fmt.Printf("Description:     %s\n", gift.Description)
-		fmt.Printf("Gift Product:    %s (%s)\n", gift.GiftProductName, gift.GiftProductID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Gift ID:         %s\n", gift.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:           %s\n", gift.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:     %s\n", gift.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Gift Product:    %s (%s)\n", gift.GiftProductName, gift.GiftProductID)
 		if gift.GiftVariantID != "" {
-			fmt.Printf("Gift Variant:    %s\n", gift.GiftVariantID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Gift Variant:    %s\n", gift.GiftVariantID)
 		}
-		fmt.Printf("Trigger Type:    %s\n", gift.TriggerType)
-		fmt.Printf("Trigger Value:   %.2f\n", gift.TriggerValue)
-		fmt.Printf("Used:            %d", gift.QuantityUsed)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Trigger Type:    %s\n", gift.TriggerType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Trigger Value:   %.2f\n", gift.TriggerValue)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Used:            %d", gift.QuantityUsed)
 		if gift.Quantity > 0 {
-			fmt.Printf(" / %d", gift.Quantity)
+			_, _ = fmt.Fprintf(outWriter(cmd), " / %d", gift.Quantity)
 		}
-		fmt.Println()
+		_, _ = fmt.Fprintln(outWriter(cmd))
 		if gift.LimitPerUser > 0 {
-			fmt.Printf("Limit Per User:  %d\n", gift.LimitPerUser)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Limit Per User:  %d\n", gift.LimitPerUser)
 		}
-		fmt.Printf("Status:          %s\n", gift.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:          %s\n", gift.Status)
 		if !gift.StartsAt.IsZero() {
-			fmt.Printf("Starts At:       %s\n", gift.StartsAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Starts At:       %s\n", gift.StartsAt.Format(time.RFC3339))
 		}
 		if !gift.EndsAt.IsZero() {
-			fmt.Printf("Ends At:         %s\n", gift.EndsAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Ends At:         %s\n", gift.EndsAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:         %s\n", gift.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:         %s\n", gift.CreatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -188,7 +188,7 @@ var giftsCreateCmd = &cobra.Command{
 			return formatter.JSON(gift)
 		}
 
-		fmt.Printf("Created gift promotion %s (%s)\n", gift.ID, gift.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created gift promotion %s (%s)\n", gift.ID, gift.Title)
 		return nil
 	},
 }
@@ -208,7 +208,7 @@ var giftsActivateCmd = &cobra.Command{
 			return fmt.Errorf("failed to activate gift: %w", err)
 		}
 
-		fmt.Printf("Activated gift %s (status: %s)\n", gift.ID, gift.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Activated gift %s (status: %s)\n", gift.ID, gift.Status)
 		return nil
 	},
 }
@@ -228,7 +228,7 @@ var giftsDeactivateCmd = &cobra.Command{
 			return fmt.Errorf("failed to deactivate gift: %w", err)
 		}
 
-		fmt.Printf("Deactivated gift %s (status: %s)\n", gift.ID, gift.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deactivated gift %s (status: %s)\n", gift.ID, gift.Status)
 		return nil
 	},
 }
@@ -245,11 +245,11 @@ var giftsDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete gift %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete gift %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -258,7 +258,7 @@ var giftsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete gift: %w", err)
 		}
 
-		fmt.Printf("Deleted gift %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted gift %s\n", args[0])
 		return nil
 	},
 }
@@ -281,7 +281,7 @@ var giftsUpdateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would update gift %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update gift %s\n", args[0])
 			return nil
 		}
 
@@ -342,7 +342,7 @@ var giftsUpdateCmd = &cobra.Command{
 			return formatter.JSON(gift)
 		}
 
-		fmt.Printf("Updated gift %s\n", gift.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated gift %s\n", gift.ID)
 		return nil
 	},
 }
@@ -356,7 +356,7 @@ var giftsUpdateQuantityCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would update gift quantity for %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update gift quantity for %s\n", args[0])
 			return nil
 		}
 
@@ -376,7 +376,7 @@ var giftsUpdateQuantityCmd = &cobra.Command{
 			return formatter.JSON(gift)
 		}
 
-		fmt.Printf("Updated gift %s quantity to %d\n", gift.ID, gift.Quantity)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated gift %s quantity to %d\n", gift.ID, gift.Quantity)
 		return nil
 	},
 }
@@ -390,7 +390,7 @@ var giftsUpdateQuantityBySKUCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would update gift quantity for SKU %s\n", sku)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update gift quantity for SKU %s\n", sku)
 			return nil
 		}
 
@@ -409,7 +409,7 @@ var giftsUpdateQuantityBySKUCmd = &cobra.Command{
 			return formatter.JSON(map[string]any{"ok": true})
 		}
 
-		fmt.Printf("Updated gift quantity for SKU %s\n", sku)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated gift quantity for SKU %s\n", sku)
 		return nil
 	},
 }
@@ -449,7 +449,7 @@ var giftsStocksUpdateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would update gift stocks for %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update gift stocks for %s\n", args[0])
 			return nil
 		}
 

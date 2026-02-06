@@ -74,7 +74,7 @@ var couponsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d coupons\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d coupons\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -101,32 +101,32 @@ var couponsGetCmd = &cobra.Command{
 			return formatter.JSON(coupon)
 		}
 
-		fmt.Printf("Coupon ID:      %s\n", coupon.ID)
-		fmt.Printf("Code:           %s\n", coupon.Code)
-		fmt.Printf("Title:          %s\n", coupon.Title)
-		fmt.Printf("Description:    %s\n", coupon.Description)
-		fmt.Printf("Discount Type:  %s\n", coupon.DiscountType)
-		fmt.Printf("Discount Value: %.2f\n", coupon.DiscountValue)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Coupon ID:      %s\n", coupon.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Code:           %s\n", coupon.Code)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:          %s\n", coupon.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:    %s\n", coupon.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Discount Type:  %s\n", coupon.DiscountType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Discount Value: %.2f\n", coupon.DiscountValue)
 		if coupon.MinPurchase > 0 {
-			fmt.Printf("Min Purchase:   %.2f\n", coupon.MinPurchase)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Min Purchase:   %.2f\n", coupon.MinPurchase)
 		}
 		if coupon.MaxDiscount > 0 {
-			fmt.Printf("Max Discount:   %.2f\n", coupon.MaxDiscount)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Max Discount:   %.2f\n", coupon.MaxDiscount)
 		}
-		fmt.Printf("Usage:          %d", coupon.UsageCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Usage:          %d", coupon.UsageCount)
 		if coupon.UsageLimit > 0 {
-			fmt.Printf(" / %d", coupon.UsageLimit)
+			_, _ = fmt.Fprintf(outWriter(cmd), " / %d", coupon.UsageLimit)
 		}
-		fmt.Println()
+		_, _ = fmt.Fprintln(outWriter(cmd))
 		if coupon.PerCustomer > 0 {
-			fmt.Printf("Per Customer:   %d\n", coupon.PerCustomer)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Per Customer:   %d\n", coupon.PerCustomer)
 		}
-		fmt.Printf("Status:         %s\n", coupon.Status)
-		fmt.Printf("Starts At:      %s\n", coupon.StartsAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:         %s\n", coupon.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Starts At:      %s\n", coupon.StartsAt.Format(time.RFC3339))
 		if !coupon.EndsAt.IsZero() {
-			fmt.Printf("Ends At:        %s\n", coupon.EndsAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Ends At:        %s\n", coupon.EndsAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:        %s\n", coupon.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", coupon.CreatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -153,11 +153,11 @@ var couponsLookupCmd = &cobra.Command{
 			return formatter.JSON(coupon)
 		}
 
-		fmt.Printf("Coupon ID:      %s\n", coupon.ID)
-		fmt.Printf("Code:           %s\n", coupon.Code)
-		fmt.Printf("Title:          %s\n", coupon.Title)
-		fmt.Printf("Discount:       %.2f (%s)\n", coupon.DiscountValue, coupon.DiscountType)
-		fmt.Printf("Status:         %s\n", coupon.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Coupon ID:      %s\n", coupon.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Code:           %s\n", coupon.Code)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:          %s\n", coupon.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Discount:       %.2f (%s)\n", coupon.DiscountValue, coupon.DiscountType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:         %s\n", coupon.Status)
 		return nil
 	},
 }
@@ -201,7 +201,7 @@ var couponsCreateCmd = &cobra.Command{
 			return formatter.JSON(coupon)
 		}
 
-		fmt.Printf("Created coupon %s (code: %s)\n", coupon.ID, coupon.Code)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created coupon %s (code: %s)\n", coupon.ID, coupon.Code)
 		return nil
 	},
 }
@@ -221,7 +221,7 @@ var couponsActivateCmd = &cobra.Command{
 			return fmt.Errorf("failed to activate coupon: %w", err)
 		}
 
-		fmt.Printf("Activated coupon %s (status: %s)\n", coupon.ID, coupon.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Activated coupon %s (status: %s)\n", coupon.ID, coupon.Status)
 		return nil
 	},
 }
@@ -241,7 +241,7 @@ var couponsDeactivateCmd = &cobra.Command{
 			return fmt.Errorf("failed to deactivate coupon: %w", err)
 		}
 
-		fmt.Printf("Deactivated coupon %s (status: %s)\n", coupon.ID, coupon.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deactivated coupon %s (status: %s)\n", coupon.ID, coupon.Status)
 		return nil
 	},
 }
@@ -258,11 +258,11 @@ var couponsDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete coupon %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete coupon %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -271,7 +271,7 @@ var couponsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete coupon: %w", err)
 		}
 
-		fmt.Printf("Deleted coupon %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted coupon %s\n", args[0])
 		return nil
 	},
 }

@@ -55,7 +55,7 @@ var marketsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d markets\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d markets\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -82,14 +82,14 @@ var marketsGetCmd = &cobra.Command{
 			return formatter.JSON(market)
 		}
 
-		fmt.Printf("Market ID:   %s\n", market.ID)
-		fmt.Printf("Name:        %s\n", market.Name)
-		fmt.Printf("Handle:      %s\n", market.Handle)
-		fmt.Printf("Primary:     %t\n", market.Primary)
-		fmt.Printf("Enabled:     %t\n", market.Enabled)
-		fmt.Printf("Countries:   %v\n", market.Countries)
-		fmt.Printf("Currencies:  %v\n", market.Currencies)
-		fmt.Printf("Languages:   %v\n", market.Languages)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Market ID:   %s\n", market.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:        %s\n", market.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle:      %s\n", market.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Primary:     %t\n", market.Primary)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Enabled:     %t\n", market.Enabled)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Countries:   %v\n", market.Countries)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Currencies:  %v\n", market.Currencies)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Languages:   %v\n", market.Languages)
 		return nil
 	},
 }
@@ -125,9 +125,9 @@ var marketsCreateCmd = &cobra.Command{
 			return formatter.JSON(market)
 		}
 
-		fmt.Printf("Created market %s\n", market.ID)
-		fmt.Printf("Name:   %s\n", market.Name)
-		fmt.Printf("Handle: %s\n", market.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created market %s\n", market.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:   %s\n", market.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle: %s\n", market.Handle)
 		return nil
 	},
 }
@@ -144,11 +144,11 @@ var marketsDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete market %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete market %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -157,7 +157,7 @@ var marketsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete market: %w", err)
 		}
 
-		fmt.Printf("Deleted market %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted market %s\n", args[0])
 		return nil
 	},
 }

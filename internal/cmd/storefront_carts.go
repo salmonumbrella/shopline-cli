@@ -64,7 +64,7 @@ var storefrontCartsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d carts\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d carts\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -91,22 +91,22 @@ var storefrontCartsGetCmd = &cobra.Command{
 			return formatter.JSON(cart)
 		}
 
-		fmt.Printf("Cart ID:       %s\n", cart.ID)
-		fmt.Printf("Customer ID:   %s\n", cart.CustomerID)
-		fmt.Printf("Email:         %s\n", cart.Email)
-		fmt.Printf("Currency:      %s\n", cart.Currency)
-		fmt.Printf("Item Count:    %d\n", cart.ItemCount)
-		fmt.Printf("Subtotal:      %s\n", cart.Subtotal)
-		fmt.Printf("Total Tax:     %s\n", cart.TotalTax)
-		fmt.Printf("Total Discount:%s\n", cart.TotalDiscount)
-		fmt.Printf("Total Price:   %s\n", cart.TotalPrice)
-		fmt.Printf("Created:       %s\n", cart.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:       %s\n", cart.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Cart ID:       %s\n", cart.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer ID:   %s\n", cart.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Email:         %s\n", cart.Email)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Currency:      %s\n", cart.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Item Count:    %d\n", cart.ItemCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Subtotal:      %s\n", cart.Subtotal)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Total Tax:     %s\n", cart.TotalTax)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Total Discount:%s\n", cart.TotalDiscount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Total Price:   %s\n", cart.TotalPrice)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:       %s\n", cart.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:       %s\n", cart.UpdatedAt.Format(time.RFC3339))
 
 		if len(cart.Items) > 0 {
-			fmt.Printf("\nItems:\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nItems:\n")
 			for _, item := range cart.Items {
-				fmt.Printf("  - %s (%s) x%d @ %s = %s\n",
+				_, _ = fmt.Fprintf(outWriter(cmd), "  - %s (%s) x%d @ %s = %s\n",
 					item.Title, item.VariantTitle, item.Quantity, item.Price, item.LineTotal)
 			}
 		}
@@ -125,11 +125,11 @@ var storefrontCartsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create storefront cart")
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create storefront cart")
 			if customerID != "" {
-				fmt.Printf(" for customer %s", customerID)
+				_, _ = fmt.Fprintf(outWriter(cmd), " for customer %s", customerID)
 			}
-			fmt.Println()
+			_, _ = fmt.Fprintln(outWriter(cmd))
 			return nil
 		}
 
@@ -156,9 +156,9 @@ var storefrontCartsCreateCmd = &cobra.Command{
 			return formatter.JSON(cart)
 		}
 
-		fmt.Printf("Created storefront cart %s\n", cart.ID)
-		fmt.Printf("Customer ID: %s\n", cart.CustomerID)
-		fmt.Printf("Currency:    %s\n", cart.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created storefront cart %s\n", cart.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer ID: %s\n", cart.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Currency:    %s\n", cart.Currency)
 
 		return nil
 	},
@@ -171,7 +171,7 @@ var storefrontCartsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete storefront cart %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete storefront cart %s\n", args[0])
 			return nil
 		}
 
@@ -184,7 +184,7 @@ var storefrontCartsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete storefront cart: %w", err)
 		}
 
-		fmt.Printf("Deleted storefront cart %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted storefront cart %s\n", args[0])
 		return nil
 	},
 }

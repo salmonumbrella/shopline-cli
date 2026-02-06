@@ -67,7 +67,7 @@ var productReviewsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d reviews\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d reviews\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -94,18 +94,18 @@ var productReviewsGetCmd = &cobra.Command{
 			return formatter.JSON(review)
 		}
 
-		fmt.Printf("Review ID:      %s\n", review.ID)
-		fmt.Printf("Product ID:     %s\n", review.ProductID)
-		fmt.Printf("Customer ID:    %s\n", review.CustomerID)
-		fmt.Printf("Customer Name:  %s\n", review.CustomerName)
-		fmt.Printf("Rating:         %d/5\n", review.Rating)
-		fmt.Printf("Title:          %s\n", review.Title)
-		fmt.Printf("Content:        %s\n", review.Content)
-		fmt.Printf("Status:         %s\n", review.Status)
-		fmt.Printf("Verified:       %t\n", review.Verified)
-		fmt.Printf("Helpful Count:  %d\n", review.HelpfulCount)
-		fmt.Printf("Created:        %s\n", review.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:        %s\n", review.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Review ID:      %s\n", review.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product ID:     %s\n", review.ProductID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer ID:    %s\n", review.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer Name:  %s\n", review.CustomerName)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Rating:         %d/5\n", review.Rating)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:          %s\n", review.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Content:        %s\n", review.Content)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:         %s\n", review.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Verified:       %t\n", review.Verified)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Helpful Count:  %d\n", review.HelpfulCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", review.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:        %s\n", review.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -123,7 +123,7 @@ var productReviewsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create review for product %s with rating %d/5\n", productID, rating)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create review for product %s with rating %d/5\n", productID, rating)
 			return nil
 		}
 
@@ -153,10 +153,10 @@ var productReviewsCreateCmd = &cobra.Command{
 			return formatter.JSON(review)
 		}
 
-		fmt.Printf("Created review %s\n", review.ID)
-		fmt.Printf("Product ID:  %s\n", review.ProductID)
-		fmt.Printf("Rating:      %d/5\n", review.Rating)
-		fmt.Printf("Status:      %s\n", review.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created review %s\n", review.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product ID:  %s\n", review.ProductID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Rating:      %d/5\n", review.Rating)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:      %s\n", review.Status)
 
 		return nil
 	},
@@ -169,7 +169,7 @@ var productReviewsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete review %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete review %s\n", args[0])
 			return nil
 		}
 
@@ -182,7 +182,7 @@ var productReviewsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete product review: %w", err)
 		}
 
-		fmt.Printf("Deleted review %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted review %s\n", args[0])
 		return nil
 	},
 }

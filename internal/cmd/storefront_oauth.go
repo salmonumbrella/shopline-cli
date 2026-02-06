@@ -56,7 +56,7 @@ var storefrontOAuthListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d OAuth clients\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d OAuth clients\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -83,13 +83,13 @@ var storefrontOAuthGetCmd = &cobra.Command{
 			return formatter.JSON(oauthClient)
 		}
 
-		fmt.Printf("ID:            %s\n", oauthClient.ID)
-		fmt.Printf("Name:          %s\n", oauthClient.Name)
-		fmt.Printf("Client ID:     %s\n", oauthClient.ClientID)
-		fmt.Printf("Redirect URIs: %s\n", strings.Join(oauthClient.RedirectURIs, ", "))
-		fmt.Printf("Scopes:        %s\n", strings.Join(oauthClient.Scopes, ", "))
-		fmt.Printf("Created:       %s\n", oauthClient.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:       %s\n", oauthClient.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "ID:            %s\n", oauthClient.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:          %s\n", oauthClient.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Client ID:     %s\n", oauthClient.ClientID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Redirect URIs: %s\n", strings.Join(oauthClient.RedirectURIs, ", "))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Scopes:        %s\n", strings.Join(oauthClient.Scopes, ", "))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:       %s\n", oauthClient.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:       %s\n", oauthClient.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -121,7 +121,7 @@ var storefrontOAuthCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create OAuth client '%s'\n", name)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create OAuth client '%s'\n", name)
 			return nil
 		}
 
@@ -148,12 +148,12 @@ var storefrontOAuthCreateCmd = &cobra.Command{
 			return formatter.JSON(oauthClient)
 		}
 
-		fmt.Printf("Created OAuth client %s\n", oauthClient.ID)
-		fmt.Printf("Name:          %s\n", oauthClient.Name)
-		fmt.Printf("Client ID:     %s\n", oauthClient.ClientID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created OAuth client %s\n", oauthClient.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:          %s\n", oauthClient.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Client ID:     %s\n", oauthClient.ClientID)
 		if oauthClient.ClientSecret != "" {
-			fmt.Printf("\nClient Secret: %s\n", oauthClient.ClientSecret)
-			fmt.Println("(Save this secret - it will not be shown again)")
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nClient Secret: %s\n", oauthClient.ClientSecret)
+			_, _ = fmt.Fprintln(outWriter(cmd), "(Save this secret - it will not be shown again)")
 		}
 
 		return nil
@@ -187,7 +187,7 @@ var storefrontOAuthUpdateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would update OAuth client %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update OAuth client %s\n", args[0])
 			return nil
 		}
 
@@ -214,7 +214,7 @@ var storefrontOAuthUpdateCmd = &cobra.Command{
 			return formatter.JSON(oauthClient)
 		}
 
-		fmt.Printf("Updated OAuth client %s\n", oauthClient.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated OAuth client %s\n", oauthClient.ID)
 		return nil
 	},
 }
@@ -226,17 +226,17 @@ var storefrontOAuthDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete OAuth client %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete OAuth client %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete OAuth client %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete OAuth client %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -250,7 +250,7 @@ var storefrontOAuthDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete OAuth client: %w", err)
 		}
 
-		fmt.Printf("Deleted OAuth client %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted OAuth client %s\n", args[0])
 		return nil
 	},
 }
@@ -262,17 +262,17 @@ var storefrontOAuthRotateCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would rotate secret for OAuth client %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would rotate secret for OAuth client %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Print("Rotate OAuth client secret? This will invalidate the existing secret. [y/N] ")
+			_, _ = fmt.Fprint(outWriter(cmd), "Rotate OAuth client secret? This will invalidate the existing secret. [y/N] ")
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -294,10 +294,10 @@ var storefrontOAuthRotateCmd = &cobra.Command{
 			return formatter.JSON(oauthClient)
 		}
 
-		fmt.Println("OAuth client secret rotated")
+		_, _ = fmt.Fprintln(outWriter(cmd), "OAuth client secret rotated")
 		if oauthClient.ClientSecret != "" {
-			fmt.Printf("\nNew Client Secret: %s\n", oauthClient.ClientSecret)
-			fmt.Println("(Save this secret - it will not be shown again)")
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nNew Client Secret: %s\n", oauthClient.ClientSecret)
+			_, _ = fmt.Fprintln(outWriter(cmd), "(Save this secret - it will not be shown again)")
 		}
 
 		return nil

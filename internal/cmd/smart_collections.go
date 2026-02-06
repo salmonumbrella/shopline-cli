@@ -66,7 +66,7 @@ var smartCollectionsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d smart collections\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d smart collections\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -93,19 +93,19 @@ var smartCollectionsGetCmd = &cobra.Command{
 			return formatter.JSON(collection)
 		}
 
-		fmt.Printf("Smart Collection ID: %s\n", collection.ID)
-		fmt.Printf("Title:               %s\n", collection.Title)
-		fmt.Printf("Handle:              %s\n", collection.Handle)
-		fmt.Printf("Body HTML:           %s\n", collection.BodyHTML)
-		fmt.Printf("Sort Order:          %s\n", collection.SortOrder)
-		fmt.Printf("Disjunctive:         %v\n", collection.Disjunctive)
-		fmt.Printf("Published:           %v\n", collection.Published)
-		fmt.Printf("Published At:        %s\n", collection.PublishedAt.Format(time.RFC3339))
-		fmt.Printf("Created:             %s\n", collection.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:             %s\n", collection.UpdatedAt.Format(time.RFC3339))
-		fmt.Printf("\nRules (%d):\n", len(collection.Rules))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Smart Collection ID: %s\n", collection.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:               %s\n", collection.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle:              %s\n", collection.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Body HTML:           %s\n", collection.BodyHTML)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Sort Order:          %s\n", collection.SortOrder)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Disjunctive:         %v\n", collection.Disjunctive)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Published:           %v\n", collection.Published)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Published At:        %s\n", collection.PublishedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:             %s\n", collection.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:             %s\n", collection.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nRules (%d):\n", len(collection.Rules))
 		for i, rule := range collection.Rules {
-			fmt.Printf("  %d. %s %s %q\n", i+1, rule.Column, rule.Relation, rule.Condition)
+			_, _ = fmt.Fprintf(outWriter(cmd), "  %d. %s %s %q\n", i+1, rule.Column, rule.Relation, rule.Condition)
 		}
 		return nil
 	},
@@ -157,10 +157,10 @@ var smartCollectionsCreateCmd = &cobra.Command{
 			return formatter.JSON(collection)
 		}
 
-		fmt.Printf("Created smart collection %s\n", collection.ID)
-		fmt.Printf("Title:  %s\n", collection.Title)
-		fmt.Printf("Handle: %s\n", collection.Handle)
-		fmt.Printf("Rules:  %d\n", len(collection.Rules))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created smart collection %s\n", collection.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:  %s\n", collection.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle: %s\n", collection.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Rules:  %d\n", len(collection.Rules))
 		return nil
 	},
 }
@@ -177,11 +177,11 @@ var smartCollectionsDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete smart collection %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete smart collection %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -190,7 +190,7 @@ var smartCollectionsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete smart collection: %w", err)
 		}
 
-		fmt.Printf("Deleted smart collection %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted smart collection %s\n", args[0])
 		return nil
 	},
 }

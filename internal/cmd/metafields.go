@@ -73,7 +73,7 @@ var metafieldsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d metafields\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d metafields\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -100,18 +100,18 @@ var metafieldsGetCmd = &cobra.Command{
 			return formatter.JSON(metafield)
 		}
 
-		fmt.Printf("Metafield ID:   %s\n", metafield.ID)
-		fmt.Printf("Namespace:      %s\n", metafield.Namespace)
-		fmt.Printf("Key:            %s\n", metafield.Key)
-		fmt.Printf("Value:          %s\n", metafield.Value)
-		fmt.Printf("Value Type:     %s\n", metafield.ValueType)
-		fmt.Printf("Description:    %s\n", metafield.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Metafield ID:   %s\n", metafield.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Namespace:      %s\n", metafield.Namespace)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Key:            %s\n", metafield.Key)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Value:          %s\n", metafield.Value)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Value Type:     %s\n", metafield.ValueType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:    %s\n", metafield.Description)
 		if metafield.OwnerType != "" {
-			fmt.Printf("Owner Type:     %s\n", metafield.OwnerType)
-			fmt.Printf("Owner ID:       %s\n", metafield.OwnerID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Owner Type:     %s\n", metafield.OwnerType)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Owner ID:       %s\n", metafield.OwnerID)
 		}
-		fmt.Printf("Created:        %s\n", metafield.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:        %s\n", metafield.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", metafield.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:        %s\n", metafield.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -155,10 +155,10 @@ var metafieldsCreateCmd = &cobra.Command{
 			return formatter.JSON(metafield)
 		}
 
-		fmt.Printf("Created metafield %s\n", metafield.ID)
-		fmt.Printf("Namespace: %s\n", metafield.Namespace)
-		fmt.Printf("Key:       %s\n", metafield.Key)
-		fmt.Printf("Value:     %s\n", metafield.Value)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created metafield %s\n", metafield.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Namespace: %s\n", metafield.Namespace)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Key:       %s\n", metafield.Key)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Value:     %s\n", metafield.Value)
 		return nil
 	},
 }
@@ -175,11 +175,11 @@ var metafieldsDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete metafield %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete metafield %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -188,7 +188,7 @@ var metafieldsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete metafield: %w", err)
 		}
 
-		fmt.Printf("Deleted metafield %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted metafield %s\n", args[0])
 		return nil
 	},
 }

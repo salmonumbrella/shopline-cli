@@ -62,7 +62,7 @@ var affiliateCampaignsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d affiliate campaigns\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d affiliate campaigns\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -89,25 +89,25 @@ var affiliateCampaignsGetCmd = &cobra.Command{
 			return formatter.JSON(campaign)
 		}
 
-		fmt.Printf("Campaign ID:     %s\n", campaign.ID)
-		fmt.Printf("Name:            %s\n", campaign.Name)
-		fmt.Printf("Status:          %s\n", campaign.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Campaign ID:     %s\n", campaign.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:            %s\n", campaign.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:          %s\n", campaign.Status)
 		if campaign.Description != "" {
-			fmt.Printf("Description:     %s\n", campaign.Description)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Description:     %s\n", campaign.Description)
 		}
-		fmt.Printf("Commission Type: %s\n", campaign.CommissionType)
-		fmt.Printf("Commission:      %.2f\n", campaign.CommissionValue)
-		fmt.Printf("Total Clicks:    %d\n", campaign.TotalClicks)
-		fmt.Printf("Total Sales:     %d\n", campaign.TotalSales)
-		fmt.Printf("Total Revenue:   $%.2f\n", campaign.TotalRevenue)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Commission Type: %s\n", campaign.CommissionType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Commission:      %.2f\n", campaign.CommissionValue)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Total Clicks:    %d\n", campaign.TotalClicks)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Total Sales:     %d\n", campaign.TotalSales)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Total Revenue:   $%.2f\n", campaign.TotalRevenue)
 		if !campaign.StartDate.IsZero() {
-			fmt.Printf("Start Date:      %s\n", campaign.StartDate.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Start Date:      %s\n", campaign.StartDate.Format(time.RFC3339))
 		}
 		if !campaign.EndDate.IsZero() {
-			fmt.Printf("End Date:        %s\n", campaign.EndDate.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "End Date:        %s\n", campaign.EndDate.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:         %s\n", campaign.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:         %s\n", campaign.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:         %s\n", campaign.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:         %s\n", campaign.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -123,7 +123,7 @@ var affiliateCampaignsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create affiliate campaign: %s\n", name)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create affiliate campaign: %s\n", name)
 			return nil
 		}
 
@@ -151,9 +151,9 @@ var affiliateCampaignsCreateCmd = &cobra.Command{
 			return formatter.JSON(campaign)
 		}
 
-		fmt.Printf("Created affiliate campaign %s\n", campaign.ID)
-		fmt.Printf("Name:       %s\n", campaign.Name)
-		fmt.Printf("Commission: %.2f (%s)\n", campaign.CommissionValue, campaign.CommissionType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created affiliate campaign %s\n", campaign.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:       %s\n", campaign.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Commission: %.2f (%s)\n", campaign.CommissionValue, campaign.CommissionType)
 
 		return nil
 	},
@@ -166,13 +166,13 @@ var affiliateCampaignsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete affiliate campaign %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete affiliate campaign %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Are you sure you want to delete affiliate campaign %s? (use --yes to confirm)\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete affiliate campaign %s? (use --yes to confirm)\n", args[0])
 			return nil
 		}
 
@@ -185,7 +185,7 @@ var affiliateCampaignsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete affiliate campaign: %w", err)
 		}
 
-		fmt.Printf("Deleted affiliate campaign %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted affiliate campaign %s\n", args[0])
 		return nil
 	},
 }
@@ -268,7 +268,7 @@ var affiliateCampaignsExportReportCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would export affiliate campaign report for %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would export affiliate campaign report for %s\n", args[0])
 			return nil
 		}
 

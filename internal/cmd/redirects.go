@@ -58,7 +58,7 @@ var redirectsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d redirects\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d redirects\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -85,11 +85,11 @@ var redirectsGetCmd = &cobra.Command{
 			return formatter.JSON(redirect)
 		}
 
-		fmt.Printf("Redirect ID: %s\n", redirect.ID)
-		fmt.Printf("Path:        %s\n", redirect.Path)
-		fmt.Printf("Target:      %s\n", redirect.Target)
-		fmt.Printf("Created:     %s\n", redirect.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:     %s\n", redirect.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Redirect ID: %s\n", redirect.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Path:        %s\n", redirect.Path)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Target:      %s\n", redirect.Target)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:     %s\n", redirect.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:     %s\n", redirect.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -103,7 +103,7 @@ var redirectsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create redirect: %s -> %s\n", path, target)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create redirect: %s -> %s\n", path, target)
 			return nil
 		}
 
@@ -129,9 +129,9 @@ var redirectsCreateCmd = &cobra.Command{
 			return formatter.JSON(redirect)
 		}
 
-		fmt.Printf("Created redirect %s\n", redirect.ID)
-		fmt.Printf("Path:   %s\n", redirect.Path)
-		fmt.Printf("Target: %s\n", redirect.Target)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created redirect %s\n", redirect.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Path:   %s\n", redirect.Path)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Target: %s\n", redirect.Target)
 
 		return nil
 	},
@@ -144,13 +144,13 @@ var redirectsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete redirect %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete redirect %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Are you sure you want to delete redirect %s? (use --yes to confirm)\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete redirect %s? (use --yes to confirm)\n", args[0])
 			return nil
 		}
 
@@ -163,7 +163,7 @@ var redirectsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete redirect: %w", err)
 		}
 
-		fmt.Printf("Deleted redirect %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted redirect %s\n", args[0])
 		return nil
 	},
 }

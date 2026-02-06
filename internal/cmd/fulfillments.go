@@ -61,7 +61,7 @@ var fulfillmentsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d fulfillments\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d fulfillments\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -88,21 +88,21 @@ var fulfillmentsGetCmd = &cobra.Command{
 			return formatter.JSON(fulfillment)
 		}
 
-		fmt.Printf("Fulfillment ID:    %s\n", fulfillment.ID)
-		fmt.Printf("Order ID:          %s\n", fulfillment.OrderID)
-		fmt.Printf("Status:            %s\n", fulfillment.Status)
-		fmt.Printf("Tracking Company:  %s\n", fulfillment.TrackingCompany)
-		fmt.Printf("Tracking Number:   %s\n", fulfillment.TrackingNumber)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Fulfillment ID:    %s\n", fulfillment.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Order ID:          %s\n", fulfillment.OrderID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:            %s\n", fulfillment.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tracking Company:  %s\n", fulfillment.TrackingCompany)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tracking Number:   %s\n", fulfillment.TrackingNumber)
 		if fulfillment.TrackingURL != "" {
-			fmt.Printf("Tracking URL:      %s\n", fulfillment.TrackingURL)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Tracking URL:      %s\n", fulfillment.TrackingURL)
 		}
-		fmt.Printf("Created:           %s\n", fulfillment.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:           %s\n", fulfillment.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:           %s\n", fulfillment.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:           %s\n", fulfillment.UpdatedAt.Format(time.RFC3339))
 
 		if len(fulfillment.LineItems) > 0 {
-			fmt.Printf("\nLine Items:\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nLine Items:\n")
 			for _, item := range fulfillment.LineItems {
-				fmt.Printf("  - %s (qty: %d, SKU: %s)\n", item.Title, item.Quantity, item.SKU)
+				_, _ = fmt.Fprintf(outWriter(cmd), "  - %s (qty: %d, SKU: %s)\n", item.Title, item.Quantity, item.SKU)
 			}
 		}
 

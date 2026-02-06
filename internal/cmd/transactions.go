@@ -63,7 +63,7 @@ var transactionsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d transactions\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d transactions\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -90,19 +90,19 @@ var transactionsGetCmd = &cobra.Command{
 			return formatter.JSON(transaction)
 		}
 
-		fmt.Printf("Transaction ID:    %s\n", transaction.ID)
-		fmt.Printf("Order ID:          %s\n", transaction.OrderID)
-		fmt.Printf("Kind:              %s\n", transaction.Kind)
-		fmt.Printf("Status:            %s\n", transaction.Status)
-		fmt.Printf("Amount:            %s %s\n", transaction.Amount, transaction.Currency)
-		fmt.Printf("Gateway:           %s\n", transaction.Gateway)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Transaction ID:    %s\n", transaction.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Order ID:          %s\n", transaction.OrderID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Kind:              %s\n", transaction.Kind)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:            %s\n", transaction.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Amount:            %s %s\n", transaction.Amount, transaction.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Gateway:           %s\n", transaction.Gateway)
 		if transaction.ErrorCode != "" {
-			fmt.Printf("Error Code:        %s\n", transaction.ErrorCode)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Error Code:        %s\n", transaction.ErrorCode)
 		}
 		if transaction.Message != "" {
-			fmt.Printf("Message:           %s\n", transaction.Message)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Message:           %s\n", transaction.Message)
 		}
-		fmt.Printf("Created:           %s\n", transaction.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:           %s\n", transaction.CreatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -144,7 +144,7 @@ var transactionsOrderCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d transactions for order %s\n", len(resp.Items), args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d transactions for order %s\n", len(resp.Items), args[0])
 		return nil
 	},
 }

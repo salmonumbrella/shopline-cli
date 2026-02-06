@@ -62,7 +62,7 @@ var articlesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d articles\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d articles\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -89,22 +89,22 @@ var articlesGetCmd = &cobra.Command{
 			return formatter.JSON(article)
 		}
 
-		fmt.Printf("Article ID:     %s\n", article.ID)
-		fmt.Printf("Blog ID:        %s\n", article.BlogID)
-		fmt.Printf("Title:          %s\n", article.Title)
-		fmt.Printf("Handle:         %s\n", article.Handle)
-		fmt.Printf("Author:         %s\n", article.Author)
-		fmt.Printf("Tags:           %s\n", article.Tags)
-		fmt.Printf("Published:      %t\n", article.Published)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Article ID:     %s\n", article.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Blog ID:        %s\n", article.BlogID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:          %s\n", article.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle:         %s\n", article.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Author:         %s\n", article.Author)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tags:           %s\n", article.Tags)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Published:      %t\n", article.Published)
 		if !article.PublishedAt.IsZero() {
-			fmt.Printf("Published At:   %s\n", article.PublishedAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Published At:   %s\n", article.PublishedAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:        %s\n", article.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:        %s\n", article.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", article.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:        %s\n", article.UpdatedAt.Format(time.RFC3339))
 		if article.Image != nil {
-			fmt.Printf("Image:          %s\n", article.Image.Src)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Image:          %s\n", article.Image.Src)
 		}
-		fmt.Printf("\nBody HTML:\n%s\n", article.BodyHTML)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nBody HTML:\n%s\n", article.BodyHTML)
 
 		return nil
 	},
@@ -123,7 +123,7 @@ var articlesCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create article '%s' in blog %s\n", title, blogID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create article '%s' in blog %s\n", title, blogID)
 			return nil
 		}
 
@@ -153,10 +153,10 @@ var articlesCreateCmd = &cobra.Command{
 			return formatter.JSON(article)
 		}
 
-		fmt.Printf("Created article %s\n", article.ID)
-		fmt.Printf("Title:     %s\n", article.Title)
-		fmt.Printf("Blog ID:   %s\n", article.BlogID)
-		fmt.Printf("Published: %t\n", article.Published)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created article %s\n", article.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:     %s\n", article.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Blog ID:   %s\n", article.BlogID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Published: %t\n", article.Published)
 
 		return nil
 	},
@@ -169,13 +169,13 @@ var articlesDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete article %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete article %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Are you sure you want to delete article %s? Use --yes to confirm.\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete article %s? Use --yes to confirm.\n", args[0])
 			return nil
 		}
 
@@ -188,7 +188,7 @@ var articlesDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete article: %w", err)
 		}
 
-		fmt.Printf("Deleted article %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted article %s\n", args[0])
 		return nil
 	},
 }

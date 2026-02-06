@@ -47,8 +47,8 @@ var authAddCmd = &cobra.Command{
 			return fmt.Errorf("failed to save credentials: %w", err)
 		}
 
-		fmt.Printf("\nSuccessfully added store: %s\n", creds.Handle)
-		fmt.Printf("Try: shopline --store %s orders list --limit 5\n", creds.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nSuccessfully added store: %s\n", creds.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Try: shopline --store %s orders list --limit 5\n", creds.Handle)
 		return nil
 	},
 }
@@ -68,7 +68,7 @@ var authListCmd = &cobra.Command{
 		}
 
 		if len(names) == 0 {
-			fmt.Println("No store profiles configured. Use 'shopline auth login' to add one.")
+			_, _ = fmt.Fprintln(outWriter(cmd), "No store profiles configured. Use 'shopline auth login' to add one.")
 			return nil
 		}
 
@@ -115,7 +115,7 @@ var authRemoveCmd = &cobra.Command{
 			return fmt.Errorf("failed to remove profile: %w", err)
 		}
 
-		fmt.Printf("Removed store profile: %s\n", name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Removed store profile: %s\n", name)
 		return nil
 	},
 }
@@ -142,12 +142,12 @@ var authStatusCmd = &cobra.Command{
 			if len(names) == 1 {
 				storeName = names[0]
 			} else if len(names) == 0 {
-				fmt.Println("Not authenticated. Use 'shopline auth login' to add a profile.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Not authenticated. Use 'shopline auth login' to add a profile.")
 				return nil
 			} else {
-				fmt.Println("Multiple profiles configured. Use --store to select one:")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Multiple profiles configured. Use --store to select one:")
 				for _, n := range names {
-					fmt.Printf("  - %s\n", n)
+					_, _ = fmt.Fprintf(outWriter(cmd), "  - %s\n", n)
 				}
 				return nil
 			}
@@ -158,12 +158,12 @@ var authStatusCmd = &cobra.Command{
 			return fmt.Errorf("profile not found: %s", storeName)
 		}
 
-		fmt.Printf("Profile:  %s\n", creds.Name)
-		fmt.Printf("Handle:   %s\n", creds.Handle)
-		fmt.Printf("Created:  %s\n", creds.CreatedAt.Format("2006-01-02 15:04:05"))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Profile:  %s\n", creds.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle:   %s\n", creds.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:  %s\n", creds.CreatedAt.Format("2006-01-02 15:04:05"))
 
 		if creds.IsOld() {
-			fmt.Println("\nWarning: Credentials are older than 90 days. Consider rotating them.")
+			_, _ = fmt.Fprintln(outWriter(cmd), "\nWarning: Credentials are older than 90 days. Consider rotating them.")
 		}
 
 		return nil

@@ -63,7 +63,7 @@ var customerAddressesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d addresses\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d addresses\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -92,28 +92,28 @@ var customerAddressesGetCmd = &cobra.Command{
 			return formatter.JSON(address)
 		}
 
-		fmt.Printf("Address ID:   %s\n", address.ID)
-		fmt.Printf("Customer ID:  %s\n", address.CustomerID)
-		fmt.Printf("Name:         %s %s\n", address.FirstName, address.LastName)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Address ID:   %s\n", address.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer ID:  %s\n", address.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:         %s %s\n", address.FirstName, address.LastName)
 		if address.Company != "" {
-			fmt.Printf("Company:      %s\n", address.Company)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Company:      %s\n", address.Company)
 		}
-		fmt.Printf("Address:      %s\n", address.Address1)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Address:      %s\n", address.Address1)
 		if address.Address2 != "" {
-			fmt.Printf("              %s\n", address.Address2)
+			_, _ = fmt.Fprintf(outWriter(cmd), "              %s\n", address.Address2)
 		}
-		fmt.Printf("City:         %s\n", address.City)
+		_, _ = fmt.Fprintf(outWriter(cmd), "City:         %s\n", address.City)
 		if address.Province != "" {
-			fmt.Printf("Province:     %s (%s)\n", address.Province, address.ProvinceCode)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Province:     %s (%s)\n", address.Province, address.ProvinceCode)
 		}
-		fmt.Printf("Country:      %s (%s)\n", address.Country, address.CountryCode)
-		fmt.Printf("ZIP:          %s\n", address.Zip)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Country:      %s (%s)\n", address.Country, address.CountryCode)
+		_, _ = fmt.Fprintf(outWriter(cmd), "ZIP:          %s\n", address.Zip)
 		if address.Phone != "" {
-			fmt.Printf("Phone:        %s\n", address.Phone)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Phone:        %s\n", address.Phone)
 		}
-		fmt.Printf("Default:      %t\n", address.Default)
-		fmt.Printf("Created:      %s\n", address.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:      %s\n", address.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Default:      %t\n", address.Default)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:      %s\n", address.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:      %s\n", address.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -158,8 +158,8 @@ var customerAddressesCreateCmd = &cobra.Command{
 			return formatter.JSON(address)
 		}
 
-		fmt.Printf("Created address %s\n", address.ID)
-		fmt.Printf("Address: %s, %s, %s\n", address.Address1, address.City, address.Country)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created address %s\n", address.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Address: %s, %s, %s\n", address.Address1, address.City, address.Country)
 		return nil
 	},
 }
@@ -181,7 +181,7 @@ var customerAddressesSetDefaultCmd = &cobra.Command{
 			return fmt.Errorf("failed to set default address: %w", err)
 		}
 
-		fmt.Printf("Set address %s as default\n", address.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Set address %s as default\n", address.ID)
 		return nil
 	},
 }
@@ -200,11 +200,11 @@ var customerAddressesDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete address %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete address %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -213,7 +213,7 @@ var customerAddressesDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete customer address: %w", err)
 		}
 
-		fmt.Printf("Deleted address %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted address %s\n", args[0])
 		return nil
 	},
 }

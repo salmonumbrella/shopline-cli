@@ -79,7 +79,7 @@ var customFieldsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d custom fields\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d custom fields\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -126,11 +126,11 @@ var customFieldsGetCmd = &cobra.Command{
 			hint = h
 		}
 
-		fmt.Printf("Custom Field ID: %s\n", field.ID)
-		fmt.Printf("Name:            %s\n", name)
-		fmt.Printf("Type:            %s\n", field.Type)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Custom Field ID: %s\n", field.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:            %s\n", name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Type:            %s\n", field.Type)
 		if hint != "" {
-			fmt.Printf("Hint:            %s\n", hint)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Hint:            %s\n", hint)
 		}
 
 		return nil
@@ -164,7 +164,7 @@ var customFieldsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create custom field: %s (%s) for %s\n", name, fieldType, ownerType)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create custom field: %s (%s) for %s\n", name, fieldType, ownerType)
 			return nil
 		}
 
@@ -206,9 +206,9 @@ var customFieldsCreateCmd = &cobra.Command{
 			displayName = v
 			break
 		}
-		fmt.Printf("Created custom field %s\n", field.ID)
-		fmt.Printf("Name:  %s\n", displayName)
-		fmt.Printf("Type:  %s\n", field.Type)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created custom field %s\n", field.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:  %s\n", displayName)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Type:  %s\n", field.Type)
 
 		return nil
 	},
@@ -259,7 +259,7 @@ var customFieldsUpdateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would update custom field %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update custom field %s\n", args[0])
 			return nil
 		}
 
@@ -286,9 +286,9 @@ var customFieldsUpdateCmd = &cobra.Command{
 			name = v
 			break
 		}
-		fmt.Printf("Updated custom field %s\n", field.ID)
-		fmt.Printf("Name:    %s\n", name)
-		fmt.Printf("Type:    %s\n", field.Type)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated custom field %s\n", field.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:    %s\n", name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Type:    %s\n", field.Type)
 
 		return nil
 	},
@@ -301,13 +301,13 @@ var customFieldsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete custom field %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete custom field %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Are you sure you want to delete custom field %s? (use --yes to confirm)\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete custom field %s? (use --yes to confirm)\n", args[0])
 			return nil
 		}
 
@@ -320,7 +320,7 @@ var customFieldsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete custom field: %w", err)
 		}
 
-		fmt.Printf("Deleted custom field %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted custom field %s\n", args[0])
 		return nil
 	},
 }

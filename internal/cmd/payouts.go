@@ -59,7 +59,7 @@ var payoutsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d payouts\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d payouts\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -86,35 +86,35 @@ var payoutsGetCmd = &cobra.Command{
 			return formatter.JSON(payout)
 		}
 
-		fmt.Printf("Payout ID:      %s\n", payout.ID)
-		fmt.Printf("Amount:         %s %s\n", payout.Amount, payout.Currency)
-		fmt.Printf("Status:         %s\n", payout.Status)
-		fmt.Printf("Type:           %s\n", payout.Type)
-		fmt.Printf("Bank Account:   %s\n", payout.BankAccount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Payout ID:      %s\n", payout.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Amount:         %s %s\n", payout.Amount, payout.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:         %s\n", payout.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Type:           %s\n", payout.Type)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Bank Account:   %s\n", payout.BankAccount)
 		if payout.TransactionID != "" {
-			fmt.Printf("Transaction ID: %s\n", payout.TransactionID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Transaction ID: %s\n", payout.TransactionID)
 		}
 		if payout.Fee != "" {
-			fmt.Printf("Fee:            %s\n", payout.Fee)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Fee:            %s\n", payout.Fee)
 		}
 		if payout.Net != "" {
-			fmt.Printf("Net:            %s\n", payout.Net)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Net:            %s\n", payout.Net)
 		}
 		if payout.Summary != nil {
-			fmt.Printf("Summary:\n")
-			fmt.Printf("  Sales:        %s\n", payout.Summary.Sales)
-			fmt.Printf("  Refunds:      %s\n", payout.Summary.Refunds)
-			fmt.Printf("  Adjustments:  %s\n", payout.Summary.Adjustments)
-			fmt.Printf("  Charges:      %s\n", payout.Summary.Charges)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Summary:\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Sales:        %s\n", payout.Summary.Sales)
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Refunds:      %s\n", payout.Summary.Refunds)
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Adjustments:  %s\n", payout.Summary.Adjustments)
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Charges:      %s\n", payout.Summary.Charges)
 		}
 		if payout.ScheduledDate != nil {
-			fmt.Printf("Scheduled:      %s\n", payout.ScheduledDate.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Scheduled:      %s\n", payout.ScheduledDate.Format(time.RFC3339))
 		}
 		if payout.ArrivalDate != nil {
-			fmt.Printf("Arrival:        %s\n", payout.ArrivalDate.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Arrival:        %s\n", payout.ArrivalDate.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:        %s\n", payout.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:        %s\n", payout.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", payout.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:        %s\n", payout.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }

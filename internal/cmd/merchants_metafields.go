@@ -105,18 +105,18 @@ var merchantsMetafieldsDeleteCmd = &cobra.Command{
 		}
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete merchant metafield %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete merchant metafield %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
 		if err := client.DeleteMerchantMetafield(cmd.Context(), args[0]); err != nil {
 			return fmt.Errorf("failed to delete merchant metafield: %w", err)
 		}
-		fmt.Printf("Deleted merchant metafield %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted merchant metafield %s\n", args[0])
 		return nil
 	},
 }
@@ -136,7 +136,7 @@ var merchantsMetafieldsBulkCreateCmd = &cobra.Command{
 		if err := client.BulkCreateMerchantMetafields(cmd.Context(), body); err != nil {
 			return fmt.Errorf("failed to bulk create merchant metafields: %w", err)
 		}
-		fmt.Println("OK")
+		_, _ = fmt.Fprintln(outWriter(cmd), "OK")
 		return nil
 	},
 }
@@ -156,7 +156,7 @@ var merchantsMetafieldsBulkUpdateCmd = &cobra.Command{
 		if err := client.BulkUpdateMerchantMetafields(cmd.Context(), body); err != nil {
 			return fmt.Errorf("failed to bulk update merchant metafields: %w", err)
 		}
-		fmt.Println("OK")
+		_, _ = fmt.Fprintln(outWriter(cmd), "OK")
 		return nil
 	},
 }
@@ -176,7 +176,7 @@ var merchantsMetafieldsBulkDeleteCmd = &cobra.Command{
 		if err := client.BulkDeleteMerchantMetafields(cmd.Context(), body); err != nil {
 			return fmt.Errorf("failed to bulk delete merchant metafields: %w", err)
 		}
-		fmt.Println("OK")
+		_, _ = fmt.Fprintln(outWriter(cmd), "OK")
 		return nil
 	},
 }
@@ -280,18 +280,18 @@ var merchantsAppMetafieldsDeleteCmd = &cobra.Command{
 		}
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete merchant app metafield %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete merchant app metafield %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
 		if err := client.DeleteMerchantAppMetafield(cmd.Context(), args[0]); err != nil {
 			return fmt.Errorf("failed to delete merchant app metafield: %w", err)
 		}
-		fmt.Printf("Deleted merchant app metafield %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted merchant app metafield %s\n", args[0])
 		return nil
 	},
 }
@@ -311,7 +311,7 @@ var merchantsAppMetafieldsBulkCreateCmd = &cobra.Command{
 		if err := client.BulkCreateMerchantAppMetafields(cmd.Context(), body); err != nil {
 			return fmt.Errorf("failed to bulk create merchant app metafields: %w", err)
 		}
-		fmt.Println("OK")
+		_, _ = fmt.Fprintln(outWriter(cmd), "OK")
 		return nil
 	},
 }
@@ -331,7 +331,7 @@ var merchantsAppMetafieldsBulkUpdateCmd = &cobra.Command{
 		if err := client.BulkUpdateMerchantAppMetafields(cmd.Context(), body); err != nil {
 			return fmt.Errorf("failed to bulk update merchant app metafields: %w", err)
 		}
-		fmt.Println("OK")
+		_, _ = fmt.Fprintln(outWriter(cmd), "OK")
 		return nil
 	},
 }
@@ -351,7 +351,7 @@ var merchantsAppMetafieldsBulkDeleteCmd = &cobra.Command{
 		if err := client.BulkDeleteMerchantAppMetafields(cmd.Context(), body); err != nil {
 			return fmt.Errorf("failed to bulk delete merchant app metafields: %w", err)
 		}
-		fmt.Println("OK")
+		_, _ = fmt.Fprintln(outWriter(cmd), "OK")
 		return nil
 	},
 }

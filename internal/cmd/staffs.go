@@ -61,7 +61,7 @@ var staffsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d staff accounts\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d staff accounts\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -88,17 +88,17 @@ var staffsGetCmd = &cobra.Command{
 			return formatter.JSON(staff)
 		}
 
-		fmt.Printf("Staff ID:      %s\n", staff.ID)
-		fmt.Printf("Email:         %s\n", staff.Email)
-		fmt.Printf("Name:          %s %s\n", staff.FirstName, staff.LastName)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Staff ID:      %s\n", staff.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Email:         %s\n", staff.Email)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:          %s %s\n", staff.FirstName, staff.LastName)
 		if staff.Phone != "" {
-			fmt.Printf("Phone:         %s\n", staff.Phone)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Phone:         %s\n", staff.Phone)
 		}
-		fmt.Printf("Account Owner: %t\n", staff.AccountOwner)
-		fmt.Printf("Locale:        %s\n", staff.Locale)
-		fmt.Printf("Permissions:   %s\n", strings.Join(staff.Permissions, ", "))
-		fmt.Printf("Created:       %s\n", staff.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:       %s\n", staff.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Account Owner: %t\n", staff.AccountOwner)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Locale:        %s\n", staff.Locale)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Permissions:   %s\n", strings.Join(staff.Permissions, ", "))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:       %s\n", staff.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:       %s\n", staff.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -153,7 +153,7 @@ var staffsUpdateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would update staff %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update staff %s\n", args[0])
 			return nil
 		}
 
@@ -182,7 +182,7 @@ var staffsUpdateCmd = &cobra.Command{
 			return formatter.JSON(staff)
 		}
 
-		fmt.Printf("Updated staff %s\n", staff.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated staff %s\n", staff.ID)
 		return nil
 	},
 }
@@ -194,17 +194,17 @@ var staffsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete staff %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete staff %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete staff account %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete staff account %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -218,7 +218,7 @@ var staffsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete staff: %w", err)
 		}
 
-		fmt.Printf("Deleted staff %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted staff %s\n", args[0])
 		return nil
 	},
 }

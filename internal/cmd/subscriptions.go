@@ -76,7 +76,7 @@ var subscriptionsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d subscriptions\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d subscriptions\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -112,17 +112,17 @@ var subscriptionsGetCmd = &cobra.Command{
 			cancelledAt = subscription.CancelledAt.Format(time.RFC3339)
 		}
 
-		fmt.Printf("Subscription ID:  %s\n", subscription.ID)
-		fmt.Printf("Customer ID:      %s\n", subscription.CustomerID)
-		fmt.Printf("Product ID:       %s\n", subscription.ProductID)
-		fmt.Printf("Variant ID:       %s\n", subscription.VariantID)
-		fmt.Printf("Status:           %s\n", subscription.Status)
-		fmt.Printf("Interval:         %d %s(s)\n", subscription.IntervalCount, subscription.Interval)
-		fmt.Printf("Price:            %s %s\n", subscription.Price, subscription.Currency)
-		fmt.Printf("Next Billing:     %s\n", nextBilling)
-		fmt.Printf("Cancelled At:     %s\n", cancelledAt)
-		fmt.Printf("Created:          %s\n", subscription.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:          %s\n", subscription.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Subscription ID:  %s\n", subscription.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer ID:      %s\n", subscription.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product ID:       %s\n", subscription.ProductID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Variant ID:       %s\n", subscription.VariantID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:           %s\n", subscription.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Interval:         %d %s(s)\n", subscription.IntervalCount, subscription.Interval)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Price:            %s %s\n", subscription.Price, subscription.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Next Billing:     %s\n", nextBilling)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Cancelled At:     %s\n", cancelledAt)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:          %s\n", subscription.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:          %s\n", subscription.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -140,7 +140,7 @@ var subscriptionsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create subscription: customer=%s, product=%s, interval=%d %s(s)\n",
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create subscription: customer=%s, product=%s, interval=%d %s(s)\n",
 				customerID, productID, intervalCount, interval)
 			return nil
 		}
@@ -170,11 +170,11 @@ var subscriptionsCreateCmd = &cobra.Command{
 			return formatter.JSON(subscription)
 		}
 
-		fmt.Printf("Created subscription: %s\n", subscription.ID)
-		fmt.Printf("Customer:  %s\n", subscription.CustomerID)
-		fmt.Printf("Product:   %s\n", subscription.ProductID)
-		fmt.Printf("Status:    %s\n", subscription.Status)
-		fmt.Printf("Interval:  %s\n", subscription.Interval)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created subscription: %s\n", subscription.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer:  %s\n", subscription.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product:   %s\n", subscription.ProductID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:    %s\n", subscription.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Interval:  %s\n", subscription.Interval)
 
 		return nil
 	},
@@ -187,7 +187,7 @@ var subscriptionsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would cancel subscription: %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would cancel subscription: %s\n", args[0])
 			return nil
 		}
 
@@ -200,7 +200,7 @@ var subscriptionsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to cancel subscription: %w", err)
 		}
 
-		fmt.Printf("Cancelled subscription: %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Cancelled subscription: %s\n", args[0])
 		return nil
 	},
 }

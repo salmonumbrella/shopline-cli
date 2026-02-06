@@ -69,7 +69,7 @@ var pickupListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d pickup locations\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d pickup locations\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -96,46 +96,46 @@ var pickupGetCmd = &cobra.Command{
 			return formatter.JSON(location)
 		}
 
-		fmt.Printf("Location ID:      %s\n", location.ID)
-		fmt.Printf("Name:             %s\n", location.Name)
-		fmt.Printf("Active:           %t\n", location.Active)
-		fmt.Printf("\n--- Address ---\n")
-		fmt.Printf("Address 1:        %s\n", location.Address1)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Location ID:      %s\n", location.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:             %s\n", location.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Active:           %t\n", location.Active)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\n--- Address ---\n")
+		_, _ = fmt.Fprintf(outWriter(cmd), "Address 1:        %s\n", location.Address1)
 		if location.Address2 != "" {
-			fmt.Printf("Address 2:        %s\n", location.Address2)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Address 2:        %s\n", location.Address2)
 		}
-		fmt.Printf("City:             %s\n", location.City)
+		_, _ = fmt.Fprintf(outWriter(cmd), "City:             %s\n", location.City)
 		if location.Province != "" {
-			fmt.Printf("Province/State:   %s\n", location.Province)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Province/State:   %s\n", location.Province)
 		}
-		fmt.Printf("Country:          %s\n", location.Country)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Country:          %s\n", location.Country)
 		if location.ZipCode != "" {
-			fmt.Printf("ZIP Code:         %s\n", location.ZipCode)
+			_, _ = fmt.Fprintf(outWriter(cmd), "ZIP Code:         %s\n", location.ZipCode)
 		}
-		fmt.Printf("\n--- Contact ---\n")
+		_, _ = fmt.Fprintf(outWriter(cmd), "\n--- Contact ---\n")
 		if location.Phone != "" {
-			fmt.Printf("Phone:            %s\n", location.Phone)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Phone:            %s\n", location.Phone)
 		}
 		if location.Email != "" {
-			fmt.Printf("Email:            %s\n", location.Email)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Email:            %s\n", location.Email)
 		}
 		if location.Instructions != "" {
-			fmt.Printf("\n--- Instructions ---\n")
-			fmt.Printf("%s\n", location.Instructions)
+			_, _ = fmt.Fprintf(outWriter(cmd), "\n--- Instructions ---\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "%s\n", location.Instructions)
 		}
 		if location.LocationID != "" {
-			fmt.Printf("\nLinked Location:  %s\n", location.LocationID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nLinked Location:  %s\n", location.LocationID)
 		}
-		fmt.Printf("\nCreated:          %s\n", location.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:          %s\n", location.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nCreated:          %s\n", location.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:          %s\n", location.UpdatedAt.Format(time.RFC3339))
 
 		if len(location.Hours) > 0 {
-			fmt.Printf("\n--- Operating Hours ---\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "\n--- Operating Hours ---\n")
 			for _, h := range location.Hours {
 				if h.Closed {
-					fmt.Printf("  %s: Closed\n", h.Day)
+					_, _ = fmt.Fprintf(outWriter(cmd), "  %s: Closed\n", h.Day)
 				} else {
-					fmt.Printf("  %s: %s - %s\n", h.Day, h.OpenTime, h.CloseTime)
+					_, _ = fmt.Fprintf(outWriter(cmd), "  %s: %s - %s\n", h.Day, h.OpenTime, h.CloseTime)
 				}
 			}
 		}
@@ -192,7 +192,7 @@ var pickupCreateCmd = &cobra.Command{
 			return formatter.JSON(location)
 		}
 
-		fmt.Printf("Created pickup location %s: %s\n", location.ID, location.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created pickup location %s: %s\n", location.ID, location.Name)
 		return nil
 	},
 }
@@ -209,11 +209,11 @@ var pickupDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete pickup location %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete pickup location %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -222,7 +222,7 @@ var pickupDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete pickup location: %w", err)
 		}
 
-		fmt.Printf("Pickup location %s deleted.\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Pickup location %s deleted.\n", args[0])
 		return nil
 	},
 }

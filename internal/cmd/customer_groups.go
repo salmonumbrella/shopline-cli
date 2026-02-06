@@ -64,7 +64,7 @@ var customerGroupsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d customer groups\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d customer groups\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -91,12 +91,12 @@ var customerGroupsGetCmd = &cobra.Command{
 			return formatter.JSON(group)
 		}
 
-		fmt.Printf("Group ID:       %s\n", group.ID)
-		fmt.Printf("Name:           %s\n", group.Name)
-		fmt.Printf("Description:    %s\n", group.Description)
-		fmt.Printf("Customer Count: %d\n", group.CustomerCount)
-		fmt.Printf("Created:        %s\n", group.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:        %s\n", group.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Group ID:       %s\n", group.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:           %s\n", group.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:    %s\n", group.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer Count: %d\n", group.CustomerCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", group.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:        %s\n", group.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -130,8 +130,8 @@ var customerGroupsCreateCmd = &cobra.Command{
 			return formatter.JSON(group)
 		}
 
-		fmt.Printf("Created customer group %s\n", group.ID)
-		fmt.Printf("Name: %s\n", group.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created customer group %s\n", group.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name: %s\n", group.Name)
 		return nil
 	},
 }
@@ -148,11 +148,11 @@ var customerGroupsDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete customer group %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete customer group %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -161,7 +161,7 @@ var customerGroupsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete customer group: %w", err)
 		}
 
-		fmt.Printf("Deleted customer group %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted customer group %s\n", args[0])
 		return nil
 	},
 }
@@ -216,7 +216,7 @@ var customerGroupsChildrenCustomerIDsCmd = &cobra.Command{
 			rows = append(rows, []string{id})
 		}
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d customers\n", len(resp.CustomerIDs), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d customers\n", len(resp.CustomerIDs), resp.TotalCount)
 		return nil
 	},
 }

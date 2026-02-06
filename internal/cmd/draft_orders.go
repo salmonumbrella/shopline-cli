@@ -77,7 +77,7 @@ var draftOrdersListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d draft orders\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d draft orders\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -104,33 +104,33 @@ var draftOrdersGetCmd = &cobra.Command{
 			return formatter.JSON(draftOrder)
 		}
 
-		fmt.Printf("Draft Order ID:  %s\n", draftOrder.ID)
-		fmt.Printf("Name:            %s\n", draftOrder.Name)
-		fmt.Printf("Status:          %s\n", draftOrder.Status)
-		fmt.Printf("Customer ID:     %s\n", draftOrder.CustomerID)
-		fmt.Printf("Customer Email:  %s\n", draftOrder.CustomerEmail)
-		fmt.Printf("Total:           %s %s\n", draftOrder.TotalPrice, draftOrder.Currency)
-		fmt.Printf("Subtotal:        %s %s\n", draftOrder.SubtotalPrice, draftOrder.Currency)
-		fmt.Printf("Tax:             %s %s\n", draftOrder.TotalTax, draftOrder.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Draft Order ID:  %s\n", draftOrder.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:            %s\n", draftOrder.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:          %s\n", draftOrder.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer ID:     %s\n", draftOrder.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer Email:  %s\n", draftOrder.CustomerEmail)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Total:           %s %s\n", draftOrder.TotalPrice, draftOrder.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Subtotal:        %s %s\n", draftOrder.SubtotalPrice, draftOrder.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tax:             %s %s\n", draftOrder.TotalTax, draftOrder.Currency)
 		if draftOrder.Note != "" {
-			fmt.Printf("Note:            %s\n", draftOrder.Note)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Note:            %s\n", draftOrder.Note)
 		}
 		if draftOrder.InvoiceURL != "" {
-			fmt.Printf("Invoice URL:     %s\n", draftOrder.InvoiceURL)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Invoice URL:     %s\n", draftOrder.InvoiceURL)
 		}
 		if draftOrder.InvoiceSentAt != nil {
-			fmt.Printf("Invoice Sent:    %s\n", draftOrder.InvoiceSentAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Invoice Sent:    %s\n", draftOrder.InvoiceSentAt.Format(time.RFC3339))
 		}
 		if draftOrder.CompletedAt != nil {
-			fmt.Printf("Completed:       %s\n", draftOrder.CompletedAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Completed:       %s\n", draftOrder.CompletedAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:         %s\n", draftOrder.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:         %s\n", draftOrder.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:         %s\n", draftOrder.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:         %s\n", draftOrder.UpdatedAt.Format(time.RFC3339))
 
 		if len(draftOrder.LineItems) > 0 {
-			fmt.Printf("\nLine Items (%d):\n", len(draftOrder.LineItems))
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nLine Items (%d):\n", len(draftOrder.LineItems))
 			for _, item := range draftOrder.LineItems {
-				fmt.Printf("  - %s (Variant: %s) x%d @ %.2f\n",
+				_, _ = fmt.Fprintf(outWriter(cmd), "  - %s (Variant: %s) x%d @ %.2f\n",
 					item.Title, item.VariantID, item.Quantity, item.Price)
 			}
 		}
@@ -150,11 +150,11 @@ var draftOrdersDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete draft order %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete draft order %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -163,7 +163,7 @@ var draftOrdersDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete draft order: %w", err)
 		}
 
-		fmt.Printf("Draft order %s deleted.\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Draft order %s deleted.\n", args[0])
 		return nil
 	},
 }
@@ -180,11 +180,11 @@ var draftOrdersCompleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Complete draft order %s? This will create a real order. [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Complete draft order %s? This will create a real order. [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -194,7 +194,7 @@ var draftOrdersCompleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to complete draft order: %w", err)
 		}
 
-		fmt.Printf("Draft order %s completed. Status: %s\n", draftOrder.ID, draftOrder.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Draft order %s completed. Status: %s\n", draftOrder.ID, draftOrder.Status)
 		return nil
 	},
 }
@@ -213,7 +213,7 @@ var draftOrdersSendInvoiceCmd = &cobra.Command{
 			return fmt.Errorf("failed to send invoice: %w", err)
 		}
 
-		fmt.Printf("Invoice sent for draft order %s.\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Invoice sent for draft order %s.\n", args[0])
 		return nil
 	},
 }

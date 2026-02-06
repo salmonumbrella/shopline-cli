@@ -53,7 +53,7 @@ var storefrontOAuthApplicationsListCmd = &cobra.Command{
 			})
 		}
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d OAuth applications\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d OAuth applications\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -80,17 +80,17 @@ var storefrontOAuthApplicationsGetCmd = &cobra.Command{
 			return formatter.JSON(app)
 		}
 
-		fmt.Printf("ID:            %s\n", app.ID)
-		fmt.Printf("Name:          %s\n", app.Name)
-		fmt.Printf("Client ID:     %s\n", app.ClientID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "ID:            %s\n", app.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:          %s\n", app.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Client ID:     %s\n", app.ClientID)
 		if len(app.RedirectURIs) > 0 {
-			fmt.Printf("Redirect URIs: %s\n", strings.Join(app.RedirectURIs, ", "))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Redirect URIs: %s\n", strings.Join(app.RedirectURIs, ", "))
 		}
 		if len(app.Scopes) > 0 {
-			fmt.Printf("Scopes:        %s\n", strings.Join(app.Scopes, ", "))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Scopes:        %s\n", strings.Join(app.Scopes, ", "))
 		}
-		fmt.Printf("Created:       %s\n", app.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:       %s\n", app.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:       %s\n", app.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:       %s\n", app.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -120,7 +120,7 @@ var storefrontOAuthApplicationsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create OAuth application %q\n", name)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create OAuth application %q\n", name)
 			return nil
 		}
 
@@ -144,9 +144,9 @@ var storefrontOAuthApplicationsCreateCmd = &cobra.Command{
 			return formatter.JSON(app)
 		}
 
-		fmt.Printf("Created OAuth application %s\n", app.ID)
-		fmt.Printf("Name:      %s\n", app.Name)
-		fmt.Printf("Client ID: %s\n", app.ClientID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created OAuth application %s\n", app.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:      %s\n", app.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Client ID: %s\n", app.ClientID)
 		return nil
 	},
 }
@@ -159,7 +159,7 @@ var storefrontOAuthApplicationsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete OAuth application %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete OAuth application %s\n", args[0])
 			return nil
 		}
 
@@ -170,7 +170,7 @@ var storefrontOAuthApplicationsDeleteCmd = &cobra.Command{
 		if err := client.DeleteStorefrontOAuthApplication(cmd.Context(), args[0]); err != nil {
 			return fmt.Errorf("failed to delete OAuth application: %w", err)
 		}
-		fmt.Printf("Deleted OAuth application %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted OAuth application %s\n", args[0])
 		return nil
 	},
 }

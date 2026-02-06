@@ -61,7 +61,7 @@ var sizeChartsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d size charts\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d size charts\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -88,27 +88,27 @@ var sizeChartsGetCmd = &cobra.Command{
 			return formatter.JSON(sizeChart)
 		}
 
-		fmt.Printf("Size Chart ID:  %s\n", sizeChart.ID)
-		fmt.Printf("Name:           %s\n", sizeChart.Name)
-		fmt.Printf("Description:    %s\n", sizeChart.Description)
-		fmt.Printf("Unit:           %s\n", sizeChart.Unit)
-		fmt.Printf("Active:         %t\n", sizeChart.Active)
-		fmt.Printf("Created:        %s\n", sizeChart.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:        %s\n", sizeChart.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Size Chart ID:  %s\n", sizeChart.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:           %s\n", sizeChart.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:    %s\n", sizeChart.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Unit:           %s\n", sizeChart.Unit)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Active:         %t\n", sizeChart.Active)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", sizeChart.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:        %s\n", sizeChart.UpdatedAt.Format(time.RFC3339))
 
 		if len(sizeChart.Headers) > 0 {
-			fmt.Printf("\nHeaders: %s\n", strings.Join(sizeChart.Headers, ", "))
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nHeaders: %s\n", strings.Join(sizeChart.Headers, ", "))
 		}
 
 		if len(sizeChart.Rows) > 0 {
-			fmt.Printf("\nSizes:\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nSizes:\n")
 			for _, row := range sizeChart.Rows {
-				fmt.Printf("  %s: %s\n", row.Size, strings.Join(row.Values, ", "))
+				_, _ = fmt.Fprintf(outWriter(cmd), "  %s: %s\n", row.Size, strings.Join(row.Values, ", "))
 			}
 		}
 
 		if len(sizeChart.ProductIDs) > 0 {
-			fmt.Printf("\nAssociated Products: %d\n", len(sizeChart.ProductIDs))
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nAssociated Products: %d\n", len(sizeChart.ProductIDs))
 		}
 
 		return nil
@@ -126,7 +126,7 @@ var sizeChartsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create size chart '%s'\n", name)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create size chart '%s'\n", name)
 			return nil
 		}
 
@@ -154,10 +154,10 @@ var sizeChartsCreateCmd = &cobra.Command{
 			return formatter.JSON(sizeChart)
 		}
 
-		fmt.Printf("Created size chart %s\n", sizeChart.ID)
-		fmt.Printf("Name:   %s\n", sizeChart.Name)
-		fmt.Printf("Unit:   %s\n", sizeChart.Unit)
-		fmt.Printf("Active: %t\n", sizeChart.Active)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created size chart %s\n", sizeChart.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:   %s\n", sizeChart.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Unit:   %s\n", sizeChart.Unit)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Active: %t\n", sizeChart.Active)
 
 		return nil
 	},
@@ -170,13 +170,13 @@ var sizeChartsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete size chart %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete size chart %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Are you sure you want to delete size chart %s? Use --yes to confirm.\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete size chart %s? Use --yes to confirm.\n", args[0])
 			return nil
 		}
 
@@ -189,7 +189,7 @@ var sizeChartsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete size chart: %w", err)
 		}
 
-		fmt.Printf("Deleted size chart %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted size chart %s\n", args[0])
 		return nil
 	},
 }

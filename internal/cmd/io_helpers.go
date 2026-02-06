@@ -13,11 +13,13 @@ import (
 // In unit tests, many tests override formatterWriter without setting cmd.SetOut,
 // so we keep formatterWriter as the test hook when it is not os.Stdout.
 func outWriter(cmd *cobra.Command) io.Writer {
-	if formatterWriter != os.Stdout {
-		return formatterWriter
-	}
+	// Prefer cobra's configured writer when available (works with cmd.SetOut and
+	// also with tests that capture by temporarily swapping os.Stdout).
 	if cmd != nil && cmd.OutOrStdout() != nil {
 		return cmd.OutOrStdout()
+	}
+	if formatterWriter != os.Stdout {
+		return formatterWriter
 	}
 	return os.Stdout
 }

@@ -66,7 +66,7 @@ var priceRulesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d price rules\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d price rules\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -93,25 +93,25 @@ var priceRulesGetCmd = &cobra.Command{
 			return formatter.JSON(priceRule)
 		}
 
-		fmt.Printf("Price Rule ID:      %s\n", priceRule.ID)
-		fmt.Printf("Title:              %s\n", priceRule.Title)
-		fmt.Printf("Value Type:         %s\n", priceRule.ValueType)
-		fmt.Printf("Value:              %s\n", priceRule.Value)
-		fmt.Printf("Target Type:        %s\n", priceRule.TargetType)
-		fmt.Printf("Target Selection:   %s\n", priceRule.TargetSelection)
-		fmt.Printf("Allocation Method:  %s\n", priceRule.AllocationMethod)
-		fmt.Printf("Customer Selection: %s\n", priceRule.CustomerSelection)
-		fmt.Printf("Once Per Customer:  %v\n", priceRule.OncePerCustomer)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Price Rule ID:      %s\n", priceRule.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:              %s\n", priceRule.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Value Type:         %s\n", priceRule.ValueType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Value:              %s\n", priceRule.Value)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Target Type:        %s\n", priceRule.TargetType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Target Selection:   %s\n", priceRule.TargetSelection)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Allocation Method:  %s\n", priceRule.AllocationMethod)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer Selection: %s\n", priceRule.CustomerSelection)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Once Per Customer:  %v\n", priceRule.OncePerCustomer)
 		if priceRule.UsageLimit > 0 {
-			fmt.Printf("Usage Limit:        %d\n", priceRule.UsageLimit)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Usage Limit:        %d\n", priceRule.UsageLimit)
 		}
 		if !priceRule.StartsAt.IsZero() {
-			fmt.Printf("Starts At:          %s\n", priceRule.StartsAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Starts At:          %s\n", priceRule.StartsAt.Format(time.RFC3339))
 		}
 		if !priceRule.EndsAt.IsZero() {
-			fmt.Printf("Ends At:            %s\n", priceRule.EndsAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Ends At:            %s\n", priceRule.EndsAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:            %s\n", priceRule.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:            %s\n", priceRule.CreatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -140,7 +140,7 @@ var priceRulesCreateCmd = &cobra.Command{
 			return fmt.Errorf("failed to create price rule: %w", err)
 		}
 
-		fmt.Printf("Created price rule %s (%s)\n", priceRule.ID, priceRule.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created price rule %s (%s)\n", priceRule.ID, priceRule.Title)
 		return nil
 	},
 }
@@ -157,11 +157,11 @@ var priceRulesDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete price rule %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete price rule %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -170,7 +170,7 @@ var priceRulesDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete price rule: %w", err)
 		}
 
-		fmt.Printf("Deleted price rule %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted price rule %s\n", args[0])
 		return nil
 	},
 }

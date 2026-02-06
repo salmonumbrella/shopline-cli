@@ -319,7 +319,7 @@ var customersCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create customer %s\n", email)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create customer %s\n", email)
 			return nil
 		}
 
@@ -346,8 +346,8 @@ var customersCreateCmd = &cobra.Command{
 		if outputFormat == "json" {
 			return formatter.JSON(resp)
 		}
-		fmt.Printf("Created customer %s\n", resp.ID)
-		fmt.Printf("Email: %s\n", resp.Email)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created customer %s\n", resp.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Email: %s\n", resp.Email)
 		return nil
 	},
 }
@@ -391,7 +391,7 @@ var customersUpdateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would update customer %s\n", id)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update customer %s\n", id)
 			return nil
 		}
 
@@ -410,7 +410,7 @@ var customersUpdateCmd = &cobra.Command{
 		if outputFormat == "json" {
 			return formatter.JSON(resp)
 		}
-		fmt.Printf("Updated customer %s\n", resp.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated customer %s\n", resp.ID)
 		return nil
 	},
 }
@@ -424,7 +424,7 @@ var customersDeleteCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete customer %s\n", id)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete customer %s\n", id)
 			return nil
 		}
 
@@ -435,11 +435,11 @@ var customersDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete customer %s? [y/N] ", id)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete customer %s? [y/N] ", id)
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -447,7 +447,7 @@ var customersDeleteCmd = &cobra.Command{
 		if err := client.DeleteCustomer(cmd.Context(), id); err != nil {
 			return fmt.Errorf("failed to delete customer: %w", err)
 		}
-		fmt.Printf("Deleted customer %s\n", id)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted customer %s\n", id)
 		return nil
 	},
 }

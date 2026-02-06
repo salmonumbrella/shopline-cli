@@ -72,7 +72,7 @@ var salesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d sales\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d sales\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -99,26 +99,26 @@ var salesGetCmd = &cobra.Command{
 			return formatter.JSON(sale)
 		}
 
-		fmt.Printf("Sale ID:         %s\n", sale.ID)
-		fmt.Printf("Title:           %s\n", sale.Title)
-		fmt.Printf("Description:     %s\n", sale.Description)
-		fmt.Printf("Discount Type:   %s\n", sale.DiscountType)
-		fmt.Printf("Discount Value:  %.2f\n", sale.DiscountValue)
-		fmt.Printf("Applies To:      %s\n", sale.AppliesTo)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Sale ID:         %s\n", sale.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:           %s\n", sale.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:     %s\n", sale.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Discount Type:   %s\n", sale.DiscountType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Discount Value:  %.2f\n", sale.DiscountValue)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Applies To:      %s\n", sale.AppliesTo)
 		if len(sale.ProductIDs) > 0 {
-			fmt.Printf("Products:        %s\n", strings.Join(sale.ProductIDs, ", "))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Products:        %s\n", strings.Join(sale.ProductIDs, ", "))
 		}
 		if len(sale.CollectionIDs) > 0 {
-			fmt.Printf("Collections:     %s\n", strings.Join(sale.CollectionIDs, ", "))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Collections:     %s\n", strings.Join(sale.CollectionIDs, ", "))
 		}
-		fmt.Printf("Status:          %s\n", sale.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:          %s\n", sale.Status)
 		if !sale.StartsAt.IsZero() {
-			fmt.Printf("Starts At:       %s\n", sale.StartsAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Starts At:       %s\n", sale.StartsAt.Format(time.RFC3339))
 		}
 		if !sale.EndsAt.IsZero() {
-			fmt.Printf("Ends At:         %s\n", sale.EndsAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Ends At:         %s\n", sale.EndsAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:         %s\n", sale.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:         %s\n", sale.CreatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -180,7 +180,7 @@ var salesCreateCmd = &cobra.Command{
 			return formatter.JSON(sale)
 		}
 
-		fmt.Printf("Created sale %s (%s)\n", sale.ID, sale.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created sale %s (%s)\n", sale.ID, sale.Title)
 		return nil
 	},
 }
@@ -200,7 +200,7 @@ var salesActivateCmd = &cobra.Command{
 			return fmt.Errorf("failed to activate sale: %w", err)
 		}
 
-		fmt.Printf("Activated sale %s (status: %s)\n", sale.ID, sale.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Activated sale %s (status: %s)\n", sale.ID, sale.Status)
 		return nil
 	},
 }
@@ -220,7 +220,7 @@ var salesDeactivateCmd = &cobra.Command{
 			return fmt.Errorf("failed to deactivate sale: %w", err)
 		}
 
-		fmt.Printf("Deactivated sale %s (status: %s)\n", sale.ID, sale.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deactivated sale %s (status: %s)\n", sale.ID, sale.Status)
 		return nil
 	},
 }
@@ -237,11 +237,11 @@ var salesDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete sale %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete sale %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -250,7 +250,7 @@ var salesDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete sale: %w", err)
 		}
 
-		fmt.Printf("Deleted sale %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted sale %s\n", args[0])
 		return nil
 	},
 }
@@ -264,7 +264,7 @@ var salesDeleteProductsCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete products from sale %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete products from sale %s\n", args[0])
 			return nil
 		}
 
@@ -285,7 +285,7 @@ var salesDeleteProductsCmd = &cobra.Command{
 			return formatter.JSON(map[string]any{"ok": true})
 		}
 
-		fmt.Printf("Deleted %d product(s) from sale %s\n", len(productIDs), args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted %d product(s) from sale %s\n", len(productIDs), args[0])
 		return nil
 	},
 }

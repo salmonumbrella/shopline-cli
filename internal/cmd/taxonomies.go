@@ -63,7 +63,7 @@ var taxonomiesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d taxonomies\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d taxonomies\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -90,25 +90,25 @@ var taxonomiesGetCmd = &cobra.Command{
 			return formatter.JSON(taxonomy)
 		}
 
-		fmt.Printf("Taxonomy ID:    %s\n", taxonomy.ID)
-		fmt.Printf("Name:           %s\n", taxonomy.Name)
-		fmt.Printf("Handle:         %s\n", taxonomy.Handle)
-		fmt.Printf("Description:    %s\n", taxonomy.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Taxonomy ID:    %s\n", taxonomy.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:           %s\n", taxonomy.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle:         %s\n", taxonomy.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:    %s\n", taxonomy.Description)
 		if taxonomy.ParentID != "" {
-			fmt.Printf("Parent ID:      %s\n", taxonomy.ParentID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Parent ID:      %s\n", taxonomy.ParentID)
 		}
-		fmt.Printf("Level:          %d\n", taxonomy.Level)
-		fmt.Printf("Position:       %d\n", taxonomy.Position)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Level:          %d\n", taxonomy.Level)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Position:       %d\n", taxonomy.Position)
 		if taxonomy.Path != "" {
-			fmt.Printf("Path:           %s\n", taxonomy.Path)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Path:           %s\n", taxonomy.Path)
 		}
 		if taxonomy.FullPath != "" {
-			fmt.Printf("Full Path:      %s\n", taxonomy.FullPath)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Full Path:      %s\n", taxonomy.FullPath)
 		}
-		fmt.Printf("Product Count:  %d\n", taxonomy.ProductCount)
-		fmt.Printf("Active:         %t\n", taxonomy.Active)
-		fmt.Printf("Created:        %s\n", taxonomy.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:        %s\n", taxonomy.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product Count:  %d\n", taxonomy.ProductCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Active:         %t\n", taxonomy.Active)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", taxonomy.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:        %s\n", taxonomy.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -127,7 +127,7 @@ var taxonomiesCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create taxonomy '%s'\n", name)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create taxonomy '%s'\n", name)
 			return nil
 		}
 
@@ -157,11 +157,11 @@ var taxonomiesCreateCmd = &cobra.Command{
 			return formatter.JSON(taxonomy)
 		}
 
-		fmt.Printf("Created taxonomy %s\n", taxonomy.ID)
-		fmt.Printf("Name:   %s\n", taxonomy.Name)
-		fmt.Printf("Handle: %s\n", taxonomy.Handle)
-		fmt.Printf("Level:  %d\n", taxonomy.Level)
-		fmt.Printf("Active: %t\n", taxonomy.Active)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created taxonomy %s\n", taxonomy.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:   %s\n", taxonomy.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle: %s\n", taxonomy.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Level:  %d\n", taxonomy.Level)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Active: %t\n", taxonomy.Active)
 
 		return nil
 	},
@@ -174,13 +174,13 @@ var taxonomiesDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete taxonomy %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete taxonomy %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Are you sure you want to delete taxonomy %s? Use --yes to confirm.\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete taxonomy %s? Use --yes to confirm.\n", args[0])
 			return nil
 		}
 
@@ -193,7 +193,7 @@ var taxonomiesDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete taxonomy: %w", err)
 		}
 
-		fmt.Printf("Deleted taxonomy %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted taxonomy %s\n", args[0])
 		return nil
 	},
 }

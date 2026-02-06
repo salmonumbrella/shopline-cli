@@ -41,9 +41,9 @@ var multipassStatusCmd = &cobra.Command{
 		if multipass.Enabled {
 			status = "Enabled"
 		}
-		fmt.Printf("Status:  %s\n", status)
-		fmt.Printf("Created: %s\n", multipass.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated: %s\n", multipass.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:  %s\n", status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created: %s\n", multipass.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated: %s\n", multipass.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -55,7 +55,7 @@ var multipassEnableCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Println("[DRY-RUN] Would enable multipass authentication")
+			_, _ = fmt.Fprintln(outWriter(cmd), "[DRY-RUN] Would enable multipass authentication")
 			return nil
 		}
 
@@ -76,10 +76,10 @@ var multipassEnableCmd = &cobra.Command{
 			return formatter.JSON(multipass)
 		}
 
-		fmt.Println("Multipass authentication enabled")
+		_, _ = fmt.Fprintln(outWriter(cmd), "Multipass authentication enabled")
 		if multipass.Secret != "" {
-			fmt.Printf("\nSecret: %s\n", multipass.Secret)
-			fmt.Println("(Save this secret - it will not be shown again)")
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nSecret: %s\n", multipass.Secret)
+			_, _ = fmt.Fprintln(outWriter(cmd), "(Save this secret - it will not be shown again)")
 		}
 
 		return nil
@@ -92,17 +92,17 @@ var multipassDisableCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Println("[DRY-RUN] Would disable multipass authentication")
+			_, _ = fmt.Fprintln(outWriter(cmd), "[DRY-RUN] Would disable multipass authentication")
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Print("Disable multipass authentication? [y/N] ")
+			_, _ = fmt.Fprint(outWriter(cmd), "Disable multipass authentication? [y/N] ")
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -116,7 +116,7 @@ var multipassDisableCmd = &cobra.Command{
 			return fmt.Errorf("failed to disable multipass: %w", err)
 		}
 
-		fmt.Println("Multipass authentication disabled")
+		_, _ = fmt.Fprintln(outWriter(cmd), "Multipass authentication disabled")
 		return nil
 	},
 }
@@ -127,17 +127,17 @@ var multipassRotateCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Println("[DRY-RUN] Would rotate multipass secret")
+			_, _ = fmt.Fprintln(outWriter(cmd), "[DRY-RUN] Would rotate multipass secret")
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Print("Rotate multipass secret? This will invalidate all existing tokens. [y/N] ")
+			_, _ = fmt.Fprint(outWriter(cmd), "Rotate multipass secret? This will invalidate all existing tokens. [y/N] ")
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -159,10 +159,10 @@ var multipassRotateCmd = &cobra.Command{
 			return formatter.JSON(multipass)
 		}
 
-		fmt.Println("Multipass secret rotated")
+		_, _ = fmt.Fprintln(outWriter(cmd), "Multipass secret rotated")
 		if multipass.Secret != "" {
-			fmt.Printf("\nNew Secret: %s\n", multipass.Secret)
-			fmt.Println("(Save this secret - it will not be shown again)")
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nNew Secret: %s\n", multipass.Secret)
+			_, _ = fmt.Fprintln(outWriter(cmd), "(Save this secret - it will not be shown again)")
 		}
 
 		return nil
@@ -178,7 +178,7 @@ var multipassTokenCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would generate multipass token for %s\n", email)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would generate multipass token for %s\n", email)
 			return nil
 		}
 
@@ -204,9 +204,9 @@ var multipassTokenCmd = &cobra.Command{
 			return formatter.JSON(token)
 		}
 
-		fmt.Printf("Token:   %s\n", token.Token)
-		fmt.Printf("URL:     %s\n", token.URL)
-		fmt.Printf("Expires: %s\n", token.ExpiresAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Token:   %s\n", token.Token)
+		_, _ = fmt.Fprintf(outWriter(cmd), "URL:     %s\n", token.URL)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Expires: %s\n", token.ExpiresAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -343,11 +343,11 @@ var multipassCustomersUnlinkCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete multipass linking for customer %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete multipass linking for customer %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}

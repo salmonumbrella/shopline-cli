@@ -62,7 +62,7 @@ var disputesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d disputes\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d disputes\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -89,38 +89,38 @@ var disputesGetCmd = &cobra.Command{
 			return formatter.JSON(dispute)
 		}
 
-		fmt.Printf("Dispute ID:   %s\n", dispute.ID)
-		fmt.Printf("Order ID:     %s\n", dispute.OrderID)
-		fmt.Printf("Payment ID:   %s\n", dispute.PaymentID)
-		fmt.Printf("Amount:       %s %s\n", dispute.Amount, dispute.Currency)
-		fmt.Printf("Status:       %s\n", dispute.Status)
-		fmt.Printf("Reason:       %s\n", dispute.Reason)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Dispute ID:   %s\n", dispute.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Order ID:     %s\n", dispute.OrderID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Payment ID:   %s\n", dispute.PaymentID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Amount:       %s %s\n", dispute.Amount, dispute.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:       %s\n", dispute.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Reason:       %s\n", dispute.Reason)
 		if dispute.NetworkReasonCode != "" {
-			fmt.Printf("Network Code: %s\n", dispute.NetworkReasonCode)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Network Code: %s\n", dispute.NetworkReasonCode)
 		}
 		if dispute.EvidenceDueBy != nil {
-			fmt.Printf("Evidence Due: %s\n", dispute.EvidenceDueBy.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Evidence Due: %s\n", dispute.EvidenceDueBy.Format(time.RFC3339))
 		}
 		if dispute.Evidence != nil {
-			fmt.Printf("Evidence:\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "Evidence:\n")
 			if dispute.Evidence.CustomerName != "" {
-				fmt.Printf("  Customer:   %s\n", dispute.Evidence.CustomerName)
+				_, _ = fmt.Fprintf(outWriter(cmd), "  Customer:   %s\n", dispute.Evidence.CustomerName)
 			}
 			if dispute.Evidence.CustomerEmail != "" {
-				fmt.Printf("  Email:      %s\n", dispute.Evidence.CustomerEmail)
+				_, _ = fmt.Fprintf(outWriter(cmd), "  Email:      %s\n", dispute.Evidence.CustomerEmail)
 			}
 			if dispute.Evidence.ShippingCarrier != "" {
-				fmt.Printf("  Carrier:    %s\n", dispute.Evidence.ShippingCarrier)
+				_, _ = fmt.Fprintf(outWriter(cmd), "  Carrier:    %s\n", dispute.Evidence.ShippingCarrier)
 			}
 			if dispute.Evidence.ShippingTrackingNumber != "" {
-				fmt.Printf("  Tracking:   %s\n", dispute.Evidence.ShippingTrackingNumber)
+				_, _ = fmt.Fprintf(outWriter(cmd), "  Tracking:   %s\n", dispute.Evidence.ShippingTrackingNumber)
 			}
 		}
 		if dispute.ResolvedAt != nil {
-			fmt.Printf("Resolved:     %s\n", dispute.ResolvedAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Resolved:     %s\n", dispute.ResolvedAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:      %s\n", dispute.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:      %s\n", dispute.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:      %s\n", dispute.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:      %s\n", dispute.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -137,11 +137,11 @@ var disputesSubmitCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Submit dispute %s for review? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Submit dispute %s for review? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -151,7 +151,7 @@ var disputesSubmitCmd = &cobra.Command{
 			return fmt.Errorf("failed to submit dispute: %w", err)
 		}
 
-		fmt.Printf("Submitted dispute %s (status: %s)\n", dispute.ID, dispute.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Submitted dispute %s (status: %s)\n", dispute.ID, dispute.Status)
 		return nil
 	},
 }
@@ -168,11 +168,11 @@ var disputesAcceptCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Accept dispute %s? This will concede to the customer. [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Accept dispute %s? This will concede to the customer. [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -182,7 +182,7 @@ var disputesAcceptCmd = &cobra.Command{
 			return fmt.Errorf("failed to accept dispute: %w", err)
 		}
 
-		fmt.Printf("Accepted dispute %s (status: %s)\n", dispute.ID, dispute.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Accepted dispute %s (status: %s)\n", dispute.ID, dispute.Status)
 		return nil
 	},
 }
@@ -218,7 +218,7 @@ var disputesEvidenceCmd = &cobra.Command{
 			return fmt.Errorf("failed to update dispute evidence: %w", err)
 		}
 
-		fmt.Printf("Updated evidence for dispute %s\n", dispute.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated evidence for dispute %s\n", dispute.ID)
 		return nil
 	},
 }

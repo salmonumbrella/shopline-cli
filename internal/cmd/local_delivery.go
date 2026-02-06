@@ -71,7 +71,7 @@ var localDeliveryListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d local delivery options\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d local delivery options\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -98,38 +98,38 @@ var localDeliveryGetCmd = &cobra.Command{
 			return formatter.JSON(option)
 		}
 
-		fmt.Printf("Option ID:        %s\n", option.ID)
-		fmt.Printf("Name:             %s\n", option.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Option ID:        %s\n", option.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:             %s\n", option.Name)
 		if option.Description != "" {
-			fmt.Printf("Description:      %s\n", option.Description)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Description:      %s\n", option.Description)
 		}
-		fmt.Printf("Active:           %t\n", option.Active)
-		fmt.Printf("Price:            %s %s\n", option.Price, option.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Active:           %t\n", option.Active)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Price:            %s %s\n", option.Price, option.Currency)
 		if option.FreeAbove != "" && option.FreeAbove != "0" {
-			fmt.Printf("Free Above:       %s %s\n", option.FreeAbove, option.Currency)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Free Above:       %s %s\n", option.FreeAbove, option.Currency)
 		}
 		if option.MinOrderAmount != "" && option.MinOrderAmount != "0" {
-			fmt.Printf("Min Order:        %s %s\n", option.MinOrderAmount, option.Currency)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Min Order:        %s %s\n", option.MinOrderAmount, option.Currency)
 		}
 		if option.MaxOrderAmount != "" && option.MaxOrderAmount != "0" {
-			fmt.Printf("Max Order:        %s %s\n", option.MaxOrderAmount, option.Currency)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Max Order:        %s %s\n", option.MaxOrderAmount, option.Currency)
 		}
 		if option.DeliveryTimeMin > 0 || option.DeliveryTimeMax > 0 {
-			fmt.Printf("Delivery Time:    %d-%d %s\n", option.DeliveryTimeMin, option.DeliveryTimeMax, option.DeliveryTimeUnit)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delivery Time:    %d-%d %s\n", option.DeliveryTimeMin, option.DeliveryTimeMax, option.DeliveryTimeUnit)
 		}
 		if option.LocationID != "" {
-			fmt.Printf("Location ID:      %s\n", option.LocationID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Location ID:      %s\n", option.LocationID)
 		}
-		fmt.Printf("Created:          %s\n", option.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:          %s\n", option.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:          %s\n", option.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:          %s\n", option.UpdatedAt.Format(time.RFC3339))
 
 		if len(option.Zones) > 0 {
-			fmt.Printf("\nDelivery Zones (%d):\n", len(option.Zones))
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nDelivery Zones (%d):\n", len(option.Zones))
 			for _, zone := range option.Zones {
 				if zone.Type == "zip_code" {
-					fmt.Printf("  - %s (%s): %s\n", zone.Name, zone.Type, strings.Join(zone.ZipCodes, ", "))
+					_, _ = fmt.Fprintf(outWriter(cmd), "  - %s (%s): %s\n", zone.Name, zone.Type, strings.Join(zone.ZipCodes, ", "))
 				} else {
-					fmt.Printf("  - %s (%s): %.1f - %.1f km\n", zone.Name, zone.Type, zone.MinDistance, zone.MaxDistance)
+					_, _ = fmt.Fprintf(outWriter(cmd), "  - %s (%s): %.1f - %.1f km\n", zone.Name, zone.Type, zone.MinDistance, zone.MaxDistance)
 				}
 			}
 		}
@@ -174,7 +174,7 @@ var localDeliveryCreateCmd = &cobra.Command{
 			return formatter.JSON(option)
 		}
 
-		fmt.Printf("Created local delivery option %s: %s\n", option.ID, option.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created local delivery option %s: %s\n", option.ID, option.Name)
 		return nil
 	},
 }
@@ -191,11 +191,11 @@ var localDeliveryDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete local delivery option %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete local delivery option %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -204,7 +204,7 @@ var localDeliveryDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete local delivery option: %w", err)
 		}
 
-		fmt.Printf("Local delivery option %s deleted.\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Local delivery option %s deleted.\n", args[0])
 		return nil
 	},
 }

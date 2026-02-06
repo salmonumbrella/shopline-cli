@@ -76,7 +76,7 @@ var domainsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d domains\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d domains\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -103,27 +103,27 @@ var domainsGetCmd = &cobra.Command{
 			return formatter.JSON(domain)
 		}
 
-		fmt.Printf("Domain ID:          %s\n", domain.ID)
-		fmt.Printf("Host:               %s\n", domain.Host)
-		fmt.Printf("Primary:            %t\n", domain.Primary)
-		fmt.Printf("SSL:                %t\n", domain.SSL)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Domain ID:          %s\n", domain.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Host:               %s\n", domain.Host)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Primary:            %t\n", domain.Primary)
+		_, _ = fmt.Fprintf(outWriter(cmd), "SSL:                %t\n", domain.SSL)
 		if domain.SSLStatus != "" {
-			fmt.Printf("SSL Status:         %s\n", domain.SSLStatus)
+			_, _ = fmt.Fprintf(outWriter(cmd), "SSL Status:         %s\n", domain.SSLStatus)
 		}
-		fmt.Printf("Status:             %s\n", domain.Status)
-		fmt.Printf("Verified:           %t\n", domain.Verified)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:             %s\n", domain.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Verified:           %t\n", domain.Verified)
 		if domain.VerifiedAt != nil {
-			fmt.Printf("Verified At:        %s\n", domain.VerifiedAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Verified At:        %s\n", domain.VerifiedAt.Format(time.RFC3339))
 		}
 		if domain.ExpiresAt != nil {
-			fmt.Printf("Expires At:         %s\n", domain.ExpiresAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Expires At:         %s\n", domain.ExpiresAt.Format(time.RFC3339))
 		}
 		if !domain.Verified && domain.VerificationDNS != "" {
-			fmt.Printf("\nVerification DNS:   %s\n", domain.VerificationDNS)
-			fmt.Printf("Verification Token: %s\n", domain.VerificationToken)
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nVerification DNS:   %s\n", domain.VerificationDNS)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Verification Token: %s\n", domain.VerificationToken)
 		}
-		fmt.Printf("\nCreated:            %s\n", domain.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:            %s\n", domain.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nCreated:            %s\n", domain.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:            %s\n", domain.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -138,7 +138,7 @@ var domainsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create domain: %s\n", host)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create domain: %s\n", host)
 			return nil
 		}
 
@@ -164,13 +164,13 @@ var domainsCreateCmd = &cobra.Command{
 			return formatter.JSON(domain)
 		}
 
-		fmt.Printf("Created domain %s\n", domain.ID)
-		fmt.Printf("Host:   %s\n", domain.Host)
-		fmt.Printf("Status: %s\n", domain.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created domain %s\n", domain.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Host:   %s\n", domain.Host)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status: %s\n", domain.Status)
 		if domain.VerificationDNS != "" {
-			fmt.Printf("\nTo verify ownership, add this DNS record:\n")
-			fmt.Printf("  %s\n", domain.VerificationDNS)
-			fmt.Printf("  Token: %s\n", domain.VerificationToken)
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nTo verify ownership, add this DNS record:\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "  %s\n", domain.VerificationDNS)
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Token: %s\n", domain.VerificationToken)
 		}
 
 		return nil
@@ -191,7 +191,7 @@ var domainsUpdateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would update domain %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update domain %s\n", args[0])
 			return nil
 		}
 
@@ -212,9 +212,9 @@ var domainsUpdateCmd = &cobra.Command{
 			return formatter.JSON(domain)
 		}
 
-		fmt.Printf("Updated domain %s\n", domain.ID)
-		fmt.Printf("Host:    %s\n", domain.Host)
-		fmt.Printf("Primary: %t\n", domain.Primary)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated domain %s\n", domain.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Host:    %s\n", domain.Host)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Primary: %t\n", domain.Primary)
 
 		return nil
 	},
@@ -227,13 +227,13 @@ var domainsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete domain %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete domain %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Are you sure you want to delete domain %s? (use --yes to confirm)\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete domain %s? (use --yes to confirm)\n", args[0])
 			return nil
 		}
 
@@ -246,7 +246,7 @@ var domainsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete domain: %w", err)
 		}
 
-		fmt.Printf("Deleted domain %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted domain %s\n", args[0])
 		return nil
 	},
 }
@@ -258,7 +258,7 @@ var domainsVerifyCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would verify domain %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would verify domain %s\n", args[0])
 			return nil
 		}
 
@@ -279,10 +279,10 @@ var domainsVerifyCmd = &cobra.Command{
 			return formatter.JSON(domain)
 		}
 
-		fmt.Printf("Verification initiated for domain %s\n", domain.ID)
-		fmt.Printf("Host:     %s\n", domain.Host)
-		fmt.Printf("Status:   %s\n", domain.Status)
-		fmt.Printf("Verified: %t\n", domain.Verified)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Verification initiated for domain %s\n", domain.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Host:     %s\n", domain.Host)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:   %s\n", domain.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Verified: %t\n", domain.Verified)
 
 		return nil
 	},

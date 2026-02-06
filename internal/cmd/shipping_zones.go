@@ -56,7 +56,7 @@ var shippingZonesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d shipping zones\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d shipping zones\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -83,29 +83,29 @@ var shippingZonesGetCmd = &cobra.Command{
 			return formatter.JSON(zone)
 		}
 
-		fmt.Printf("Zone ID:  %s\n", zone.ID)
-		fmt.Printf("Name:     %s\n", zone.Name)
-		fmt.Printf("Created:  %s\n", zone.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:  %s\n", zone.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Zone ID:  %s\n", zone.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:     %s\n", zone.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:  %s\n", zone.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:  %s\n", zone.UpdatedAt.Format(time.RFC3339))
 
 		if len(zone.Countries) > 0 {
-			fmt.Println("\nCountries:")
+			_, _ = fmt.Fprintln(outWriter(cmd), "\nCountries:")
 			for _, c := range zone.Countries {
-				fmt.Printf("  %s - %s\n", c.Code, c.Name)
+				_, _ = fmt.Fprintf(outWriter(cmd), "  %s - %s\n", c.Code, c.Name)
 			}
 		}
 
 		if len(zone.PriceBasedRates) > 0 {
-			fmt.Println("\nPrice-Based Rates:")
+			_, _ = fmt.Fprintln(outWriter(cmd), "\nPrice-Based Rates:")
 			for _, r := range zone.PriceBasedRates {
-				fmt.Printf("  %s: %s (%s - %s)\n", r.Name, r.Price, r.MinValue, r.MaxValue)
+				_, _ = fmt.Fprintf(outWriter(cmd), "  %s: %s (%s - %s)\n", r.Name, r.Price, r.MinValue, r.MaxValue)
 			}
 		}
 
 		if len(zone.WeightBasedRates) > 0 {
-			fmt.Println("\nWeight-Based Rates:")
+			_, _ = fmt.Fprintln(outWriter(cmd), "\nWeight-Based Rates:")
 			for _, r := range zone.WeightBasedRates {
-				fmt.Printf("  %s: %s (%.2f - %.2f kg)\n", r.Name, r.Price, r.MinWeight, r.MaxWeight)
+				_, _ = fmt.Fprintf(outWriter(cmd), "  %s: %s (%.2f - %.2f kg)\n", r.Name, r.Price, r.MinWeight, r.MaxWeight)
 			}
 		}
 		return nil
@@ -139,8 +139,8 @@ var shippingZonesCreateCmd = &cobra.Command{
 			return formatter.JSON(zone)
 		}
 
-		fmt.Printf("Created shipping zone %s\n", zone.ID)
-		fmt.Printf("Name: %s\n", zone.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created shipping zone %s\n", zone.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name: %s\n", zone.Name)
 		return nil
 	},
 }
@@ -157,11 +157,11 @@ var shippingZonesDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete shipping zone %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete shipping zone %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -170,7 +170,7 @@ var shippingZonesDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete shipping zone: %w", err)
 		}
 
-		fmt.Printf("Deleted shipping zone %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted shipping zone %s\n", args[0])
 		return nil
 	},
 }

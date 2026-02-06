@@ -70,7 +70,7 @@ var companyCatalogsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d company catalogs\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d company catalogs\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -97,19 +97,19 @@ var companyCatalogsGetCmd = &cobra.Command{
 			return formatter.JSON(catalog)
 		}
 
-		fmt.Printf("Catalog ID:      %s\n", catalog.ID)
-		fmt.Printf("Company ID:      %s\n", catalog.CompanyID)
-		fmt.Printf("Company Name:    %s\n", catalog.CompanyName)
-		fmt.Printf("Name:            %s\n", catalog.Name)
-		fmt.Printf("Description:     %s\n", catalog.Description)
-		fmt.Printf("Products:        %d\n", len(catalog.ProductIDs))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Catalog ID:      %s\n", catalog.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Company ID:      %s\n", catalog.CompanyID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Company Name:    %s\n", catalog.CompanyName)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:            %s\n", catalog.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:     %s\n", catalog.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Products:        %d\n", len(catalog.ProductIDs))
 		if len(catalog.ProductIDs) > 0 && len(catalog.ProductIDs) <= 10 {
-			fmt.Printf("Product IDs:     %s\n", strings.Join(catalog.ProductIDs, ", "))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Product IDs:     %s\n", strings.Join(catalog.ProductIDs, ", "))
 		}
-		fmt.Printf("Default:         %t\n", catalog.IsDefault)
-		fmt.Printf("Status:          %s\n", catalog.Status)
-		fmt.Printf("Created:         %s\n", catalog.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:         %s\n", catalog.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Default:         %t\n", catalog.IsDefault)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:          %s\n", catalog.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:         %s\n", catalog.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:         %s\n", catalog.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -149,7 +149,7 @@ var companyCatalogsCreateCmd = &cobra.Command{
 			return formatter.JSON(catalog)
 		}
 
-		fmt.Printf("Created company catalog %s (%s)\n", catalog.ID, catalog.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created company catalog %s (%s)\n", catalog.ID, catalog.Name)
 		return nil
 	},
 }
@@ -195,7 +195,7 @@ var companyCatalogsUpdateCmd = &cobra.Command{
 			return formatter.JSON(catalog)
 		}
 
-		fmt.Printf("Updated company catalog %s\n", catalog.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated company catalog %s\n", catalog.ID)
 		return nil
 	},
 }
@@ -212,11 +212,11 @@ var companyCatalogsDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete company catalog %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete company catalog %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -225,7 +225,7 @@ var companyCatalogsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete company catalog: %w", err)
 		}
 
-		fmt.Printf("Deleted company catalog %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted company catalog %s\n", args[0])
 		return nil
 	},
 }

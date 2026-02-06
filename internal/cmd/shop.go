@@ -33,29 +33,29 @@ var shopInfoCmd = &cobra.Command{
 			return formatter.JSON(shop)
 		}
 
-		fmt.Printf("Shop ID:         %s\n", shop.ID)
-		fmt.Printf("Name:            %s\n", shop.Name)
-		fmt.Printf("Email:           %s\n", shop.Email)
-		fmt.Printf("Domain:          %s\n", shop.Domain)
-		fmt.Printf("Shopline Domain: %s\n", shop.MyshoplineDomain)
-		fmt.Printf("Phone:           %s\n", shop.Phone)
-		fmt.Printf("Owner:           %s\n", shop.ShopOwner)
-		fmt.Println()
-		fmt.Printf("Address:         %s\n", shop.Address1)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Shop ID:         %s\n", shop.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:            %s\n", shop.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Email:           %s\n", shop.Email)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Domain:          %s\n", shop.Domain)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Shopline Domain: %s\n", shop.MyshoplineDomain)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Phone:           %s\n", shop.Phone)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Owner:           %s\n", shop.ShopOwner)
+		_, _ = fmt.Fprintln(outWriter(cmd))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Address:         %s\n", shop.Address1)
 		if shop.Address2 != "" {
-			fmt.Printf("                 %s\n", shop.Address2)
+			_, _ = fmt.Fprintf(outWriter(cmd), "                 %s\n", shop.Address2)
 		}
-		fmt.Printf("City:            %s\n", shop.City)
-		fmt.Printf("Province:        %s (%s)\n", shop.Province, shop.ProvinceCode)
-		fmt.Printf("Country:         %s (%s)\n", shop.Country, shop.CountryCode)
-		fmt.Printf("ZIP:             %s\n", shop.Zip)
-		fmt.Println()
-		fmt.Printf("Currency:        %s\n", shop.Currency)
-		fmt.Printf("Timezone:        %s\n", shop.Timezone)
-		fmt.Printf("Weight Unit:     %s\n", shop.WeightUnit)
-		fmt.Println()
-		fmt.Printf("Plan:            %s (%s)\n", shop.PlanDisplayName, shop.PlanName)
-		fmt.Printf("Created:         %s\n", shop.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "City:            %s\n", shop.City)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Province:        %s (%s)\n", shop.Province, shop.ProvinceCode)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Country:         %s (%s)\n", shop.Country, shop.CountryCode)
+		_, _ = fmt.Fprintf(outWriter(cmd), "ZIP:             %s\n", shop.Zip)
+		_, _ = fmt.Fprintln(outWriter(cmd))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Currency:        %s\n", shop.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Timezone:        %s\n", shop.Timezone)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Weight Unit:     %s\n", shop.WeightUnit)
+		_, _ = fmt.Fprintln(outWriter(cmd))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Plan:            %s (%s)\n", shop.PlanDisplayName, shop.PlanName)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:         %s\n", shop.CreatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -81,16 +81,16 @@ var shopSettingsCmd = &cobra.Command{
 			return formatter.JSON(settings)
 		}
 
-		fmt.Printf("Currency:             %s\n", settings.Currency)
-		fmt.Printf("Weight Unit:          %s\n", settings.WeightUnit)
-		fmt.Printf("Timezone:             %s\n", settings.Timezone)
-		fmt.Printf("Order Prefix:         %s\n", settings.OrderPrefix)
-		fmt.Printf("Order Suffix:         %s\n", settings.OrderSuffix)
-		fmt.Printf("Taxes Included:       %t\n", settings.TaxesIncluded)
-		fmt.Printf("Tax Shipping:         %t\n", settings.TaxShipping)
-		fmt.Printf("Auto Fulfillment:     %t\n", settings.AutomaticFulfillment)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Currency:             %s\n", settings.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Weight Unit:          %s\n", settings.WeightUnit)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Timezone:             %s\n", settings.Timezone)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Order Prefix:         %s\n", settings.OrderPrefix)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Order Suffix:         %s\n", settings.OrderSuffix)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Taxes Included:       %t\n", settings.TaxesIncluded)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tax Shipping:         %t\n", settings.TaxShipping)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Auto Fulfillment:     %t\n", settings.AutomaticFulfillment)
 		if len(settings.EnabledPresentmentCurrencies) > 0 {
-			fmt.Printf("Currencies Enabled:   %v\n", settings.EnabledPresentmentCurrencies)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Currencies Enabled:   %v\n", settings.EnabledPresentmentCurrencies)
 		}
 		return nil
 	},

@@ -60,7 +60,7 @@ var customerBlacklistListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d blacklist entries\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d blacklist entries\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -87,13 +87,13 @@ var customerBlacklistGetCmd = &cobra.Command{
 			return formatter.JSON(entry)
 		}
 
-		fmt.Printf("Entry ID:     %s\n", entry.ID)
-		fmt.Printf("Customer ID:  %s\n", entry.CustomerID)
-		fmt.Printf("Email:        %s\n", entry.Email)
-		fmt.Printf("Phone:        %s\n", entry.Phone)
-		fmt.Printf("Reason:       %s\n", entry.Reason)
-		fmt.Printf("Created:      %s\n", entry.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:      %s\n", entry.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Entry ID:     %s\n", entry.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer ID:  %s\n", entry.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Email:        %s\n", entry.Email)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Phone:        %s\n", entry.Phone)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Reason:       %s\n", entry.Reason)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:      %s\n", entry.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:      %s\n", entry.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -110,7 +110,7 @@ var customerBlacklistCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would add to blacklist: customer=%s, email=%s, phone=%s\n", customerID, email, phone)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would add to blacklist: customer=%s, email=%s, phone=%s\n", customerID, email, phone)
 			return nil
 		}
 
@@ -138,9 +138,9 @@ var customerBlacklistCreateCmd = &cobra.Command{
 			return formatter.JSON(entry)
 		}
 
-		fmt.Printf("Added to blacklist: %s\n", entry.ID)
-		fmt.Printf("Email:  %s\n", entry.Email)
-		fmt.Printf("Reason: %s\n", entry.Reason)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Added to blacklist: %s\n", entry.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Email:  %s\n", entry.Email)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Reason: %s\n", entry.Reason)
 
 		return nil
 	},
@@ -153,7 +153,7 @@ var customerBlacklistDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would remove from blacklist: %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would remove from blacklist: %s\n", args[0])
 			return nil
 		}
 
@@ -166,7 +166,7 @@ var customerBlacklistDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to remove from blacklist: %w", err)
 		}
 
-		fmt.Printf("Removed from blacklist: %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Removed from blacklist: %s\n", args[0])
 		return nil
 	},
 }

@@ -60,7 +60,7 @@ var bulkOperationsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d bulk operations\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d bulk operations\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -87,23 +87,23 @@ var bulkOperationsGetCmd = &cobra.Command{
 			return formatter.JSON(op)
 		}
 
-		fmt.Printf("Operation ID:   %s\n", op.ID)
-		fmt.Printf("Type:           %s\n", op.Type)
-		fmt.Printf("Status:         %s\n", op.Status)
-		fmt.Printf("Object Count:   %d\n", op.ObjectCount)
-		fmt.Printf("File Size:      %s\n", formatBytes(op.FileSize))
-		fmt.Printf("Created:        %s\n", op.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Operation ID:   %s\n", op.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Type:           %s\n", op.Type)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:         %s\n", op.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Object Count:   %d\n", op.ObjectCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "File Size:      %s\n", formatBytes(op.FileSize))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", op.CreatedAt.Format(time.RFC3339))
 		if op.CompletedAt != nil {
-			fmt.Printf("Completed:      %s\n", op.CompletedAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Completed:      %s\n", op.CompletedAt.Format(time.RFC3339))
 		}
 		if op.URL != "" {
-			fmt.Printf("Result URL:     %s\n", op.URL)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Result URL:     %s\n", op.URL)
 		}
 		if op.ErrorCode != "" {
-			fmt.Printf("Error Code:     %s\n", op.ErrorCode)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Error Code:     %s\n", op.ErrorCode)
 		}
 		if op.PartialDataURL != "" {
-			fmt.Printf("Partial Data:   %s\n", op.PartialDataURL)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Partial Data:   %s\n", op.PartialDataURL)
 		}
 		return nil
 	},
@@ -131,15 +131,15 @@ var bulkOperationsCurrentCmd = &cobra.Command{
 		}
 
 		if op.ID == "" {
-			fmt.Println("No bulk operation currently running")
+			_, _ = fmt.Fprintln(outWriter(cmd), "No bulk operation currently running")
 			return nil
 		}
 
-		fmt.Printf("Operation ID:   %s\n", op.ID)
-		fmt.Printf("Type:           %s\n", op.Type)
-		fmt.Printf("Status:         %s\n", op.Status)
-		fmt.Printf("Object Count:   %d\n", op.ObjectCount)
-		fmt.Printf("Created:        %s\n", op.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Operation ID:   %s\n", op.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Type:           %s\n", op.Type)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:         %s\n", op.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Object Count:   %d\n", op.ObjectCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", op.CreatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -171,8 +171,8 @@ var bulkOperationsQueryCmd = &cobra.Command{
 			return formatter.JSON(op)
 		}
 
-		fmt.Printf("Created bulk query %s\n", op.ID)
-		fmt.Printf("Status: %s\n", op.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created bulk query %s\n", op.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status: %s\n", op.Status)
 		return nil
 	},
 }
@@ -199,8 +199,8 @@ var bulkOperationsCancelCmd = &cobra.Command{
 			return formatter.JSON(op)
 		}
 
-		fmt.Printf("Cancelled bulk operation %s\n", op.ID)
-		fmt.Printf("Status: %s\n", op.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Cancelled bulk operation %s\n", op.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status: %s\n", op.Status)
 		return nil
 	},
 }

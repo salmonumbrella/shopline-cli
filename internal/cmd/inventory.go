@@ -59,7 +59,7 @@ var inventoryListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d inventory levels\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d inventory levels\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -86,11 +86,11 @@ var inventoryGetCmd = &cobra.Command{
 			return formatter.JSON(level)
 		}
 
-		fmt.Printf("Inventory ID:     %s\n", level.ID)
-		fmt.Printf("Inventory Item:   %s\n", level.InventoryItemID)
-		fmt.Printf("Location:         %s\n", level.LocationID)
-		fmt.Printf("Available:        %d\n", level.Available)
-		fmt.Printf("Updated:          %s\n", level.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Inventory ID:     %s\n", level.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Inventory Item:   %s\n", level.InventoryItemID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Location:         %s\n", level.LocationID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Available:        %d\n", level.Available)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:          %s\n", level.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -117,11 +117,11 @@ var inventoryAdjustCmd = &cobra.Command{
 			if delta < 0 {
 				action = "decrease"
 			}
-			fmt.Printf("Adjust inventory %s by %d (%s)? [y/N] ", args[0], delta, action)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Adjust inventory %s by %d (%s)? [y/N] ", args[0], delta, action)
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -138,7 +138,7 @@ var inventoryAdjustCmd = &cobra.Command{
 			return formatter.JSON(level)
 		}
 
-		fmt.Printf("Inventory adjusted. New available quantity: %d\n", level.Available)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Inventory adjusted. New available quantity: %d\n", level.Available)
 		return nil
 	},
 }

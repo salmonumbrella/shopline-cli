@@ -63,7 +63,7 @@ var paymentsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d payments\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d payments\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -90,27 +90,27 @@ var paymentsGetCmd = &cobra.Command{
 			return formatter.JSON(payment)
 		}
 
-		fmt.Printf("Payment ID:     %s\n", payment.ID)
-		fmt.Printf("Order ID:       %s\n", payment.OrderID)
-		fmt.Printf("Amount:         %s %s\n", payment.Amount, payment.Currency)
-		fmt.Printf("Status:         %s\n", payment.Status)
-		fmt.Printf("Gateway:        %s\n", payment.Gateway)
-		fmt.Printf("Payment Method: %s\n", payment.PaymentMethod)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Payment ID:     %s\n", payment.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Order ID:       %s\n", payment.OrderID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Amount:         %s %s\n", payment.Amount, payment.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:         %s\n", payment.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Gateway:        %s\n", payment.Gateway)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Payment Method: %s\n", payment.PaymentMethod)
 		if payment.TransactionID != "" {
-			fmt.Printf("Transaction ID: %s\n", payment.TransactionID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Transaction ID: %s\n", payment.TransactionID)
 		}
 		if payment.ErrorMessage != "" {
-			fmt.Printf("Error:          %s\n", payment.ErrorMessage)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Error:          %s\n", payment.ErrorMessage)
 		}
 		if payment.CreditCard != nil {
-			fmt.Printf("Card:           %s ****%s (%02d/%d)\n",
+			_, _ = fmt.Fprintf(outWriter(cmd), "Card:           %s ****%s (%02d/%d)\n",
 				payment.CreditCard.Brand,
 				payment.CreditCard.Last4,
 				payment.CreditCard.ExpiryMonth,
 				payment.CreditCard.ExpiryYear)
 		}
-		fmt.Printf("Created:        %s\n", payment.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:        %s\n", payment.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", payment.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:        %s\n", payment.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -152,7 +152,7 @@ var paymentsOrderCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d payments for order %s\n", len(resp.Items), args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d payments for order %s\n", len(resp.Items), args[0])
 		return nil
 	},
 }
@@ -174,7 +174,7 @@ var paymentsCaptureCmd = &cobra.Command{
 			return fmt.Errorf("failed to capture payment: %w", err)
 		}
 
-		fmt.Printf("Captured payment %s (status: %s)\n", payment.ID, payment.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Captured payment %s (status: %s)\n", payment.ID, payment.Status)
 		return nil
 	},
 }
@@ -191,11 +191,11 @@ var paymentsVoidCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Void payment %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Void payment %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -205,7 +205,7 @@ var paymentsVoidCmd = &cobra.Command{
 			return fmt.Errorf("failed to void payment: %w", err)
 		}
 
-		fmt.Printf("Voided payment %s (status: %s)\n", payment.ID, payment.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Voided payment %s (status: %s)\n", payment.ID, payment.Status)
 		return nil
 	},
 }
@@ -225,11 +225,11 @@ var paymentsRefundCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Refund payment %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Refund payment %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -239,7 +239,7 @@ var paymentsRefundCmd = &cobra.Command{
 			return fmt.Errorf("failed to refund payment: %w", err)
 		}
 
-		fmt.Printf("Refunded payment %s (status: %s)\n", payment.ID, payment.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Refunded payment %s (status: %s)\n", payment.ID, payment.Status)
 		return nil
 	},
 }

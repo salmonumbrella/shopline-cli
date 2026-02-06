@@ -70,7 +70,7 @@ var catalogPricingListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d catalog pricing entries\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d catalog pricing entries\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -97,23 +97,23 @@ var catalogPricingGetCmd = &cobra.Command{
 			return formatter.JSON(pricing)
 		}
 
-		fmt.Printf("Pricing ID:      %s\n", pricing.ID)
-		fmt.Printf("Catalog ID:      %s\n", pricing.CatalogID)
-		fmt.Printf("Product ID:      %s\n", pricing.ProductID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Pricing ID:      %s\n", pricing.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Catalog ID:      %s\n", pricing.CatalogID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product ID:      %s\n", pricing.ProductID)
 		if pricing.VariantID != "" {
-			fmt.Printf("Variant ID:      %s\n", pricing.VariantID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Variant ID:      %s\n", pricing.VariantID)
 		}
-		fmt.Printf("Original Price:  %.2f\n", pricing.OriginalPrice)
-		fmt.Printf("Catalog Price:   %.2f\n", pricing.CatalogPrice)
-		fmt.Printf("Discount:        %.0f%%\n", pricing.DiscountPct)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Original Price:  %.2f\n", pricing.OriginalPrice)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Catalog Price:   %.2f\n", pricing.CatalogPrice)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Discount:        %.0f%%\n", pricing.DiscountPct)
 		if pricing.MinQuantity > 0 {
-			fmt.Printf("Min Quantity:    %d\n", pricing.MinQuantity)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Min Quantity:    %d\n", pricing.MinQuantity)
 		}
 		if pricing.MaxQuantity > 0 {
-			fmt.Printf("Max Quantity:    %d\n", pricing.MaxQuantity)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Max Quantity:    %d\n", pricing.MaxQuantity)
 		}
-		fmt.Printf("Created:         %s\n", pricing.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:         %s\n", pricing.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:         %s\n", pricing.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:         %s\n", pricing.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -155,7 +155,7 @@ var catalogPricingCreateCmd = &cobra.Command{
 			return formatter.JSON(pricing)
 		}
 
-		fmt.Printf("Created catalog pricing %s (price: %.2f)\n", pricing.ID, pricing.CatalogPrice)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created catalog pricing %s (price: %.2f)\n", pricing.ID, pricing.CatalogPrice)
 		return nil
 	},
 }
@@ -197,7 +197,7 @@ var catalogPricingUpdateCmd = &cobra.Command{
 			return formatter.JSON(pricing)
 		}
 
-		fmt.Printf("Updated catalog pricing %s\n", pricing.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated catalog pricing %s\n", pricing.ID)
 		return nil
 	},
 }
@@ -214,11 +214,11 @@ var catalogPricingDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete catalog pricing %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete catalog pricing %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -227,7 +227,7 @@ var catalogPricingDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete catalog pricing: %w", err)
 		}
 
-		fmt.Printf("Deleted catalog pricing %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted catalog pricing %s\n", args[0])
 		return nil
 	},
 }

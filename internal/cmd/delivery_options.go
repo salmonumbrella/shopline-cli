@@ -62,7 +62,7 @@ var deliveryOptionsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d delivery options\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d delivery options\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -89,16 +89,16 @@ var deliveryOptionsGetCmd = &cobra.Command{
 			return formatter.JSON(opt)
 		}
 
-		fmt.Printf("Option ID:    %s\n", opt.ID)
-		fmt.Printf("Name:         %s\n", opt.Name)
-		fmt.Printf("Type:         %s\n", opt.Type)
-		fmt.Printf("Status:       %s\n", opt.Status)
-		fmt.Printf("Description:  %s\n", opt.Description)
-		fmt.Printf("Created:      %s\n", opt.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:      %s\n", opt.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Option ID:    %s\n", opt.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:         %s\n", opt.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Type:         %s\n", opt.Type)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:       %s\n", opt.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:  %s\n", opt.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:      %s\n", opt.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:      %s\n", opt.UpdatedAt.Format(time.RFC3339))
 
 		if len(opt.SupportedCountries) > 0 {
-			fmt.Printf("\nSupported Countries:\n  %s\n", strings.Join(opt.SupportedCountries, ", "))
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nSupported Countries:\n  %s\n", strings.Join(opt.SupportedCountries, ", "))
 		}
 		return nil
 	},
@@ -157,7 +157,7 @@ var deliveryOptionsTimeSlotsCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d time slots\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d time slots\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -196,7 +196,7 @@ var deliveryOptionsUpdatePickupCmd = &cobra.Command{
 			return formatter.JSON(opt)
 		}
 
-		fmt.Printf("Updated pickup store for delivery option %s\n", opt.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated pickup store for delivery option %s\n", opt.ID)
 		return nil
 	},
 }

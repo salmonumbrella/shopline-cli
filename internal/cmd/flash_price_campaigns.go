@@ -116,11 +116,11 @@ var flashPriceCampaignsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete flash price campaign %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete flash price campaign %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -138,7 +138,7 @@ var flashPriceCampaignsDeleteCmd = &cobra.Command{
 		if err := client.DeleteFlashPriceCampaign(cmd.Context(), args[0]); err != nil {
 			return fmt.Errorf("failed to delete flash price campaign: %w", err)
 		}
-		fmt.Printf("Deleted flash price campaign %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted flash price campaign %s\n", args[0])
 		return nil
 	},
 }

@@ -64,7 +64,7 @@ var marketingEventsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d marketing events\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d marketing events\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -91,44 +91,44 @@ var marketingEventsGetCmd = &cobra.Command{
 			return formatter.JSON(event)
 		}
 
-		fmt.Printf("Event ID:       %s\n", event.ID)
-		fmt.Printf("Event Type:     %s\n", event.EventType)
-		fmt.Printf("Marketing Type: %s\n", event.MarketingType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Event ID:       %s\n", event.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Event Type:     %s\n", event.EventType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Marketing Type: %s\n", event.MarketingType)
 		if event.RemoteID != "" {
-			fmt.Printf("Remote ID:      %s\n", event.RemoteID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Remote ID:      %s\n", event.RemoteID)
 		}
 		if event.Description != "" {
-			fmt.Printf("Description:    %s\n", event.Description)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Description:    %s\n", event.Description)
 		}
 		if event.Budget > 0 {
-			fmt.Printf("Budget:         %.2f %s\n", event.Budget, event.Currency)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Budget:         %.2f %s\n", event.Budget, event.Currency)
 		}
 		if event.UTMCampaign != "" {
-			fmt.Printf("UTM Campaign:   %s\n", event.UTMCampaign)
+			_, _ = fmt.Fprintf(outWriter(cmd), "UTM Campaign:   %s\n", event.UTMCampaign)
 		}
 		if event.UTMSource != "" {
-			fmt.Printf("UTM Source:     %s\n", event.UTMSource)
+			_, _ = fmt.Fprintf(outWriter(cmd), "UTM Source:     %s\n", event.UTMSource)
 		}
 		if event.UTMMedium != "" {
-			fmt.Printf("UTM Medium:     %s\n", event.UTMMedium)
+			_, _ = fmt.Fprintf(outWriter(cmd), "UTM Medium:     %s\n", event.UTMMedium)
 		}
 		if event.ManageURL != "" {
-			fmt.Printf("Manage URL:     %s\n", event.ManageURL)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Manage URL:     %s\n", event.ManageURL)
 		}
 		if event.PreviewURL != "" {
-			fmt.Printf("Preview URL:    %s\n", event.PreviewURL)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Preview URL:    %s\n", event.PreviewURL)
 		}
 		if !event.StartedAt.IsZero() {
-			fmt.Printf("Started At:     %s\n", event.StartedAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Started At:     %s\n", event.StartedAt.Format(time.RFC3339))
 		}
 		if !event.EndedAt.IsZero() {
-			fmt.Printf("Ended At:       %s\n", event.EndedAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Ended At:       %s\n", event.EndedAt.Format(time.RFC3339))
 		}
 		if len(event.MarketedResources) > 0 {
-			fmt.Printf("Resources:      %d marketed resources\n", len(event.MarketedResources))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Resources:      %d marketed resources\n", len(event.MarketedResources))
 		}
-		fmt.Printf("Created:        %s\n", event.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:        %s\n", event.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", event.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:        %s\n", event.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -148,7 +148,7 @@ var marketingEventsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create marketing event: %s (%s)\n", eventType, marketingType)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create marketing event: %s (%s)\n", eventType, marketingType)
 			return nil
 		}
 
@@ -180,9 +180,9 @@ var marketingEventsCreateCmd = &cobra.Command{
 			return formatter.JSON(event)
 		}
 
-		fmt.Printf("Created marketing event %s\n", event.ID)
-		fmt.Printf("Event Type:     %s\n", event.EventType)
-		fmt.Printf("Marketing Type: %s\n", event.MarketingType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created marketing event %s\n", event.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Event Type:     %s\n", event.EventType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Marketing Type: %s\n", event.MarketingType)
 
 		return nil
 	},
@@ -195,13 +195,13 @@ var marketingEventsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete marketing event %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete marketing event %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Are you sure you want to delete marketing event %s? (use --yes to confirm)\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete marketing event %s? (use --yes to confirm)\n", args[0])
 			return nil
 		}
 
@@ -214,7 +214,7 @@ var marketingEventsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete marketing event: %w", err)
 		}
 
-		fmt.Printf("Deleted marketing event %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted marketing event %s\n", args[0])
 		return nil
 	},
 }

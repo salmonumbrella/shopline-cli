@@ -36,50 +36,50 @@ var merchantsGetCmd = &cobra.Command{
 			return formatter.JSON(merchant)
 		}
 
-		fmt.Printf("Merchant ID:     %s\n", merchant.ID)
-		fmt.Printf("Name:            %s\n", merchant.Name)
-		fmt.Printf("Handle:          %s\n", merchant.Handle)
-		fmt.Printf("Owner:           %s\n", merchant.ShopOwner)
-		fmt.Printf("Email:           %s\n", merchant.Email)
-		fmt.Printf("Phone:           %s\n", merchant.Phone)
-		fmt.Printf("Domain:          %s\n", merchant.Domain)
-		fmt.Printf("Primary Domain:  %s\n", merchant.PrimaryDomain)
-		fmt.Printf("\n--- Location ---\n")
-		fmt.Printf("Country:         %s (%s)\n", merchant.Country, merchant.CountryCode)
-		fmt.Printf("Province:        %s\n", merchant.Province)
-		fmt.Printf("City:            %s\n", merchant.City)
-		fmt.Printf("Address:         %s\n", merchant.Address1)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Merchant ID:     %s\n", merchant.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:            %s\n", merchant.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle:          %s\n", merchant.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Owner:           %s\n", merchant.ShopOwner)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Email:           %s\n", merchant.Email)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Phone:           %s\n", merchant.Phone)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Domain:          %s\n", merchant.Domain)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Primary Domain:  %s\n", merchant.PrimaryDomain)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\n--- Location ---\n")
+		_, _ = fmt.Fprintf(outWriter(cmd), "Country:         %s (%s)\n", merchant.Country, merchant.CountryCode)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Province:        %s\n", merchant.Province)
+		_, _ = fmt.Fprintf(outWriter(cmd), "City:            %s\n", merchant.City)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Address:         %s\n", merchant.Address1)
 		if merchant.Address2 != "" {
-			fmt.Printf("                 %s\n", merchant.Address2)
+			_, _ = fmt.Fprintf(outWriter(cmd), "                 %s\n", merchant.Address2)
 		}
-		fmt.Printf("ZIP:             %s\n", merchant.Zip)
-		fmt.Printf("Timezone:        %s\n", merchant.Timezone)
-		fmt.Printf("\n--- Settings ---\n")
-		fmt.Printf("Plan:            %s (%s)\n", merchant.PlanDisplayName, merchant.Plan)
-		fmt.Printf("Currency:        %s\n", merchant.Currency)
-		fmt.Printf("Weight Unit:     %s\n", merchant.WeightUnit)
-		fmt.Printf("Taxes Included:  %v\n", merchant.TaxesIncluded)
-		fmt.Printf("Tax Shipping:    %v\n", merchant.TaxShipping)
-		fmt.Printf("Password Enabled:%v\n", merchant.PasswordEnabled)
-		fmt.Printf("Setup Required:  %v\n", merchant.SetupRequired)
+		_, _ = fmt.Fprintf(outWriter(cmd), "ZIP:             %s\n", merchant.Zip)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Timezone:        %s\n", merchant.Timezone)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\n--- Settings ---\n")
+		_, _ = fmt.Fprintf(outWriter(cmd), "Plan:            %s (%s)\n", merchant.PlanDisplayName, merchant.Plan)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Currency:        %s\n", merchant.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Weight Unit:     %s\n", merchant.WeightUnit)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Taxes Included:  %v\n", merchant.TaxesIncluded)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tax Shipping:    %v\n", merchant.TaxShipping)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Password Enabled:%v\n", merchant.PasswordEnabled)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Setup Required:  %v\n", merchant.SetupRequired)
 
 		if merchant.Features != nil {
-			fmt.Printf("\n--- Features ---\n")
-			fmt.Printf("Checkout:        %v\n", merchant.Features.Checkout)
-			fmt.Printf("Multi-Location:  %v\n", merchant.Features.MultiLocation)
-			fmt.Printf("Multi-Currency:  %v\n", merchant.Features.MultiCurrency)
-			fmt.Printf("Gift Cards:      %v\n", merchant.Features.GiftCards)
-			fmt.Printf("Subscriptions:   %v\n", merchant.Features.Subscriptions)
-			fmt.Printf("Discounts:       %v\n", merchant.Features.Discounts)
+			_, _ = fmt.Fprintf(outWriter(cmd), "\n--- Features ---\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "Checkout:        %v\n", merchant.Features.Checkout)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Multi-Location:  %v\n", merchant.Features.MultiLocation)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Multi-Currency:  %v\n", merchant.Features.MultiCurrency)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Gift Cards:      %v\n", merchant.Features.GiftCards)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Subscriptions:   %v\n", merchant.Features.Subscriptions)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Discounts:       %v\n", merchant.Features.Discounts)
 		}
 
 		if merchant.Finances != nil && len(merchant.Finances.EnabledPresentmentCurrencies) > 0 {
-			fmt.Printf("\n--- Currencies ---\n")
-			fmt.Printf("Presentment Currencies: %s\n", strings.Join(merchant.Finances.EnabledPresentmentCurrencies, ", "))
+			_, _ = fmt.Fprintf(outWriter(cmd), "\n--- Currencies ---\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "Presentment Currencies: %s\n", strings.Join(merchant.Finances.EnabledPresentmentCurrencies, ", "))
 		}
 
-		fmt.Printf("\nCreated:         %s\n", merchant.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:         %s\n", merchant.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nCreated:         %s\n", merchant.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:         %s\n", merchant.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -150,7 +150,7 @@ var merchantsStaffListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d staff members\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d staff members\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -177,24 +177,24 @@ var merchantsStaffGetCmd = &cobra.Command{
 			return formatter.JSON(staff)
 		}
 
-		fmt.Printf("Staff ID:      %s\n", staff.ID)
-		fmt.Printf("Email:         %s\n", staff.Email)
-		fmt.Printf("First Name:    %s\n", staff.FirstName)
-		fmt.Printf("Last Name:     %s\n", staff.LastName)
-		fmt.Printf("Phone:         %s\n", staff.Phone)
-		fmt.Printf("Role:          %s\n", staff.Role)
-		fmt.Printf("Account Owner: %v\n", staff.AccountOwner)
-		fmt.Printf("Active:        %v\n", staff.Active)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Staff ID:      %s\n", staff.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Email:         %s\n", staff.Email)
+		_, _ = fmt.Fprintf(outWriter(cmd), "First Name:    %s\n", staff.FirstName)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Last Name:     %s\n", staff.LastName)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Phone:         %s\n", staff.Phone)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Role:          %s\n", staff.Role)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Account Owner: %v\n", staff.AccountOwner)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Active:        %v\n", staff.Active)
 
 		if len(staff.Permissions) > 0 {
-			fmt.Printf("Permissions:   %s\n", strings.Join(staff.Permissions, ", "))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Permissions:   %s\n", strings.Join(staff.Permissions, ", "))
 		}
 
 		if staff.LastLoginAt != nil {
-			fmt.Printf("Last Login:    %s\n", staff.LastLoginAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Last Login:    %s\n", staff.LastLoginAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:       %s\n", staff.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:       %s\n", staff.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:       %s\n", staff.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:       %s\n", staff.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},

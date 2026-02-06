@@ -65,7 +65,7 @@ var productListingsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d product listings\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d product listings\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -92,21 +92,21 @@ var productListingsGetCmd = &cobra.Command{
 			return formatter.JSON(listing)
 		}
 
-		fmt.Printf("Listing ID:    %s\n", listing.ID)
-		fmt.Printf("Product ID:    %s\n", listing.ProductID)
-		fmt.Printf("Title:         %s\n", listing.Title)
-		fmt.Printf("Handle:        %s\n", listing.Handle)
-		fmt.Printf("Vendor:        %s\n", listing.Vendor)
-		fmt.Printf("Product Type:  %s\n", listing.ProductType)
-		fmt.Printf("Available:     %t\n", listing.Available)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Listing ID:    %s\n", listing.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product ID:    %s\n", listing.ProductID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:         %s\n", listing.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle:        %s\n", listing.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Vendor:        %s\n", listing.Vendor)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product Type:  %s\n", listing.ProductType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Available:     %t\n", listing.Available)
 		if listing.BodyHTML != "" {
-			fmt.Printf("Body HTML:     %s\n", listing.BodyHTML)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Body HTML:     %s\n", listing.BodyHTML)
 		}
 		if !listing.PublishedAt.IsZero() {
-			fmt.Printf("Published:     %s\n", listing.PublishedAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Published:     %s\n", listing.PublishedAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:       %s\n", listing.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:       %s\n", listing.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:       %s\n", listing.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:       %s\n", listing.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -119,7 +119,7 @@ var productListingsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create product listing for product %s\n", productID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create product listing for product %s\n", productID)
 			return nil
 		}
 
@@ -140,10 +140,10 @@ var productListingsCreateCmd = &cobra.Command{
 			return formatter.JSON(listing)
 		}
 
-		fmt.Printf("Created product listing %s\n", listing.ID)
-		fmt.Printf("Product ID:  %s\n", listing.ProductID)
-		fmt.Printf("Title:       %s\n", listing.Title)
-		fmt.Printf("Available:   %t\n", listing.Available)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created product listing %s\n", listing.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product ID:  %s\n", listing.ProductID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:       %s\n", listing.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Available:   %t\n", listing.Available)
 
 		return nil
 	},
@@ -156,13 +156,13 @@ var productListingsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Are you sure you want to delete product listing %s? Use --yes to confirm.\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete product listing %s? Use --yes to confirm.\n", args[0])
 			return nil
 		}
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete product listing %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete product listing %s\n", args[0])
 			return nil
 		}
 
@@ -175,7 +175,7 @@ var productListingsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete product listing: %w", err)
 		}
 
-		fmt.Printf("Deleted product listing %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted product listing %s\n", args[0])
 		return nil
 	},
 }

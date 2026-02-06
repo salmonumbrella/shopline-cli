@@ -80,7 +80,7 @@ var orderAttributionListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d attributions\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d attributions\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -107,51 +107,51 @@ var orderAttributionGetCmd = &cobra.Command{
 			return formatter.JSON(attribution)
 		}
 
-		fmt.Printf("Attribution ID:   %s\n", attribution.ID)
-		fmt.Printf("Order ID:         %s\n", attribution.OrderID)
-		fmt.Printf("\n--- Traffic Source ---\n")
-		fmt.Printf("Source:           %s\n", attribution.Source)
-		fmt.Printf("Medium:           %s\n", attribution.Medium)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Attribution ID:   %s\n", attribution.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Order ID:         %s\n", attribution.OrderID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\n--- Traffic Source ---\n")
+		_, _ = fmt.Fprintf(outWriter(cmd), "Source:           %s\n", attribution.Source)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Medium:           %s\n", attribution.Medium)
 		if attribution.Campaign != "" {
-			fmt.Printf("Campaign:         %s\n", attribution.Campaign)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Campaign:         %s\n", attribution.Campaign)
 		}
 		if attribution.Content != "" {
-			fmt.Printf("Content:          %s\n", attribution.Content)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Content:          %s\n", attribution.Content)
 		}
 		if attribution.Term != "" {
-			fmt.Printf("Term:             %s\n", attribution.Term)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Term:             %s\n", attribution.Term)
 		}
-		fmt.Printf("\n--- UTM Parameters ---\n")
+		_, _ = fmt.Fprintf(outWriter(cmd), "\n--- UTM Parameters ---\n")
 		if attribution.UtmSource != "" {
-			fmt.Printf("utm_source:       %s\n", attribution.UtmSource)
+			_, _ = fmt.Fprintf(outWriter(cmd), "utm_source:       %s\n", attribution.UtmSource)
 		}
 		if attribution.UtmMedium != "" {
-			fmt.Printf("utm_medium:       %s\n", attribution.UtmMedium)
+			_, _ = fmt.Fprintf(outWriter(cmd), "utm_medium:       %s\n", attribution.UtmMedium)
 		}
 		if attribution.UtmCampaign != "" {
-			fmt.Printf("utm_campaign:     %s\n", attribution.UtmCampaign)
+			_, _ = fmt.Fprintf(outWriter(cmd), "utm_campaign:     %s\n", attribution.UtmCampaign)
 		}
 		if attribution.UtmContent != "" {
-			fmt.Printf("utm_content:      %s\n", attribution.UtmContent)
+			_, _ = fmt.Fprintf(outWriter(cmd), "utm_content:      %s\n", attribution.UtmContent)
 		}
 		if attribution.UtmTerm != "" {
-			fmt.Printf("utm_term:         %s\n", attribution.UtmTerm)
+			_, _ = fmt.Fprintf(outWriter(cmd), "utm_term:         %s\n", attribution.UtmTerm)
 		}
-		fmt.Printf("\n--- Journey ---\n")
+		_, _ = fmt.Fprintf(outWriter(cmd), "\n--- Journey ---\n")
 		if attribution.ReferrerURL != "" {
-			fmt.Printf("Referrer:         %s\n", attribution.ReferrerURL)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Referrer:         %s\n", attribution.ReferrerURL)
 		}
 		if attribution.LandingPage != "" {
-			fmt.Printf("Landing Page:     %s\n", attribution.LandingPage)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Landing Page:     %s\n", attribution.LandingPage)
 		}
-		fmt.Printf("Touchpoints:      %d\n", attribution.TouchpointCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Touchpoints:      %d\n", attribution.TouchpointCount)
 		if attribution.FirstVisitAt != nil {
-			fmt.Printf("First Visit:      %s\n", attribution.FirstVisitAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "First Visit:      %s\n", attribution.FirstVisitAt.Format(time.RFC3339))
 		}
 		if attribution.LastVisitAt != nil {
-			fmt.Printf("Last Visit:       %s\n", attribution.LastVisitAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Last Visit:       %s\n", attribution.LastVisitAt.Format(time.RFC3339))
 		}
-		fmt.Printf("\nCreated:          %s\n", attribution.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nCreated:          %s\n", attribution.CreatedAt.Format(time.RFC3339))
 		return nil
 	},
 }

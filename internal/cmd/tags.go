@@ -57,7 +57,7 @@ var tagsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d tags\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d tags\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -84,12 +84,12 @@ var tagsGetCmd = &cobra.Command{
 			return formatter.JSON(tag)
 		}
 
-		fmt.Printf("Tag ID:         %s\n", tag.ID)
-		fmt.Printf("Name:           %s\n", tag.Name)
-		fmt.Printf("Handle:         %s\n", tag.Handle)
-		fmt.Printf("Product Count:  %d\n", tag.ProductCount)
-		fmt.Printf("Created:        %s\n", tag.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:        %s\n", tag.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tag ID:         %s\n", tag.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:           %s\n", tag.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle:         %s\n", tag.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product Count:  %d\n", tag.ProductCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", tag.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:        %s\n", tag.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -102,7 +102,7 @@ var tagsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create tag '%s'\n", name)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create tag '%s'\n", name)
 			return nil
 		}
 
@@ -127,9 +127,9 @@ var tagsCreateCmd = &cobra.Command{
 			return formatter.JSON(tag)
 		}
 
-		fmt.Printf("Created tag %s\n", tag.ID)
-		fmt.Printf("Name:    %s\n", tag.Name)
-		fmt.Printf("Handle:  %s\n", tag.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created tag %s\n", tag.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:    %s\n", tag.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle:  %s\n", tag.Handle)
 
 		return nil
 	},
@@ -142,7 +142,7 @@ var tagsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete tag %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete tag %s\n", args[0])
 			return nil
 		}
 
@@ -155,7 +155,7 @@ var tagsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete tag: %w", err)
 		}
 
-		fmt.Printf("Deleted tag %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted tag %s\n", args[0])
 		return nil
 	},
 }

@@ -66,7 +66,7 @@ var wishListsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d wish lists\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d wish lists\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -93,33 +93,33 @@ var wishListsGetCmd = &cobra.Command{
 			return formatter.JSON(wishList)
 		}
 
-		fmt.Printf("Wish List ID:  %s\n", wishList.ID)
-		fmt.Printf("Customer ID:   %s\n", wishList.CustomerID)
-		fmt.Printf("Name:          %s\n", wishList.Name)
-		fmt.Printf("Description:   %s\n", wishList.Description)
-		fmt.Printf("Default:       %v\n", wishList.IsDefault)
-		fmt.Printf("Public:        %v\n", wishList.IsPublic)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Wish List ID:  %s\n", wishList.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer ID:   %s\n", wishList.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:          %s\n", wishList.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:   %s\n", wishList.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Default:       %v\n", wishList.IsDefault)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Public:        %v\n", wishList.IsPublic)
 		if wishList.IsPublic && wishList.ShareURL != "" {
-			fmt.Printf("Share URL:     %s\n", wishList.ShareURL)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Share URL:     %s\n", wishList.ShareURL)
 		}
-		fmt.Printf("Item Count:    %d\n", wishList.ItemCount)
-		fmt.Printf("Created:       %s\n", wishList.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:       %s\n", wishList.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Item Count:    %d\n", wishList.ItemCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:       %s\n", wishList.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:       %s\n", wishList.UpdatedAt.Format(time.RFC3339))
 
 		if len(wishList.Items) > 0 {
-			fmt.Printf("\nItems:\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nItems:\n")
 			for _, item := range wishList.Items {
 				available := "unavailable"
 				if item.Available {
 					available = "available"
 				}
-				fmt.Printf("  - %s", item.Title)
+				_, _ = fmt.Fprintf(outWriter(cmd), "  - %s", item.Title)
 				if item.VariantTitle != "" {
-					fmt.Printf(" (%s)", item.VariantTitle)
+					_, _ = fmt.Fprintf(outWriter(cmd), " (%s)", item.VariantTitle)
 				}
-				fmt.Printf(" - %s %s [%s]\n", item.Price, item.Currency, available)
+				_, _ = fmt.Fprintf(outWriter(cmd), " - %s %s [%s]\n", item.Price, item.Currency, available)
 				if item.Notes != "" {
-					fmt.Printf("    Notes: %s\n", item.Notes)
+					_, _ = fmt.Fprintf(outWriter(cmd), "    Notes: %s\n", item.Notes)
 				}
 			}
 		}
@@ -140,7 +140,7 @@ var wishListsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create wish list '%s' for customer %s\n", name, customerID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create wish list '%s' for customer %s\n", name, customerID)
 			return nil
 		}
 
@@ -169,11 +169,11 @@ var wishListsCreateCmd = &cobra.Command{
 			return formatter.JSON(wishList)
 		}
 
-		fmt.Printf("Created wish list %s\n", wishList.ID)
-		fmt.Printf("Name:        %s\n", wishList.Name)
-		fmt.Printf("Customer ID: %s\n", wishList.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created wish list %s\n", wishList.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:        %s\n", wishList.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer ID: %s\n", wishList.CustomerID)
 		if wishList.IsPublic && wishList.ShareURL != "" {
-			fmt.Printf("Share URL:   %s\n", wishList.ShareURL)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Share URL:   %s\n", wishList.ShareURL)
 		}
 
 		return nil
@@ -187,7 +187,7 @@ var wishListsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete wish list %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete wish list %s\n", args[0])
 			return nil
 		}
 
@@ -200,7 +200,7 @@ var wishListsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete wish list: %w", err)
 		}
 
-		fmt.Printf("Deleted wish list %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted wish list %s\n", args[0])
 		return nil
 	},
 }
@@ -218,7 +218,7 @@ var wishListsAddItemCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would add product %s to wish list %s\n", productID, args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would add product %s to wish list %s\n", productID, args[0])
 			return nil
 		}
 
@@ -247,9 +247,9 @@ var wishListsAddItemCmd = &cobra.Command{
 			return formatter.JSON(item)
 		}
 
-		fmt.Printf("Added item %s to wish list\n", item.ID)
-		fmt.Printf("Product: %s\n", item.Title)
-		fmt.Printf("Price:   %s %s\n", item.Price, item.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Added item %s to wish list\n", item.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product: %s\n", item.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Price:   %s %s\n", item.Price, item.Currency)
 
 		return nil
 	},
@@ -262,7 +262,7 @@ var wishListsRemoveItemCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would remove item %s from wish list %s\n", args[1], args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would remove item %s from wish list %s\n", args[1], args[0])
 			return nil
 		}
 
@@ -275,7 +275,7 @@ var wishListsRemoveItemCmd = &cobra.Command{
 			return fmt.Errorf("failed to remove item from wish list: %w", err)
 		}
 
-		fmt.Printf("Removed item %s from wish list %s\n", args[1], args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Removed item %s from wish list %s\n", args[1], args[0])
 		return nil
 	},
 }

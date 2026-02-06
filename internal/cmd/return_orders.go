@@ -82,7 +82,7 @@ var returnOrdersListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d return orders\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d return orders\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -109,41 +109,41 @@ var returnOrdersGetCmd = &cobra.Command{
 			return formatter.JSON(returnOrder)
 		}
 
-		fmt.Printf("Return Order ID:  %s\n", returnOrder.ID)
-		fmt.Printf("Order ID:         %s\n", returnOrder.OrderID)
-		fmt.Printf("Order Number:     %s\n", returnOrder.OrderNumber)
-		fmt.Printf("Status:           %s\n", returnOrder.Status)
-		fmt.Printf("Return Type:      %s\n", returnOrder.ReturnType)
-		fmt.Printf("Customer ID:      %s\n", returnOrder.CustomerID)
-		fmt.Printf("Customer Email:   %s\n", returnOrder.CustomerEmail)
-		fmt.Printf("Total Amount:     %s %s\n", returnOrder.TotalAmount, returnOrder.Currency)
-		fmt.Printf("Refund Amount:    %s %s\n", returnOrder.RefundAmount, returnOrder.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Return Order ID:  %s\n", returnOrder.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Order ID:         %s\n", returnOrder.OrderID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Order Number:     %s\n", returnOrder.OrderNumber)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:           %s\n", returnOrder.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Return Type:      %s\n", returnOrder.ReturnType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer ID:      %s\n", returnOrder.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer Email:   %s\n", returnOrder.CustomerEmail)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Total Amount:     %s %s\n", returnOrder.TotalAmount, returnOrder.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Refund Amount:    %s %s\n", returnOrder.RefundAmount, returnOrder.Currency)
 		if returnOrder.Reason != "" {
-			fmt.Printf("Reason:           %s\n", returnOrder.Reason)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Reason:           %s\n", returnOrder.Reason)
 		}
 		if returnOrder.Note != "" {
-			fmt.Printf("Note:             %s\n", returnOrder.Note)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Note:             %s\n", returnOrder.Note)
 		}
 		if returnOrder.TrackingNumber != "" {
-			fmt.Printf("Tracking Number:  %s\n", returnOrder.TrackingNumber)
-			fmt.Printf("Tracking Company: %s\n", returnOrder.TrackingCompany)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Tracking Number:  %s\n", returnOrder.TrackingNumber)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Tracking Company: %s\n", returnOrder.TrackingCompany)
 		}
 		if returnOrder.ReceivedAt != nil {
-			fmt.Printf("Received:         %s\n", returnOrder.ReceivedAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Received:         %s\n", returnOrder.ReceivedAt.Format(time.RFC3339))
 		}
 		if returnOrder.CompletedAt != nil {
-			fmt.Printf("Completed:        %s\n", returnOrder.CompletedAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Completed:        %s\n", returnOrder.CompletedAt.Format(time.RFC3339))
 		}
 		if returnOrder.CancelledAt != nil {
-			fmt.Printf("Cancelled:        %s\n", returnOrder.CancelledAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Cancelled:        %s\n", returnOrder.CancelledAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:          %s\n", returnOrder.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:          %s\n", returnOrder.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:          %s\n", returnOrder.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:          %s\n", returnOrder.UpdatedAt.Format(time.RFC3339))
 
 		if len(returnOrder.LineItems) > 0 {
-			fmt.Printf("\nLine Items (%d):\n", len(returnOrder.LineItems))
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nLine Items (%d):\n", len(returnOrder.LineItems))
 			for _, item := range returnOrder.LineItems {
-				fmt.Printf("  - %s x%d (Reason: %s)\n",
+				_, _ = fmt.Fprintf(outWriter(cmd), "  - %s x%d (Reason: %s)\n",
 					item.Title, item.Quantity, item.ReturnReason)
 			}
 		}
@@ -163,11 +163,11 @@ var returnOrdersCancelCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Cancel return order %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Cancel return order %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -176,7 +176,7 @@ var returnOrdersCancelCmd = &cobra.Command{
 			return fmt.Errorf("failed to cancel return order: %w", err)
 		}
 
-		fmt.Printf("Return order %s cancelled.\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Return order %s cancelled.\n", args[0])
 		return nil
 	},
 }
@@ -196,7 +196,7 @@ var returnOrdersCompleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to complete return order: %w", err)
 		}
 
-		fmt.Printf("Return order %s completed. Status: %s\n", returnOrder.ID, returnOrder.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Return order %s completed. Status: %s\n", returnOrder.ID, returnOrder.Status)
 		return nil
 	},
 }
@@ -216,7 +216,7 @@ var returnOrdersReceiveCmd = &cobra.Command{
 			return fmt.Errorf("failed to receive return order: %w", err)
 		}
 
-		fmt.Printf("Return order %s marked as received. Status: %s\n", returnOrder.ID, returnOrder.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Return order %s marked as received. Status: %s\n", returnOrder.ID, returnOrder.Status)
 		return nil
 	},
 }

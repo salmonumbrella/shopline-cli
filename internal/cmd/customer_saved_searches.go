@@ -56,7 +56,7 @@ var customerSavedSearchesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d saved searches\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d saved searches\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -83,11 +83,11 @@ var customerSavedSearchesGetCmd = &cobra.Command{
 			return formatter.JSON(search)
 		}
 
-		fmt.Printf("Search ID:  %s\n", search.ID)
-		fmt.Printf("Name:       %s\n", search.Name)
-		fmt.Printf("Query:      %s\n", search.Query)
-		fmt.Printf("Created:    %s\n", search.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:    %s\n", search.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Search ID:  %s\n", search.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:       %s\n", search.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Query:      %s\n", search.Query)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:    %s\n", search.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:    %s\n", search.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -102,7 +102,7 @@ var customerSavedSearchesCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create saved search: name=%s, query=%s\n", name, query)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create saved search: name=%s, query=%s\n", name, query)
 			return nil
 		}
 
@@ -128,9 +128,9 @@ var customerSavedSearchesCreateCmd = &cobra.Command{
 			return formatter.JSON(search)
 		}
 
-		fmt.Printf("Created saved search: %s\n", search.ID)
-		fmt.Printf("Name:  %s\n", search.Name)
-		fmt.Printf("Query: %s\n", search.Query)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created saved search: %s\n", search.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:  %s\n", search.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Query: %s\n", search.Query)
 
 		return nil
 	},
@@ -143,7 +143,7 @@ var customerSavedSearchesDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete saved search: %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete saved search: %s\n", args[0])
 			return nil
 		}
 
@@ -156,7 +156,7 @@ var customerSavedSearchesDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete saved search: %w", err)
 		}
 
-		fmt.Printf("Deleted saved search: %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted saved search: %s\n", args[0])
 		return nil
 	},
 }

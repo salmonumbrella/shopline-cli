@@ -460,7 +460,7 @@ var ordersCancelCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would cancel order %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would cancel order %s\n", args[0])
 			return nil
 		}
 
@@ -471,11 +471,11 @@ var ordersCancelCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Cancel order %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Cancel order %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -484,7 +484,7 @@ var ordersCancelCmd = &cobra.Command{
 			return fmt.Errorf("failed to cancel order: %w", err)
 		}
 
-		fmt.Printf("Order %s cancelled.\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Order %s cancelled.\n", args[0])
 		return nil
 	},
 }

@@ -59,7 +59,7 @@ var labelsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d labels\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d labels\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -86,14 +86,14 @@ var labelsGetCmd = &cobra.Command{
 			return formatter.JSON(label)
 		}
 
-		fmt.Printf("Label ID:     %s\n", label.ID)
-		fmt.Printf("Name:         %s\n", label.Name)
-		fmt.Printf("Description:  %s\n", label.Description)
-		fmt.Printf("Color:        %s\n", label.Color)
-		fmt.Printf("Icon:         %s\n", label.Icon)
-		fmt.Printf("Active:       %t\n", label.Active)
-		fmt.Printf("Created:      %s\n", label.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:      %s\n", label.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Label ID:     %s\n", label.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:         %s\n", label.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:  %s\n", label.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Color:        %s\n", label.Color)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Icon:         %s\n", label.Icon)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Active:       %t\n", label.Active)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:      %s\n", label.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:      %s\n", label.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -111,7 +111,7 @@ var labelsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create label '%s'\n", name)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create label '%s'\n", name)
 			return nil
 		}
 
@@ -140,10 +140,10 @@ var labelsCreateCmd = &cobra.Command{
 			return formatter.JSON(label)
 		}
 
-		fmt.Printf("Created label %s\n", label.ID)
-		fmt.Printf("Name:   %s\n", label.Name)
-		fmt.Printf("Color:  %s\n", label.Color)
-		fmt.Printf("Active: %t\n", label.Active)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created label %s\n", label.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:   %s\n", label.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Color:  %s\n", label.Color)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Active: %t\n", label.Active)
 
 		return nil
 	},
@@ -156,13 +156,13 @@ var labelsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete label %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete label %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Are you sure you want to delete label %s? Use --yes to confirm.\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete label %s? Use --yes to confirm.\n", args[0])
 			return nil
 		}
 
@@ -175,7 +175,7 @@ var labelsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete label: %w", err)
 		}
 
-		fmt.Printf("Deleted label %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted label %s\n", args[0])
 		return nil
 	},
 }

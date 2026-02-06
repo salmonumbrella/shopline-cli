@@ -65,7 +65,7 @@ var collectionsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d collections\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d collections\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -92,16 +92,16 @@ var collectionsGetCmd = &cobra.Command{
 			return formatter.JSON(collection)
 		}
 
-		fmt.Printf("Collection ID:    %s\n", collection.ID)
-		fmt.Printf("Title:            %s\n", collection.Title)
-		fmt.Printf("Handle:           %s\n", collection.Handle)
-		fmt.Printf("Description:      %s\n", collection.Description)
-		fmt.Printf("Sort Order:       %s\n", collection.SortOrder)
-		fmt.Printf("Products Count:   %d\n", collection.ProductsCount)
-		fmt.Printf("Published Scope:  %s\n", collection.PublishedScope)
-		fmt.Printf("Published At:     %s\n", collection.PublishedAt.Format(time.RFC3339))
-		fmt.Printf("Created:          %s\n", collection.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:          %s\n", collection.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Collection ID:    %s\n", collection.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:            %s\n", collection.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle:           %s\n", collection.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:      %s\n", collection.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Sort Order:       %s\n", collection.SortOrder)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Products Count:   %d\n", collection.ProductsCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Published Scope:  %s\n", collection.PublishedScope)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Published At:     %s\n", collection.PublishedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:          %s\n", collection.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:          %s\n", collection.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -139,9 +139,9 @@ var collectionsCreateCmd = &cobra.Command{
 			return formatter.JSON(collection)
 		}
 
-		fmt.Printf("Created collection %s\n", collection.ID)
-		fmt.Printf("Title:  %s\n", collection.Title)
-		fmt.Printf("Handle: %s\n", collection.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created collection %s\n", collection.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:  %s\n", collection.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle: %s\n", collection.Handle)
 		return nil
 	},
 }
@@ -158,11 +158,11 @@ var collectionsDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete collection %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete collection %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -171,7 +171,7 @@ var collectionsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete collection: %w", err)
 		}
 
-		fmt.Printf("Deleted collection %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted collection %s\n", args[0])
 		return nil
 	},
 }

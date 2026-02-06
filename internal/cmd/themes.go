@@ -67,7 +67,7 @@ var themesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d themes\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d themes\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -94,13 +94,13 @@ var themesGetCmd = &cobra.Command{
 			return formatter.JSON(theme)
 		}
 
-		fmt.Printf("Theme ID:    %s\n", theme.ID)
-		fmt.Printf("Name:        %s\n", theme.Name)
-		fmt.Printf("Role:        %s\n", theme.Role)
-		fmt.Printf("Previewable: %t\n", theme.Previewable)
-		fmt.Printf("Processing:  %t\n", theme.Processing)
-		fmt.Printf("Created:     %s\n", theme.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:     %s\n", theme.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Theme ID:    %s\n", theme.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:        %s\n", theme.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Role:        %s\n", theme.Role)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Previewable: %t\n", theme.Previewable)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Processing:  %t\n", theme.Processing)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:     %s\n", theme.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:     %s\n", theme.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -136,9 +136,9 @@ var themesCreateCmd = &cobra.Command{
 			return formatter.JSON(theme)
 		}
 
-		fmt.Printf("Created theme %s\n", theme.ID)
-		fmt.Printf("Name: %s\n", theme.Name)
-		fmt.Printf("Role: %s\n", theme.Role)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created theme %s\n", theme.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name: %s\n", theme.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Role: %s\n", theme.Role)
 
 		return nil
 	},
@@ -156,17 +156,17 @@ var themesDeleteCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete theme %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete theme %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete theme %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete theme %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -175,7 +175,7 @@ var themesDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete theme: %w", err)
 		}
 
-		fmt.Printf("Deleted theme %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted theme %s\n", args[0])
 		return nil
 	},
 }

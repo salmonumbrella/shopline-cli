@@ -55,7 +55,7 @@ var blogsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d blogs\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d blogs\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -82,18 +82,18 @@ var blogsGetCmd = &cobra.Command{
 			return formatter.JSON(blog)
 		}
 
-		fmt.Printf("Blog ID:        %s\n", blog.ID)
-		fmt.Printf("Title:          %s\n", blog.Title)
-		fmt.Printf("Handle:         %s\n", blog.Handle)
-		fmt.Printf("Commentable:    %s\n", blog.Commentable)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Blog ID:        %s\n", blog.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:          %s\n", blog.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle:         %s\n", blog.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Commentable:    %s\n", blog.Commentable)
 		if blog.Tags != "" {
-			fmt.Printf("Tags:           %s\n", blog.Tags)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Tags:           %s\n", blog.Tags)
 		}
 		if blog.TemplateSuffix != "" {
-			fmt.Printf("Template:       %s\n", blog.TemplateSuffix)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Template:       %s\n", blog.TemplateSuffix)
 		}
-		fmt.Printf("Created:        %s\n", blog.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:        %s\n", blog.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", blog.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:        %s\n", blog.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -108,7 +108,7 @@ var blogsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create blog: %s\n", title)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create blog: %s\n", title)
 			return nil
 		}
 
@@ -135,9 +135,9 @@ var blogsCreateCmd = &cobra.Command{
 			return formatter.JSON(blog)
 		}
 
-		fmt.Printf("Created blog %s\n", blog.ID)
-		fmt.Printf("Title:   %s\n", blog.Title)
-		fmt.Printf("Handle:  %s\n", blog.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created blog %s\n", blog.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:   %s\n", blog.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle:  %s\n", blog.Handle)
 
 		return nil
 	},
@@ -150,13 +150,13 @@ var blogsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete blog %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete blog %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Are you sure you want to delete blog %s? (use --yes to confirm)\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete blog %s? (use --yes to confirm)\n", args[0])
 			return nil
 		}
 
@@ -169,7 +169,7 @@ var blogsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete blog: %w", err)
 		}
 
-		fmt.Printf("Deleted blog %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted blog %s\n", args[0])
 		return nil
 	},
 }

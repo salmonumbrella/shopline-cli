@@ -47,7 +47,7 @@ var assetsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d assets\n", len(resp.Items))
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d assets\n", len(resp.Items))
 		return nil
 	},
 }
@@ -76,18 +76,18 @@ var assetsGetCmd = &cobra.Command{
 			return formatter.JSON(asset)
 		}
 
-		fmt.Printf("Key:          %s\n", asset.Key)
-		fmt.Printf("Theme ID:     %s\n", asset.ThemeID)
-		fmt.Printf("Content Type: %s\n", asset.ContentType)
-		fmt.Printf("Size:         %d bytes\n", asset.Size)
-		fmt.Printf("Checksum:     %s\n", asset.Checksum)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Key:          %s\n", asset.Key)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Theme ID:     %s\n", asset.ThemeID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Content Type: %s\n", asset.ContentType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Size:         %d bytes\n", asset.Size)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Checksum:     %s\n", asset.Checksum)
 		if asset.PublicURL != "" {
-			fmt.Printf("Public URL:   %s\n", asset.PublicURL)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Public URL:   %s\n", asset.PublicURL)
 		}
-		fmt.Printf("Created:      %s\n", asset.CreatedAt.Format("2006-01-02 15:04:05"))
-		fmt.Printf("Updated:      %s\n", asset.UpdatedAt.Format("2006-01-02 15:04:05"))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:      %s\n", asset.CreatedAt.Format("2006-01-02 15:04:05"))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:      %s\n", asset.UpdatedAt.Format("2006-01-02 15:04:05"))
 		if asset.Value != "" {
-			fmt.Printf("\n--- Content ---\n%s\n", asset.Value)
+			_, _ = fmt.Fprintf(outWriter(cmd), "\n--- Content ---\n%s\n", asset.Value)
 		}
 		return nil
 	},
@@ -103,7 +103,7 @@ var assetsPutCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create/update asset %s in theme %s\n", key, themeID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create/update asset %s in theme %s\n", key, themeID)
 			return nil
 		}
 
@@ -129,7 +129,7 @@ var assetsPutCmd = &cobra.Command{
 			return formatter.JSON(asset)
 		}
 
-		fmt.Printf("Updated asset %s\n", asset.Key)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated asset %s\n", asset.Key)
 		return nil
 	},
 }
@@ -143,13 +143,13 @@ var assetsDeleteCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete asset %s from theme %s\n", key, themeID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete asset %s from theme %s\n", key, themeID)
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Are you sure you want to delete asset %s? (use --yes to confirm)\n", key)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete asset %s? (use --yes to confirm)\n", key)
 			return nil
 		}
 
@@ -162,7 +162,7 @@ var assetsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete asset: %w", err)
 		}
 
-		fmt.Printf("Deleted asset %s\n", key)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted asset %s\n", key)
 		return nil
 	},
 }

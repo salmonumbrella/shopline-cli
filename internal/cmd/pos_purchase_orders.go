@@ -69,7 +69,7 @@ var posPurchaseOrdersCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create POS purchase order\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create POS purchase order\n")
 			return nil
 		}
 
@@ -98,7 +98,7 @@ var posPurchaseOrdersUpdateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would update POS purchase order %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update POS purchase order %s\n", args[0])
 			return nil
 		}
 
@@ -126,7 +126,7 @@ var posPurchaseOrdersBulkDeleteCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would bulk delete POS purchase orders\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would bulk delete POS purchase orders\n")
 			return nil
 		}
 
@@ -155,7 +155,7 @@ var posPurchaseOrdersCreateChildCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create child POS purchase order for %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create child POS purchase order for %s\n", args[0])
 			return nil
 		}
 

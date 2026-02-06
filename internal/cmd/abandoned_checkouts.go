@@ -77,7 +77,7 @@ var abandonedCheckoutsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d abandoned checkouts\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d abandoned checkouts\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -104,36 +104,36 @@ var abandonedCheckoutsGetCmd = &cobra.Command{
 			return formatter.JSON(checkout)
 		}
 
-		fmt.Printf("Checkout ID:       %s\n", checkout.ID)
-		fmt.Printf("Email:             %s\n", checkout.Email)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Checkout ID:       %s\n", checkout.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Email:             %s\n", checkout.Email)
 		if checkout.Phone != "" {
-			fmt.Printf("Phone:             %s\n", checkout.Phone)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Phone:             %s\n", checkout.Phone)
 		}
-		fmt.Printf("Customer ID:       %s\n", checkout.CustomerID)
-		fmt.Printf("Customer Locale:   %s\n", checkout.CustomerLocale)
-		fmt.Printf("Total:             %s %s\n", checkout.TotalPrice, checkout.Currency)
-		fmt.Printf("Subtotal:          %s %s\n", checkout.SubtotalPrice, checkout.Currency)
-		fmt.Printf("Tax:               %s %s\n", checkout.TotalTax, checkout.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer ID:       %s\n", checkout.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer Locale:   %s\n", checkout.CustomerLocale)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Total:             %s %s\n", checkout.TotalPrice, checkout.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Subtotal:          %s %s\n", checkout.SubtotalPrice, checkout.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tax:               %s %s\n", checkout.TotalTax, checkout.Currency)
 		if checkout.TotalDiscounts != "" && checkout.TotalDiscounts != "0" {
-			fmt.Printf("Discounts:         %s %s\n", checkout.TotalDiscounts, checkout.Currency)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Discounts:         %s %s\n", checkout.TotalDiscounts, checkout.Currency)
 		}
-		fmt.Printf("Recovery Emails:   %d\n", checkout.RecoveryEmailSentCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Recovery Emails:   %d\n", checkout.RecoveryEmailSentCount)
 		if checkout.RecoveryURL != "" {
-			fmt.Printf("Recovery URL:      %s\n", checkout.RecoveryURL)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Recovery URL:      %s\n", checkout.RecoveryURL)
 		}
 		if checkout.CompletedAt != nil {
-			fmt.Printf("Completed:         %s\n", checkout.CompletedAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Completed:         %s\n", checkout.CompletedAt.Format(time.RFC3339))
 		}
 		if checkout.ClosedAt != nil {
-			fmt.Printf("Closed:            %s\n", checkout.ClosedAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Closed:            %s\n", checkout.ClosedAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:           %s\n", checkout.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:           %s\n", checkout.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:           %s\n", checkout.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:           %s\n", checkout.UpdatedAt.Format(time.RFC3339))
 
 		if len(checkout.LineItems) > 0 {
-			fmt.Printf("\nLine Items (%d):\n", len(checkout.LineItems))
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nLine Items (%d):\n", len(checkout.LineItems))
 			for _, item := range checkout.LineItems {
-				fmt.Printf("  - %s (%s) x%d @ %.2f\n",
+				_, _ = fmt.Fprintf(outWriter(cmd), "  - %s (%s) x%d @ %.2f\n",
 					item.Title, item.VariantName, item.Quantity, item.Price)
 			}
 		}
@@ -155,7 +155,7 @@ var abandonedCheckoutsSendRecoveryCmd = &cobra.Command{
 			return fmt.Errorf("failed to send recovery email: %w", err)
 		}
 
-		fmt.Printf("Recovery email sent for checkout %s.\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Recovery email sent for checkout %s.\n", args[0])
 		return nil
 	},
 }

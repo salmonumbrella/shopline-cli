@@ -82,7 +82,7 @@ var storefrontProductsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d products\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d products\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -116,44 +116,44 @@ var storefrontProductsGetCmd = &cobra.Command{
 			return formatter.JSON(product)
 		}
 
-		fmt.Printf("Product ID:     %s\n", product.ID)
-		fmt.Printf("Handle:         %s\n", product.Handle)
-		fmt.Printf("Title:          %s\n", product.Title)
-		fmt.Printf("Description:    %s\n", product.Description)
-		fmt.Printf("Vendor:         %s\n", product.Vendor)
-		fmt.Printf("Product Type:   %s\n", product.ProductType)
-		fmt.Printf("Tags:           %s\n", strings.Join(product.Tags, ", "))
-		fmt.Printf("Status:         %s\n", product.Status)
-		fmt.Printf("Available:      %v\n", product.Available)
-		fmt.Printf("Price:          %s %s\n", product.Price, product.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product ID:     %s\n", product.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle:         %s\n", product.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:          %s\n", product.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:    %s\n", product.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Vendor:         %s\n", product.Vendor)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product Type:   %s\n", product.ProductType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tags:           %s\n", strings.Join(product.Tags, ", "))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:         %s\n", product.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Available:      %v\n", product.Available)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Price:          %s %s\n", product.Price, product.Currency)
 		if product.CompareAtPrice != "" {
-			fmt.Printf("Compare At:     %s %s\n", product.CompareAtPrice, product.Currency)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Compare At:     %s %s\n", product.CompareAtPrice, product.Currency)
 		}
-		fmt.Printf("View Count:     %d\n", product.ViewCount)
-		fmt.Printf("Sales Count:    %d\n", product.SalesCount)
-		fmt.Printf("Review Count:   %d\n", product.ReviewCount)
-		fmt.Printf("Average Rating: %.1f\n", product.AverageRating)
+		_, _ = fmt.Fprintf(outWriter(cmd), "View Count:     %d\n", product.ViewCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Sales Count:    %d\n", product.SalesCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Review Count:   %d\n", product.ReviewCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Average Rating: %.1f\n", product.AverageRating)
 		if product.PublishedAt != nil {
-			fmt.Printf("Published:      %s\n", product.PublishedAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Published:      %s\n", product.PublishedAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:        %s\n", product.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:        %s\n", product.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", product.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:        %s\n", product.UpdatedAt.Format(time.RFC3339))
 
 		if len(product.Variants) > 0 {
-			fmt.Printf("\nVariants (%d):\n", len(product.Variants))
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nVariants (%d):\n", len(product.Variants))
 			for _, v := range product.Variants {
 				available := "unavailable"
 				if v.Available {
 					available = "available"
 				}
-				fmt.Printf("  - %s (SKU: %s) %s - %s\n", v.Title, v.SKU, v.Price, available)
+				_, _ = fmt.Fprintf(outWriter(cmd), "  - %s (SKU: %s) %s - %s\n", v.Title, v.SKU, v.Price, available)
 			}
 		}
 
 		if len(product.Images) > 0 {
-			fmt.Printf("\nImages (%d):\n", len(product.Images))
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nImages (%d):\n", len(product.Images))
 			for _, img := range product.Images {
-				fmt.Printf("  - %s (%dx%d)\n", img.URL, img.Width, img.Height)
+				_, _ = fmt.Fprintf(outWriter(cmd), "  - %s (%dx%d)\n", img.URL, img.Width, img.Height)
 			}
 		}
 

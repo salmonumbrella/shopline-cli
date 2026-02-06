@@ -61,7 +61,7 @@ var filesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d files\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d files\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -88,21 +88,21 @@ var filesGetCmd = &cobra.Command{
 			return formatter.JSON(file)
 		}
 
-		fmt.Printf("File ID:      %s\n", file.ID)
-		fmt.Printf("Filename:     %s\n", file.Filename)
-		fmt.Printf("MIME Type:    %s\n", file.MimeType)
-		fmt.Printf("File Size:    %s\n", formatFileSize(file.FileSize))
-		fmt.Printf("URL:          %s\n", file.URL)
-		fmt.Printf("Alt:          %s\n", file.Alt)
-		fmt.Printf("Status:       %s\n", file.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "File ID:      %s\n", file.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Filename:     %s\n", file.Filename)
+		_, _ = fmt.Fprintf(outWriter(cmd), "MIME Type:    %s\n", file.MimeType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "File Size:    %s\n", formatFileSize(file.FileSize))
+		_, _ = fmt.Fprintf(outWriter(cmd), "URL:          %s\n", file.URL)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Alt:          %s\n", file.Alt)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:       %s\n", file.Status)
 		if file.ContentType != "" {
-			fmt.Printf("Content Type: %s\n", file.ContentType)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Content Type: %s\n", file.ContentType)
 		}
 		if file.Width > 0 && file.Height > 0 {
-			fmt.Printf("Dimensions:   %dx%d\n", file.Width, file.Height)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Dimensions:   %dx%d\n", file.Width, file.Height)
 		}
-		fmt.Printf("Created:      %s\n", file.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:      %s\n", file.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:      %s\n", file.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:      %s\n", file.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -119,7 +119,7 @@ var filesCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create file '%s'\n", filename)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create file '%s'\n", filename)
 			return nil
 		}
 
@@ -147,9 +147,9 @@ var filesCreateCmd = &cobra.Command{
 			return formatter.JSON(file)
 		}
 
-		fmt.Printf("Created file %s\n", file.ID)
-		fmt.Printf("Filename: %s\n", file.Filename)
-		fmt.Printf("Status:   %s\n", file.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created file %s\n", file.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Filename: %s\n", file.Filename)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:   %s\n", file.Status)
 
 		return nil
 	},
@@ -162,13 +162,13 @@ var filesDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete file %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete file %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Are you sure you want to delete file %s? Use --yes to confirm.\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete file %s? Use --yes to confirm.\n", args[0])
 			return nil
 		}
 
@@ -181,7 +181,7 @@ var filesDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete file: %w", err)
 		}
 
-		fmt.Printf("Deleted file %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted file %s\n", args[0])
 		return nil
 	},
 }

@@ -34,14 +34,14 @@ var balanceGetCmd = &cobra.Command{
 			return formatter.JSON(balance)
 		}
 
-		fmt.Printf("Currency:   %s\n", balance.Currency)
-		fmt.Printf("Available:  %s\n", balance.Available)
-		fmt.Printf("Pending:    %s\n", balance.Pending)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Currency:   %s\n", balance.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Available:  %s\n", balance.Available)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Pending:    %s\n", balance.Pending)
 		if balance.Reserved != "" {
-			fmt.Printf("Reserved:   %s\n", balance.Reserved)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Reserved:   %s\n", balance.Reserved)
 		}
-		fmt.Printf("Total:      %s\n", balance.Total)
-		fmt.Printf("Updated:    %s\n", balance.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Total:      %s\n", balance.Total)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:    %s\n", balance.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -94,7 +94,7 @@ var balanceTransactionsCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d transactions\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d transactions\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -121,25 +121,25 @@ var balanceTransactionGetCmd = &cobra.Command{
 			return formatter.JSON(txn)
 		}
 
-		fmt.Printf("Transaction ID: %s\n", txn.ID)
-		fmt.Printf("Type:           %s\n", txn.Type)
-		fmt.Printf("Amount:         %s %s\n", txn.Amount, txn.Currency)
-		fmt.Printf("Net:            %s\n", txn.Net)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Transaction ID: %s\n", txn.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Type:           %s\n", txn.Type)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Amount:         %s %s\n", txn.Amount, txn.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Net:            %s\n", txn.Net)
 		if txn.Fee != "" {
-			fmt.Printf("Fee:            %s\n", txn.Fee)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Fee:            %s\n", txn.Fee)
 		}
-		fmt.Printf("Status:         %s\n", txn.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:         %s\n", txn.Status)
 		if txn.Description != "" {
-			fmt.Printf("Description:    %s\n", txn.Description)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Description:    %s\n", txn.Description)
 		}
 		if txn.SourceID != "" {
-			fmt.Printf("Source ID:      %s\n", txn.SourceID)
-			fmt.Printf("Source Type:    %s\n", txn.SourceType)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Source ID:      %s\n", txn.SourceID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Source Type:    %s\n", txn.SourceType)
 		}
 		if txn.AvailableOn != nil {
-			fmt.Printf("Available On:   %s\n", txn.AvailableOn.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Available On:   %s\n", txn.AvailableOn.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:        %s\n", txn.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", txn.CreatedAt.Format(time.RFC3339))
 		return nil
 	},
 }

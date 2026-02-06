@@ -68,7 +68,7 @@ var purchaseOrdersListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d purchase orders\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d purchase orders\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -95,32 +95,32 @@ var purchaseOrdersGetCmd = &cobra.Command{
 			return formatter.JSON(po)
 		}
 
-		fmt.Printf("Purchase Order ID: %s\n", po.ID)
-		fmt.Printf("Number:            %s\n", po.Number)
-		fmt.Printf("Status:            %s\n", po.Status)
-		fmt.Printf("Supplier:          %s (%s)\n", po.SupplierName, po.SupplierID)
-		fmt.Printf("Warehouse:         %s (%s)\n", po.WarehouseName, po.WarehouseID)
-		fmt.Printf("Currency:          %s\n", po.Currency)
-		fmt.Printf("Subtotal:          %s\n", po.Subtotal)
-		fmt.Printf("Tax:               %s\n", po.Tax)
-		fmt.Printf("Total:             %s\n", po.Total)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Purchase Order ID: %s\n", po.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Number:            %s\n", po.Number)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:            %s\n", po.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Supplier:          %s (%s)\n", po.SupplierName, po.SupplierID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Warehouse:         %s (%s)\n", po.WarehouseName, po.WarehouseID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Currency:          %s\n", po.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Subtotal:          %s\n", po.Subtotal)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tax:               %s\n", po.Tax)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Total:             %s\n", po.Total)
 		if po.Note != "" {
-			fmt.Printf("Note:              %s\n", po.Note)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Note:              %s\n", po.Note)
 		}
 		if !po.ExpectedAt.IsZero() {
-			fmt.Printf("Expected At:       %s\n", po.ExpectedAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Expected At:       %s\n", po.ExpectedAt.Format(time.RFC3339))
 		}
 		if !po.ReceivedAt.IsZero() {
-			fmt.Printf("Received At:       %s\n", po.ReceivedAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Received At:       %s\n", po.ReceivedAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:           %s\n", po.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:           %s\n", po.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:           %s\n", po.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:           %s\n", po.UpdatedAt.Format(time.RFC3339))
 
 		if len(po.LineItems) > 0 {
-			fmt.Printf("\nLine Items (%d):\n", len(po.LineItems))
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nLine Items (%d):\n", len(po.LineItems))
 			for _, item := range po.LineItems {
-				fmt.Printf("  - %s (SKU: %s)\n", item.Title, item.SKU)
-				fmt.Printf("    Quantity: %d, Received: %d, Unit Cost: %s, Total: %s\n",
+				_, _ = fmt.Fprintf(outWriter(cmd), "  - %s (SKU: %s)\n", item.Title, item.SKU)
+				_, _ = fmt.Fprintf(outWriter(cmd), "    Quantity: %d, Received: %d, Unit Cost: %s, Total: %s\n",
 					item.Quantity, item.ReceivedQty, item.UnitCost, item.Total)
 			}
 		}
@@ -143,7 +143,7 @@ var purchaseOrdersReceiveCmd = &cobra.Command{
 			return fmt.Errorf("failed to receive purchase order: %w", err)
 		}
 
-		fmt.Printf("Marked purchase order %s as received (status: %s)\n", po.ID, po.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Marked purchase order %s as received (status: %s)\n", po.ID, po.Status)
 		return nil
 	},
 }
@@ -160,11 +160,11 @@ var purchaseOrdersCancelCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Cancel purchase order %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Cancel purchase order %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -174,7 +174,7 @@ var purchaseOrdersCancelCmd = &cobra.Command{
 			return fmt.Errorf("failed to cancel purchase order: %w", err)
 		}
 
-		fmt.Printf("Cancelled purchase order %s (status: %s)\n", po.ID, po.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Cancelled purchase order %s (status: %s)\n", po.ID, po.Status)
 		return nil
 	},
 }
@@ -191,11 +191,11 @@ var purchaseOrdersDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete purchase order %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete purchase order %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -204,7 +204,7 @@ var purchaseOrdersDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete purchase order: %w", err)
 		}
 
-		fmt.Printf("Deleted purchase order %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted purchase order %s\n", args[0])
 		return nil
 	},
 }

@@ -68,7 +68,7 @@ var pagesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d pages\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d pages\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -95,23 +95,23 @@ var pagesGetCmd = &cobra.Command{
 			return formatter.JSON(pg)
 		}
 
-		fmt.Printf("Page ID:        %s\n", pg.ID)
-		fmt.Printf("Title:          %s\n", pg.Title)
-		fmt.Printf("Handle:         %s\n", pg.Handle)
-		fmt.Printf("Author:         %s\n", pg.Author)
-		fmt.Printf("Published:      %t\n", pg.Published)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Page ID:        %s\n", pg.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:          %s\n", pg.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle:         %s\n", pg.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Author:         %s\n", pg.Author)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Published:      %t\n", pg.Published)
 		if !pg.PublishedAt.IsZero() {
-			fmt.Printf("Published At:   %s\n", pg.PublishedAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Published At:   %s\n", pg.PublishedAt.Format(time.RFC3339))
 		}
 		if pg.TemplateSuffix != "" {
-			fmt.Printf("Template:       %s\n", pg.TemplateSuffix)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Template:       %s\n", pg.TemplateSuffix)
 		}
-		fmt.Printf("Created:        %s\n", pg.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:        %s\n", pg.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", pg.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:        %s\n", pg.UpdatedAt.Format(time.RFC3339))
 
 		showBody, _ := cmd.Flags().GetBool("body")
 		if showBody && pg.BodyHTML != "" {
-			fmt.Printf("\nBody HTML:\n%s\n", pg.BodyHTML)
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nBody HTML:\n%s\n", pg.BodyHTML)
 		}
 		return nil
 	},
@@ -129,7 +129,7 @@ var pagesCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create page: %s\n", title)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create page: %s\n", title)
 			return nil
 		}
 
@@ -158,9 +158,9 @@ var pagesCreateCmd = &cobra.Command{
 			return formatter.JSON(pg)
 		}
 
-		fmt.Printf("Created page %s\n", pg.ID)
-		fmt.Printf("Title:   %s\n", pg.Title)
-		fmt.Printf("Handle:  %s\n", pg.Handle)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created page %s\n", pg.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:   %s\n", pg.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Handle:  %s\n", pg.Handle)
 
 		return nil
 	},
@@ -173,13 +173,13 @@ var pagesDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete page %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete page %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Are you sure you want to delete page %s? (use --yes to confirm)\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete page %s? (use --yes to confirm)\n", args[0])
 			return nil
 		}
 
@@ -192,7 +192,7 @@ var pagesDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete page: %w", err)
 		}
 
-		fmt.Printf("Deleted page %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted page %s\n", args[0])
 		return nil
 	},
 }

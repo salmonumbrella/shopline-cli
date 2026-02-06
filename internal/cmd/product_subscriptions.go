@@ -80,7 +80,7 @@ var productSubscriptionsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d subscriptions\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d subscriptions\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -107,26 +107,26 @@ var productSubscriptionsGetCmd = &cobra.Command{
 			return formatter.JSON(subscription)
 		}
 
-		fmt.Printf("Subscription ID:     %s\n", subscription.ID)
-		fmt.Printf("Product ID:          %s\n", subscription.ProductID)
-		fmt.Printf("Variant ID:          %s\n", subscription.VariantID)
-		fmt.Printf("Customer ID:         %s\n", subscription.CustomerID)
-		fmt.Printf("Selling Plan ID:     %s\n", subscription.SellingPlanID)
-		fmt.Printf("Status:              %s\n", subscription.Status)
-		fmt.Printf("Frequency:           %s\n", subscription.Frequency)
-		fmt.Printf("Frequency Interval:  %d\n", subscription.FrequencyInterval)
-		fmt.Printf("Price:               %s %s\n", subscription.Price, subscription.Currency)
-		fmt.Printf("Quantity:            %d\n", subscription.Quantity)
-		fmt.Printf("Total Cycles:        %d\n", subscription.TotalCycles)
-		fmt.Printf("Completed Cycles:    %d\n", subscription.CompletedCycles)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Subscription ID:     %s\n", subscription.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product ID:          %s\n", subscription.ProductID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Variant ID:          %s\n", subscription.VariantID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer ID:         %s\n", subscription.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Selling Plan ID:     %s\n", subscription.SellingPlanID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:              %s\n", subscription.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Frequency:           %s\n", subscription.Frequency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Frequency Interval:  %d\n", subscription.FrequencyInterval)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Price:               %s %s\n", subscription.Price, subscription.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Quantity:            %d\n", subscription.Quantity)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Total Cycles:        %d\n", subscription.TotalCycles)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Completed Cycles:    %d\n", subscription.CompletedCycles)
 		if !subscription.NextBillingDate.IsZero() {
-			fmt.Printf("Next Billing Date:   %s\n", subscription.NextBillingDate.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Next Billing Date:   %s\n", subscription.NextBillingDate.Format(time.RFC3339))
 		}
 		if !subscription.LastBillingDate.IsZero() {
-			fmt.Printf("Last Billing Date:   %s\n", subscription.LastBillingDate.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Last Billing Date:   %s\n", subscription.LastBillingDate.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:             %s\n", subscription.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:             %s\n", subscription.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:             %s\n", subscription.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:             %s\n", subscription.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -144,7 +144,7 @@ var productSubscriptionsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create subscription for product %s, customer %s\n", productID, customerID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create subscription for product %s, customer %s\n", productID, customerID)
 			return nil
 		}
 
@@ -174,11 +174,11 @@ var productSubscriptionsCreateCmd = &cobra.Command{
 			return formatter.JSON(subscription)
 		}
 
-		fmt.Printf("Created subscription %s\n", subscription.ID)
-		fmt.Printf("Product ID:      %s\n", subscription.ProductID)
-		fmt.Printf("Customer ID:     %s\n", subscription.CustomerID)
-		fmt.Printf("Selling Plan ID: %s\n", subscription.SellingPlanID)
-		fmt.Printf("Status:          %s\n", subscription.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created subscription %s\n", subscription.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product ID:      %s\n", subscription.ProductID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer ID:     %s\n", subscription.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Selling Plan ID: %s\n", subscription.SellingPlanID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:          %s\n", subscription.Status)
 
 		return nil
 	},
@@ -191,7 +191,7 @@ var productSubscriptionsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would cancel subscription %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would cancel subscription %s\n", args[0])
 			return nil
 		}
 
@@ -204,7 +204,7 @@ var productSubscriptionsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to cancel product subscription: %w", err)
 		}
 
-		fmt.Printf("Cancelled subscription %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Cancelled subscription %s\n", args[0])
 		return nil
 	},
 }

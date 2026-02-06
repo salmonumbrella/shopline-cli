@@ -67,7 +67,7 @@ var giftCardsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d gift cards\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d gift cards\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -103,18 +103,18 @@ var giftCardsGetCmd = &cobra.Command{
 			disabledAt = giftCard.DisabledAt.Format(time.RFC3339)
 		}
 
-		fmt.Printf("Gift Card ID:   %s\n", giftCard.ID)
-		fmt.Printf("Code:           %s\n", giftCard.Code)
-		fmt.Printf("Masked Code:    %s\n", giftCard.MaskedCode)
-		fmt.Printf("Initial Value:  %s %s\n", giftCard.InitialValue, giftCard.Currency)
-		fmt.Printf("Balance:        %s %s\n", giftCard.Balance, giftCard.Currency)
-		fmt.Printf("Status:         %s\n", giftCard.Status)
-		fmt.Printf("Customer ID:    %s\n", giftCard.CustomerID)
-		fmt.Printf("Note:           %s\n", giftCard.Note)
-		fmt.Printf("Expires:        %s\n", expiresAt)
-		fmt.Printf("Disabled At:    %s\n", disabledAt)
-		fmt.Printf("Created:        %s\n", giftCard.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:        %s\n", giftCard.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Gift Card ID:   %s\n", giftCard.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Code:           %s\n", giftCard.Code)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Masked Code:    %s\n", giftCard.MaskedCode)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Initial Value:  %s %s\n", giftCard.InitialValue, giftCard.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Balance:        %s %s\n", giftCard.Balance, giftCard.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:         %s\n", giftCard.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer ID:    %s\n", giftCard.CustomerID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Note:           %s\n", giftCard.Note)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Expires:        %s\n", expiresAt)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Disabled At:    %s\n", disabledAt)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", giftCard.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:        %s\n", giftCard.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -132,7 +132,7 @@ var giftCardsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create gift card: value=%s %s\n", initialValue, currency)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create gift card: value=%s %s\n", initialValue, currency)
 			return nil
 		}
 
@@ -161,10 +161,10 @@ var giftCardsCreateCmd = &cobra.Command{
 			return formatter.JSON(giftCard)
 		}
 
-		fmt.Printf("Created gift card: %s\n", giftCard.ID)
-		fmt.Printf("Code:    %s\n", giftCard.Code)
-		fmt.Printf("Value:   %s %s\n", giftCard.InitialValue, giftCard.Currency)
-		fmt.Printf("Status:  %s\n", giftCard.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created gift card: %s\n", giftCard.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Code:    %s\n", giftCard.Code)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Value:   %s %s\n", giftCard.InitialValue, giftCard.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:  %s\n", giftCard.Status)
 
 		return nil
 	},
@@ -177,7 +177,7 @@ var giftCardsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would disable gift card: %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would disable gift card: %s\n", args[0])
 			return nil
 		}
 
@@ -190,7 +190,7 @@ var giftCardsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to disable gift card: %w", err)
 		}
 
-		fmt.Printf("Disabled gift card: %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Disabled gift card: %s\n", args[0])
 		return nil
 	},
 }

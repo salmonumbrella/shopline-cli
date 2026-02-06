@@ -53,7 +53,7 @@ var storefrontTokensListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d storefront tokens\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d storefront tokens\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -80,9 +80,9 @@ var storefrontTokensGetCmd = &cobra.Command{
 			return formatter.JSON(token)
 		}
 
-		fmt.Printf("Token ID: %s\n", token.ID)
-		fmt.Printf("Title:    %s\n", token.Title)
-		fmt.Printf("Created:  %s\n", token.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Token ID: %s\n", token.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:    %s\n", token.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:  %s\n", token.CreatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -96,7 +96,7 @@ var storefrontTokensCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create storefront token '%s'\n", title)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create storefront token '%s'\n", title)
 			return nil
 		}
 
@@ -121,11 +121,11 @@ var storefrontTokensCreateCmd = &cobra.Command{
 			return formatter.JSON(token)
 		}
 
-		fmt.Printf("Created storefront token %s\n", token.ID)
-		fmt.Printf("Title: %s\n", token.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created storefront token %s\n", token.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title: %s\n", token.Title)
 		if token.AccessToken != "" {
-			fmt.Printf("\nAccess Token: %s\n", token.AccessToken)
-			fmt.Println("(Save this token - it will not be shown again)")
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nAccess Token: %s\n", token.AccessToken)
+			_, _ = fmt.Fprintln(outWriter(cmd), "(Save this token - it will not be shown again)")
 		}
 
 		return nil
@@ -139,17 +139,17 @@ var storefrontTokensDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete storefront token %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete storefront token %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete storefront token %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete storefront token %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -163,7 +163,7 @@ var storefrontTokensDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete storefront token: %w", err)
 		}
 
-		fmt.Printf("Deleted storefront token %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted storefront token %s\n", args[0])
 		return nil
 	},
 }

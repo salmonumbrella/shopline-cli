@@ -66,7 +66,7 @@ var locationsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d locations\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d locations\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -93,21 +93,21 @@ var locationsGetCmd = &cobra.Command{
 			return formatter.JSON(location)
 		}
 
-		fmt.Printf("Location ID:    %s\n", location.ID)
-		fmt.Printf("Name:           %s\n", location.Name)
-		fmt.Printf("Address:        %s\n", location.Address1)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Location ID:    %s\n", location.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:           %s\n", location.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Address:        %s\n", location.Address1)
 		if location.Address2 != "" {
-			fmt.Printf("                %s\n", location.Address2)
+			_, _ = fmt.Fprintf(outWriter(cmd), "                %s\n", location.Address2)
 		}
-		fmt.Printf("City:           %s\n", location.City)
-		fmt.Printf("Province:       %s\n", location.Province)
-		fmt.Printf("Country:        %s (%s)\n", location.Country, location.CountryCode)
-		fmt.Printf("ZIP:            %s\n", location.Zip)
-		fmt.Printf("Phone:          %s\n", location.Phone)
-		fmt.Printf("Active:         %t\n", location.Active)
-		fmt.Printf("Default:        %t\n", location.IsDefault)
-		fmt.Printf("Created:        %s\n", location.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:        %s\n", location.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "City:           %s\n", location.City)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Province:       %s\n", location.Province)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Country:        %s (%s)\n", location.Country, location.CountryCode)
+		_, _ = fmt.Fprintf(outWriter(cmd), "ZIP:            %s\n", location.Zip)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Phone:          %s\n", location.Phone)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Active:         %t\n", location.Active)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Default:        %t\n", location.IsDefault)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", location.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:        %s\n", location.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -147,9 +147,9 @@ var locationsCreateCmd = &cobra.Command{
 			return formatter.JSON(location)
 		}
 
-		fmt.Printf("Created location %s\n", location.ID)
-		fmt.Printf("Name:    %s\n", location.Name)
-		fmt.Printf("Address: %s, %s, %s\n", location.Address1, location.City, location.Country)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created location %s\n", location.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:    %s\n", location.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Address: %s, %s, %s\n", location.Address1, location.City, location.Country)
 		return nil
 	},
 }
@@ -166,11 +166,11 @@ var locationsDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete location %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete location %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -179,7 +179,7 @@ var locationsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete location: %w", err)
 		}
 
-		fmt.Printf("Deleted location %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted location %s\n", args[0])
 		return nil
 	},
 }

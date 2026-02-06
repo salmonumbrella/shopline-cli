@@ -65,7 +65,7 @@ var membershipListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d membership tiers\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d membership tiers\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -92,19 +92,19 @@ var membershipGetCmd = &cobra.Command{
 			return formatter.JSON(tier)
 		}
 
-		fmt.Printf("Tier ID:      %s\n", tier.ID)
-		fmt.Printf("Name:         %s\n", tier.Name)
-		fmt.Printf("Level:        %d\n", tier.Level)
-		fmt.Printf("Description:  %s\n", tier.Description)
-		fmt.Printf("Min Points:   %d\n", tier.MinPoints)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tier ID:      %s\n", tier.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:         %s\n", tier.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Level:        %d\n", tier.Level)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:  %s\n", tier.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Min Points:   %d\n", tier.MinPoints)
 		if tier.MaxPoints > 0 {
-			fmt.Printf("Max Points:   %d\n", tier.MaxPoints)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Max Points:   %d\n", tier.MaxPoints)
 		}
 		if tier.Discount > 0 {
-			fmt.Printf("Discount:     %.0f%%\n", tier.Discount*100)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Discount:     %.0f%%\n", tier.Discount*100)
 		}
-		fmt.Printf("Created:      %s\n", tier.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:      %s\n", tier.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:      %s\n", tier.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:      %s\n", tier.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -146,9 +146,9 @@ var membershipCreateCmd = &cobra.Command{
 			return formatter.JSON(tier)
 		}
 
-		fmt.Printf("Created membership tier %s\n", tier.ID)
-		fmt.Printf("Name:  %s\n", tier.Name)
-		fmt.Printf("Level: %d\n", tier.Level)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created membership tier %s\n", tier.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:  %s\n", tier.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Level: %d\n", tier.Level)
 		return nil
 	},
 }
@@ -165,11 +165,11 @@ var membershipDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete membership tier %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete membership tier %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -178,7 +178,7 @@ var membershipDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete membership tier: %w", err)
 		}
 
-		fmt.Printf("Deleted membership tier %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted membership tier %s\n", args[0])
 		return nil
 	},
 }

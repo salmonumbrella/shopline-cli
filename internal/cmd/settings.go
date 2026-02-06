@@ -46,36 +46,36 @@ var settingsGetCmd = &cobra.Command{
 			return formatter.JSON(combined)
 		}
 
-		fmt.Printf("Store Settings\n")
-		fmt.Printf("==============\n\n")
-		fmt.Printf("Name:            %s\n", merchant.Name)
-		fmt.Printf("Email:           %s\n", merchant.Email)
-		fmt.Printf("Domain:          %s\n", merchant.Domain)
-		fmt.Printf("Phone:           %s\n", merchant.Phone)
-		fmt.Println()
-		fmt.Printf("Address:         %s\n", merchant.Address1)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Store Settings\n")
+		_, _ = fmt.Fprintf(outWriter(cmd), "==============\n\n")
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:            %s\n", merchant.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Email:           %s\n", merchant.Email)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Domain:          %s\n", merchant.Domain)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Phone:           %s\n", merchant.Phone)
+		_, _ = fmt.Fprintln(outWriter(cmd))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Address:         %s\n", merchant.Address1)
 		if merchant.Address2 != "" {
-			fmt.Printf("                 %s\n", merchant.Address2)
+			_, _ = fmt.Fprintf(outWriter(cmd), "                 %s\n", merchant.Address2)
 		}
-		fmt.Printf("City:            %s\n", merchant.City)
-		fmt.Printf("Province:        %s\n", merchant.Province)
-		fmt.Printf("Country:         %s\n", merchant.CountryCode)
-		fmt.Printf("ZIP:             %s\n", merchant.Zip)
-		fmt.Println()
-		fmt.Printf("Currency:        %s\n", merchant.Currency)
-		fmt.Printf("Timezone:        %s\n", merchant.Timezone)
-		fmt.Printf("Weight Unit:     %s\n", merchant.WeightUnit)
-		fmt.Println()
-		fmt.Printf("Taxes Included:  %t\n", merchant.TaxesIncluded)
-		fmt.Printf("Tax Shipping:    %t\n", merchant.TaxShipping)
-		fmt.Println()
-		fmt.Printf("User Settings\n")
-		fmt.Printf("-------------\n")
-		fmt.Printf("Min Age Limit:   %s\n", userSettings.Users.MinimumAgeLimit)
-		fmt.Printf("POS Apply Credit: %t\n", userSettings.Users.PosApplyCredit)
-		fmt.Println()
-		fmt.Printf("Created:         %s\n", merchant.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:         %s\n", merchant.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "City:            %s\n", merchant.City)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Province:        %s\n", merchant.Province)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Country:         %s\n", merchant.CountryCode)
+		_, _ = fmt.Fprintf(outWriter(cmd), "ZIP:             %s\n", merchant.Zip)
+		_, _ = fmt.Fprintln(outWriter(cmd))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Currency:        %s\n", merchant.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Timezone:        %s\n", merchant.Timezone)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Weight Unit:     %s\n", merchant.WeightUnit)
+		_, _ = fmt.Fprintln(outWriter(cmd))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Taxes Included:  %t\n", merchant.TaxesIncluded)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tax Shipping:    %t\n", merchant.TaxShipping)
+		_, _ = fmt.Fprintln(outWriter(cmd))
+		_, _ = fmt.Fprintf(outWriter(cmd), "User Settings\n")
+		_, _ = fmt.Fprintf(outWriter(cmd), "-------------\n")
+		_, _ = fmt.Fprintf(outWriter(cmd), "Min Age Limit:   %s\n", userSettings.Users.MinimumAgeLimit)
+		_, _ = fmt.Fprintf(outWriter(cmd), "POS Apply Credit: %t\n", userSettings.Users.PosApplyCredit)
+		_, _ = fmt.Fprintln(outWriter(cmd))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:         %s\n", merchant.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:         %s\n", merchant.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -101,7 +101,7 @@ var settingsUpdateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Println("[DRY-RUN] Would update user settings")
+			_, _ = fmt.Fprintln(outWriter(cmd), "[DRY-RUN] Would update user settings")
 			return nil
 		}
 
@@ -122,9 +122,9 @@ var settingsUpdateCmd = &cobra.Command{
 			return formatter.JSON(settings)
 		}
 
-		fmt.Println("User settings updated successfully")
-		fmt.Printf("Min Age Limit:    %s\n", settings.Users.MinimumAgeLimit)
-		fmt.Printf("POS Apply Credit: %t\n", settings.Users.PosApplyCredit)
+		_, _ = fmt.Fprintln(outWriter(cmd), "User settings updated successfully")
+		_, _ = fmt.Fprintf(outWriter(cmd), "Min Age Limit:    %s\n", settings.Users.MinimumAgeLimit)
+		_, _ = fmt.Fprintf(outWriter(cmd), "POS Apply Credit: %t\n", settings.Users.PosApplyCredit)
 
 		return nil
 	},

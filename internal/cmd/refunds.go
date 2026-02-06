@@ -63,7 +63,7 @@ var refundsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d refunds\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d refunds\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -90,23 +90,23 @@ var refundsGetCmd = &cobra.Command{
 			return formatter.JSON(refund)
 		}
 
-		fmt.Printf("Refund ID:      %s\n", refund.ID)
-		fmt.Printf("Order ID:       %s\n", refund.OrderID)
-		fmt.Printf("Status:         %s\n", refund.Status)
-		fmt.Printf("Amount:         %s %s\n", refund.Amount, refund.Currency)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Refund ID:      %s\n", refund.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Order ID:       %s\n", refund.OrderID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:         %s\n", refund.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Amount:         %s %s\n", refund.Amount, refund.Currency)
 		if refund.Note != "" {
-			fmt.Printf("Note:           %s\n", refund.Note)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Note:           %s\n", refund.Note)
 		}
-		fmt.Printf("Restock:        %t\n", refund.Restock)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Restock:        %t\n", refund.Restock)
 		if !refund.ProcessedAt.IsZero() {
-			fmt.Printf("Processed At:   %s\n", refund.ProcessedAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Processed At:   %s\n", refund.ProcessedAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:        %s\n", refund.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", refund.CreatedAt.Format(time.RFC3339))
 
 		if len(refund.LineItems) > 0 {
-			fmt.Printf("\nLine Items (%d):\n", len(refund.LineItems))
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nLine Items (%d):\n", len(refund.LineItems))
 			for _, item := range refund.LineItems {
-				fmt.Printf("  - Line Item: %s, Qty: %d, Subtotal: %.2f\n",
+				_, _ = fmt.Fprintf(outWriter(cmd), "  - Line Item: %s, Qty: %d, Subtotal: %.2f\n",
 					item.LineItemID, item.Quantity, item.Subtotal)
 			}
 		}
@@ -155,7 +155,7 @@ var refundsOrderCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d refunds for order %s\n", len(resp.Items), args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d refunds for order %s\n", len(resp.Items), args[0])
 		return nil
 	},
 }

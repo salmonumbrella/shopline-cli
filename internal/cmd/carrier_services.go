@@ -65,7 +65,7 @@ var carrierServicesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d carrier services\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d carrier services\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -92,15 +92,15 @@ var carrierServicesGetCmd = &cobra.Command{
 			return formatter.JSON(cs)
 		}
 
-		fmt.Printf("ID:                %s\n", cs.ID)
-		fmt.Printf("Name:              %s\n", cs.Name)
-		fmt.Printf("Type:              %s\n", cs.CarrierServiceType)
-		fmt.Printf("Callback URL:      %s\n", cs.CallbackURL)
-		fmt.Printf("Active:            %v\n", cs.Active)
-		fmt.Printf("Service Discovery: %v\n", cs.ServiceDiscovery)
-		fmt.Printf("Format:            %s\n", cs.Format)
-		fmt.Printf("Created:           %s\n", cs.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:           %s\n", cs.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "ID:                %s\n", cs.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:              %s\n", cs.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Type:              %s\n", cs.CarrierServiceType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Callback URL:      %s\n", cs.CallbackURL)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Active:            %v\n", cs.Active)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Service Discovery: %v\n", cs.ServiceDiscovery)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Format:            %s\n", cs.Format)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:           %s\n", cs.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:           %s\n", cs.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -117,7 +117,7 @@ var carrierServicesCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create carrier service %q with callback URL %s\n", name, callbackURL)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create carrier service %q with callback URL %s\n", name, callbackURL)
 			return nil
 		}
 
@@ -145,9 +145,9 @@ var carrierServicesCreateCmd = &cobra.Command{
 			return formatter.JSON(cs)
 		}
 
-		fmt.Printf("Created carrier service %s\n", cs.ID)
-		fmt.Printf("Name:         %s\n", cs.Name)
-		fmt.Printf("Callback URL: %s\n", cs.CallbackURL)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created carrier service %s\n", cs.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:         %s\n", cs.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Callback URL: %s\n", cs.CallbackURL)
 
 		return nil
 	},
@@ -162,12 +162,12 @@ var carrierServicesDeleteCmd = &cobra.Command{
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete carrier service %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete carrier service %s\n", args[0])
 			return nil
 		}
 
 		if !yes {
-			fmt.Printf("Are you sure you want to delete carrier service %s? Use --yes to confirm.\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete carrier service %s? Use --yes to confirm.\n", args[0])
 			return nil
 		}
 
@@ -180,7 +180,7 @@ var carrierServicesDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete carrier service: %w", err)
 		}
 
-		fmt.Printf("Deleted carrier service %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted carrier service %s\n", args[0])
 		return nil
 	},
 }

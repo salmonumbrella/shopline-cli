@@ -64,7 +64,7 @@ var mediasListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d medias\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d medias\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -91,32 +91,32 @@ var mediasGetCmd = &cobra.Command{
 			return formatter.JSON(media)
 		}
 
-		fmt.Printf("Media ID:     %s\n", media.ID)
-		fmt.Printf("Product ID:   %s\n", media.ProductID)
-		fmt.Printf("Type:         %s\n", media.MediaType)
-		fmt.Printf("Position:     %d\n", media.Position)
-		fmt.Printf("Alt:          %s\n", media.Alt)
-		fmt.Printf("Src:          %s\n", media.Src)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Media ID:     %s\n", media.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product ID:   %s\n", media.ProductID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Type:         %s\n", media.MediaType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Position:     %d\n", media.Position)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Alt:          %s\n", media.Alt)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Src:          %s\n", media.Src)
 		if media.Width > 0 && media.Height > 0 {
-			fmt.Printf("Dimensions:   %dx%d\n", media.Width, media.Height)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Dimensions:   %dx%d\n", media.Width, media.Height)
 		}
 		if media.MimeType != "" {
-			fmt.Printf("MIME Type:    %s\n", media.MimeType)
+			_, _ = fmt.Fprintf(outWriter(cmd), "MIME Type:    %s\n", media.MimeType)
 		}
 		if media.FileSize > 0 {
-			fmt.Printf("File Size:    %d bytes\n", media.FileSize)
+			_, _ = fmt.Fprintf(outWriter(cmd), "File Size:    %d bytes\n", media.FileSize)
 		}
 		if media.Duration > 0 {
-			fmt.Printf("Duration:     %d seconds\n", media.Duration)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Duration:     %d seconds\n", media.Duration)
 		}
 		if media.PreviewURL != "" {
-			fmt.Printf("Preview URL:  %s\n", media.PreviewURL)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Preview URL:  %s\n", media.PreviewURL)
 		}
 		if media.ExternalURL != "" {
-			fmt.Printf("External URL: %s\n", media.ExternalURL)
+			_, _ = fmt.Fprintf(outWriter(cmd), "External URL: %s\n", media.ExternalURL)
 		}
-		fmt.Printf("Created:      %s\n", media.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:      %s\n", media.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:      %s\n", media.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:      %s\n", media.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -135,7 +135,7 @@ var mediasCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create %s media for product %s\n", mediaType, productID)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create %s media for product %s\n", mediaType, productID)
 			return nil
 		}
 
@@ -165,10 +165,10 @@ var mediasCreateCmd = &cobra.Command{
 			return formatter.JSON(media)
 		}
 
-		fmt.Printf("Created media %s\n", media.ID)
-		fmt.Printf("Product ID: %s\n", media.ProductID)
-		fmt.Printf("Type:       %s\n", media.MediaType)
-		fmt.Printf("Src:        %s\n", media.Src)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created media %s\n", media.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Product ID: %s\n", media.ProductID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Type:       %s\n", media.MediaType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Src:        %s\n", media.Src)
 
 		return nil
 	},
@@ -181,13 +181,13 @@ var mediasDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete media %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete media %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Are you sure you want to delete media %s? Use --yes to confirm.\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete media %s? Use --yes to confirm.\n", args[0])
 			return nil
 		}
 
@@ -200,7 +200,7 @@ var mediasDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete media: %w", err)
 		}
 
-		fmt.Printf("Deleted media %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted media %s\n", args[0])
 		return nil
 	},
 }

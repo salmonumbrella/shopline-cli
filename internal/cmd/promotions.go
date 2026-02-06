@@ -74,7 +74,7 @@ var promotionsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d promotions\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d promotions\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -101,24 +101,24 @@ var promotionsGetCmd = &cobra.Command{
 			return formatter.JSON(promotion)
 		}
 
-		fmt.Printf("Promotion ID:    %s\n", promotion.ID)
-		fmt.Printf("Title:           %s\n", promotion.Title)
-		fmt.Printf("Description:     %s\n", promotion.Description)
-		fmt.Printf("Type:            %s\n", promotion.Type)
-		fmt.Printf("Status:          %s\n", promotion.Status)
-		fmt.Printf("Discount Type:   %s\n", promotion.DiscountType)
-		fmt.Printf("Discount Value:  %.2f\n", promotion.DiscountValue)
-		fmt.Printf("Min Purchase:    %.2f\n", promotion.MinPurchase)
-		fmt.Printf("Usage:           %d", promotion.UsageCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Promotion ID:    %s\n", promotion.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:           %s\n", promotion.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Description:     %s\n", promotion.Description)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Type:            %s\n", promotion.Type)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:          %s\n", promotion.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Discount Type:   %s\n", promotion.DiscountType)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Discount Value:  %.2f\n", promotion.DiscountValue)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Min Purchase:    %.2f\n", promotion.MinPurchase)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Usage:           %d", promotion.UsageCount)
 		if promotion.UsageLimit > 0 {
-			fmt.Printf(" / %d", promotion.UsageLimit)
+			_, _ = fmt.Fprintf(outWriter(cmd), " / %d", promotion.UsageLimit)
 		}
-		fmt.Println()
-		fmt.Printf("Starts At:       %s\n", promotion.StartsAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintln(outWriter(cmd))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Starts At:       %s\n", promotion.StartsAt.Format(time.RFC3339))
 		if !promotion.EndsAt.IsZero() {
-			fmt.Printf("Ends At:         %s\n", promotion.EndsAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Ends At:         %s\n", promotion.EndsAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:         %s\n", promotion.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:         %s\n", promotion.CreatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -138,7 +138,7 @@ var promotionsActivateCmd = &cobra.Command{
 			return fmt.Errorf("failed to activate promotion: %w", err)
 		}
 
-		fmt.Printf("Activated promotion %s (status: %s)\n", promotion.ID, promotion.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Activated promotion %s (status: %s)\n", promotion.ID, promotion.Status)
 		return nil
 	},
 }
@@ -158,7 +158,7 @@ var promotionsDeactivateCmd = &cobra.Command{
 			return fmt.Errorf("failed to deactivate promotion: %w", err)
 		}
 
-		fmt.Printf("Deactivated promotion %s (status: %s)\n", promotion.ID, promotion.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deactivated promotion %s (status: %s)\n", promotion.ID, promotion.Status)
 		return nil
 	},
 }
@@ -175,11 +175,11 @@ var promotionsDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete promotion %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete promotion %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -188,7 +188,7 @@ var promotionsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete promotion: %w", err)
 		}
 
-		fmt.Printf("Deleted promotion %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted promotion %s\n", args[0])
 		return nil
 	},
 }

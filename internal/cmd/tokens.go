@@ -60,7 +60,7 @@ var tokensListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d tokens\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d tokens\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -87,16 +87,16 @@ var tokensGetCmd = &cobra.Command{
 			return formatter.JSON(token)
 		}
 
-		fmt.Printf("Token ID:  %s\n", token.ID)
-		fmt.Printf("Title:     %s\n", token.Title)
-		fmt.Printf("Scopes:    %s\n", strings.Join(token.Scopes, ", "))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Token ID:  %s\n", token.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:     %s\n", token.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Scopes:    %s\n", strings.Join(token.Scopes, ", "))
 		if token.ExpiresAt != nil {
-			fmt.Printf("Expires:   %s\n", token.ExpiresAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Expires:   %s\n", token.ExpiresAt.Format(time.RFC3339))
 		} else {
-			fmt.Printf("Expires:   Never\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "Expires:   Never\n")
 		}
-		fmt.Printf("Created:   %s\n", token.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:   %s\n", token.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:   %s\n", token.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:   %s\n", token.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -119,7 +119,7 @@ var tokensCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create token '%s' with scopes: %s\n", title, strings.Join(scopes, ", "))
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create token '%s' with scopes: %s\n", title, strings.Join(scopes, ", "))
 			return nil
 		}
 
@@ -145,12 +145,12 @@ var tokensCreateCmd = &cobra.Command{
 			return formatter.JSON(token)
 		}
 
-		fmt.Printf("Created token %s\n", token.ID)
-		fmt.Printf("Title:        %s\n", token.Title)
-		fmt.Printf("Scopes:       %s\n", strings.Join(token.Scopes, ", "))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created token %s\n", token.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Title:        %s\n", token.Title)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Scopes:       %s\n", strings.Join(token.Scopes, ", "))
 		if token.AccessToken != "" {
-			fmt.Printf("\nAccess Token: %s\n", token.AccessToken)
-			fmt.Println("(Save this token - it will not be shown again)")
+			_, _ = fmt.Fprintf(outWriter(cmd), "\nAccess Token: %s\n", token.AccessToken)
+			_, _ = fmt.Fprintln(outWriter(cmd), "(Save this token - it will not be shown again)")
 		}
 
 		return nil
@@ -164,17 +164,17 @@ var tokensDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete token %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete token %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete token %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete token %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -188,7 +188,7 @@ var tokensDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete token: %w", err)
 		}
 
-		fmt.Printf("Deleted token %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted token %s\n", args[0])
 		return nil
 	},
 }

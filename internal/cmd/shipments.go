@@ -66,7 +66,7 @@ var shipmentsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d shipments\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d shipments\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -93,23 +93,23 @@ var shipmentsGetCmd = &cobra.Command{
 			return formatter.JSON(shipment)
 		}
 
-		fmt.Printf("Shipment ID:        %s\n", shipment.ID)
-		fmt.Printf("Order ID:           %s\n", shipment.OrderID)
-		fmt.Printf("Fulfillment ID:     %s\n", shipment.FulfillmentID)
-		fmt.Printf("Tracking Company:   %s\n", shipment.TrackingCompany)
-		fmt.Printf("Tracking Number:    %s\n", shipment.TrackingNumber)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Shipment ID:        %s\n", shipment.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Order ID:           %s\n", shipment.OrderID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Fulfillment ID:     %s\n", shipment.FulfillmentID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tracking Company:   %s\n", shipment.TrackingCompany)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tracking Number:    %s\n", shipment.TrackingNumber)
 		if shipment.TrackingURL != "" {
-			fmt.Printf("Tracking URL:       %s\n", shipment.TrackingURL)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Tracking URL:       %s\n", shipment.TrackingURL)
 		}
-		fmt.Printf("Status:             %s\n", shipment.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:             %s\n", shipment.Status)
 		if !shipment.EstimatedDelivery.IsZero() {
-			fmt.Printf("Estimated Delivery: %s\n", shipment.EstimatedDelivery.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Estimated Delivery: %s\n", shipment.EstimatedDelivery.Format(time.RFC3339))
 		}
 		if !shipment.DeliveredAt.IsZero() {
-			fmt.Printf("Delivered At:       %s\n", shipment.DeliveredAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delivered At:       %s\n", shipment.DeliveredAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:            %s\n", shipment.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:            %s\n", shipment.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:            %s\n", shipment.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:            %s\n", shipment.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -150,11 +150,11 @@ var shipmentsCreateCmd = &cobra.Command{
 			return formatter.JSON(shipment)
 		}
 
-		fmt.Printf("Created shipment %s\n", shipment.ID)
-		fmt.Printf("Order ID:         %s\n", shipment.OrderID)
-		fmt.Printf("Fulfillment ID:   %s\n", shipment.FulfillmentID)
-		fmt.Printf("Tracking Company: %s\n", shipment.TrackingCompany)
-		fmt.Printf("Tracking Number:  %s\n", shipment.TrackingNumber)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created shipment %s\n", shipment.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Order ID:         %s\n", shipment.OrderID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Fulfillment ID:   %s\n", shipment.FulfillmentID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tracking Company: %s\n", shipment.TrackingCompany)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tracking Number:  %s\n", shipment.TrackingNumber)
 		return nil
 	},
 }
@@ -193,10 +193,10 @@ var shipmentsUpdateCmd = &cobra.Command{
 			return formatter.JSON(shipment)
 		}
 
-		fmt.Printf("Updated shipment %s\n", shipment.ID)
-		fmt.Printf("Tracking Company: %s\n", shipment.TrackingCompany)
-		fmt.Printf("Tracking Number:  %s\n", shipment.TrackingNumber)
-		fmt.Printf("Status:           %s\n", shipment.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated shipment %s\n", shipment.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tracking Company: %s\n", shipment.TrackingCompany)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tracking Number:  %s\n", shipment.TrackingNumber)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:           %s\n", shipment.Status)
 		return nil
 	},
 }
@@ -213,11 +213,11 @@ var shipmentsDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete shipment %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete shipment %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -226,7 +226,7 @@ var shipmentsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete shipment: %w", err)
 		}
 
-		fmt.Printf("Deleted shipment %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted shipment %s\n", args[0])
 		return nil
 	},
 }

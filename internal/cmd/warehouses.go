@@ -66,7 +66,7 @@ var warehousesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d warehouses\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d warehouses\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -93,29 +93,29 @@ var warehousesGetCmd = &cobra.Command{
 			return formatter.JSON(warehouse)
 		}
 
-		fmt.Printf("Warehouse ID:   %s\n", warehouse.ID)
-		fmt.Printf("Name:           %s\n", warehouse.Name)
-		fmt.Printf("Code:           %s\n", warehouse.Code)
-		fmt.Printf("Address:        %s\n", warehouse.Address1)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Warehouse ID:   %s\n", warehouse.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:           %s\n", warehouse.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Code:           %s\n", warehouse.Code)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Address:        %s\n", warehouse.Address1)
 		if warehouse.Address2 != "" {
-			fmt.Printf("                %s\n", warehouse.Address2)
+			_, _ = fmt.Fprintf(outWriter(cmd), "                %s\n", warehouse.Address2)
 		}
-		fmt.Printf("City:           %s\n", warehouse.City)
+		_, _ = fmt.Fprintf(outWriter(cmd), "City:           %s\n", warehouse.City)
 		if warehouse.Province != "" {
-			fmt.Printf("Province:       %s (%s)\n", warehouse.Province, warehouse.ProvinceCode)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Province:       %s (%s)\n", warehouse.Province, warehouse.ProvinceCode)
 		}
-		fmt.Printf("Country:        %s (%s)\n", warehouse.Country, warehouse.CountryCode)
-		fmt.Printf("ZIP:            %s\n", warehouse.Zip)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Country:        %s (%s)\n", warehouse.Country, warehouse.CountryCode)
+		_, _ = fmt.Fprintf(outWriter(cmd), "ZIP:            %s\n", warehouse.Zip)
 		if warehouse.Phone != "" {
-			fmt.Printf("Phone:          %s\n", warehouse.Phone)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Phone:          %s\n", warehouse.Phone)
 		}
 		if warehouse.Email != "" {
-			fmt.Printf("Email:          %s\n", warehouse.Email)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Email:          %s\n", warehouse.Email)
 		}
-		fmt.Printf("Active:         %t\n", warehouse.Active)
-		fmt.Printf("Default:        %t\n", warehouse.IsDefault)
-		fmt.Printf("Created:        %s\n", warehouse.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:        %s\n", warehouse.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Active:         %t\n", warehouse.Active)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Default:        %t\n", warehouse.IsDefault)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:        %s\n", warehouse.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:        %s\n", warehouse.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -159,9 +159,9 @@ var warehousesCreateCmd = &cobra.Command{
 			return formatter.JSON(warehouse)
 		}
 
-		fmt.Printf("Created warehouse %s\n", warehouse.ID)
-		fmt.Printf("Name: %s\n", warehouse.Name)
-		fmt.Printf("Code: %s\n", warehouse.Code)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created warehouse %s\n", warehouse.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name: %s\n", warehouse.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Code: %s\n", warehouse.Code)
 		return nil
 	},
 }
@@ -178,11 +178,11 @@ var warehousesDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Delete warehouse %s? [y/N] ", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete warehouse %s? [y/N] ", args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
-				fmt.Println("Cancelled.")
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
 				return nil
 			}
 		}
@@ -191,7 +191,7 @@ var warehousesDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete warehouse: %w", err)
 		}
 
-		fmt.Printf("Deleted warehouse %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted warehouse %s\n", args[0])
 		return nil
 	},
 }

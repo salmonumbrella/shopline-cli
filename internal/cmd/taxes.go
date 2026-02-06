@@ -72,7 +72,7 @@ var taxesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d taxes\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d taxes\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -99,19 +99,19 @@ var taxesGetCmd = &cobra.Command{
 			return formatter.JSON(tax)
 		}
 
-		fmt.Printf("Tax ID:       %s\n", tax.ID)
-		fmt.Printf("Name:         %s\n", tax.Name)
-		fmt.Printf("Rate:         %.2f%%\n", tax.Rate)
-		fmt.Printf("Country:      %s\n", tax.CountryCode)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tax ID:       %s\n", tax.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:         %s\n", tax.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Rate:         %.2f%%\n", tax.Rate)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Country:      %s\n", tax.CountryCode)
 		if tax.ProvinceCode != "" {
-			fmt.Printf("Province:     %s\n", tax.ProvinceCode)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Province:     %s\n", tax.ProvinceCode)
 		}
-		fmt.Printf("Priority:     %d\n", tax.Priority)
-		fmt.Printf("Compound:     %t\n", tax.Compound)
-		fmt.Printf("Shipping:     %t\n", tax.Shipping)
-		fmt.Printf("Enabled:      %t\n", tax.Enabled)
-		fmt.Printf("Created:      %s\n", tax.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:      %s\n", tax.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Priority:     %d\n", tax.Priority)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Compound:     %t\n", tax.Compound)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Shipping:     %t\n", tax.Shipping)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Enabled:      %t\n", tax.Enabled)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:      %s\n", tax.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:      %s\n", tax.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -132,7 +132,7 @@ var taxesCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create tax: %s (%.2f%%) for %s\n", name, rate, countryCode)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create tax: %s (%.2f%%) for %s\n", name, rate, countryCode)
 			return nil
 		}
 
@@ -164,10 +164,10 @@ var taxesCreateCmd = &cobra.Command{
 			return formatter.JSON(tax)
 		}
 
-		fmt.Printf("Created tax %s\n", tax.ID)
-		fmt.Printf("Name:    %s\n", tax.Name)
-		fmt.Printf("Rate:    %.2f%%\n", tax.Rate)
-		fmt.Printf("Country: %s\n", tax.CountryCode)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created tax %s\n", tax.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:    %s\n", tax.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Rate:    %.2f%%\n", tax.Rate)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Country: %s\n", tax.CountryCode)
 
 		return nil
 	},
@@ -205,7 +205,7 @@ var taxesUpdateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would update tax %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update tax %s\n", args[0])
 			return nil
 		}
 
@@ -226,9 +226,9 @@ var taxesUpdateCmd = &cobra.Command{
 			return formatter.JSON(tax)
 		}
 
-		fmt.Printf("Updated tax %s\n", tax.ID)
-		fmt.Printf("Name: %s\n", tax.Name)
-		fmt.Printf("Rate: %.2f%%\n", tax.Rate)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated tax %s\n", tax.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name: %s\n", tax.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Rate: %.2f%%\n", tax.Rate)
 
 		return nil
 	},
@@ -241,13 +241,13 @@ var taxesDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete tax %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete tax %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Are you sure you want to delete tax %s? (use --yes to confirm)\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete tax %s? (use --yes to confirm)\n", args[0])
 			return nil
 		}
 
@@ -260,7 +260,7 @@ var taxesDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete tax: %w", err)
 		}
 
-		fmt.Printf("Deleted tax %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted tax %s\n", args[0])
 		return nil
 	},
 }

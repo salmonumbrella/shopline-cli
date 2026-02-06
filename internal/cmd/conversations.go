@@ -68,7 +68,7 @@ var conversationsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d conversations\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d conversations\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -95,28 +95,28 @@ var conversationsGetCmd = &cobra.Command{
 			return formatter.JSON(conversation)
 		}
 
-		fmt.Printf("Conversation ID: %s\n", conversation.ID)
-		fmt.Printf("Customer:        %s\n", conversation.CustomerName)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Conversation ID: %s\n", conversation.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer:        %s\n", conversation.CustomerName)
 		if conversation.CustomerEmail != "" {
-			fmt.Printf("Email:           %s\n", conversation.CustomerEmail)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Email:           %s\n", conversation.CustomerEmail)
 		}
-		fmt.Printf("Status:          %s\n", conversation.Status)
-		fmt.Printf("Channel:         %s\n", conversation.Channel)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:          %s\n", conversation.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Channel:         %s\n", conversation.Channel)
 		if conversation.Subject != "" {
-			fmt.Printf("Subject:         %s\n", conversation.Subject)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Subject:         %s\n", conversation.Subject)
 		}
 		if conversation.AssigneeName != "" {
-			fmt.Printf("Assignee:        %s\n", conversation.AssigneeName)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Assignee:        %s\n", conversation.AssigneeName)
 		}
-		fmt.Printf("Messages:        %d\n", conversation.MessageCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Messages:        %d\n", conversation.MessageCount)
 		if conversation.UnreadCount > 0 {
-			fmt.Printf("Unread:          %d\n", conversation.UnreadCount)
+			_, _ = fmt.Fprintf(outWriter(cmd), "Unread:          %d\n", conversation.UnreadCount)
 		}
 		if !conversation.LastMessageAt.IsZero() {
-			fmt.Printf("Last Message:    %s\n", conversation.LastMessageAt.Format(time.RFC3339))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Last Message:    %s\n", conversation.LastMessageAt.Format(time.RFC3339))
 		}
-		fmt.Printf("Created:         %s\n", conversation.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:         %s\n", conversation.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created:         %s\n", conversation.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:         %s\n", conversation.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }
@@ -132,7 +132,7 @@ var conversationsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create conversation for customer %s via %s\n", customerID, channel)
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create conversation for customer %s via %s\n", customerID, channel)
 			return nil
 		}
 
@@ -160,9 +160,9 @@ var conversationsCreateCmd = &cobra.Command{
 			return formatter.JSON(conversation)
 		}
 
-		fmt.Printf("Created conversation %s\n", conversation.ID)
-		fmt.Printf("Channel: %s\n", conversation.Channel)
-		fmt.Printf("Status:  %s\n", conversation.Status)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created conversation %s\n", conversation.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Channel: %s\n", conversation.Channel)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Status:  %s\n", conversation.Status)
 
 		return nil
 	},
@@ -175,13 +175,13 @@ var conversationsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete conversation %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete conversation %s\n", args[0])
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Are you sure you want to delete conversation %s? (use --yes to confirm)\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete conversation %s? (use --yes to confirm)\n", args[0])
 			return nil
 		}
 
@@ -194,7 +194,7 @@ var conversationsDeleteCmd = &cobra.Command{
 			return fmt.Errorf("failed to delete conversation: %w", err)
 		}
 
-		fmt.Printf("Deleted conversation %s\n", args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted conversation %s\n", args[0])
 		return nil
 	},
 }
@@ -241,7 +241,7 @@ var conversationsMessagesCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d messages\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d messages\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -255,7 +255,7 @@ var conversationsSendCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would send message to conversation %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would send message to conversation %s\n", args[0])
 			return nil
 		}
 
@@ -280,7 +280,7 @@ var conversationsSendCmd = &cobra.Command{
 			return formatter.JSON(message)
 		}
 
-		fmt.Printf("Sent message %s\n", message.ID)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Sent message %s\n", message.ID)
 		return nil
 	},
 }
@@ -296,7 +296,7 @@ var conversationsShopMessageCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create shop message\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create shop message\n")
 			return nil
 		}
 

@@ -64,7 +64,7 @@ var productReviewCommentsCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would create product review comment\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create product review comment\n")
 			return nil
 		}
 
@@ -93,7 +93,7 @@ var productReviewCommentsUpdateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would update product review comment %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update product review comment %s\n", args[0])
 			return nil
 		}
 
@@ -117,13 +117,13 @@ var productReviewCommentsDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Are you sure you want to delete product review comment %s? Use --yes to confirm.\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to delete product review comment %s? Use --yes to confirm.\n", args[0])
 			return nil
 		}
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would delete product review comment %s\n", args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete product review comment %s\n", args[0])
 			return nil
 		}
 
@@ -151,7 +151,7 @@ var productReviewCommentsBulkCreateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would bulk create product review comments\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would bulk create product review comments\n")
 			return nil
 		}
 
@@ -179,7 +179,7 @@ var productReviewCommentsBulkUpdateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would bulk update product review comments\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would bulk update product review comments\n")
 			return nil
 		}
 
@@ -207,13 +207,13 @@ var productReviewCommentsBulkDeleteCmd = &cobra.Command{
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			fmt.Printf("Are you sure you want to bulk delete product review comments? Use --yes to confirm.\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "Are you sure you want to bulk delete product review comments? Use --yes to confirm.\n")
 			return nil
 		}
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Printf("[DRY-RUN] Would bulk delete product review comments\n")
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would bulk delete product review comments\n")
 			return nil
 		}
 

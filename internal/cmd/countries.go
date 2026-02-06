@@ -45,7 +45,7 @@ var countriesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d countries\n", len(resp.Items))
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d countries\n", len(resp.Items))
 		return nil
 	},
 }
@@ -72,16 +72,16 @@ var countriesGetCmd = &cobra.Command{
 			return formatter.JSON(country)
 		}
 
-		fmt.Printf("Code:       %s\n", country.Code)
-		fmt.Printf("Name:       %s\n", country.Name)
-		fmt.Printf("Tax:        %.2f%%\n", country.Tax)
-		fmt.Printf("Tax Name:   %s\n", country.TaxName)
-		fmt.Printf("Provinces:  %d\n", len(country.Provinces))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Code:       %s\n", country.Code)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:       %s\n", country.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tax:        %.2f%%\n", country.Tax)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tax Name:   %s\n", country.TaxName)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Provinces:  %d\n", len(country.Provinces))
 
 		if len(country.Provinces) > 0 {
-			fmt.Println("\nProvinces/States:")
+			_, _ = fmt.Fprintln(outWriter(cmd), "\nProvinces/States:")
 			for _, p := range country.Provinces {
-				fmt.Printf("  %s - %s (Tax: %.2f%% %s)\n", p.Code, p.Name, p.Tax, p.TaxName)
+				_, _ = fmt.Fprintf(outWriter(cmd), "  %s - %s (Tax: %.2f%% %s)\n", p.Code, p.Name, p.Tax, p.TaxName)
 			}
 		}
 		return nil

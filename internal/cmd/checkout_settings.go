@@ -35,47 +35,47 @@ var checkoutSettingsGetCmd = &cobra.Command{
 			return formatter.JSON(settings)
 		}
 
-		fmt.Printf("Checkout Settings\n")
-		fmt.Printf("=================\n\n")
-		fmt.Printf("Customer Requirements\n")
-		fmt.Printf("  Require Phone:            %t\n", settings.RequirePhone)
-		fmt.Printf("  Require Shipping Address: %t\n", settings.RequireShippingAddress)
-		fmt.Printf("  Require Billing Address:  %t\n", settings.RequireBillingAddress)
-		fmt.Printf("  Require Company:          %t\n", settings.RequireCompany)
-		fmt.Printf("  Require Full Name:        %t\n", settings.RequireFullName)
-		fmt.Println()
-		fmt.Printf("Checkout Options\n")
-		fmt.Printf("  Guest Checkout:           %t\n", settings.EnableGuestCheckout)
-		fmt.Printf("  Express Checkout:         %t\n", settings.EnableExpressCheckout)
-		fmt.Printf("  Order Notes:              %t\n", settings.EnableOrderNotes)
-		fmt.Printf("  Address Autofill:         %t\n", settings.EnableAddressAutofill)
-		fmt.Printf("  Multi-Currency:           %t\n", settings.EnableMultiCurrency)
-		fmt.Println()
-		fmt.Printf("Tipping\n")
-		fmt.Printf("  Enabled:                  %t\n", settings.EnableTipping)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Checkout Settings\n")
+		_, _ = fmt.Fprintf(outWriter(cmd), "=================\n\n")
+		_, _ = fmt.Fprintf(outWriter(cmd), "Customer Requirements\n")
+		_, _ = fmt.Fprintf(outWriter(cmd), "  Require Phone:            %t\n", settings.RequirePhone)
+		_, _ = fmt.Fprintf(outWriter(cmd), "  Require Shipping Address: %t\n", settings.RequireShippingAddress)
+		_, _ = fmt.Fprintf(outWriter(cmd), "  Require Billing Address:  %t\n", settings.RequireBillingAddress)
+		_, _ = fmt.Fprintf(outWriter(cmd), "  Require Company:          %t\n", settings.RequireCompany)
+		_, _ = fmt.Fprintf(outWriter(cmd), "  Require Full Name:        %t\n", settings.RequireFullName)
+		_, _ = fmt.Fprintln(outWriter(cmd))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Checkout Options\n")
+		_, _ = fmt.Fprintf(outWriter(cmd), "  Guest Checkout:           %t\n", settings.EnableGuestCheckout)
+		_, _ = fmt.Fprintf(outWriter(cmd), "  Express Checkout:         %t\n", settings.EnableExpressCheckout)
+		_, _ = fmt.Fprintf(outWriter(cmd), "  Order Notes:              %t\n", settings.EnableOrderNotes)
+		_, _ = fmt.Fprintf(outWriter(cmd), "  Address Autofill:         %t\n", settings.EnableAddressAutofill)
+		_, _ = fmt.Fprintf(outWriter(cmd), "  Multi-Currency:           %t\n", settings.EnableMultiCurrency)
+		_, _ = fmt.Fprintln(outWriter(cmd))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tipping\n")
+		_, _ = fmt.Fprintf(outWriter(cmd), "  Enabled:                  %t\n", settings.EnableTipping)
 		if settings.EnableTipping && len(settings.TippingOptions) > 0 {
-			fmt.Printf("  Options:                  %v%%\n", settings.TippingOptions)
-			fmt.Printf("  Default:                  %.0f%%\n", settings.DefaultTippingOption)
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Options:                  %v%%\n", settings.TippingOptions)
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Default:                  %.0f%%\n", settings.DefaultTippingOption)
 		}
-		fmt.Println()
-		fmt.Printf("Abandoned Cart\n")
-		fmt.Printf("  Enabled:                  %t\n", settings.AbandonedCartEnabled)
+		_, _ = fmt.Fprintln(outWriter(cmd))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Abandoned Cart\n")
+		_, _ = fmt.Fprintf(outWriter(cmd), "  Enabled:                  %t\n", settings.AbandonedCartEnabled)
 		if settings.AbandonedCartEnabled {
-			fmt.Printf("  Delay (hours):            %d\n", settings.AbandonedCartDelay)
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Delay (hours):            %d\n", settings.AbandonedCartDelay)
 		}
-		fmt.Println()
-		fmt.Printf("Policies\n")
+		_, _ = fmt.Fprintln(outWriter(cmd))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Policies\n")
 		if settings.TermsOfServiceURL != "" {
-			fmt.Printf("  Terms of Service:         %s\n", settings.TermsOfServiceURL)
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Terms of Service:         %s\n", settings.TermsOfServiceURL)
 		}
 		if settings.PrivacyPolicyURL != "" {
-			fmt.Printf("  Privacy Policy:           %s\n", settings.PrivacyPolicyURL)
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Privacy Policy:           %s\n", settings.PrivacyPolicyURL)
 		}
 		if settings.RefundPolicyURL != "" {
-			fmt.Printf("  Refund Policy:            %s\n", settings.RefundPolicyURL)
+			_, _ = fmt.Fprintf(outWriter(cmd), "  Refund Policy:            %s\n", settings.RefundPolicyURL)
 		}
-		fmt.Println()
-		fmt.Printf("Updated:                    %s\n", settings.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintln(outWriter(cmd))
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated:                    %s\n", settings.UpdatedAt.Format(time.RFC3339))
 
 		return nil
 	},
@@ -131,7 +131,7 @@ var checkoutSettingsUpdateCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			fmt.Println("[DRY-RUN] Would update checkout settings")
+			_, _ = fmt.Fprintln(outWriter(cmd), "[DRY-RUN] Would update checkout settings")
 			return nil
 		}
 
@@ -152,10 +152,10 @@ var checkoutSettingsUpdateCmd = &cobra.Command{
 			return formatter.JSON(settings)
 		}
 
-		fmt.Println("Checkout settings updated successfully")
-		fmt.Printf("Guest Checkout:    %t\n", settings.EnableGuestCheckout)
-		fmt.Printf("Express Checkout:  %t\n", settings.EnableExpressCheckout)
-		fmt.Printf("Tipping:           %t\n", settings.EnableTipping)
+		_, _ = fmt.Fprintln(outWriter(cmd), "Checkout settings updated successfully")
+		_, _ = fmt.Fprintf(outWriter(cmd), "Guest Checkout:    %t\n", settings.EnableGuestCheckout)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Express Checkout:  %t\n", settings.EnableExpressCheckout)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tipping:           %t\n", settings.EnableTipping)
 
 		return nil
 	},

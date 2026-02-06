@@ -47,7 +47,7 @@ var currenciesListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d currencies\n", len(resp.Items))
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d currencies\n", len(resp.Items))
 		return nil
 	},
 }
@@ -74,13 +74,13 @@ var currenciesGetCmd = &cobra.Command{
 			return formatter.JSON(currency)
 		}
 
-		fmt.Printf("Code:          %s\n", currency.Code)
-		fmt.Printf("Name:          %s\n", currency.Name)
-		fmt.Printf("Symbol:        %s\n", currency.Symbol)
-		fmt.Printf("Primary:       %t\n", currency.Primary)
-		fmt.Printf("Enabled:       %t\n", currency.Enabled)
-		fmt.Printf("Auto-Update:   %t\n", currency.AutoUpdate)
-		fmt.Printf("Exchange Rate: %.4f\n", currency.ExchangeRate)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Code:          %s\n", currency.Code)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:          %s\n", currency.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Symbol:        %s\n", currency.Symbol)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Primary:       %t\n", currency.Primary)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Enabled:       %t\n", currency.Enabled)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Auto-Update:   %t\n", currency.AutoUpdate)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Exchange Rate: %.4f\n", currency.ExchangeRate)
 		return nil
 	},
 }
@@ -122,10 +122,10 @@ var currenciesUpdateCmd = &cobra.Command{
 			return formatter.JSON(currency)
 		}
 
-		fmt.Printf("Updated currency %s\n", currency.Code)
-		fmt.Printf("Name:          %s\n", currency.Name)
-		fmt.Printf("Enabled:       %t\n", currency.Enabled)
-		fmt.Printf("Exchange Rate: %.4f\n", currency.ExchangeRate)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated currency %s\n", currency.Code)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Name:          %s\n", currency.Name)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Enabled:       %t\n", currency.Enabled)
+		_, _ = fmt.Fprintf(outWriter(cmd), "Exchange Rate: %.4f\n", currency.ExchangeRate)
 		return nil
 	},
 }
