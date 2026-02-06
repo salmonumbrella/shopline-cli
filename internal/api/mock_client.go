@@ -933,6 +933,10 @@ func (m *MockClient) GetGift(ctx context.Context, id string) (*Gift, error) {
 	return nil, m.notImplemented("GetGift")
 }
 
+func (m *MockClient) GetGiftStocks(ctx context.Context, id string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetGiftStocks")
+}
+
 func (m *MockClient) GetGiftCard(ctx context.Context, id string) (*GiftCard, error) {
 	return nil, m.notImplemented("GetGiftCard")
 }
@@ -1815,6 +1819,22 @@ func (m *MockClient) UpdateFlashPrice(ctx context.Context, id string, req *Flash
 
 func (m *MockClient) UpdateFulfillmentService(ctx context.Context, id string, req *FulfillmentServiceUpdateRequest) (*FulfillmentService, error) {
 	return nil, m.notImplemented("UpdateFulfillmentService")
+}
+
+func (m *MockClient) UpdateGift(ctx context.Context, id string, req *GiftUpdateRequest) (*Gift, error) {
+	return nil, m.notImplemented("UpdateGift")
+}
+
+func (m *MockClient) UpdateGiftQuantity(ctx context.Context, id string, quantity int) (*Gift, error) {
+	return nil, m.notImplemented("UpdateGiftQuantity")
+}
+
+func (m *MockClient) UpdateGiftStocks(ctx context.Context, id string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateGiftStocks")
+}
+
+func (m *MockClient) UpdateGiftsQuantityBySKU(ctx context.Context, sku string, quantity int) error {
+	return m.notImplemented("UpdateGiftsQuantityBySKU")
 }
 
 func (m *MockClient) UpdateLabel(ctx context.Context, id string, req *LabelUpdateRequest) (*Label, error) {

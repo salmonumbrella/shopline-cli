@@ -1330,13 +1330,13 @@
     "source": "internal/api/gifts.go"
   },
   {
-    "method": "PATCH",
-    "path": "/gifts/quantity-by-sku",
+    "method": "GET",
+    "path": "/gifts/search",
     "source": "internal/api/gifts.go"
   },
   {
-    "method": "GET",
-    "path": "/gifts/search",
+    "method": "PUT",
+    "path": "/gifts/update_quantity",
     "source": "internal/api/gifts.go"
   },
   {
@@ -1350,7 +1350,7 @@
     "source": "internal/api/gifts.go"
   },
   {
-    "method": "PATCH",
+    "method": "PUT",
     "path": "/gifts/{}",
     "source": "internal/api/gifts.go"
   },
@@ -1365,8 +1365,18 @@
     "source": "internal/api/gifts.go"
   },
   {
-    "method": "PATCH",
-    "path": "/gifts/{}/quantity",
+    "method": "GET",
+    "path": "/gifts/{}/stocks",
+    "source": "internal/api/gifts.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/gifts/{}/stocks",
+    "source": "internal/api/gifts.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/gifts/{}/update_quantity",
     "source": "internal/api/gifts.go"
   },
   {

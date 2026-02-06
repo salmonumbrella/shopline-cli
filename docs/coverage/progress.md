@@ -64,6 +64,8 @@ go run ./cmd/shopline-coverage
 - `GET /affiliate_campaigns/{id}/orders` + `GET /affiliate_campaigns/{id}/summary` + `GET /affiliate_campaigns/{id}/get_products_sales_ranking` + `POST /affiliate_campaigns/{id}/export_report` (done)
 - [x] Conversations (docs endpoints)
 - `POST /conversations/message` (done)
+- [x] Gifts (docs endpoints)
+- `PUT /gifts/{id}` + `PUT /gifts/{id}/update_quantity` + `PUT /gifts/update_quantity` + `GET/PUT /gifts/{id}/stocks` (done)
 
 ## Storefront API
 

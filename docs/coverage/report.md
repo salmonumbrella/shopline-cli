@@ -3,9 +3,9 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 692
-- Missing in code: 19
-- Extra in code: 403
+- Code endpoints detected: 694
+- Missing in code: 14
+- Extra in code: 400
 - Unparsed doc pages: 55
 
 ## Unparsed Doc Pages
@@ -68,11 +68,6 @@
 
 ## Missing In Code
 
-- `PUT /gifts/update_quantity` (https://open-api.docs.shoplineapp.com/reference/put_gifts-update-quantity-1)
-- `PUT /gifts/{}` (https://open-api.docs.shoplineapp.com/reference/put_gifts-id)
-- `GET /gifts/{}/stocks` (https://open-api.docs.shoplineapp.com/reference/get_gifts-id-stocks-1)
-- `PUT /gifts/{}/stocks` (https://open-api.docs.shoplineapp.com/reference/put_gifts-id-stocks-1)
-- `PUT /gifts/{}/update_quantity` (https://open-api.docs.shoplineapp.com/reference/put_gifts-id-update-quantity-1)
 - `GET /pos/purchase_orders` (https://open-api.docs.shoplineapp.com/reference/get_pos-purchase-orders)
 - `POST /pos/purchase_orders` (https://open-api.docs.shoplineapp.com/reference/post_pos-purchase-orders)
 - `PUT /pos/purchase_orders/bulk_delete` (https://open-api.docs.shoplineapp.com/reference/put_pos-purchase-orders-bulk-delete)
@@ -255,13 +250,10 @@
 - `POST /gift_cards` (internal/api/gift_cards.go)
 - `DELETE /gift_cards/{}` (internal/api/gift_cards.go)
 - `GET /gift_cards/{}` (internal/api/gift_cards.go)
-- `PATCH /gifts/quantity-by-sku` (internal/api/gifts.go)
 - `DELETE /gifts/{}` (internal/api/gifts.go)
 - `GET /gifts/{}` (internal/api/gifts.go)
-- `PATCH /gifts/{}` (internal/api/gifts.go)
 - `POST /gifts/{}/activate` (internal/api/gifts.go)
 - `POST /gifts/{}/deactivate` (internal/api/gifts.go)
-- `PATCH /gifts/{}/quantity` (internal/api/gifts.go)
 - `GET /inventory_levels` (internal/api/inventory.go)
 - `POST /inventory_levels/adjust` (internal/api/inventory.go)
 - `POST /inventory_levels/set` (internal/api/inventory.go)

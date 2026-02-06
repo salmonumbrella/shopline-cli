@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"os"
 	"strings"
@@ -25,12 +26,16 @@ func TestGiftsCmd(t *testing.T) {
 
 func TestGiftsSubcommands(t *testing.T) {
 	subcommands := map[string]string{
-		"list":       "List gift promotions",
-		"get":        "Get gift details",
-		"create":     "Create a gift promotion",
-		"activate":   "Activate a gift promotion",
-		"deactivate": "Deactivate a gift promotion",
-		"delete":     "Delete a gift promotion",
+		"list":                   "List gift promotions",
+		"get":                    "Get gift details",
+		"create":                 "Create a gift promotion",
+		"update":                 "Update a gift promotion",
+		"update-quantity":        "Update gift quantity (documented endpoint)",
+		"update-quantity-by-sku": "Bulk update gift quantity by SKU (documented endpoint)",
+		"stocks":                 "Manage gift stocks (documented endpoints)",
+		"activate":               "Activate a gift promotion",
+		"deactivate":             "Deactivate a gift promotion",
+		"delete":                 "Delete a gift promotion",
 	}
 
 	for name, short := range subcommands {
@@ -309,6 +314,15 @@ type giftsMockAPIClient struct {
 	getGiftErr         error
 	createGiftResp     *api.Gift
 	createGiftErr      error
+	updateGiftResp     *api.Gift
+	updateGiftErr      error
+	updateQtyResp      *api.Gift
+	updateQtyErr       error
+	updateBySKUErr     error
+	getStocksResp      json.RawMessage
+	getStocksErr       error
+	updateStocksResp   json.RawMessage
+	updateStocksErr    error
 	activateGiftResp   *api.Gift
 	activateGiftErr    error
 	deactivateGiftResp *api.Gift
@@ -326,6 +340,26 @@ func (m *giftsMockAPIClient) GetGift(ctx context.Context, id string) (*api.Gift,
 
 func (m *giftsMockAPIClient) CreateGift(ctx context.Context, req *api.GiftCreateRequest) (*api.Gift, error) {
 	return m.createGiftResp, m.createGiftErr
+}
+
+func (m *giftsMockAPIClient) UpdateGift(ctx context.Context, id string, req *api.GiftUpdateRequest) (*api.Gift, error) {
+	return m.updateGiftResp, m.updateGiftErr
+}
+
+func (m *giftsMockAPIClient) UpdateGiftQuantity(ctx context.Context, id string, quantity int) (*api.Gift, error) {
+	return m.updateQtyResp, m.updateQtyErr
+}
+
+func (m *giftsMockAPIClient) UpdateGiftsQuantityBySKU(ctx context.Context, sku string, quantity int) error {
+	return m.updateBySKUErr
+}
+
+func (m *giftsMockAPIClient) GetGiftStocks(ctx context.Context, id string) (json.RawMessage, error) {
+	return m.getStocksResp, m.getStocksErr
+}
+
+func (m *giftsMockAPIClient) UpdateGiftStocks(ctx context.Context, id string, body any) (json.RawMessage, error) {
+	return m.updateStocksResp, m.updateStocksErr
 }
 
 func (m *giftsMockAPIClient) ActivateGift(ctx context.Context, id string) (*api.Gift, error) {
@@ -969,5 +1003,112 @@ func TestGiftsDeleteRunE(t *testing.T) {
 				t.Errorf("unexpected error: %v", err)
 			}
 		})
+	}
+}
+
+func TestGiftsUpdateRunE_JSON(t *testing.T) {
+	mockClient := &giftsMockAPIClient{
+		updateGiftResp: &api.Gift{ID: "gift_123", Title: "Updated Gift"},
+	}
+	cleanup, buf := setupGiftsMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newGiftsTestCmd()
+	cmd.Flags().String("title", "", "")
+	cmd.Flags().String("description", "", "")
+	cmd.Flags().String("gift-product-id", "", "")
+	cmd.Flags().String("gift-variant-id", "", "")
+	cmd.Flags().String("trigger-type", "", "")
+	cmd.Flags().Float64("trigger-value", 0, "")
+	cmd.Flags().Int("quantity", 0, "")
+	cmd.Flags().Int("limit-per-user", 0, "")
+	cmd.Flags().String("starts-at", "", "")
+	cmd.Flags().String("ends-at", "", "")
+	_ = cmd.Flags().Set("output", "json")
+	_ = cmd.Flags().Set("title", "Updated Gift")
+
+	if err := giftsUpdateCmd.RunE(cmd, []string{"gift_123"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "Updated Gift") {
+		t.Fatalf("expected updated gift in output, got %q", buf.String())
+	}
+}
+
+func TestGiftsUpdateQuantityRunE_JSON(t *testing.T) {
+	mockClient := &giftsMockAPIClient{
+		updateQtyResp: &api.Gift{ID: "gift_123", Quantity: 100},
+	}
+	cleanup, buf := setupGiftsMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newGiftsTestCmd()
+	cmd.Flags().Int("quantity", 0, "")
+	_ = cmd.Flags().Set("output", "json")
+	_ = cmd.Flags().Set("quantity", "100")
+
+	if err := giftsUpdateQuantityCmd.RunE(cmd, []string{"gift_123"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "\"quantity\"") {
+		t.Fatalf("expected quantity in output, got %q", buf.String())
+	}
+}
+
+func TestGiftsUpdateQuantityBySKURunE_JSON(t *testing.T) {
+	mockClient := &giftsMockAPIClient{}
+	cleanup, buf := setupGiftsMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newGiftsTestCmd()
+	cmd.Flags().String("sku", "", "")
+	cmd.Flags().Int("quantity", 0, "")
+	_ = cmd.Flags().Set("output", "json")
+	_ = cmd.Flags().Set("sku", "SKU-123")
+	_ = cmd.Flags().Set("quantity", "50")
+
+	if err := giftsUpdateQuantityBySKUCmd.RunE(cmd, []string{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "\"ok\"") {
+		t.Fatalf("expected ok in output, got %q", buf.String())
+	}
+}
+
+func TestGiftsStocksGetRunE_JSON(t *testing.T) {
+	mockClient := &giftsMockAPIClient{
+		getStocksResp: json.RawMessage(`{"items":[]}`),
+	}
+	cleanup, buf := setupGiftsMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newGiftsTestCmd()
+	_ = cmd.Flags().Set("output", "json")
+
+	if err := giftsStocksGetCmd.RunE(cmd, []string{"gift_123"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "\"items\"") {
+		t.Fatalf("expected items in output, got %q", buf.String())
+	}
+}
+
+func TestGiftsStocksUpdateRunE_JSON(t *testing.T) {
+	mockClient := &giftsMockAPIClient{
+		updateStocksResp: json.RawMessage(`{"updated":true}`),
+	}
+	cleanup, buf := setupGiftsMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newGiftsTestCmd()
+	addJSONBodyFlags(cmd)
+	_ = cmd.Flags().Set("output", "json")
+	_ = cmd.Flags().Set("body", `{"ok":true}`)
+
+	if err := giftsStocksUpdateCmd.RunE(cmd, []string{"gift_123"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "\"updated\"") {
+		t.Fatalf("expected updated in output, got %q", buf.String())
 	}
 }

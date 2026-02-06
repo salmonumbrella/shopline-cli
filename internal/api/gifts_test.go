@@ -259,8 +259,8 @@ func TestGiftsDeactivate(t *testing.T) {
 
 func TestGiftsUpdate(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPatch {
-			t.Errorf("Expected PATCH, got %s", r.Method)
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
 		}
 		if r.URL.Path != "/gifts/gift_123" {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
@@ -367,10 +367,10 @@ func TestGiftsSearch(t *testing.T) {
 
 func TestGiftsUpdateQuantity(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPatch {
-			t.Errorf("Expected PATCH, got %s", r.Method)
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
 		}
-		if r.URL.Path != "/gifts/gift_123/quantity" {
+		if r.URL.Path != "/gifts/gift_123/update_quantity" {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
 		}
 
@@ -425,10 +425,10 @@ func TestUpdateGiftQuantityEmptyID(t *testing.T) {
 
 func TestGiftsUpdateQuantityBySKU(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPatch {
-			t.Errorf("Expected PATCH, got %s", r.Method)
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
 		}
-		if r.URL.Path != "/gifts/quantity-by-sku" {
+		if r.URL.Path != "/gifts/update_quantity" {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
 		}
 
@@ -452,6 +452,63 @@ func TestGiftsUpdateQuantityBySKU(t *testing.T) {
 	err := client.UpdateGiftsQuantityBySKU(context.Background(), "SKU-123", 50)
 	if err != nil {
 		t.Fatalf("UpdateGiftsQuantityBySKU failed: %v", err)
+	}
+}
+
+func TestGiftsGetStocks(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Fatalf("expected GET, got %s", r.Method)
+		}
+		if r.URL.Path != "/gifts/gift_123/stocks" {
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+		_ = json.NewEncoder(w).Encode(map[string]any{"items": []any{}})
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	raw, err := client.GetGiftStocks(context.Background(), "gift_123")
+	if err != nil {
+		t.Fatalf("GetGiftStocks failed: %v", err)
+	}
+	if len(raw) == 0 {
+		t.Fatalf("expected response body")
+	}
+}
+
+func TestGiftsUpdateStocks(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Fatalf("expected PUT, got %s", r.Method)
+		}
+		if r.URL.Path != "/gifts/gift_123/stocks" {
+			t.Fatalf("unexpected path: %s", r.URL.Path)
+		}
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("failed to decode body: %v", err)
+		}
+		if body["ok"] != true {
+			t.Fatalf("expected ok=true, got %v", body)
+		}
+		_ = json.NewEncoder(w).Encode(map[string]any{"updated": true})
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	raw, err := client.UpdateGiftStocks(context.Background(), "gift_123", map[string]any{"ok": true})
+	if err != nil {
+		t.Fatalf("UpdateGiftStocks failed: %v", err)
+	}
+	if len(raw) == 0 {
+		t.Fatalf("expected response body")
 	}
 }
 

@@ -268,6 +268,7 @@ type APIClient interface {
 	GetFulfillmentOrder(ctx context.Context, id string) (*FulfillmentOrder, error)
 	GetFulfillmentService(ctx context.Context, id string) (*FulfillmentService, error)
 	GetGift(ctx context.Context, id string) (*Gift, error)
+	GetGiftStocks(ctx context.Context, id string) (json.RawMessage, error)
 	GetGiftCard(ctx context.Context, id string) (*GiftCard, error)
 	GetInventoryLevel(ctx context.Context, id string) (*InventoryLevel, error)
 	GetLabel(ctx context.Context, id string) (*Label, error)
@@ -608,6 +609,10 @@ type APIClient interface {
 	UpdateFlashPrice(ctx context.Context, id string, req *FlashPriceUpdateRequest) (*FlashPrice, error)
 	UpdateFlashPriceCampaign(ctx context.Context, id string, body any) (json.RawMessage, error)
 	UpdateFulfillmentService(ctx context.Context, id string, req *FulfillmentServiceUpdateRequest) (*FulfillmentService, error)
+	UpdateGift(ctx context.Context, id string, req *GiftUpdateRequest) (*Gift, error)
+	UpdateGiftQuantity(ctx context.Context, id string, quantity int) (*Gift, error)
+	UpdateGiftStocks(ctx context.Context, id string, body any) (json.RawMessage, error)
+	UpdateGiftsQuantityBySKU(ctx context.Context, sku string, quantity int) error
 	UpdateLabel(ctx context.Context, id string, req *LabelUpdateRequest) (*Label, error)
 	UpdateLocalDeliveryOption(ctx context.Context, id string, req *LocalDeliveryUpdateRequest) (*LocalDeliveryOption, error)
 	UpdateLocation(ctx context.Context, id string, req *LocationUpdateRequest) (*Location, error)

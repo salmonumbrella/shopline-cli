@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -158,7 +159,7 @@ func (c *Client) UpdateGift(ctx context.Context, id string, req *GiftUpdateReque
 		return nil, fmt.Errorf("gift id is required")
 	}
 	var gift Gift
-	if err := c.Patch(ctx, fmt.Sprintf("/gifts/%s", id), req, &gift); err != nil {
+	if err := c.Put(ctx, fmt.Sprintf("/gifts/%s", id), req, &gift); err != nil {
 		return nil, err
 	}
 	return &gift, nil
@@ -187,7 +188,7 @@ func (c *Client) UpdateGiftQuantity(ctx context.Context, id string, quantity int
 	}
 	req := &GiftQuantityUpdateRequest{Quantity: quantity}
 	var gift Gift
-	if err := c.Patch(ctx, fmt.Sprintf("/gifts/%s/quantity", id), req, &gift); err != nil {
+	if err := c.Put(ctx, fmt.Sprintf("/gifts/%s/update_quantity", id), req, &gift); err != nil {
 		return nil, err
 	}
 	return &gift, nil
@@ -199,5 +200,33 @@ func (c *Client) UpdateGiftsQuantityBySKU(ctx context.Context, sku string, quant
 		return fmt.Errorf("sku is required")
 	}
 	req := &GiftQuantityBySKURequest{SKU: sku, Quantity: quantity}
-	return c.Patch(ctx, "/gifts/quantity-by-sku", req, nil)
+	return c.Put(ctx, "/gifts/update_quantity", req, nil)
+}
+
+// GetGiftStocks retrieves stock info for a gift (documented endpoint).
+//
+// Docs: GET /gifts/{id}/stocks
+func (c *Client) GetGiftStocks(ctx context.Context, id string) (json.RawMessage, error) {
+	if strings.TrimSpace(id) == "" {
+		return nil, fmt.Errorf("gift id is required")
+	}
+	var resp json.RawMessage
+	if err := c.Get(ctx, fmt.Sprintf("/gifts/%s/stocks", id), &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+// UpdateGiftStocks updates stock info for a gift (documented endpoint; raw JSON body).
+//
+// Docs: PUT /gifts/{id}/stocks
+func (c *Client) UpdateGiftStocks(ctx context.Context, id string, body any) (json.RawMessage, error) {
+	if strings.TrimSpace(id) == "" {
+		return nil, fmt.Errorf("gift id is required")
+	}
+	var resp json.RawMessage
+	if err := c.Put(ctx, fmt.Sprintf("/gifts/%s/stocks", id), body, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
 }

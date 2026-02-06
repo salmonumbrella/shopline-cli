@@ -263,6 +263,209 @@ var giftsDeleteCmd = &cobra.Command{
 	},
 }
 
+var giftsUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a gift promotion",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		title, _ := cmd.Flags().GetString("title")
+		description, _ := cmd.Flags().GetString("description")
+		giftProductID, _ := cmd.Flags().GetString("gift-product-id")
+		giftVariantID, _ := cmd.Flags().GetString("gift-variant-id")
+		triggerType, _ := cmd.Flags().GetString("trigger-type")
+		triggerValue, _ := cmd.Flags().GetFloat64("trigger-value")
+		quantity, _ := cmd.Flags().GetInt("quantity")
+		limitPerUser, _ := cmd.Flags().GetInt("limit-per-user")
+		startsAtStr, _ := cmd.Flags().GetString("starts-at")
+		endsAtStr, _ := cmd.Flags().GetString("ends-at")
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			fmt.Printf("[DRY-RUN] Would update gift %s\n", args[0])
+			return nil
+		}
+
+		req := &api.GiftUpdateRequest{}
+		if cmd.Flags().Changed("title") {
+			req.Title = title
+		}
+		if cmd.Flags().Changed("description") {
+			req.Description = description
+		}
+		if cmd.Flags().Changed("gift-product-id") {
+			req.GiftProductID = giftProductID
+		}
+		if cmd.Flags().Changed("gift-variant-id") {
+			req.GiftVariantID = giftVariantID
+		}
+		if cmd.Flags().Changed("trigger-type") {
+			req.TriggerType = triggerType
+		}
+		if cmd.Flags().Changed("trigger-value") {
+			req.TriggerValue = &triggerValue
+		}
+		if cmd.Flags().Changed("quantity") {
+			req.Quantity = &quantity
+		}
+		if cmd.Flags().Changed("limit-per-user") {
+			req.LimitPerUser = &limitPerUser
+		}
+		if cmd.Flags().Changed("starts-at") && startsAtStr != "" {
+			startsAt, err := time.Parse(time.RFC3339, startsAtStr)
+			if err != nil {
+				return fmt.Errorf("invalid starts-at format (use RFC3339): %w", err)
+			}
+			req.StartsAt = &startsAt
+		}
+		if cmd.Flags().Changed("ends-at") && endsAtStr != "" {
+			endsAt, err := time.Parse(time.RFC3339, endsAtStr)
+			if err != nil {
+				return fmt.Errorf("invalid ends-at format (use RFC3339): %w", err)
+			}
+			req.EndsAt = &endsAt
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		gift, err := client.UpdateGift(cmd.Context(), args[0], req)
+		if err != nil {
+			return fmt.Errorf("failed to update gift: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(gift)
+		}
+
+		fmt.Printf("Updated gift %s\n", gift.ID)
+		return nil
+	},
+}
+
+var giftsUpdateQuantityCmd = &cobra.Command{
+	Use:   "update-quantity <id>",
+	Short: "Update gift quantity (documented endpoint)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		qty, _ := cmd.Flags().GetInt("quantity")
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			fmt.Printf("[DRY-RUN] Would update gift quantity for %s\n", args[0])
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		gift, err := client.UpdateGiftQuantity(cmd.Context(), args[0], qty)
+		if err != nil {
+			return fmt.Errorf("failed to update gift quantity: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(gift)
+		}
+
+		fmt.Printf("Updated gift %s quantity to %d\n", gift.ID, gift.Quantity)
+		return nil
+	},
+}
+
+var giftsUpdateQuantityBySKUCmd = &cobra.Command{
+	Use:   "update-quantity-by-sku",
+	Short: "Bulk update gift quantity by SKU (documented endpoint)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		sku, _ := cmd.Flags().GetString("sku")
+		qty, _ := cmd.Flags().GetInt("quantity")
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			fmt.Printf("[DRY-RUN] Would update gift quantity for SKU %s\n", sku)
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		if err := client.UpdateGiftsQuantityBySKU(cmd.Context(), sku, qty); err != nil {
+			return fmt.Errorf("failed to update gifts quantity by sku: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(map[string]any{"ok": true})
+		}
+
+		fmt.Printf("Updated gift quantity for SKU %s\n", sku)
+		return nil
+	},
+}
+
+var giftsStocksCmd = &cobra.Command{
+	Use:   "stocks",
+	Short: "Manage gift stocks (documented endpoints)",
+}
+
+var giftsStocksGetCmd = &cobra.Command{
+	Use:   "get <id>",
+	Short: "Get gift stocks (documented endpoint; raw JSON)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.GetGiftStocks(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to get gift stocks: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var giftsStocksUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update gift stocks (documented endpoint; raw JSON body)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			fmt.Printf("[DRY-RUN] Would update gift stocks for %s\n", args[0])
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.UpdateGiftStocks(cmd.Context(), args[0], body)
+		if err != nil {
+			return fmt.Errorf("failed to update gift stocks: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(giftsCmd)
 
@@ -294,4 +497,31 @@ func init() {
 
 	giftsCmd.AddCommand(giftsDeleteCmd)
 	giftsDeleteCmd.Flags().Bool("yes", false, "Skip confirmation prompt")
+
+	giftsCmd.AddCommand(giftsUpdateCmd)
+	giftsUpdateCmd.Flags().String("title", "", "Gift title")
+	giftsUpdateCmd.Flags().String("description", "", "Gift description")
+	giftsUpdateCmd.Flags().String("gift-product-id", "", "Product ID for the gift")
+	giftsUpdateCmd.Flags().String("gift-variant-id", "", "Variant ID for the gift")
+	giftsUpdateCmd.Flags().String("trigger-type", "", "Trigger type: min_purchase, product_purchase")
+	giftsUpdateCmd.Flags().Float64("trigger-value", 0, "Trigger value")
+	giftsUpdateCmd.Flags().Int("quantity", 0, "Available quantity")
+	giftsUpdateCmd.Flags().Int("limit-per-user", 0, "Limit per user")
+	giftsUpdateCmd.Flags().String("starts-at", "", "Start time (RFC3339 format)")
+	giftsUpdateCmd.Flags().String("ends-at", "", "End time (RFC3339 format)")
+
+	giftsCmd.AddCommand(giftsUpdateQuantityCmd)
+	giftsUpdateQuantityCmd.Flags().Int("quantity", 0, "Quantity (required)")
+	_ = giftsUpdateQuantityCmd.MarkFlagRequired("quantity")
+
+	giftsCmd.AddCommand(giftsUpdateQuantityBySKUCmd)
+	giftsUpdateQuantityBySKUCmd.Flags().String("sku", "", "Gift SKU (required)")
+	giftsUpdateQuantityBySKUCmd.Flags().Int("quantity", 0, "Quantity (required)")
+	_ = giftsUpdateQuantityBySKUCmd.MarkFlagRequired("sku")
+	_ = giftsUpdateQuantityBySKUCmd.MarkFlagRequired("quantity")
+
+	giftsCmd.AddCommand(giftsStocksCmd)
+	giftsStocksCmd.AddCommand(giftsStocksGetCmd)
+	giftsStocksCmd.AddCommand(giftsStocksUpdateCmd)
+	addJSONBodyFlags(giftsStocksUpdateCmd)
 }
