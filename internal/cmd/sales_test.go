@@ -27,12 +27,13 @@ func TestSalesCommandSetup(t *testing.T) {
 // TestSalesSubcommands verifies all subcommands are registered
 func TestSalesSubcommands(t *testing.T) {
 	subcommands := map[string]string{
-		"list":       "List sale campaigns",
-		"get":        "Get sale details",
-		"create":     "Create a sale campaign",
-		"activate":   "Activate a sale campaign",
-		"deactivate": "Deactivate a sale campaign",
-		"delete":     "Delete a sale campaign",
+		"list":            "List sale campaigns",
+		"get":             "Get sale details",
+		"create":          "Create a sale campaign",
+		"activate":        "Activate a sale campaign",
+		"deactivate":      "Deactivate a sale campaign",
+		"delete":          "Delete a sale campaign",
+		"delete-products": "Delete products from a sale",
 	}
 
 	for name, short := range subcommands {
@@ -119,6 +120,17 @@ func TestSalesDeleteFlags(t *testing.T) {
 	}
 	if flag.DefValue != "false" {
 		t.Errorf("expected default 'false', got %q", flag.DefValue)
+	}
+}
+
+func TestSalesDeleteProductsFlags(t *testing.T) {
+	flag := salesDeleteProductsCmd.Flags().Lookup("product-ids")
+	if flag == nil {
+		t.Error("flag 'product-ids' not found")
+		return
+	}
+	if flag.DefValue != "[]" {
+		t.Errorf("expected default '[]', got %q", flag.DefValue)
 	}
 }
 
@@ -295,17 +307,20 @@ func TestSalesListRunE_NoProfiles(t *testing.T) {
 // salesMockAPIClient is a mock implementation of api.APIClient for sales tests.
 type salesMockAPIClient struct {
 	api.MockClient
-	listSalesResp      *api.SalesListResponse
-	listSalesErr       error
-	getSaleResp        *api.Sale
-	getSaleErr         error
-	createSaleResp     *api.Sale
-	createSaleErr      error
-	activateSaleResp   *api.Sale
-	activateSaleErr    error
-	deactivateSaleResp *api.Sale
-	deactivateSaleErr  error
-	deleteSaleErr      error
+	listSalesResp            *api.SalesListResponse
+	listSalesErr             error
+	getSaleResp              *api.Sale
+	getSaleErr               error
+	createSaleResp           *api.Sale
+	createSaleErr            error
+	activateSaleResp         *api.Sale
+	activateSaleErr          error
+	deactivateSaleResp       *api.Sale
+	deactivateSaleErr        error
+	deleteSaleErr            error
+	deleteSaleProductsSaleID string
+	deleteSaleProductsReq    *api.SaleDeleteProductsRequest
+	deleteSaleProductsErr    error
 }
 
 func (m *salesMockAPIClient) ListSales(ctx context.Context, opts *api.SalesListOptions) (*api.SalesListResponse, error) {
@@ -330,6 +345,12 @@ func (m *salesMockAPIClient) DeactivateSale(ctx context.Context, id string) (*ap
 
 func (m *salesMockAPIClient) DeleteSale(ctx context.Context, id string) error {
 	return m.deleteSaleErr
+}
+
+func (m *salesMockAPIClient) DeleteSaleProducts(ctx context.Context, saleID string, req *api.SaleDeleteProductsRequest) error {
+	m.deleteSaleProductsSaleID = saleID
+	m.deleteSaleProductsReq = req
+	return m.deleteSaleProductsErr
 }
 
 // setupSalesMockFactories sets up mock factories for sales tests.
@@ -1133,5 +1154,52 @@ func TestSalesCreateRunE_WithProductsAndCollections(t *testing.T) {
 	err := salesCreateCmd.RunE(cmd, []string{})
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+func TestSalesDeleteProductsRunE_JSON(t *testing.T) {
+	mockClient := &salesMockAPIClient{}
+	cleanup, buf := setupSalesMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newSalesTestCmd()
+	cmd.Flags().StringSlice("product-ids", nil, "")
+	_ = cmd.Flags().Set("output", "json")
+	_ = cmd.Flags().Set("product-ids", "prod_1,prod_2")
+
+	err := salesDeleteProductsCmd.RunE(cmd, []string{"sale_123"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if mockClient.deleteSaleProductsSaleID != "sale_123" {
+		t.Fatalf("expected saleID sale_123, got %q", mockClient.deleteSaleProductsSaleID)
+	}
+	if mockClient.deleteSaleProductsReq == nil || len(mockClient.deleteSaleProductsReq.ProductIDs) != 2 {
+		t.Fatalf("expected product ids in request, got %+v", mockClient.deleteSaleProductsReq)
+	}
+
+	out := buf.String()
+	if !strings.Contains(out, "\"ok\"") {
+		t.Fatalf("expected ok in JSON output, got %q", out)
+	}
+}
+
+func TestSalesDeleteProductsRunE_DryRun(t *testing.T) {
+	mockClient := &salesMockAPIClient{}
+	cleanup, _ := setupSalesMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newSalesTestCmd()
+	cmd.Flags().StringSlice("product-ids", nil, "")
+	_ = cmd.Flags().Set("dry-run", "true")
+	_ = cmd.Flags().Set("product-ids", "prod_1")
+
+	err := salesDeleteProductsCmd.RunE(cmd, []string{"sale_123"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if mockClient.deleteSaleProductsSaleID != "" {
+		t.Fatalf("expected API not called on dry-run, got saleID=%q", mockClient.deleteSaleProductsSaleID)
 	}
 }

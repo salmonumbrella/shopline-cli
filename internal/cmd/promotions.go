@@ -193,6 +193,22 @@ var promotionsDeleteCmd = &cobra.Command{
 	},
 }
 
+var promotionsCouponCenterCmd = &cobra.Command{
+	Use:   "coupon-center",
+	Short: "Get coupon center promotions (documented endpoint; raw JSON)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.GetPromotionsCouponCenter(cmd.Context())
+		if err != nil {
+			return fmt.Errorf("failed to get promotions coupon center: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(promotionsCmd)
 
@@ -206,4 +222,5 @@ func init() {
 	promotionsCmd.AddCommand(promotionsActivateCmd)
 	promotionsCmd.AddCommand(promotionsDeactivateCmd)
 	promotionsCmd.AddCommand(promotionsDeleteCmd)
+	promotionsCmd.AddCommand(promotionsCouponCenterCmd)
 }

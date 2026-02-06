@@ -3,9 +3,9 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 685
-- Missing in code: 27
-- Extra in code: 404
+- Code endpoints detected: 687
+- Missing in code: 24
+- Extra in code: 403
 - Unparsed doc pages: 55
 
 ## Unparsed Doc Pages
@@ -78,7 +78,6 @@
 - `GET /gifts/{}/stocks` (https://open-api.docs.shoplineapp.com/reference/get_gifts-id-stocks-1)
 - `PUT /gifts/{}/stocks` (https://open-api.docs.shoplineapp.com/reference/put_gifts-id-stocks-1)
 - `PUT /gifts/{}/update_quantity` (https://open-api.docs.shoplineapp.com/reference/put_gifts-id-update-quantity-1)
-- `POST /media` (https://open-api.docs.shoplineapp.com/reference/post_media-1)
 - `GET /pos/purchase_orders` (https://open-api.docs.shoplineapp.com/reference/get_pos-purchase-orders)
 - `POST /pos/purchase_orders` (https://open-api.docs.shoplineapp.com/reference/post_pos-purchase-orders)
 - `PUT /pos/purchase_orders/bulk_delete` (https://open-api.docs.shoplineapp.com/reference/put_pos-purchase-orders-bulk-delete)
@@ -93,8 +92,6 @@
 - `DELETE /product_review_comments/{}` (https://open-api.docs.shoplineapp.com/reference/delete_product-review-comments-id-1)
 - `GET /product_review_comments/{}` (https://open-api.docs.shoplineapp.com/reference/get_product-review-comments-id-1)
 - `PUT /product_review_comments/{}` (https://open-api.docs.shoplineapp.com/reference/put_product-review-comments-id-1)
-- `GET /promotions/coupon-center` (https://open-api.docs.shoplineapp.com/reference/get_promotions-coupon-center)
-- `POST /sales/{}/delete_products` (https://open-api.docs.shoplineapp.com/reference/post_sales-saleid-delete-products)
 
 ## Extra In Code
 
@@ -399,7 +396,6 @@
 - `GET /sales/{}` (internal/api/sales.go)
 - `POST /sales/{}/activate` (internal/api/sales.go)
 - `POST /sales/{}/deactivate` (internal/api/sales.go)
-- `POST /sales/{}/delete-products` (internal/api/sales.go)
 - `GET /script_tags` (internal/api/script_tags.go)
 - `POST /script_tags` (internal/api/script_tags.go)
 - `DELETE /script_tags/{}` (internal/api/script_tags.go)

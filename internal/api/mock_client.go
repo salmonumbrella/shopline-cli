@@ -2432,3 +2432,15 @@ func (m *MockClient) UpdateMultipassCustomerLinking(ctx context.Context, custome
 func (m *MockClient) DeleteMultipassCustomerLinking(ctx context.Context, customerID string) (json.RawMessage, error) {
 	return nil, m.notImplemented("DeleteMultipassCustomerLinking")
 }
+
+func (m *MockClient) CreateMediaImage(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("CreateMediaImage")
+}
+
+func (m *MockClient) GetPromotionsCouponCenter(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetPromotionsCouponCenter")
+}
+
+func (m *MockClient) DeleteSaleProducts(ctx context.Context, saleID string, req *SaleDeleteProductsRequest) error {
+	return m.notImplemented("DeleteSaleProducts")
+}

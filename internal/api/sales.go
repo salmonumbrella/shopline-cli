@@ -265,7 +265,7 @@ func (c *Client) DeleteSaleProducts(ctx context.Context, saleID string, req *Sal
 		return fmt.Errorf("at least one product id is required")
 	}
 
-	return c.Post(ctx, fmt.Sprintf("/sales/%s/delete-products", saleID), req, nil)
+	return c.Post(ctx, fmt.Sprintf("/sales/%s/delete_products", saleID), req, nil)
 }
 
 // GetSaleComments retrieves comments from a live stream.

@@ -255,6 +255,41 @@ var salesDeleteCmd = &cobra.Command{
 	},
 }
 
+var salesDeleteProductsCmd = &cobra.Command{
+	Use:   "delete-products <id>",
+	Short: "Delete products from a sale",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		productIDs, _ := cmd.Flags().GetStringSlice("product-ids")
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			fmt.Printf("[DRY-RUN] Would delete products from sale %s\n", args[0])
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		err = client.DeleteSaleProducts(cmd.Context(), args[0], &api.SaleDeleteProductsRequest{
+			ProductIDs: productIDs,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to delete sale products: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(map[string]any{"ok": true})
+		}
+
+		fmt.Printf("Deleted %d product(s) from sale %s\n", len(productIDs), args[0])
+		return nil
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(salesCmd)
 
@@ -284,4 +319,8 @@ func init() {
 
 	salesCmd.AddCommand(salesDeleteCmd)
 	salesDeleteCmd.Flags().Bool("yes", false, "Skip confirmation prompt")
+
+	salesCmd.AddCommand(salesDeleteProductsCmd)
+	salesDeleteProductsCmd.Flags().StringSlice("product-ids", nil, "Product IDs (comma-separated) (required)")
+	_ = salesDeleteProductsCmd.MarkFlagRequired("product-ids")
 }

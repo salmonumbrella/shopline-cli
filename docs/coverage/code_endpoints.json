@@ -1490,6 +1490,11 @@
     "source": "internal/api/markets.go"
   },
   {
+    "method": "POST",
+    "path": "/media",
+    "source": "internal/api/media_docs.go"
+  },
+  {
     "method": "GET",
     "path": "/medias",
     "source": "internal/api/medias.go"
@@ -2455,6 +2460,11 @@
     "source": "internal/api/promotions.go"
   },
   {
+    "method": "GET",
+    "path": "/promotions/coupon-center",
+    "source": "internal/api/promotions_coupon_center.go"
+  },
+  {
     "method": "POST",
     "path": "/promotions/redeem-coupon",
     "source": "internal/api/promotions.go"
@@ -2641,7 +2651,7 @@
   },
   {
     "method": "POST",
-    "path": "/sales/{}/delete-products",
+    "path": "/sales/{}/delete_products",
     "source": "internal/api/sales.go"
   },
   {

@@ -54,6 +54,12 @@ go run ./cmd/shopline-coverage
 - `GET/POST/DELETE /wish_list_items` (done)
 - [x] User coupons (docs endpoints)
 - `GET /user_coupons/list` + `POST /user_coupons/{coupon_code}/claim` + `POST /user_coupons/{coupon_code}/redeem` (done)
+- [x] Promotions (docs endpoints)
+- `GET /promotions/coupon-center` (done)
+- [x] Media (docs endpoints)
+- `POST /media` (done)
+- [x] Sales (docs endpoints)
+- `POST /sales/{saleId}/delete_products` (done)
 
 ## Storefront API
 

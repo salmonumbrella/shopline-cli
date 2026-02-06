@@ -256,3 +256,54 @@ func TestSalesDeactivate(t *testing.T) {
 		t.Errorf("Expected inactive status, got: %s", sale.Status)
 	}
 }
+
+func TestDeleteSaleProducts(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("Expected POST, got %s", r.Method)
+		}
+		if r.URL.Path != "/sales/sale_123/delete_products" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+
+		var req SaleDeleteProductsRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			t.Fatalf("failed to decode request body: %v", err)
+		}
+		if len(req.ProductIDs) != 2 || req.ProductIDs[0] != "prod_1" || req.ProductIDs[1] != "prod_2" {
+			t.Fatalf("unexpected product ids: %+v", req.ProductIDs)
+		}
+
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	err := client.DeleteSaleProducts(context.Background(), "sale_123", &SaleDeleteProductsRequest{ProductIDs: []string{"prod_1", "prod_2"}})
+	if err != nil {
+		t.Fatalf("DeleteSaleProducts failed: %v", err)
+	}
+}
+
+func TestDeleteSaleProductsEmptyID(t *testing.T) {
+	client := NewClient("test", "token")
+	client.SetUseOpenAPI(false)
+
+	err := client.DeleteSaleProducts(context.Background(), " ", &SaleDeleteProductsRequest{ProductIDs: []string{"prod_1"}})
+	if err == nil {
+		t.Fatalf("expected error for empty sale id")
+	}
+}
+
+func TestDeleteSaleProductsEmptyProductIDs(t *testing.T) {
+	client := NewClient("test", "token")
+	client.SetUseOpenAPI(false)
+
+	err := client.DeleteSaleProducts(context.Background(), "sale_123", &SaleDeleteProductsRequest{ProductIDs: nil})
+	if err == nil {
+		t.Fatalf("expected error for empty product ids")
+	}
+}

@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"os"
 	"strings"
@@ -32,6 +33,9 @@ type mockPromotionsClient struct {
 	deactivatePromotionErr  error
 
 	deletePromotionErr error
+
+	getCouponCenterResp json.RawMessage
+	getCouponCenterErr  error
 }
 
 func (m *mockPromotionsClient) ListPromotions(ctx context.Context, opts *api.PromotionsListOptions) (*api.PromotionsListResponse, error) {
@@ -52,6 +56,10 @@ func (m *mockPromotionsClient) DeactivatePromotion(ctx context.Context, id strin
 
 func (m *mockPromotionsClient) DeletePromotion(ctx context.Context, id string) error {
 	return m.deletePromotionErr
+}
+
+func (m *mockPromotionsClient) GetPromotionsCouponCenter(ctx context.Context) (json.RawMessage, error) {
+	return m.getCouponCenterResp, m.getCouponCenterErr
 }
 
 // setupPromotionsTest sets up the test environment with mocked factories.
@@ -112,11 +120,12 @@ func TestPromotionsCommandSetup(t *testing.T) {
 // TestPromotionsSubcommands verifies all subcommands are registered
 func TestPromotionsSubcommands(t *testing.T) {
 	subcommands := map[string]string{
-		"list":       "List promotions",
-		"get":        "Get promotion details",
-		"activate":   "Activate a promotion",
-		"deactivate": "Deactivate a promotion",
-		"delete":     "Delete a promotion",
+		"list":          "List promotions",
+		"get":           "Get promotion details",
+		"activate":      "Activate a promotion",
+		"deactivate":    "Deactivate a promotion",
+		"delete":        "Delete a promotion",
+		"coupon-center": "Get coupon center promotions (documented endpoint; raw JSON)",
 	}
 
 	for name, short := range subcommands {
@@ -135,6 +144,27 @@ func TestPromotionsSubcommands(t *testing.T) {
 				t.Errorf("subcommand %q not found", name)
 			}
 		})
+	}
+}
+
+func TestPromotionsCouponCenterRunE(t *testing.T) {
+	mockClient := &mockPromotionsClient{
+		getCouponCenterResp: json.RawMessage(`{"items":[]}`),
+	}
+	restore := setupPromotionsTest(t, mockClient)
+	defer restore()
+
+	var buf bytes.Buffer
+	formatterWriter = &buf
+
+	cmd := newPromotionsTestCmd()
+	_ = cmd.Flags().Set("output", "json")
+
+	if err := promotionsCouponCenterCmd.RunE(cmd, []string{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "\"items\"") {
+		t.Fatalf("expected items in output, got %q", buf.String())
 	}
 }
 
