@@ -2251,6 +2251,46 @@
   },
   {
     "method": "GET",
+    "path": "/product_review_comments",
+    "source": "internal/api/product_review_comments_docs.go"
+  },
+  {
+    "method": "POST",
+    "path": "/product_review_comments",
+    "source": "internal/api/product_review_comments_docs.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/product_review_comments/bulk",
+    "source": "internal/api/product_review_comments_docs.go"
+  },
+  {
+    "method": "POST",
+    "path": "/product_review_comments/bulk",
+    "source": "internal/api/product_review_comments_docs.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/product_review_comments/bulk",
+    "source": "internal/api/product_review_comments_docs.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/product_review_comments/{}",
+    "source": "internal/api/product_review_comments_docs.go"
+  },
+  {
+    "method": "GET",
+    "path": "/product_review_comments/{}",
+    "source": "internal/api/product_review_comments_docs.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/product_review_comments/{}",
+    "source": "internal/api/product_review_comments_docs.go"
+  },
+  {
+    "method": "GET",
     "path": "/product_reviews",
     "source": "internal/api/product_reviews.go"
   },

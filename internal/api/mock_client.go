@@ -309,6 +309,14 @@ func (m *MockClient) CreateProductReview(ctx context.Context, req *ProductReview
 	return nil, m.notImplemented("CreateProductReview")
 }
 
+func (m *MockClient) CreateProductReviewComment(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("CreateProductReviewComment")
+}
+
+func (m *MockClient) BulkCreateProductReviewComments(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("BulkCreateProductReviewComments")
+}
+
 func (m *MockClient) CreateProductSubscription(ctx context.Context, req *ProductSubscriptionCreateRequest) (*ProductSubscription, error) {
 	return nil, m.notImplemented("CreateProductSubscription")
 }
@@ -619,6 +627,10 @@ func (m *MockClient) DeleteProductListing(ctx context.Context, id string) error 
 
 func (m *MockClient) DeleteProductReview(ctx context.Context, id string) error {
 	return m.notImplemented("DeleteProductReview")
+}
+
+func (m *MockClient) DeleteProductReviewComment(ctx context.Context, id string) (json.RawMessage, error) {
+	return nil, m.notImplemented("DeleteProductReviewComment")
 }
 
 func (m *MockClient) DeleteProductSubscription(ctx context.Context, id string) error {
@@ -1051,6 +1063,10 @@ func (m *MockClient) GetProductListing(ctx context.Context, id string) (*Product
 
 func (m *MockClient) GetProductReview(ctx context.Context, id string) (*ProductReview, error) {
 	return nil, m.notImplemented("GetProductReview")
+}
+
+func (m *MockClient) GetProductReviewComment(ctx context.Context, id string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetProductReviewComment")
 }
 
 func (m *MockClient) GetProductSubscription(ctx context.Context, id string) (*ProductSubscription, error) {
@@ -1499,6 +1515,10 @@ func (m *MockClient) ListProductListings(ctx context.Context, opts *ProductListi
 
 func (m *MockClient) ListProductReviews(ctx context.Context, opts *ProductReviewsListOptions) (*ProductReviewsListResponse, error) {
 	return nil, m.notImplemented("ListProductReviews")
+}
+
+func (m *MockClient) ListProductReviewComments(ctx context.Context, opts *ProductReviewCommentsListOptions) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListProductReviewComments")
 }
 
 func (m *MockClient) ListProducts(ctx context.Context, opts *ProductsListOptions) (*ProductsListResponse, error) {
@@ -2171,6 +2191,18 @@ func (m *MockClient) ListMemberPointRules(ctx context.Context) (json.RawMessage,
 
 func (m *MockClient) BulkUpdateMemberPoints(ctx context.Context, body any) (json.RawMessage, error) {
 	return nil, m.notImplemented("BulkUpdateMemberPoints")
+}
+
+func (m *MockClient) UpdateProductReviewComment(ctx context.Context, id string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateProductReviewComment")
+}
+
+func (m *MockClient) BulkUpdateProductReviewComments(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("BulkUpdateProductReviewComments")
+}
+
+func (m *MockClient) BulkDeleteProductReviewComments(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("BulkDeleteProductReviewComments")
 }
 
 func (m *MockClient) ExchangeCart(ctx context.Context, body any) (json.RawMessage, error) {

@@ -3,8 +3,8 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 700
-- Missing in code: 8
+- Code endpoints detected: 708
+- Missing in code: 0
 - Extra in code: 400
 - Unparsed doc pages: 55
 
@@ -65,17 +65,6 @@
 - docs/shopline-openapi/pages/reference/warehouses.json
 - docs/shopline-openapi/pages/reference/webhooks-1.json
 - docs/shopline-openapi/pages/reference/wish-list-items.json
-
-## Missing In Code
-
-- `GET /product_review_comments` (https://open-api.docs.shoplineapp.com/reference/get_product-review-comments-1)
-- `POST /product_review_comments` (https://open-api.docs.shoplineapp.com/reference/post_product-review-comments-1)
-- `DELETE /product_review_comments/bulk` (https://open-api.docs.shoplineapp.com/reference/delete_product-review-comments-bulk-1)
-- `POST /product_review_comments/bulk` (https://open-api.docs.shoplineapp.com/reference/post_product-review-comments-bulk-1)
-- `PUT /product_review_comments/bulk` (https://open-api.docs.shoplineapp.com/reference/put_product-review-comments-bulk-1)
-- `DELETE /product_review_comments/{}` (https://open-api.docs.shoplineapp.com/reference/delete_product-review-comments-id-1)
-- `GET /product_review_comments/{}` (https://open-api.docs.shoplineapp.com/reference/get_product-review-comments-id-1)
-- `PUT /product_review_comments/{}` (https://open-api.docs.shoplineapp.com/reference/put_product-review-comments-id-1)
 
 ## Extra In Code
 

@@ -81,6 +81,9 @@ type APIClient interface {
 	CreatePriceRule(ctx context.Context, req *PriceRuleCreateRequest) (*PriceRule, error)
 	CreateProductListing(ctx context.Context, productID string) (*ProductListing, error)
 	CreateProductReview(ctx context.Context, req *ProductReviewCreateRequest) (*ProductReview, error)
+	// Product review comments (documented endpoints)
+	CreateProductReviewComment(ctx context.Context, body any) (json.RawMessage, error)
+	BulkCreateProductReviewComments(ctx context.Context, body any) (json.RawMessage, error)
 	CreateProductSubscription(ctx context.Context, req *ProductSubscriptionCreateRequest) (*ProductSubscription, error)
 	CreatePromotion(ctx context.Context, req *PromotionCreateRequest) (*Promotion, error)
 	CreatePurchaseOrder(ctx context.Context, req *PurchaseOrderCreateRequest) (*PurchaseOrder, error)
@@ -179,6 +182,7 @@ type APIClient interface {
 	DeletePriceRule(ctx context.Context, id string) error
 	DeleteProductListing(ctx context.Context, id string) error
 	DeleteProductReview(ctx context.Context, id string) error
+	DeleteProductReviewComment(ctx context.Context, id string) (json.RawMessage, error)
 	DeleteProductSubscription(ctx context.Context, id string) error
 	DeletePromotion(ctx context.Context, id string) error
 	DeletePurchaseOrder(ctx context.Context, id string) error
@@ -385,6 +389,7 @@ type APIClient interface {
 	GetProduct(ctx context.Context, id string) (*Product, error)
 	GetProductListing(ctx context.Context, id string) (*ProductListing, error)
 	GetProductReview(ctx context.Context, id string) (*ProductReview, error)
+	GetProductReviewComment(ctx context.Context, id string) (json.RawMessage, error)
 	GetProductSubscription(ctx context.Context, id string) (*ProductSubscription, error)
 	GetPromotion(ctx context.Context, id string) (*Promotion, error)
 	GetPurchaseOrder(ctx context.Context, id string) (*PurchaseOrder, error)
@@ -520,6 +525,7 @@ type APIClient interface {
 	ListPriceRules(ctx context.Context, opts *PriceRulesListOptions) (*PriceRulesListResponse, error)
 	ListProductListings(ctx context.Context, opts *ProductListingsListOptions) (*ProductListingsListResponse, error)
 	ListProductReviews(ctx context.Context, opts *ProductReviewsListOptions) (*ProductReviewsListResponse, error)
+	ListProductReviewComments(ctx context.Context, opts *ProductReviewCommentsListOptions) (json.RawMessage, error)
 	ListProducts(ctx context.Context, opts *ProductsListOptions) (*ProductsListResponse, error)
 	ListProductSubscriptions(ctx context.Context, opts *ProductSubscriptionsListOptions) (*ProductSubscriptionsListResponse, error)
 	ListPromotions(ctx context.Context, opts *PromotionsListOptions) (*PromotionsListResponse, error)
@@ -606,6 +612,9 @@ type APIClient interface {
 	UpdateCustomerSubscriptions(ctx context.Context, customerID string, body any) (json.RawMessage, error)
 	BulkUpdateUserCredits(ctx context.Context, body any) (json.RawMessage, error)
 	BulkUpdateMemberPoints(ctx context.Context, body any) (json.RawMessage, error)
+	UpdateProductReviewComment(ctx context.Context, id string, body any) (json.RawMessage, error)
+	BulkUpdateProductReviewComments(ctx context.Context, body any) (json.RawMessage, error)
+	BulkDeleteProductReviewComments(ctx context.Context, body any) (json.RawMessage, error)
 	UpdateCustomField(ctx context.Context, id string, req *CustomFieldUpdateRequest) (*CustomField, error)
 	UpdateDeliveryOptionPickupStore(ctx context.Context, id string, req *PickupStoreUpdateRequest) (*DeliveryOption, error)
 	UpdateDisputeEvidence(ctx context.Context, id string, req *DisputeUpdateEvidenceRequest) (*Dispute, error)
