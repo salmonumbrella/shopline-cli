@@ -9,28 +9,28 @@ import (
 
 // Balance represents a Shopline account balance.
 type Balance struct {
-	Currency  string           `json:"currency"`
-	Available string           `json:"available"`
-	Pending   string           `json:"pending"`
-	Reserved  string           `json:"reserved,omitempty"`
-	Total     string           `json:"total"`
-	UpdatedAt time.Time        `json:"updated_at"`
+	Currency  string    `json:"currency"`
+	Available string    `json:"available"`
+	Pending   string    `json:"pending"`
+	Reserved  string    `json:"reserved,omitempty"`
+	Total     string    `json:"total"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // BalanceTransaction represents a balance transaction.
 type BalanceTransaction struct {
-	ID              string    `json:"id"`
-	Type            string    `json:"type"`
-	Amount          string    `json:"amount"`
-	Currency        string    `json:"currency"`
-	Net             string    `json:"net"`
-	Fee             string    `json:"fee,omitempty"`
-	Status          string    `json:"status"`
-	Description     string    `json:"description,omitempty"`
-	SourceID        string    `json:"source_id,omitempty"`
-	SourceType      string    `json:"source_type,omitempty"`
-	AvailableOn     *time.Time `json:"available_on,omitempty"`
-	CreatedAt       time.Time  `json:"created_at"`
+	ID          string     `json:"id"`
+	Type        string     `json:"type"`
+	Amount      string     `json:"amount"`
+	Currency    string     `json:"currency"`
+	Net         string     `json:"net"`
+	Fee         string     `json:"fee,omitempty"`
+	Status      string     `json:"status"`
+	Description string     `json:"description,omitempty"`
+	SourceID    string     `json:"source_id,omitempty"`
+	SourceType  string     `json:"source_type,omitempty"`
+	AvailableOn *time.Time `json:"available_on,omitempty"`
+	CreatedAt   time.Time  `json:"created_at"`
 }
 
 // BalanceTransactionsListOptions contains options for listing balance transactions.

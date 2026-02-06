@@ -1,6 +1,11 @@
 [
   {
     "method": "GET",
+    "path": "/abandoned_checkouts",
+    "source": "internal/api/abandoned_checkouts.go"
+  },
+  {
+    "method": "GET",
     "path": "/abandoned_checkouts/{}",
     "source": "internal/api/abandoned_checkouts.go"
   },
@@ -10,8 +15,18 @@
     "source": "internal/api/abandoned_checkouts.go"
   },
   {
+    "method": "GET",
+    "path": "/addon_products",
+    "source": "internal/api/addon_products.go"
+  },
+  {
     "method": "POST",
     "path": "/addon_products",
+    "source": "internal/api/addon_products.go"
+  },
+  {
+    "method": "GET",
+    "path": "/addon_products/search",
     "source": "internal/api/addon_products.go"
   },
   {
@@ -50,6 +65,11 @@
     "source": "internal/api/addon_products.go"
   },
   {
+    "method": "GET",
+    "path": "/affiliate_campaigns",
+    "source": "internal/api/affiliate_campaigns.go"
+  },
+  {
     "method": "POST",
     "path": "/affiliate_campaigns",
     "source": "internal/api/affiliate_campaigns.go"
@@ -71,8 +91,18 @@
   },
   {
     "method": "GET",
+    "path": "/agents",
+    "source": "internal/api/agents.go"
+  },
+  {
+    "method": "GET",
     "path": "/agents/{}",
     "source": "internal/api/agents.go"
+  },
+  {
+    "method": "GET",
+    "path": "/articles",
+    "source": "internal/api/articles.go"
   },
   {
     "method": "POST",
@@ -101,8 +131,18 @@
   },
   {
     "method": "GET",
+    "path": "/balance/transactions",
+    "source": "internal/api/balance.go"
+  },
+  {
+    "method": "GET",
     "path": "/balance/transactions/{}",
     "source": "internal/api/balance.go"
+  },
+  {
+    "method": "GET",
+    "path": "/blogs",
+    "source": "internal/api/blogs.go"
   },
   {
     "method": "POST",
@@ -123,6 +163,11 @@
     "method": "PUT",
     "path": "/blogs/{}",
     "source": "internal/api/blogs.go"
+  },
+  {
+    "method": "GET",
+    "path": "/bulk_operations",
+    "source": "internal/api/bulk_operations.go"
   },
   {
     "method": "GET",
@@ -150,6 +195,11 @@
     "source": "internal/api/bulk_operations.go"
   },
   {
+    "method": "GET",
+    "path": "/carrier_services",
+    "source": "internal/api/carrier_services.go"
+  },
+  {
     "method": "POST",
     "path": "/carrier_services",
     "source": "internal/api/carrier_services.go"
@@ -168,6 +218,11 @@
     "method": "PUT",
     "path": "/carrier_services/{}",
     "source": "internal/api/carrier_services.go"
+  },
+  {
+    "method": "GET",
+    "path": "/catalog_pricing",
+    "source": "internal/api/catalog_pricing.go"
   },
   {
     "method": "POST",
@@ -190,9 +245,19 @@
     "source": "internal/api/catalog_pricing.go"
   },
   {
+    "method": "GET",
+    "path": "/categories",
+    "source": "internal/api/categories.go"
+  },
+  {
     "method": "POST",
     "path": "/categories",
     "source": "internal/api/categories.go"
+  },
+  {
+    "method": "POST",
+    "path": "/categories/bulk_assign",
+    "source": "internal/api/products.go"
   },
   {
     "method": "DELETE",
@@ -211,7 +276,17 @@
   },
   {
     "method": "GET",
+    "path": "/cdp/events",
+    "source": "internal/api/cdp.go"
+  },
+  {
+    "method": "GET",
     "path": "/cdp/events/{}",
+    "source": "internal/api/cdp.go"
+  },
+  {
+    "method": "GET",
+    "path": "/cdp/profiles",
     "source": "internal/api/cdp.go"
   },
   {
@@ -221,8 +296,18 @@
   },
   {
     "method": "GET",
+    "path": "/cdp/segments",
+    "source": "internal/api/cdp.go"
+  },
+  {
+    "method": "GET",
     "path": "/cdp/segments/{}",
     "source": "internal/api/cdp.go"
+  },
+  {
+    "method": "GET",
+    "path": "/channels",
+    "source": "internal/api/channels.go"
   },
   {
     "method": "POST",
@@ -245,6 +330,11 @@
     "source": "internal/api/channels.go"
   },
   {
+    "method": "GET",
+    "path": "/channels/{}/product_listings",
+    "source": "internal/api/channel_products.go"
+  },
+  {
     "method": "POST",
     "path": "/channels/{}/product_listings",
     "source": "internal/api/channel_products.go"
@@ -265,6 +355,11 @@
     "source": "internal/api/channel_products.go"
   },
   {
+    "method": "GET",
+    "path": "/channels/{}/products",
+    "source": "internal/api/channels.go"
+  },
+  {
     "method": "POST",
     "path": "/channels/{}/products",
     "source": "internal/api/channels.go"
@@ -283,6 +378,11 @@
     "method": "PUT",
     "path": "/checkout_settings",
     "source": "internal/api/checkout_settings.go"
+  },
+  {
+    "method": "GET",
+    "path": "/collections",
+    "source": "internal/api/collections.go"
   },
   {
     "method": "POST",
@@ -315,6 +415,11 @@
     "source": "internal/api/collections.go"
   },
   {
+    "method": "GET",
+    "path": "/company_catalogs",
+    "source": "internal/api/company_catalogs.go"
+  },
+  {
     "method": "POST",
     "path": "/company_catalogs",
     "source": "internal/api/company_catalogs.go"
@@ -335,6 +440,11 @@
     "source": "internal/api/company_catalogs.go"
   },
   {
+    "method": "GET",
+    "path": "/company_credits",
+    "source": "internal/api/company_credits.go"
+  },
+  {
     "method": "POST",
     "path": "/company_credits",
     "source": "internal/api/company_credits.go"
@@ -353,6 +463,16 @@
     "method": "POST",
     "path": "/company_credits/{}/adjust",
     "source": "internal/api/company_credits.go"
+  },
+  {
+    "method": "GET",
+    "path": "/company_credits/{}/transactions",
+    "source": "internal/api/company_credits.go"
+  },
+  {
+    "method": "GET",
+    "path": "/conversations",
+    "source": "internal/api/conversations.go"
   },
   {
     "method": "POST",
@@ -385,6 +505,11 @@
     "source": "internal/api/conversations.go"
   },
   {
+    "method": "GET",
+    "path": "/conversations/{}/messages",
+    "source": "internal/api/conversations.go"
+  },
+  {
     "method": "POST",
     "path": "/conversations/{}/messages",
     "source": "internal/api/conversations.go"
@@ -398,6 +523,11 @@
     "method": "GET",
     "path": "/countries/{}",
     "source": "internal/api/countries.go"
+  },
+  {
+    "method": "GET",
+    "path": "/coupons",
+    "source": "internal/api/coupons.go"
   },
   {
     "method": "POST",
@@ -450,6 +580,11 @@
     "source": "internal/api/currencies.go"
   },
   {
+    "method": "GET",
+    "path": "/custom_fields",
+    "source": "internal/api/custom_fields.go"
+  },
+  {
     "method": "POST",
     "path": "/custom_fields",
     "source": "internal/api/custom_fields.go"
@@ -470,6 +605,11 @@
     "source": "internal/api/custom_fields.go"
   },
   {
+    "method": "GET",
+    "path": "/customer_blacklist",
+    "source": "internal/api/customer_blacklist.go"
+  },
+  {
     "method": "POST",
     "path": "/customer_blacklist",
     "source": "internal/api/customer_blacklist.go"
@@ -485,8 +625,18 @@
     "source": "internal/api/customer_blacklist.go"
   },
   {
+    "method": "GET",
+    "path": "/customer_groups",
+    "source": "internal/api/customer_groups.go"
+  },
+  {
     "method": "POST",
     "path": "/customer_groups",
+    "source": "internal/api/customer_groups.go"
+  },
+  {
+    "method": "GET",
+    "path": "/customer_groups/search",
     "source": "internal/api/customer_groups.go"
   },
   {
@@ -510,6 +660,11 @@
     "source": "internal/api/customer_groups.go"
   },
   {
+    "method": "GET",
+    "path": "/customer_saved_searches",
+    "source": "internal/api/customer_saved_searches.go"
+  },
+  {
     "method": "POST",
     "path": "/customer_saved_searches",
     "source": "internal/api/customer_saved_searches.go"
@@ -525,8 +680,18 @@
     "source": "internal/api/customer_saved_searches.go"
   },
   {
+    "method": "GET",
+    "path": "/customers",
+    "source": "internal/api/customers.go"
+  },
+  {
     "method": "POST",
     "path": "/customers",
+    "source": "internal/api/customers.go"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/search",
     "source": "internal/api/customers.go"
   },
   {
@@ -543,6 +708,11 @@
     "method": "PUT",
     "path": "/customers/{}",
     "source": "internal/api/customers.go"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/{}/addresses",
+    "source": "internal/api/customer_addresses.go"
   },
   {
     "method": "POST",
@@ -576,6 +746,11 @@
   },
   {
     "method": "GET",
+    "path": "/customers/{}/points/transactions",
+    "source": "internal/api/member_points.go"
+  },
+  {
+    "method": "GET",
     "path": "/customers/{}/promotions",
     "source": "internal/api/customers.go"
   },
@@ -596,6 +771,11 @@
   },
   {
     "method": "GET",
+    "path": "/delivery_options",
+    "source": "internal/api/delivery_options.go"
+  },
+  {
+    "method": "GET",
     "path": "/delivery_options/{}",
     "source": "internal/api/delivery_options.go"
   },
@@ -605,8 +785,23 @@
     "source": "internal/api/delivery_options.go"
   },
   {
+    "method": "GET",
+    "path": "/delivery_options/{}/time_slots",
+    "source": "internal/api/delivery_options.go"
+  },
+  {
+    "method": "GET",
+    "path": "/discount_codes",
+    "source": "internal/api/discount_codes.go"
+  },
+  {
     "method": "POST",
     "path": "/discount_codes",
+    "source": "internal/api/discount_codes.go"
+  },
+  {
+    "method": "GET",
+    "path": "/discount_codes/lookup",
     "source": "internal/api/discount_codes.go"
   },
   {
@@ -618,6 +813,11 @@
     "method": "GET",
     "path": "/discount_codes/{}",
     "source": "internal/api/discount_codes.go"
+  },
+  {
+    "method": "GET",
+    "path": "/disputes",
+    "source": "internal/api/disputes.go"
   },
   {
     "method": "GET",
@@ -638,6 +838,11 @@
     "method": "POST",
     "path": "/disputes/{}/submit",
     "source": "internal/api/disputes.go"
+  },
+  {
+    "method": "GET",
+    "path": "/domains",
+    "source": "internal/api/domains.go"
   },
   {
     "method": "POST",
@@ -665,6 +870,11 @@
     "source": "internal/api/domains.go"
   },
   {
+    "method": "GET",
+    "path": "/draft_orders",
+    "source": "internal/api/draft_orders.go"
+  },
+  {
     "method": "POST",
     "path": "/draft_orders",
     "source": "internal/api/draft_orders.go"
@@ -690,6 +900,11 @@
     "source": "internal/api/draft_orders.go"
   },
   {
+    "method": "GET",
+    "path": "/files",
+    "source": "internal/api/files.go"
+  },
+  {
     "method": "POST",
     "path": "/files",
     "source": "internal/api/files.go"
@@ -708,6 +923,11 @@
     "method": "PUT",
     "path": "/files/{}",
     "source": "internal/api/files.go"
+  },
+  {
+    "method": "GET",
+    "path": "/flash-price-campaigns",
+    "source": "internal/api/flash_price.go"
   },
   {
     "method": "POST",
@@ -741,6 +961,11 @@
   },
   {
     "method": "GET",
+    "path": "/fulfillment_orders",
+    "source": "internal/api/fulfillment_orders.go"
+  },
+  {
+    "method": "GET",
     "path": "/fulfillment_orders/{}",
     "source": "internal/api/fulfillment_orders.go"
   },
@@ -758,6 +983,11 @@
     "method": "POST",
     "path": "/fulfillment_orders/{}/move",
     "source": "internal/api/fulfillment_orders.go"
+  },
+  {
+    "method": "GET",
+    "path": "/fulfillment_services",
+    "source": "internal/api/fulfillment_services.go"
   },
   {
     "method": "POST",
@@ -781,8 +1011,18 @@
   },
   {
     "method": "GET",
+    "path": "/fulfillments",
+    "source": "internal/api/fulfillments.go"
+  },
+  {
+    "method": "GET",
     "path": "/fulfillments/{}",
     "source": "internal/api/fulfillments.go"
+  },
+  {
+    "method": "GET",
+    "path": "/gift_cards",
+    "source": "internal/api/gift_cards.go"
   },
   {
     "method": "POST",
@@ -800,6 +1040,11 @@
     "source": "internal/api/gift_cards.go"
   },
   {
+    "method": "GET",
+    "path": "/gifts",
+    "source": "internal/api/gifts.go"
+  },
+  {
     "method": "POST",
     "path": "/gifts",
     "source": "internal/api/gifts.go"
@@ -807,6 +1052,11 @@
   {
     "method": "PATCH",
     "path": "/gifts/quantity-by-sku",
+    "source": "internal/api/gifts.go"
+  },
+  {
+    "method": "GET",
+    "path": "/gifts/search",
     "source": "internal/api/gifts.go"
   },
   {
@@ -840,6 +1090,11 @@
     "source": "internal/api/gifts.go"
   },
   {
+    "method": "GET",
+    "path": "/inventory_levels",
+    "source": "internal/api/inventory.go"
+  },
+  {
     "method": "POST",
     "path": "/inventory_levels/adjust",
     "source": "internal/api/inventory.go"
@@ -858,6 +1113,11 @@
     "method": "POST",
     "path": "/inventory_levels/{}/adjust",
     "source": "internal/api/inventory.go"
+  },
+  {
+    "method": "GET",
+    "path": "/labels",
+    "source": "internal/api/labels.go"
   },
   {
     "method": "POST",
@@ -880,6 +1140,11 @@
     "source": "internal/api/labels.go"
   },
   {
+    "method": "GET",
+    "path": "/local_delivery",
+    "source": "internal/api/local_delivery.go"
+  },
+  {
     "method": "POST",
     "path": "/local_delivery",
     "source": "internal/api/local_delivery.go"
@@ -898,6 +1163,11 @@
     "method": "PUT",
     "path": "/local_delivery/{}",
     "source": "internal/api/local_delivery.go"
+  },
+  {
+    "method": "GET",
+    "path": "/locations",
+    "source": "internal/api/locations.go"
   },
   {
     "method": "POST",
@@ -920,6 +1190,11 @@
     "source": "internal/api/locations.go"
   },
   {
+    "method": "GET",
+    "path": "/marketing_events",
+    "source": "internal/api/marketing_events.go"
+  },
+  {
     "method": "POST",
     "path": "/marketing_events",
     "source": "internal/api/marketing_events.go"
@@ -940,6 +1215,11 @@
     "source": "internal/api/marketing_events.go"
   },
   {
+    "method": "GET",
+    "path": "/markets",
+    "source": "internal/api/markets.go"
+  },
+  {
     "method": "POST",
     "path": "/markets",
     "source": "internal/api/markets.go"
@@ -953,6 +1233,11 @@
     "method": "GET",
     "path": "/markets/{}",
     "source": "internal/api/markets.go"
+  },
+  {
+    "method": "GET",
+    "path": "/medias",
+    "source": "internal/api/medias.go"
   },
   {
     "method": "POST",
@@ -975,6 +1260,11 @@
     "source": "internal/api/medias.go"
   },
   {
+    "method": "GET",
+    "path": "/membership_tiers",
+    "source": "internal/api/membership.go"
+  },
+  {
     "method": "POST",
     "path": "/membership_tiers",
     "source": "internal/api/membership.go"
@@ -991,6 +1281,11 @@
   },
   {
     "method": "GET",
+    "path": "/merchant/staff",
+    "source": "internal/api/merchants.go"
+  },
+  {
+    "method": "GET",
     "path": "/merchant/staff/{}",
     "source": "internal/api/merchants.go"
   },
@@ -998,6 +1293,11 @@
     "method": "GET",
     "path": "/merchants",
     "source": "internal/api/merchants.go"
+  },
+  {
+    "method": "GET",
+    "path": "/metafield_definitions",
+    "source": "internal/api/metafield_definitions.go"
   },
   {
     "method": "POST",
@@ -1018,6 +1318,11 @@
     "method": "PUT",
     "path": "/metafield_definitions/{}",
     "source": "internal/api/metafield_definitions.go"
+  },
+  {
+    "method": "GET",
+    "path": "/metafields",
+    "source": "internal/api/metafields.go"
   },
   {
     "method": "POST",
@@ -1066,8 +1371,23 @@
   },
   {
     "method": "GET",
+    "path": "/operation_logs",
+    "source": "internal/api/operation_logs.go"
+  },
+  {
+    "method": "GET",
     "path": "/operation_logs/{}",
     "source": "internal/api/operation_logs.go"
+  },
+  {
+    "method": "GET",
+    "path": "/order_attributions",
+    "source": "internal/api/order_attribution.go"
+  },
+  {
+    "method": "GET",
+    "path": "/orders",
+    "source": "internal/api/orders.go"
   },
   {
     "method": "POST",
@@ -1075,8 +1395,18 @@
     "source": "internal/api/orders.go"
   },
   {
+    "method": "GET",
+    "path": "/orders/archived",
+    "source": "internal/api/orders.go"
+  },
+  {
     "method": "POST",
     "path": "/orders/bulk-execute-shipment",
+    "source": "internal/api/orders.go"
+  },
+  {
+    "method": "GET",
+    "path": "/orders/search",
     "source": "internal/api/orders.go"
   },
   {
@@ -1135,6 +1465,11 @@
     "source": "internal/api/refunds.go"
   },
   {
+    "method": "GET",
+    "path": "/orders/{}/risks",
+    "source": "internal/api/order_risks.go"
+  },
+  {
     "method": "POST",
     "path": "/orders/{}/risks",
     "source": "internal/api/order_risks.go"
@@ -1180,6 +1515,11 @@
     "source": "internal/api/transactions.go"
   },
   {
+    "method": "GET",
+    "path": "/pages",
+    "source": "internal/api/pages.go"
+  },
+  {
     "method": "POST",
     "path": "/pages",
     "source": "internal/api/pages.go"
@@ -1198,6 +1538,11 @@
     "method": "PUT",
     "path": "/pages/{}",
     "source": "internal/api/pages.go"
+  },
+  {
+    "method": "GET",
+    "path": "/payments",
+    "source": "internal/api/payments.go"
   },
   {
     "method": "GET",
@@ -1221,8 +1566,18 @@
   },
   {
     "method": "GET",
+    "path": "/payouts",
+    "source": "internal/api/payouts.go"
+  },
+  {
+    "method": "GET",
     "path": "/payouts/{}",
     "source": "internal/api/payouts.go"
+  },
+  {
+    "method": "GET",
+    "path": "/pickup",
+    "source": "internal/api/pickup.go"
   },
   {
     "method": "POST",
@@ -1245,6 +1600,11 @@
     "source": "internal/api/pickup.go"
   },
   {
+    "method": "GET",
+    "path": "/price_rules",
+    "source": "internal/api/price_rules.go"
+  },
+  {
     "method": "POST",
     "path": "/price_rules",
     "source": "internal/api/price_rules.go"
@@ -1265,6 +1625,11 @@
     "source": "internal/api/price_rules.go"
   },
   {
+    "method": "GET",
+    "path": "/product_listings",
+    "source": "internal/api/product_listings.go"
+  },
+  {
     "method": "POST",
     "path": "/product_listings",
     "source": "internal/api/product_listings.go"
@@ -1278,6 +1643,11 @@
     "method": "GET",
     "path": "/product_listings/{}",
     "source": "internal/api/product_listings.go"
+  },
+  {
+    "method": "GET",
+    "path": "/product_reviews",
+    "source": "internal/api/product_reviews.go"
   },
   {
     "method": "POST",
@@ -1295,6 +1665,11 @@
     "source": "internal/api/product_reviews.go"
   },
   {
+    "method": "GET",
+    "path": "/product_subscriptions",
+    "source": "internal/api/product_subscriptions.go"
+  },
+  {
     "method": "POST",
     "path": "/product_subscriptions",
     "source": "internal/api/product_subscriptions.go"
@@ -1310,18 +1685,58 @@
     "source": "internal/api/product_subscriptions.go"
   },
   {
-    "method": "POST",
+    "method": "GET",
     "path": "/products",
     "source": "internal/api/products.go"
   },
   {
     "method": "POST",
-    "path": "/products/bulk-assign-category",
+    "path": "/products",
+    "source": "internal/api/products.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/products/bulk",
+    "source": "internal/api/products.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/bulk_update_stocks",
     "source": "internal/api/products.go"
   },
   {
     "method": "PATCH",
-    "path": "/products/quantity-by-sku",
+    "path": "/products/labels",
+    "source": "internal/api/products.go"
+  },
+  {
+    "method": "POST",
+    "path": "/products/locked_inventory_count",
+    "source": "internal/api/products.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/retail_status/bulk",
+    "source": "internal/api/products.go"
+  },
+  {
+    "method": "GET",
+    "path": "/products/search",
+    "source": "internal/api/products.go"
+  },
+  {
+    "method": "POST",
+    "path": "/products/search",
+    "source": "internal/api/products.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/status/bulk",
+    "source": "internal/api/products.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/update_quantity",
     "source": "internal/api/products.go"
   },
   {
@@ -1341,32 +1756,127 @@
   },
   {
     "method": "POST",
-    "path": "/products/{}/images",
-    "source": "internal/api/products.go"
-  },
-  {
-    "method": "POST",
-    "path": "/products/{}/images/delete",
+    "path": "/products/{}/add_images",
     "source": "internal/api/products.go"
   },
   {
     "method": "GET",
-    "path": "/products/{}/locked-inventory",
+    "path": "/products/{}/app_metafields",
+    "source": "internal/api/product_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/products/{}/app_metafields",
+    "source": "internal/api/product_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/products/{}/app_metafields/bulk",
+    "source": "internal/api/product_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/products/{}/app_metafields/bulk",
+    "source": "internal/api/product_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}/app_metafields/bulk",
+    "source": "internal/api/product_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/products/{}/app_metafields/{}",
+    "source": "internal/api/product_metafields.go"
+  },
+  {
+    "method": "GET",
+    "path": "/products/{}/app_metafields/{}",
+    "source": "internal/api/product_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}/app_metafields/{}",
+    "source": "internal/api/product_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/products/{}/delete_images",
     "source": "internal/api/products.go"
   },
   {
-    "method": "PATCH",
-    "path": "/products/{}/price",
+    "method": "GET",
+    "path": "/products/{}/metafields",
+    "source": "internal/api/product_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/products/{}/metafields",
+    "source": "internal/api/product_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/products/{}/metafields/bulk",
+    "source": "internal/api/product_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/products/{}/metafields/bulk",
+    "source": "internal/api/product_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}/metafields/bulk",
+    "source": "internal/api/product_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/products/{}/metafields/{}",
+    "source": "internal/api/product_metafields.go"
+  },
+  {
+    "method": "GET",
+    "path": "/products/{}/metafields/{}",
+    "source": "internal/api/product_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}/metafields/{}",
+    "source": "internal/api/product_metafields.go"
+  },
+  {
+    "method": "GET",
+    "path": "/products/{}/promotions",
     "source": "internal/api/products.go"
   },
   {
-    "method": "PATCH",
-    "path": "/products/{}/quantity",
+    "method": "GET",
+    "path": "/products/{}/stocks",
+    "source": "internal/api/products.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}/stocks",
     "source": "internal/api/products.go"
   },
   {
     "method": "PATCH",
     "path": "/products/{}/tags",
+    "source": "internal/api/products.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}/tags",
+    "source": "internal/api/products.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}/update_price",
+    "source": "internal/api/products.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/products/{}/update_quantity",
     "source": "internal/api/products.go"
   },
   {
@@ -1385,14 +1895,19 @@
     "source": "internal/api/products.go"
   },
   {
-    "method": "PATCH",
-    "path": "/products/{}/variations/{}/price",
+    "method": "PUT",
+    "path": "/products/{}/variations/{}/update_price",
     "source": "internal/api/products.go"
   },
   {
-    "method": "PATCH",
-    "path": "/products/{}/variations/{}/quantity",
+    "method": "PUT",
+    "path": "/products/{}/variations/{}/update_quantity",
     "source": "internal/api/products.go"
+  },
+  {
+    "method": "GET",
+    "path": "/promotions",
+    "source": "internal/api/promotions.go"
   },
   {
     "method": "POST",
@@ -1407,6 +1922,11 @@
   {
     "method": "POST",
     "path": "/promotions/redeem-coupon",
+    "source": "internal/api/promotions.go"
+  },
+  {
+    "method": "GET",
+    "path": "/promotions/search",
     "source": "internal/api/promotions.go"
   },
   {
@@ -1440,6 +1960,11 @@
     "source": "internal/api/promotions.go"
   },
   {
+    "method": "GET",
+    "path": "/purchase_orders",
+    "source": "internal/api/purchase_orders.go"
+  },
+  {
     "method": "POST",
     "path": "/purchase_orders",
     "source": "internal/api/purchase_orders.go"
@@ -1465,6 +1990,11 @@
     "source": "internal/api/purchase_orders.go"
   },
   {
+    "method": "GET",
+    "path": "/redirects",
+    "source": "internal/api/redirects.go"
+  },
+  {
     "method": "POST",
     "path": "/redirects",
     "source": "internal/api/redirects.go"
@@ -1485,6 +2015,11 @@
     "source": "internal/api/redirects.go"
   },
   {
+    "method": "GET",
+    "path": "/refunds",
+    "source": "internal/api/refunds.go"
+  },
+  {
     "method": "POST",
     "path": "/refunds",
     "source": "internal/api/refunds.go"
@@ -1493,6 +2028,11 @@
     "method": "GET",
     "path": "/refunds/{}",
     "source": "internal/api/refunds.go"
+  },
+  {
+    "method": "GET",
+    "path": "/return_orders",
+    "source": "internal/api/return_orders.go"
   },
   {
     "method": "POST",
@@ -1525,6 +2065,11 @@
     "source": "internal/api/return_orders.go"
   },
   {
+    "method": "GET",
+    "path": "/sales",
+    "source": "internal/api/sales.go"
+  },
+  {
     "method": "POST",
     "path": "/sales",
     "source": "internal/api/sales.go"
@@ -1545,6 +2090,16 @@
     "source": "internal/api/sales.go"
   },
   {
+    "method": "GET",
+    "path": "/sales/{}/comments",
+    "source": "internal/api/sales.go"
+  },
+  {
+    "method": "GET",
+    "path": "/sales/{}/customers",
+    "source": "internal/api/sales.go"
+  },
+  {
     "method": "POST",
     "path": "/sales/{}/deactivate",
     "source": "internal/api/sales.go"
@@ -1552,6 +2107,11 @@
   {
     "method": "POST",
     "path": "/sales/{}/delete-products",
+    "source": "internal/api/sales.go"
+  },
+  {
+    "method": "GET",
+    "path": "/sales/{}/products",
     "source": "internal/api/sales.go"
   },
   {
@@ -1563,6 +2123,11 @@
     "method": "PUT",
     "path": "/sales/{}/products",
     "source": "internal/api/sales.go"
+  },
+  {
+    "method": "GET",
+    "path": "/script_tags",
+    "source": "internal/api/script_tags.go"
   },
   {
     "method": "POST",
@@ -1583,6 +2148,11 @@
     "method": "PUT",
     "path": "/script_tags/{}",
     "source": "internal/api/script_tags.go"
+  },
+  {
+    "method": "GET",
+    "path": "/selling_plans",
+    "source": "internal/api/selling_plans.go"
   },
   {
     "method": "POST",
@@ -1610,6 +2180,11 @@
     "source": "internal/api/settings.go"
   },
   {
+    "method": "GET",
+    "path": "/shipments",
+    "source": "internal/api/shipments.go"
+  },
+  {
     "method": "POST",
     "path": "/shipments",
     "source": "internal/api/shipments.go"
@@ -1628,6 +2203,11 @@
     "method": "PUT",
     "path": "/shipments/{}",
     "source": "internal/api/shipments.go"
+  },
+  {
+    "method": "GET",
+    "path": "/shipping_zones",
+    "source": "internal/api/shipping_zones.go"
   },
   {
     "method": "POST",
@@ -1660,6 +2240,11 @@
     "source": "internal/api/shop.go"
   },
   {
+    "method": "GET",
+    "path": "/size_charts",
+    "source": "internal/api/size_charts.go"
+  },
+  {
     "method": "POST",
     "path": "/size_charts",
     "source": "internal/api/size_charts.go"
@@ -1678,6 +2263,11 @@
     "method": "PUT",
     "path": "/size_charts/{}",
     "source": "internal/api/size_charts.go"
+  },
+  {
+    "method": "GET",
+    "path": "/smart_collections",
+    "source": "internal/api/smart_collections.go"
   },
   {
     "method": "POST",
@@ -1700,6 +2290,11 @@
     "source": "internal/api/smart_collections.go"
   },
   {
+    "method": "GET",
+    "path": "/staffs",
+    "source": "internal/api/staffs.go"
+  },
+  {
     "method": "DELETE",
     "path": "/staffs/{}",
     "source": "internal/api/staffs.go"
@@ -1715,6 +2310,11 @@
     "source": "internal/api/staffs.go"
   },
   {
+    "method": "GET",
+    "path": "/store_credits",
+    "source": "internal/api/store_credits.go"
+  },
+  {
     "method": "POST",
     "path": "/store_credits",
     "source": "internal/api/store_credits.go"
@@ -1728,6 +2328,11 @@
     "method": "GET",
     "path": "/store_credits/{}",
     "source": "internal/api/store_credits.go"
+  },
+  {
+    "method": "GET",
+    "path": "/storefront/carts",
+    "source": "internal/api/storefront_carts.go"
   },
   {
     "method": "POST",
@@ -1746,6 +2351,11 @@
   },
   {
     "method": "GET",
+    "path": "/storefront/products",
+    "source": "internal/api/storefront_products.go"
+  },
+  {
+    "method": "GET",
     "path": "/storefront/products/handle/{}",
     "source": "internal/api/storefront_products.go"
   },
@@ -1756,6 +2366,11 @@
   },
   {
     "method": "GET",
+    "path": "/storefront/promotions",
+    "source": "internal/api/storefront_promotions.go"
+  },
+  {
+    "method": "GET",
     "path": "/storefront/promotions/code/{}",
     "source": "internal/api/storefront_promotions.go"
   },
@@ -1763,6 +2378,11 @@
     "method": "GET",
     "path": "/storefront/promotions/{}",
     "source": "internal/api/storefront_promotions.go"
+  },
+  {
+    "method": "GET",
+    "path": "/storefront_oauth/clients",
+    "source": "internal/api/storefront_oauth.go"
   },
   {
     "method": "POST",
@@ -1790,6 +2410,11 @@
     "source": "internal/api/storefront_oauth.go"
   },
   {
+    "method": "GET",
+    "path": "/storefront_tokens",
+    "source": "internal/api/storefront_tokens.go"
+  },
+  {
     "method": "POST",
     "path": "/storefront_tokens",
     "source": "internal/api/storefront_tokens.go"
@@ -1803,6 +2428,11 @@
     "method": "GET",
     "path": "/storefront_tokens/{}",
     "source": "internal/api/storefront_tokens.go"
+  },
+  {
+    "method": "GET",
+    "path": "/subscriptions",
+    "source": "internal/api/subscriptions.go"
   },
   {
     "method": "POST",
@@ -1820,6 +2450,11 @@
     "source": "internal/api/subscriptions.go"
   },
   {
+    "method": "GET",
+    "path": "/tags",
+    "source": "internal/api/tags.go"
+  },
+  {
     "method": "POST",
     "path": "/tags",
     "source": "internal/api/tags.go"
@@ -1833,6 +2468,11 @@
     "method": "GET",
     "path": "/tags/{}",
     "source": "internal/api/tags.go"
+  },
+  {
+    "method": "GET",
+    "path": "/tax_services",
+    "source": "internal/api/tax_services.go"
   },
   {
     "method": "POST",
@@ -1855,6 +2495,11 @@
     "source": "internal/api/tax_services.go"
   },
   {
+    "method": "GET",
+    "path": "/taxes",
+    "source": "internal/api/taxes.go"
+  },
+  {
     "method": "POST",
     "path": "/taxes",
     "source": "internal/api/taxes.go"
@@ -1875,6 +2520,11 @@
     "source": "internal/api/taxes.go"
   },
   {
+    "method": "GET",
+    "path": "/taxonomies",
+    "source": "internal/api/taxonomies.go"
+  },
+  {
     "method": "POST",
     "path": "/taxonomies",
     "source": "internal/api/taxonomies.go"
@@ -1893,6 +2543,11 @@
     "method": "PUT",
     "path": "/taxonomies/{}",
     "source": "internal/api/taxonomies.go"
+  },
+  {
+    "method": "GET",
+    "path": "/themes",
+    "source": "internal/api/themes.go"
   },
   {
     "method": "POST",
@@ -1930,6 +2585,11 @@
     "source": "internal/api/assets.go"
   },
   {
+    "method": "GET",
+    "path": "/tokens",
+    "source": "internal/api/tokens.go"
+  },
+  {
     "method": "POST",
     "path": "/tokens",
     "source": "internal/api/tokens.go"
@@ -1946,8 +2606,18 @@
   },
   {
     "method": "GET",
+    "path": "/transactions",
+    "source": "internal/api/transactions.go"
+  },
+  {
+    "method": "GET",
     "path": "/transactions/{}",
     "source": "internal/api/transactions.go"
+  },
+  {
+    "method": "GET",
+    "path": "/user_coupons",
+    "source": "internal/api/user_coupons.go"
   },
   {
     "method": "POST",
@@ -1963,6 +2633,11 @@
     "method": "GET",
     "path": "/user_coupons/{}",
     "source": "internal/api/user_coupons.go"
+  },
+  {
+    "method": "GET",
+    "path": "/warehouses",
+    "source": "internal/api/warehouses.go"
   },
   {
     "method": "POST",
@@ -1985,6 +2660,11 @@
     "source": "internal/api/warehouses.go"
   },
   {
+    "method": "GET",
+    "path": "/webhooks",
+    "source": "internal/api/webhooks.go"
+  },
+  {
     "method": "POST",
     "path": "/webhooks",
     "source": "internal/api/webhooks.go"
@@ -1998,6 +2678,11 @@
     "method": "GET",
     "path": "/webhooks/{}",
     "source": "internal/api/webhooks.go"
+  },
+  {
+    "method": "GET",
+    "path": "/wish_lists",
+    "source": "internal/api/wish_lists.go"
   },
   {
     "method": "POST",

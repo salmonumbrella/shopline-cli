@@ -13,7 +13,7 @@ go run ./cmd/shopline-coverage
 
 - [ ] Orders
 - [ ] Order metafields
-- [ ] Products
+- [x] Products (endpoints wired; types still partially raw for metafields/stocks)
 - [ ] Customers
 - [ ] Store credits
 - [ ] Channels
@@ -25,4 +25,3 @@ go run ./cmd/shopline-coverage
 - [ ] Carts
 - [ ] Storefront tokens
 - [ ] Storefront OAuth applications
-

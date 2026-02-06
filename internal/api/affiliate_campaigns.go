@@ -12,7 +12,7 @@ type AffiliateCampaign struct {
 	ID              string    `json:"id"`
 	Name            string    `json:"name"`
 	Description     string    `json:"description"`
-	Status          string    `json:"status"` // active, paused, ended
+	Status          string    `json:"status"`          // active, paused, ended
 	CommissionType  string    `json:"commission_type"` // percentage, fixed
 	CommissionValue float64   `json:"commission_value"`
 	StartDate       time.Time `json:"start_date"`

@@ -163,6 +163,10 @@ type ProductQuantityBySKURequest struct {
 	Quantity int    `json:"quantity"`
 }
 
+type ProductLockedInventoryCountRequest struct {
+	ProductID string `json:"product_id"`
+}
+
 // ProductImage represents a product image.
 type ProductImage struct {
 	ID        string    `json:"id"`
@@ -189,6 +193,14 @@ type ProductImageInput struct {
 // ProductDeleteImagesRequest contains the request body for deleting product images.
 type ProductDeleteImagesRequest struct {
 	ImageIDs []string `json:"image_ids"`
+}
+
+type ProductTagsReplaceRequest struct {
+	Tags []string `json:"tags"`
+}
+
+type ProductBulkDeleteRequest struct {
+	ProductIDs []string `json:"product_ids"`
 }
 
 // ProductVariation represents a product variation.
@@ -239,6 +251,16 @@ type LockedInventoryCount struct {
 	LockedCount int    `json:"locked_count"`
 }
 
+// SearchProductsPost searches for products via POST /products/search.
+// This exists alongside the GET version since both are documented.
+type ProductSearchRequest struct {
+	Query    string `json:"query,omitempty"`
+	Status   string `json:"status,omitempty"`
+	Vendor   string `json:"vendor,omitempty"`
+	Page     int    `json:"page,omitempty"`
+	PageSize int    `json:"page_size,omitempty"`
+}
+
 // SearchProducts searches for products with query parameters.
 func (c *Client) SearchProducts(ctx context.Context, opts *ProductSearchOptions) (*ProductsListResponse, error) {
 	path := "/products/search" + NewQuery().
@@ -251,6 +273,14 @@ func (c *Client) SearchProducts(ctx context.Context, opts *ProductSearchOptions)
 
 	var resp ProductsListResponse
 	if err := c.Get(ctx, path, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+func (c *Client) SearchProductsPost(ctx context.Context, req *ProductSearchRequest) (*ProductsListResponse, error) {
+	var resp ProductsListResponse
+	if err := c.Post(ctx, "/products/search", req, &resp); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -285,6 +315,15 @@ func (c *Client) DeleteProduct(ctx context.Context, id string) error {
 	return c.Delete(ctx, fmt.Sprintf("/products/%s", id))
 }
 
+// BulkDeleteProducts deletes multiple products by id.
+func (c *Client) BulkDeleteProducts(ctx context.Context, productIDs []string) error {
+	if len(productIDs) == 0 {
+		return fmt.Errorf("at least one product id is required")
+	}
+	req := &ProductBulkDeleteRequest{ProductIDs: productIDs}
+	return c.DeleteWithBody(ctx, "/products/bulk", req, nil)
+}
+
 // UpdateProductQuantity updates the quantity of a product.
 func (c *Client) UpdateProductQuantity(ctx context.Context, id string, quantity int) (*Product, error) {
 	if strings.TrimSpace(id) == "" {
@@ -292,7 +331,7 @@ func (c *Client) UpdateProductQuantity(ctx context.Context, id string, quantity 
 	}
 	req := &ProductQuantityUpdateRequest{Quantity: quantity}
 	var product Product
-	if err := c.Patch(ctx, fmt.Sprintf("/products/%s/quantity", id), req, &product); err != nil {
+	if err := c.Put(ctx, fmt.Sprintf("/products/%s/update_quantity", id), req, &product); err != nil {
 		return nil, err
 	}
 	return &product, nil
@@ -308,7 +347,7 @@ func (c *Client) UpdateProductVariationQuantity(ctx context.Context, productID, 
 	}
 	req := &ProductQuantityUpdateRequest{Quantity: quantity}
 	var product Product
-	if err := c.Patch(ctx, fmt.Sprintf("/products/%s/variations/%s/quantity", productID, variationID), req, &product); err != nil {
+	if err := c.Put(ctx, fmt.Sprintf("/products/%s/variations/%s/update_quantity", productID, variationID), req, &product); err != nil {
 		return nil, err
 	}
 	return &product, nil
@@ -320,7 +359,7 @@ func (c *Client) UpdateProductQuantityBySKU(ctx context.Context, sku string, qua
 		return fmt.Errorf("sku is required")
 	}
 	req := &ProductQuantityBySKURequest{SKU: sku, Quantity: quantity}
-	return c.Patch(ctx, "/products/quantity-by-sku", req, nil)
+	return c.Put(ctx, "/products/update_quantity", req, nil)
 }
 
 // UpdateProductPrice updates the price of a product.
@@ -330,7 +369,7 @@ func (c *Client) UpdateProductPrice(ctx context.Context, id string, price float6
 	}
 	req := &ProductPriceUpdateRequest{Price: price}
 	var product Product
-	if err := c.Patch(ctx, fmt.Sprintf("/products/%s/price", id), req, &product); err != nil {
+	if err := c.Put(ctx, fmt.Sprintf("/products/%s/update_price", id), req, &product); err != nil {
 		return nil, err
 	}
 	return &product, nil
@@ -346,7 +385,7 @@ func (c *Client) UpdateProductVariationPrice(ctx context.Context, productID, var
 	}
 	req := &ProductPriceUpdateRequest{Price: price}
 	var product Product
-	if err := c.Patch(ctx, fmt.Sprintf("/products/%s/variations/%s/price", productID, variationID), req, &product); err != nil {
+	if err := c.Put(ctx, fmt.Sprintf("/products/%s/variations/%s/update_price", productID, variationID), req, &product); err != nil {
 		return nil, err
 	}
 	return &product, nil
@@ -358,7 +397,7 @@ func (c *Client) AddProductImages(ctx context.Context, productID string, req *Pr
 		return nil, fmt.Errorf("product id is required")
 	}
 	var images []ProductImage
-	if err := c.Post(ctx, fmt.Sprintf("/products/%s/images", productID), req, &images); err != nil {
+	if err := c.Post(ctx, fmt.Sprintf("/products/%s/add_images", productID), req, &images); err != nil {
 		return nil, err
 	}
 	return images, nil
@@ -373,7 +412,20 @@ func (c *Client) DeleteProductImages(ctx context.Context, productID string, imag
 		return fmt.Errorf("at least one image id is required")
 	}
 	req := &ProductDeleteImagesRequest{ImageIDs: imageIDs}
-	return c.Post(ctx, fmt.Sprintf("/products/%s/images/delete", productID), req, nil)
+	return c.DeleteWithBody(ctx, fmt.Sprintf("/products/%s/delete_images", productID), req, nil)
+}
+
+// ReplaceProductTags replaces the full tag list for a product.
+func (c *Client) ReplaceProductTags(ctx context.Context, id string, tags []string) (*Product, error) {
+	if strings.TrimSpace(id) == "" {
+		return nil, fmt.Errorf("product id is required")
+	}
+	req := &ProductTagsReplaceRequest{Tags: tags}
+	var product Product
+	if err := c.Put(ctx, fmt.Sprintf("/products/%s/tags", id), req, &product); err != nil {
+		return nil, err
+	}
+	return &product, nil
 }
 
 // AddProductVariation adds a variation to a product.
@@ -434,7 +486,8 @@ func (c *Client) BulkAssignProductsToCategory(ctx context.Context, req *ProductC
 	if strings.TrimSpace(req.CategoryID) == "" {
 		return fmt.Errorf("category id is required")
 	}
-	return c.Post(ctx, "/products/bulk-assign-category", req, nil)
+	// Per OpenAPI docs this is a Categories endpoint (bulk assign products to a category).
+	return c.Post(ctx, "/categories/bulk_assign", req, nil)
 }
 
 // GetLockedInventoryCount retrieves locked inventory counts for a product.
@@ -443,8 +496,65 @@ func (c *Client) GetLockedInventoryCount(ctx context.Context, productID string) 
 		return nil, fmt.Errorf("product id is required")
 	}
 	var count LockedInventoryCount
-	if err := c.Get(ctx, fmt.Sprintf("/products/%s/locked-inventory", productID), &count); err != nil {
+	req := &ProductLockedInventoryCountRequest{ProductID: productID}
+	if err := c.Post(ctx, "/products/locked_inventory_count", req, &count); err != nil {
 		return nil, err
 	}
 	return &count, nil
+}
+
+// GetProductPromotions retrieves promotions for a product.
+func (c *Client) GetProductPromotions(ctx context.Context, productID string) (json.RawMessage, error) {
+	if strings.TrimSpace(productID) == "" {
+		return nil, fmt.Errorf("product id is required")
+	}
+	var resp json.RawMessage
+	if err := c.Get(ctx, fmt.Sprintf("/products/%s/promotions", productID), &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+// GetProductStocks retrieves product stock info.
+func (c *Client) GetProductStocks(ctx context.Context, productID string) (json.RawMessage, error) {
+	if strings.TrimSpace(productID) == "" {
+		return nil, fmt.Errorf("product id is required")
+	}
+	var resp json.RawMessage
+	if err := c.Get(ctx, fmt.Sprintf("/products/%s/stocks", productID), &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+// UpdateProductStocks updates product stock info.
+func (c *Client) UpdateProductStocks(ctx context.Context, productID string, body any) (json.RawMessage, error) {
+	if strings.TrimSpace(productID) == "" {
+		return nil, fmt.Errorf("product id is required")
+	}
+	var resp json.RawMessage
+	if err := c.Put(ctx, fmt.Sprintf("/products/%s/stocks", productID), body, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+// BulkUpdateProductStocks updates stocks for multiple products.
+func (c *Client) BulkUpdateProductStocks(ctx context.Context, body any) error {
+	return c.Put(ctx, "/products/bulk_update_stocks", body, nil)
+}
+
+// UpdateProductsStatusBulk updates the online-store status for multiple products.
+func (c *Client) UpdateProductsStatusBulk(ctx context.Context, body any) error {
+	return c.Put(ctx, "/products/status/bulk", body, nil)
+}
+
+// UpdateProductsRetailStatusBulk updates the retail-store status for multiple products.
+func (c *Client) UpdateProductsRetailStatusBulk(ctx context.Context, body any) error {
+	return c.Put(ctx, "/products/retail_status/bulk", body, nil)
+}
+
+// UpdateProductsLabelsBulk updates product labels.
+func (c *Client) UpdateProductsLabelsBulk(ctx context.Context, body any) error {
+	return c.Patch(ctx, "/products/labels", body, nil)
 }

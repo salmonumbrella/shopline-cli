@@ -145,6 +145,12 @@ func (c *Client) Delete(ctx context.Context, path string) error {
 	return c.do(ctx, http.MethodDelete, path, nil, nil)
 }
 
+// DeleteWithBody performs a DELETE request with a JSON body. Some Shopline endpoints
+// (bulk deletes, delete images, etc.) require a body.
+func (c *Client) DeleteWithBody(ctx context.Context, path string, body, result interface{}) error {
+	return c.do(ctx, http.MethodDelete, path, body, result)
+}
+
 // Patch performs a PATCH request.
 func (c *Client) Patch(ctx context.Context, path string, body, result interface{}) error {
 	return c.do(ctx, http.MethodPatch, path, body, result)

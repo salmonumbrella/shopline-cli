@@ -23,11 +23,18 @@ import (
 type Client struct{}
 
 func (c *Client) Get(ctx context.Context, path string, result interface{}) error { return nil }
+func (c *Client) Post(ctx context.Context, path string, body, result interface{}) error { return nil }
 
 func (c *Client) Foo(ctx context.Context, id string) error {
 	var out any
 	_ = c.Get(ctx, "/orders", &out)
 	_ = c.Get(ctx, fmt.Sprintf("/orders/%s/items/%d", id, 1), &out)
+
+	// Variable path patterns common in this repo.
+	path := "/products"
+	_ = c.Get(ctx, path, &out)
+	searchPath := "/products/search" + "?" + "q=hi"
+	_ = c.Get(ctx, searchPath, &out)
 	return nil
 }
 `
@@ -51,6 +58,12 @@ func (c *Client) Foo(ctx context.Context, id string) error {
 	}
 	if !seen["GET /orders/{}/items/{}"] {
 		t.Fatalf("missing GET /orders/{}/items/{}, got keys=%v", keys(seen))
+	}
+	if !seen["GET /products"] {
+		t.Fatalf("missing GET /products, got keys=%v", keys(seen))
+	}
+	if !seen["GET /products/search"] {
+		t.Fatalf("missing GET /products/search, got keys=%v", keys(seen))
 	}
 }
 

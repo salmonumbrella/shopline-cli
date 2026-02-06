@@ -36,46 +36,85 @@ func ParseEndpointsFromGoFiles(globs []string) ([]Endpoint, error) {
 			return nil, fmt.Errorf("parse %s: %w", path, err)
 		}
 
-		ast.Inspect(f, func(n ast.Node) bool {
-			ce, ok := n.(*ast.CallExpr)
-			if !ok {
-				return true
+		for _, decl := range f.Decls {
+			fn, ok := decl.(*ast.FuncDecl)
+			if !ok || fn.Body == nil {
+				continue
 			}
-			sel, ok := ce.Fun.(*ast.SelectorExpr)
-			if !ok {
+
+			pathVars := map[string]string{}
+			ast.Inspect(fn.Body, func(n ast.Node) bool {
+				switch v := n.(type) {
+				case *ast.AssignStmt:
+					for i := 0; i < len(v.Lhs) && i < len(v.Rhs); i++ {
+						lhs, ok := v.Lhs[i].(*ast.Ident)
+						if !ok {
+							continue
+						}
+						if tmpl, ok := evalPathTemplate(v.Rhs[i]); ok && strings.HasPrefix(tmpl, "/") {
+							pathVars[lhs.Name] = tmpl
+						}
+					}
+				case *ast.ValueSpec:
+					for i, name := range v.Names {
+						if name == nil || i >= len(v.Values) {
+							continue
+						}
+						if tmpl, ok := evalPathTemplate(v.Values[i]); ok && strings.HasPrefix(tmpl, "/") {
+							pathVars[name.Name] = tmpl
+						}
+					}
+				case *ast.CallExpr:
+					sel, ok := v.Fun.(*ast.SelectorExpr)
+					if !ok {
+						return true
+					}
+					name := sel.Sel.Name
+					var method string
+					switch name {
+					case "Get":
+						method = "GET"
+					case "Post":
+						method = "POST"
+					case "Put":
+						method = "PUT"
+					case "Patch":
+						method = "PATCH"
+					case "Delete":
+						method = "DELETE"
+					case "DeleteWithBody":
+						method = "DELETE"
+					default:
+						return true
+					}
+					// Signature: (ctx, path, ...)
+					if len(v.Args) < 2 {
+						return true
+					}
+
+					pathTmpl, ok := evalPathTemplate(v.Args[1])
+					if !ok {
+						ident, isIdent := v.Args[1].(*ast.Ident)
+						if isIdent {
+							if s, found := pathVars[ident.Name]; found {
+								pathTmpl = s
+								ok = true
+							}
+						}
+					}
+					if !ok || pathTmpl == "" || !strings.HasPrefix(pathTmpl, "/") {
+						return true
+					}
+
+					out = append(out, Endpoint{
+						Method: method,
+						Path:   NormalizePath(pathTmpl),
+						Source: path,
+					})
+				}
 				return true
-			}
-			name := sel.Sel.Name
-			var method string
-			switch name {
-			case "Get":
-				method = "GET"
-			case "Post":
-				method = "POST"
-			case "Put":
-				method = "PUT"
-			case "Patch":
-				method = "PATCH"
-			case "Delete":
-				method = "DELETE"
-			default:
-				return true
-			}
-			// Signature: (ctx, path, ...)
-			if len(ce.Args) < 2 {
-				return true
-			}
-			pathTmpl, ok := evalPathTemplate(ce.Args[1])
-			if !ok || pathTmpl == "" || !strings.HasPrefix(pathTmpl, "/") {
-				return true
-			}
-			out = append(out, Endpoint{
-				Method: method,
-				Path:   NormalizePath(pathTmpl),
-				Source: path,
 			})
-			return true
-		})
+		}
 	}
 
 	return out, nil
@@ -99,11 +138,16 @@ func evalPathTemplate(e ast.Expr) (string, bool) {
 			return "", false
 		}
 		l, ok := evalPathTemplate(v.X)
-		if !ok {
-			return "", false
+		r, ok2 := evalPathTemplate(v.Y)
+		// If we have a literal prefix but can't evaluate the suffix (usually query builder),
+		// keep the prefix.
+		if ok && !ok2 {
+			return l, true
 		}
-		r, ok := evalPathTemplate(v.Y)
-		if !ok {
+		if !ok && ok2 {
+			return r, true
+		}
+		if !ok || !ok2 {
 			return "", false
 		}
 		return l + r, true

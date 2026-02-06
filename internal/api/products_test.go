@@ -486,12 +486,42 @@ func TestDeleteProductAPIError(t *testing.T) {
 	}
 }
 
+func TestBulkDeleteProducts(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("Expected DELETE, got %s", r.Method)
+		}
+		if r.URL.Path != "/products/bulk" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+
+		var req ProductBulkDeleteRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			t.Fatalf("Failed to decode request body: %v", err)
+		}
+		if len(req.ProductIDs) != 2 || req.ProductIDs[0] != "prod_1" || req.ProductIDs[1] != "prod_2" {
+			t.Errorf("Unexpected product IDs: %v", req.ProductIDs)
+		}
+
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	if err := client.BulkDeleteProducts(context.Background(), []string{"prod_1", "prod_2"}); err != nil {
+		t.Fatalf("BulkDeleteProducts failed: %v", err)
+	}
+}
+
 func TestUpdateProductQuantity(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPatch {
-			t.Errorf("Expected PATCH, got %s", r.Method)
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
 		}
-		if r.URL.Path != "/products/prod_123/quantity" {
+		if r.URL.Path != "/products/prod_123/update_quantity" {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
 		}
 
@@ -566,10 +596,10 @@ func TestUpdateProductQuantityAPIError(t *testing.T) {
 
 func TestUpdateProductVariationQuantity(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPatch {
-			t.Errorf("Expected PATCH, got %s", r.Method)
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
 		}
-		if r.URL.Path != "/products/prod_123/variations/var_456/quantity" {
+		if r.URL.Path != "/products/prod_123/variations/var_456/update_quantity" {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
 		}
 
@@ -647,10 +677,10 @@ func TestUpdateProductVariationQuantityAPIError(t *testing.T) {
 
 func TestUpdateProductPrice(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPatch {
-			t.Errorf("Expected PATCH, got %s", r.Method)
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
 		}
-		if r.URL.Path != "/products/prod_123/price" {
+		if r.URL.Path != "/products/prod_123/update_price" {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
 		}
 
@@ -725,10 +755,10 @@ func TestUpdateProductPriceAPIError(t *testing.T) {
 
 func TestUpdateProductVariationPrice(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPatch {
-			t.Errorf("Expected PATCH, got %s", r.Method)
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
 		}
-		if r.URL.Path != "/products/prod_123/variations/var_456/price" {
+		if r.URL.Path != "/products/prod_123/variations/var_456/update_price" {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
 		}
 
@@ -806,10 +836,10 @@ func TestUpdateProductVariationPriceAPIError(t *testing.T) {
 
 func TestUpdateProductQuantityBySKU(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPatch {
-			t.Errorf("Expected PATCH, got %s", r.Method)
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
 		}
-		if r.URL.Path != "/products/quantity-by-sku" {
+		if r.URL.Path != "/products/update_quantity" {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
 		}
 
@@ -880,12 +910,47 @@ func TestUpdateProductQuantityBySKUAPIError(t *testing.T) {
 	}
 }
 
+func TestSearchProductsPost(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			t.Errorf("Expected POST, got %s", r.Method)
+		}
+		if r.URL.Path != "/products/search" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+
+		var req ProductSearchRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			t.Fatalf("Failed to decode request body: %v", err)
+		}
+		if req.Query != "shoes" {
+			t.Errorf("Expected query=shoes, got %q", req.Query)
+		}
+
+		resp := ProductsListResponse{Items: []Product{{ID: "prod_1", Title: "Shoe"}}}
+		_ = json.NewEncoder(w).Encode(resp)
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	resp, err := client.SearchProductsPost(context.Background(), &ProductSearchRequest{Query: "shoes"})
+	if err != nil {
+		t.Fatalf("SearchProductsPost failed: %v", err)
+	}
+	if len(resp.Items) != 1 || resp.Items[0].ID != "prod_1" {
+		t.Fatalf("unexpected response: %+v", resp)
+	}
+}
+
 func TestAddProductImages(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("Expected POST, got %s", r.Method)
 		}
-		if r.URL.Path != "/products/prod_123/images" {
+		if r.URL.Path != "/products/prod_123/add_images" {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
 		}
 
@@ -981,10 +1046,10 @@ func TestAddProductImagesAPIError(t *testing.T) {
 
 func TestDeleteProductImages(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			t.Errorf("Expected POST, got %s", r.Method)
+		if r.Method != http.MethodDelete {
+			t.Errorf("Expected DELETE, got %s", r.Method)
 		}
-		if r.URL.Path != "/products/prod_123/images/delete" {
+		if r.URL.Path != "/products/prod_123/delete_images" {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
 		}
 
@@ -1076,6 +1141,41 @@ func TestDeleteProductImagesAPIError(t *testing.T) {
 	err := client.DeleteProductImages(context.Background(), "prod_123", []string{"img_1"})
 	if err == nil {
 		t.Error("Expected error from DeleteProductImages")
+	}
+}
+
+func TestReplaceProductTags(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
+		}
+		if r.URL.Path != "/products/prod_123/tags" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+
+		var req ProductTagsReplaceRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			t.Fatalf("Failed to decode request body: %v", err)
+		}
+		if len(req.Tags) != 2 || req.Tags[0] != "tag1" || req.Tags[1] != "tag2" {
+			t.Errorf("Unexpected tags: %v", req.Tags)
+		}
+
+		product := Product{ID: "prod_123", Title: "Widget", Tags: req.Tags}
+		_ = json.NewEncoder(w).Encode(product)
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	product, err := client.ReplaceProductTags(context.Background(), "prod_123", []string{"tag1", "tag2"})
+	if err != nil {
+		t.Fatalf("ReplaceProductTags failed: %v", err)
+	}
+	if len(product.Tags) != 2 {
+		t.Fatalf("unexpected tags: %+v", product.Tags)
 	}
 }
 
@@ -1437,7 +1537,7 @@ func TestBulkAssignProductsToCategory(t *testing.T) {
 		if r.Method != http.MethodPost {
 			t.Errorf("Expected POST, got %s", r.Method)
 		}
-		if r.URL.Path != "/products/bulk-assign-category" {
+		if r.URL.Path != "/categories/bulk_assign" {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
 		}
 
@@ -1544,10 +1644,10 @@ func TestBulkAssignProductsToCategoryAPIError(t *testing.T) {
 
 func TestGetLockedInventoryCount(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			t.Errorf("Expected GET, got %s", r.Method)
+		if r.Method != http.MethodPost {
+			t.Errorf("Expected POST, got %s", r.Method)
 		}
-		if r.URL.Path != "/products/prod_123/locked-inventory" {
+		if r.URL.Path != "/products/locked_inventory_count" {
 			t.Errorf("Unexpected path: %s", r.URL.Path)
 		}
 
@@ -1618,5 +1718,167 @@ func TestGetLockedInventoryCountAPIError(t *testing.T) {
 	_, err := client.GetLockedInventoryCount(context.Background(), "prod_123")
 	if err == nil {
 		t.Error("Expected error from GetLockedInventoryCount")
+	}
+}
+
+func TestGetProductPromotions(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("Expected GET, got %s", r.Method)
+		}
+		if r.URL.Path != "/products/prod_123/promotions" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"items":[{"id":"promo_1"}]}`))
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	raw, err := client.GetProductPromotions(context.Background(), "prod_123")
+	if err != nil {
+		t.Fatalf("GetProductPromotions failed: %v", err)
+	}
+	if len(raw) == 0 {
+		t.Fatalf("expected non-empty response")
+	}
+}
+
+func TestGetProductStocks(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("Expected GET, got %s", r.Method)
+		}
+		if r.URL.Path != "/products/prod_123/stocks" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"items":[{"location_id":"loc_1","available":3}]}`))
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	raw, err := client.GetProductStocks(context.Background(), "prod_123")
+	if err != nil {
+		t.Fatalf("GetProductStocks failed: %v", err)
+	}
+	if len(raw) == 0 {
+		t.Fatalf("expected non-empty response")
+	}
+}
+
+func TestUpdateProductStocks(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
+		}
+		if r.URL.Path != "/products/prod_123/stocks" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"ok":true}`))
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	raw, err := client.UpdateProductStocks(context.Background(), "prod_123", map[string]any{"items": []any{}})
+	if err != nil {
+		t.Fatalf("UpdateProductStocks failed: %v", err)
+	}
+	if len(raw) == 0 {
+		t.Fatalf("expected non-empty response")
+	}
+}
+
+func TestBulkUpdateProductStocks(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
+		}
+		if r.URL.Path != "/products/bulk_update_stocks" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	if err := client.BulkUpdateProductStocks(context.Background(), map[string]any{"items": []any{}}); err != nil {
+		t.Fatalf("BulkUpdateProductStocks failed: %v", err)
+	}
+}
+
+func TestUpdateProductsStatusBulk(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
+		}
+		if r.URL.Path != "/products/status/bulk" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	if err := client.UpdateProductsStatusBulk(context.Background(), map[string]any{"product_ids": []string{"prod_1"}, "status": "active"}); err != nil {
+		t.Fatalf("UpdateProductsStatusBulk failed: %v", err)
+	}
+}
+
+func TestUpdateProductsRetailStatusBulk(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
+		}
+		if r.URL.Path != "/products/retail_status/bulk" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	if err := client.UpdateProductsRetailStatusBulk(context.Background(), map[string]any{"product_ids": []string{"prod_1"}, "status": "active"}); err != nil {
+		t.Fatalf("UpdateProductsRetailStatusBulk failed: %v", err)
+	}
+}
+
+func TestUpdateProductsLabelsBulk(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPatch {
+			t.Errorf("Expected PATCH, got %s", r.Method)
+		}
+		if r.URL.Path != "/products/labels" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	if err := client.UpdateProductsLabelsBulk(context.Background(), map[string]any{"items": []any{}}); err != nil {
+		t.Fatalf("UpdateProductsLabelsBulk failed: %v", err)
 	}
 }
