@@ -1,4 +1,4 @@
-.PHONY: build test lint fmt ci setup clean docs docs-man docs-markdown coverage
+.PHONY: build test lint fmt ci setup clean docs docs-man docs-markdown coverage cli-coverage
 
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 COMMIT  ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo "none")
@@ -48,3 +48,6 @@ docs: docs-man docs-markdown
 
 coverage:
 	go run ./cmd/shopline-coverage
+
+cli-coverage:
+	go run ./cmd/shopline-cli-coverage
