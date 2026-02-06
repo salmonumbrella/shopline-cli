@@ -2004,3 +2004,67 @@ func (m *MockClient) BulkUpdateOrderItemAppMetafields(ctx context.Context, order
 func (m *MockClient) BulkDeleteOrderItemAppMetafields(ctx context.Context, orderID string, body any) error {
 	return m.notImplemented("BulkDeleteOrderItemAppMetafields")
 }
+
+func (m *MockClient) ListCustomerMetafields(ctx context.Context, customerID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListCustomerMetafields")
+}
+
+func (m *MockClient) GetCustomerMetafield(ctx context.Context, customerID, metafieldID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetCustomerMetafield")
+}
+
+func (m *MockClient) CreateCustomerMetafield(ctx context.Context, customerID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("CreateCustomerMetafield")
+}
+
+func (m *MockClient) UpdateCustomerMetafield(ctx context.Context, customerID, metafieldID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateCustomerMetafield")
+}
+
+func (m *MockClient) DeleteCustomerMetafield(ctx context.Context, customerID, metafieldID string) error {
+	return m.notImplemented("DeleteCustomerMetafield")
+}
+
+func (m *MockClient) BulkCreateCustomerMetafields(ctx context.Context, customerID string, body any) error {
+	return m.notImplemented("BulkCreateCustomerMetafields")
+}
+
+func (m *MockClient) BulkUpdateCustomerMetafields(ctx context.Context, customerID string, body any) error {
+	return m.notImplemented("BulkUpdateCustomerMetafields")
+}
+
+func (m *MockClient) BulkDeleteCustomerMetafields(ctx context.Context, customerID string, body any) error {
+	return m.notImplemented("BulkDeleteCustomerMetafields")
+}
+
+func (m *MockClient) ListCustomerAppMetafields(ctx context.Context, customerID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListCustomerAppMetafields")
+}
+
+func (m *MockClient) GetCustomerAppMetafield(ctx context.Context, customerID, metafieldID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetCustomerAppMetafield")
+}
+
+func (m *MockClient) CreateCustomerAppMetafield(ctx context.Context, customerID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("CreateCustomerAppMetafield")
+}
+
+func (m *MockClient) UpdateCustomerAppMetafield(ctx context.Context, customerID, metafieldID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateCustomerAppMetafield")
+}
+
+func (m *MockClient) DeleteCustomerAppMetafield(ctx context.Context, customerID, metafieldID string) error {
+	return m.notImplemented("DeleteCustomerAppMetafield")
+}
+
+func (m *MockClient) BulkCreateCustomerAppMetafields(ctx context.Context, customerID string, body any) error {
+	return m.notImplemented("BulkCreateCustomerAppMetafields")
+}
+
+func (m *MockClient) BulkUpdateCustomerAppMetafields(ctx context.Context, customerID string, body any) error {
+	return m.notImplemented("BulkUpdateCustomerAppMetafields")
+}
+
+func (m *MockClient) BulkDeleteCustomerAppMetafields(ctx context.Context, customerID string, body any) error {
+	return m.notImplemented("BulkDeleteCustomerAppMetafields")
+}

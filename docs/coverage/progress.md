@@ -15,7 +15,8 @@ go run ./cmd/shopline-coverage
 - [x] Order metafields
 - [x] Products (endpoints wired; types still partially raw for metafields/stocks)
 - [ ] Customers
-- Customers core: list/get/search/create/update/delete + tags + subscriptions + LINE lookup (done); metafields/credits pending
+- Customers core: list/get/search/create/update/delete + tags + subscriptions + LINE lookup (done)
+- Customer metafields + app_metafields (done); credits/points pending
 - [ ] Store credits
 - [x] Channels
 - [ ] Staffs

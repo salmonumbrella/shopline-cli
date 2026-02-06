@@ -28,15 +28,17 @@ func TestCustomersCommandSetup(t *testing.T) {
 // TestCustomersSubcommands verifies all subcommands are registered
 func TestCustomersSubcommands(t *testing.T) {
 	subcommands := map[string]string{
-		"list":          "List customers",
-		"get":           "Get customer details",
-		"search":        "Search customers",
-		"create":        "Create a customer",
-		"update":        "Update a customer",
-		"delete":        "Delete a customer",
-		"tags":          "Manage customer tags",
-		"subscriptions": "Manage customer subscriptions",
-		"line":          "Lookup customers by LINE ID",
+		"list":           "List customers",
+		"get":            "Get customer details",
+		"search":         "Search customers",
+		"create":         "Create a customer",
+		"update":         "Update a customer",
+		"delete":         "Delete a customer",
+		"tags":           "Manage customer tags",
+		"subscriptions":  "Manage customer subscriptions",
+		"line":           "Lookup customers by LINE ID",
+		"metafields":     "Manage customer metafields",
+		"app-metafields": "Manage customer app metafields",
 	}
 
 	for name, short := range subcommands {

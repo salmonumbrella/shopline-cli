@@ -277,6 +277,26 @@ type APIClient interface {
 	BulkCreateOrderItemAppMetafields(ctx context.Context, orderID string, body any) error
 	BulkUpdateOrderItemAppMetafields(ctx context.Context, orderID string, body any) error
 	BulkDeleteOrderItemAppMetafields(ctx context.Context, orderID string, body any) error
+
+	// Customer metafields (nested endpoints under /customers/{id}/...)
+	ListCustomerMetafields(ctx context.Context, customerID string) (json.RawMessage, error)
+	GetCustomerMetafield(ctx context.Context, customerID, metafieldID string) (json.RawMessage, error)
+	CreateCustomerMetafield(ctx context.Context, customerID string, body any) (json.RawMessage, error)
+	UpdateCustomerMetafield(ctx context.Context, customerID, metafieldID string, body any) (json.RawMessage, error)
+	DeleteCustomerMetafield(ctx context.Context, customerID, metafieldID string) error
+	BulkCreateCustomerMetafields(ctx context.Context, customerID string, body any) error
+	BulkUpdateCustomerMetafields(ctx context.Context, customerID string, body any) error
+	BulkDeleteCustomerMetafields(ctx context.Context, customerID string, body any) error
+
+	// Customer app metafields (nested endpoints under /customers/{id}/...)
+	ListCustomerAppMetafields(ctx context.Context, customerID string) (json.RawMessage, error)
+	GetCustomerAppMetafield(ctx context.Context, customerID, metafieldID string) (json.RawMessage, error)
+	CreateCustomerAppMetafield(ctx context.Context, customerID string, body any) (json.RawMessage, error)
+	UpdateCustomerAppMetafield(ctx context.Context, customerID, metafieldID string, body any) (json.RawMessage, error)
+	DeleteCustomerAppMetafield(ctx context.Context, customerID, metafieldID string) error
+	BulkCreateCustomerAppMetafields(ctx context.Context, customerID string, body any) error
+	BulkUpdateCustomerAppMetafields(ctx context.Context, customerID string, body any) error
+	BulkDeleteCustomerAppMetafields(ctx context.Context, customerID string, body any) error
 	GetOrderRisk(ctx context.Context, orderID, riskID string) (*OrderRisk, error)
 	GetPage(ctx context.Context, id string) (*Page, error)
 	GetPayment(ctx context.Context, id string) (*Payment, error)

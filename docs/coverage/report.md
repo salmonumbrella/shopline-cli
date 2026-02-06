@@ -3,8 +3,8 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 579
-- Missing in code: 134
+- Code endpoints detected: 595
+- Missing in code: 118
 - Extra in code: 405
 - Unparsed doc pages: 55
 
@@ -89,26 +89,10 @@
 - `GET /customer_groups/{}/customer_group_children` (https://open-api.docs.shoplineapp.com/reference/get_customer-groups-parentcustomergroupid-customer-group-children)
 - `GET /customer_groups/{}/customer_group_children/{}/customer_ids` (https://open-api.docs.shoplineapp.com/reference/get_customer-groups-parentcustomergroupid-customer-group-children-id-customer-ids)
 - `GET /customers/membership_info` (https://open-api.docs.shoplineapp.com/reference/get_customers-membership-info-1)
-- `GET /customers/{}/app_metafields` (https://open-api.docs.shoplineapp.com/reference/get_customers-customer-id-app-metafields)
-- `POST /customers/{}/app_metafields` (https://open-api.docs.shoplineapp.com/reference/post_customers-customer-id-app-metafields)
-- `DELETE /customers/{}/app_metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/delete_customers-customer-id-app-metafields-bulk)
-- `POST /customers/{}/app_metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/post_customers-customer-id-app-metafields-bulk)
-- `PUT /customers/{}/app_metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/put_customers-customer-id-app-metafields-bulk)
-- `DELETE /customers/{}/app_metafields/{}` (https://open-api.docs.shoplineapp.com/reference/delete_customers-customer-id-app-metafields-metafield-id)
-- `GET /customers/{}/app_metafields/{}` (https://open-api.docs.shoplineapp.com/reference/get_customers-customer-id-app-metafields-metafield-id)
-- `PUT /customers/{}/app_metafields/{}` (https://open-api.docs.shoplineapp.com/reference/put_customers-customer-id-app-metafields-metafield-id)
 - `GET /customers/{}/coupon_promotions` (https://open-api.docs.shoplineapp.com/reference/get_customers-customer-id-coupon-promotions)
 - `GET /customers/{}/member_points` (https://open-api.docs.shoplineapp.com/reference/get_customers-id-member-points-1)
 - `POST /customers/{}/member_points` (https://open-api.docs.shoplineapp.com/reference/post_customers-id-member-points-1)
 - `GET /customers/{}/membership_tier/action_logs` (https://open-api.docs.shoplineapp.com/reference/get_customers-id-membership-tier-action-logs-1)
-- `GET /customers/{}/metafields` (https://open-api.docs.shoplineapp.com/reference/get_customers-customer-id-metafields-1)
-- `POST /customers/{}/metafields` (https://open-api.docs.shoplineapp.com/reference/post_customers-customer-id-metafields-1)
-- `DELETE /customers/{}/metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/delete_customers-customer-id-metafields-bulk-1)
-- `POST /customers/{}/metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/post_customers-customer-id-metafields-bulk-1)
-- `PUT /customers/{}/metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/put_customers-customer-id-metafields-bulk-1)
-- `DELETE /customers/{}/metafields/{}` (https://open-api.docs.shoplineapp.com/reference/delete_customers-customer-id-metafields-metafield-id-1)
-- `GET /customers/{}/metafields/{}` (https://open-api.docs.shoplineapp.com/reference/get_customers-customer-id-metafields-metafield-id-1)
-- `PUT /customers/{}/metafields/{}` (https://open-api.docs.shoplineapp.com/reference/put_customers-customer-id-metafields-metafield-id-1)
 - `GET /customers/{}/store_credits` (https://open-api.docs.shoplineapp.com/reference/get_customers-id-store-credits-1)
 - `POST /customers/{}/store_credits` (https://open-api.docs.shoplineapp.com/reference/post_customers-id-store-credits-1)
 - `GET /delivery_options/delivery_config` (https://open-api.docs.shoplineapp.com/reference/get_delivery-options-delivery-config)

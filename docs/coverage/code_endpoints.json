@@ -761,6 +761,86 @@
   },
   {
     "method": "GET",
+    "path": "/customers/{}/app_metafields",
+    "source": "internal/api/customer_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/customers/{}/app_metafields",
+    "source": "internal/api/customer_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/customers/{}/app_metafields/bulk",
+    "source": "internal/api/customer_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/customers/{}/app_metafields/bulk",
+    "source": "internal/api/customer_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/customers/{}/app_metafields/bulk",
+    "source": "internal/api/customer_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/customers/{}/app_metafields/{}",
+    "source": "internal/api/customer_metafields.go"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/{}/app_metafields/{}",
+    "source": "internal/api/customer_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/customers/{}/app_metafields/{}",
+    "source": "internal/api/customer_metafields.go"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/{}/metafields",
+    "source": "internal/api/customer_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/customers/{}/metafields",
+    "source": "internal/api/customer_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/customers/{}/metafields/bulk",
+    "source": "internal/api/customer_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/customers/{}/metafields/bulk",
+    "source": "internal/api/customer_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/customers/{}/metafields/bulk",
+    "source": "internal/api/customer_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/customers/{}/metafields/{}",
+    "source": "internal/api/customer_metafields.go"
+  },
+  {
+    "method": "GET",
+    "path": "/customers/{}/metafields/{}",
+    "source": "internal/api/customer_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/customers/{}/metafields/{}",
+    "source": "internal/api/customer_metafields.go"
+  },
+  {
+    "method": "GET",
     "path": "/customers/{}/points",
     "source": "internal/api/member_points.go"
   },
