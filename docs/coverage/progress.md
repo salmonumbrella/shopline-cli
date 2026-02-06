@@ -33,6 +33,8 @@ go run ./cmd/shopline-coverage
 - Includes `PUT /webhooks/{id}` (done)
 - [x] Token info
 - `GET /token/info` (done)
+- [x] Storefront OAuth applications
+- `GET/POST/GET(id)/DELETE /storefront/oauth_applications` (done)
 
 ## Storefront API
 

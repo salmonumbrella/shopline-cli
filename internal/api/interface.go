@@ -106,6 +106,7 @@ type APIClient interface {
 	BulkDeleteCartItemAppMetafields(ctx context.Context, cartID string, body any) error
 	CreateStorefrontCart(ctx context.Context, req *StorefrontCartCreateRequest) (*StorefrontCart, error)
 	CreateStorefrontOAuthClient(ctx context.Context, req *StorefrontOAuthClientCreateRequest) (*StorefrontOAuthClient, error)
+	CreateStorefrontOAuthApplication(ctx context.Context, req *StorefrontOAuthApplicationCreateRequest) (*StorefrontOAuthApplication, error)
 	CreateStorefrontToken(ctx context.Context, req *StorefrontTokenCreateRequest) (*StorefrontToken, error)
 	CreateSubscription(ctx context.Context, req *SubscriptionCreateRequest) (*Subscription, error)
 	CreateTag(ctx context.Context, req *TagCreateRequest) (*Tag, error)
@@ -181,6 +182,7 @@ type APIClient interface {
 	DeleteStoreCredit(ctx context.Context, id string) error
 	DeleteStorefrontCart(ctx context.Context, id string) error
 	DeleteStorefrontOAuthClient(ctx context.Context, id string) error
+	DeleteStorefrontOAuthApplication(ctx context.Context, id string) error
 	DeleteStorefrontToken(ctx context.Context, id string) error
 	DeleteSubscription(ctx context.Context, id string) error
 	DeleteTag(ctx context.Context, id string) error
@@ -385,6 +387,7 @@ type APIClient interface {
 	GetStoreCredit(ctx context.Context, id string) (*StoreCredit, error)
 	GetStorefrontCart(ctx context.Context, id string) (*StorefrontCart, error)
 	GetStorefrontOAuthClient(ctx context.Context, id string) (*StorefrontOAuthClient, error)
+	GetStorefrontOAuthApplication(ctx context.Context, id string) (*StorefrontOAuthApplication, error)
 	GetStorefrontProduct(ctx context.Context, id string) (*StorefrontProduct, error)
 	GetStorefrontProductByHandle(ctx context.Context, handle string) (*StorefrontProduct, error)
 	GetStorefrontPromotion(ctx context.Context, id string) (*StorefrontPromotion, error)
@@ -497,6 +500,7 @@ type APIClient interface {
 	ListUserCredits(ctx context.Context, opts *UserCreditsListOptions) (json.RawMessage, error)
 	ListStorefrontCarts(ctx context.Context, opts *StorefrontCartsListOptions) (*StorefrontCartsListResponse, error)
 	ListStorefrontOAuthClients(ctx context.Context, opts *StorefrontOAuthClientsListOptions) (*StorefrontOAuthClientsListResponse, error)
+	ListStorefrontOAuthApplications(ctx context.Context, opts *StorefrontOAuthApplicationsListOptions) (*StorefrontOAuthApplicationsListResponse, error)
 	ListStorefrontProducts(ctx context.Context, opts *StorefrontProductsListOptions) (*StorefrontProductsListResponse, error)
 	ListStorefrontPromotions(ctx context.Context, opts *StorefrontPromotionsListOptions) (*StorefrontPromotionsListResponse, error)
 	ListStorefrontTokens(ctx context.Context, opts *StorefrontTokensListOptions) (*StorefrontTokensListResponse, error)

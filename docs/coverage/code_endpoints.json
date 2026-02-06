@@ -2906,6 +2906,26 @@
   },
   {
     "method": "GET",
+    "path": "/storefront/oauth_applications",
+    "source": "internal/api/storefront_oauth_applications.go"
+  },
+  {
+    "method": "POST",
+    "path": "/storefront/oauth_applications",
+    "source": "internal/api/storefront_oauth_applications.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/storefront/oauth_applications/{}",
+    "source": "internal/api/storefront_oauth_applications.go"
+  },
+  {
+    "method": "GET",
+    "path": "/storefront/oauth_applications/{}",
+    "source": "internal/api/storefront_oauth_applications.go"
+  },
+  {
+    "method": "GET",
     "path": "/storefront/products",
     "source": "internal/api/storefront_products.go"
   },

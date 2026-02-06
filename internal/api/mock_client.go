@@ -2320,3 +2320,19 @@ func (m *MockClient) GetTokenInfo(ctx context.Context) (json.RawMessage, error) 
 func (m *MockClient) UpdateWebhook(ctx context.Context, id string, req *WebhookUpdateRequest) (*Webhook, error) {
 	return nil, m.notImplemented("UpdateWebhook")
 }
+
+func (m *MockClient) ListStorefrontOAuthApplications(ctx context.Context, opts *StorefrontOAuthApplicationsListOptions) (*StorefrontOAuthApplicationsListResponse, error) {
+	return nil, m.notImplemented("ListStorefrontOAuthApplications")
+}
+
+func (m *MockClient) GetStorefrontOAuthApplication(ctx context.Context, id string) (*StorefrontOAuthApplication, error) {
+	return nil, m.notImplemented("GetStorefrontOAuthApplication")
+}
+
+func (m *MockClient) CreateStorefrontOAuthApplication(ctx context.Context, req *StorefrontOAuthApplicationCreateRequest) (*StorefrontOAuthApplication, error) {
+	return nil, m.notImplemented("CreateStorefrontOAuthApplication")
+}
+
+func (m *MockClient) DeleteStorefrontOAuthApplication(ctx context.Context, id string) error {
+	return m.notImplemented("DeleteStorefrontOAuthApplication")
+}

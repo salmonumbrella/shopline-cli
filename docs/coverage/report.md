@@ -3,8 +3,8 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 657
-- Missing in code: 55
+- Code endpoints detected: 661
+- Missing in code: 51
 - Extra in code: 404
 - Unparsed doc pages: 55
 
@@ -113,10 +113,6 @@
 - `PUT /product_review_comments/{}` (https://open-api.docs.shoplineapp.com/reference/put_product-review-comments-id-1)
 - `GET /promotions/coupon-center` (https://open-api.docs.shoplineapp.com/reference/get_promotions-coupon-center)
 - `POST /sales/{}/delete_products` (https://open-api.docs.shoplineapp.com/reference/post_sales-saleid-delete-products)
-- `GET /storefront/oauth_applications` (https://open-api.docs.shoplineapp.com/reference/get_storefront-oauth-applications)
-- `POST /storefront/oauth_applications` (https://open-api.docs.shoplineapp.com/reference/post_storefront-oauth-applications)
-- `DELETE /storefront/oauth_applications/{}` (https://open-api.docs.shoplineapp.com/reference/delete_storefront-oauth-applications-id)
-- `GET /storefront/oauth_applications/{}` (https://open-api.docs.shoplineapp.com/reference/get_storefront-oauth-applications-id)
 - `GET /user_coupons/list` (https://open-api.docs.shoplineapp.com/reference/get_user-coupons-list)
 - `POST /user_coupons/{}/claim` (https://open-api.docs.shoplineapp.com/reference/post_user-coupons-coupon-code-claim)
 - `POST /user_coupons/{}/redeem` (https://open-api.docs.shoplineapp.com/reference/post_user-coupons-couponcode-redeem)
