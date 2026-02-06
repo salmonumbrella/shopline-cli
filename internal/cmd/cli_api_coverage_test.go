@@ -130,4 +130,3 @@ func scanCmdForMethodRefsForTest(cmdDir string, methods []string) (map[string]bo
 	}
 	return found, nil
 }
-
