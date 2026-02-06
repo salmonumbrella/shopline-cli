@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -31,6 +32,7 @@ type mockAPIClient struct {
 	getOrderResp *api.Order
 	getOrderErr  error
 	getOrderByID map[string]*api.Order
+	getOrderMu   sync.Mutex
 	getOrderIDs  []string
 
 	cancelOrderErr error
@@ -50,7 +52,9 @@ func (m *mockAPIClient) ListOrders(ctx context.Context, opts *api.OrdersListOpti
 }
 
 func (m *mockAPIClient) GetOrder(ctx context.Context, id string) (*api.Order, error) {
+	m.getOrderMu.Lock()
 	m.getOrderIDs = append(m.getOrderIDs, id)
+	m.getOrderMu.Unlock()
 	if m.getOrderByID != nil {
 		if o, ok := m.getOrderByID[id]; ok {
 			return o, m.getOrderErr
