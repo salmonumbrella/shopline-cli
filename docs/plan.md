@@ -145,6 +145,9 @@ go run ./cmd/shopline-coverage
 
 ### Phase 2: Products + Inventory + Pricing
 
+- [x] Add channel product pricing endpoints + CLI (`channels prices get/create/update`)
+- [x] Add category product sorting endpoint + CLI (`categories products-sorting update`)
+- [x] Make `--query` safe on typed Go slices/structs (normalize to generic JSON before gojq)
 - [ ] Fill product endpoints (variations, stocks, tags, etc.)
 - [ ] Ensure product JSON types decode translation fields consistently
 - [ ] CLI coverage + tests
