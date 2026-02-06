@@ -37,16 +37,70 @@ var customersSearchCmd = &cobra.Command{
 		phone, _ := cmd.Flags().GetString("phone")
 		page, _ := cmd.Flags().GetInt("page")
 		pageSize, _ := cmd.Flags().GetInt("page-size")
+		limit, _ := cmd.Flags().GetInt("limit")
 
-		resp, err := client.SearchCustomers(cmd.Context(), &api.CustomerSearchOptions{
+		opts := &api.CustomerSearchOptions{
 			Query:    q,
 			Email:    email,
 			Phone:    phone,
 			Page:     page,
 			PageSize: pageSize,
-		})
-		if err != nil {
-			return fmt.Errorf("failed to search customers: %w", err)
+		}
+
+		resp := &api.CustomersListResponse{}
+		if limit > 0 {
+			curPage := opts.Page
+			perPage := opts.PageSize
+			if perPage <= 0 || perPage > limit {
+				perPage = limit
+			}
+
+			items := make([]api.Customer, 0, limit)
+			totalCount := 0
+			hasMore := false
+			var pagination api.Pagination
+
+			for len(items) < limit {
+				pageOpts := *opts
+				pageOpts.Page = curPage
+				pageOpts.PageSize = perPage
+
+				pageResp, err := client.SearchCustomers(cmd.Context(), &pageOpts)
+				if err != nil {
+					return fmt.Errorf("failed to search customers: %w", err)
+				}
+				if totalCount == 0 {
+					totalCount = pageResp.TotalCount
+					pagination = pageResp.Pagination
+				}
+				items = append(items, pageResp.Items...)
+				hasMore = pageResp.HasMore
+
+				if !pageResp.HasMore || len(pageResp.Items) == 0 {
+					break
+				}
+				curPage++
+			}
+
+			if len(items) > limit {
+				items = items[:limit]
+				hasMore = true
+			}
+
+			resp.Items = items
+			resp.Page = opts.Page
+			resp.PageSize = perPage
+			resp.TotalCount = totalCount
+			resp.HasMore = hasMore
+			resp.Pagination = pagination
+			resp.Pagination.CurrentPage = opts.Page
+			resp.Pagination.PerPage = perPage
+		} else {
+			r, err := client.SearchCustomers(cmd.Context(), opts)
+			if err != nil {
+				return fmt.Errorf("failed to search customers: %w", err)
+			}
+			resp = r
 		}
 
 		formatter := getFormatter(cmd)
@@ -94,6 +148,7 @@ var customersListCmd = &cobra.Command{
 		tags, _ := cmd.Flags().GetString("tags")
 		page, _ := cmd.Flags().GetInt("page")
 		pageSize, _ := cmd.Flags().GetInt("page-size")
+		limit, _ := cmd.Flags().GetInt("limit")
 
 		opts := &api.CustomersListOptions{
 			Page:     page,
@@ -107,9 +162,60 @@ var customersListCmd = &cobra.Command{
 			opts.SortOrder = sortOrder
 		}
 
-		resp, err := client.ListCustomers(cmd.Context(), opts)
-		if err != nil {
-			return fmt.Errorf("failed to list customers: %w", err)
+		resp := &api.CustomersListResponse{}
+		if limit > 0 {
+			curPage := opts.Page
+			perPage := opts.PageSize
+			if perPage <= 0 || perPage > limit {
+				perPage = limit
+			}
+
+			items := make([]api.Customer, 0, limit)
+			totalCount := 0
+			hasMore := false
+			var pagination api.Pagination
+
+			for len(items) < limit {
+				pageOpts := *opts
+				pageOpts.Page = curPage
+				pageOpts.PageSize = perPage
+
+				pageResp, err := client.ListCustomers(cmd.Context(), &pageOpts)
+				if err != nil {
+					return fmt.Errorf("failed to list customers: %w", err)
+				}
+				if totalCount == 0 {
+					totalCount = pageResp.TotalCount
+					pagination = pageResp.Pagination
+				}
+				items = append(items, pageResp.Items...)
+				hasMore = pageResp.HasMore
+
+				if !pageResp.HasMore || len(pageResp.Items) == 0 {
+					break
+				}
+				curPage++
+			}
+
+			if len(items) > limit {
+				items = items[:limit]
+				hasMore = true
+			}
+
+			resp.Items = items
+			resp.Page = opts.Page
+			resp.PageSize = perPage
+			resp.TotalCount = totalCount
+			resp.HasMore = hasMore
+			resp.Pagination = pagination
+			resp.Pagination.CurrentPage = opts.Page
+			resp.Pagination.PerPage = perPage
+		} else {
+			r, err := client.ListCustomers(cmd.Context(), opts)
+			if err != nil {
+				return fmt.Errorf("failed to list customers: %w", err)
+			}
+			resp = r
 		}
 
 		formatter := getFormatter(cmd)

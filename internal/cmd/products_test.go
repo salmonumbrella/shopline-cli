@@ -3,8 +3,10 @@ package cmd
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -128,13 +130,24 @@ func TestProductsWithMockStore(t *testing.T) {
 // productsMockAPIClient is a mock implementation of api.APIClient for products tests.
 type productsMockAPIClient struct {
 	api.MockClient
-	listProductsResp *api.ProductsListResponse
-	listProductsErr  error
-	getProductResp   *api.Product
-	getProductErr    error
+	listProductsResp   *api.ProductsListResponse
+	listProductsErr    error
+	listProductsByPage map[int]*api.ProductsListResponse
+	listProductsCalls  []*api.ProductsListOptions
+	getProductResp     *api.Product
+	getProductErr      error
 }
 
 func (m *productsMockAPIClient) ListProducts(ctx context.Context, opts *api.ProductsListOptions) (*api.ProductsListResponse, error) {
+	if opts != nil {
+		cp := *opts
+		m.listProductsCalls = append(m.listProductsCalls, &cp)
+		if m.listProductsByPage != nil {
+			if resp, ok := m.listProductsByPage[opts.Page]; ok {
+				return resp, m.listProductsErr
+			}
+		}
+	}
 	return m.listProductsResp, m.listProductsErr
 }
 
@@ -264,6 +277,65 @@ func TestProductsListRunE(t *testing.T) {
 				t.Errorf("output %q should contain %q", output, tt.wantOutput)
 			}
 		})
+	}
+}
+
+func TestProductsListRunELimitPaginates(t *testing.T) {
+	page1 := &api.ProductsListResponse{
+		Items:      make([]api.Product, 24),
+		TotalCount: 100,
+		HasMore:    true,
+	}
+	for i := range page1.Items {
+		page1.Items[i] = api.Product{ID: "prod_p1_" + strconv.Itoa(i)}
+	}
+
+	page2 := &api.ProductsListResponse{
+		Items:      make([]api.Product, 24),
+		TotalCount: 100,
+		HasMore:    false,
+	}
+	for i := range page2.Items {
+		page2.Items[i] = api.Product{ID: "prod_p2_" + strconv.Itoa(i)}
+	}
+
+	mockClient := &productsMockAPIClient{
+		listProductsByPage: map[int]*api.ProductsListResponse{
+			1: page1,
+			2: page2,
+		},
+	}
+	cleanup, buf := setupProductsMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newProductsTestCmd()
+	_ = cmd.Flags().Set("output", "json")
+	cmd.Flags().Bool("items-only", false, "")
+	cmd.Flags().Int("limit", 0, "")
+	_ = cmd.Flags().Set("limit", "30")
+	cmd.Flags().String("status", "", "")
+	cmd.Flags().String("vendor", "", "")
+	cmd.Flags().String("product-type", "", "")
+	cmd.Flags().Int("page", 1, "")
+	cmd.Flags().Int("page-size", 20, "")
+
+	if err := productsListCmd.RunE(cmd, []string{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if len(mockClient.listProductsCalls) < 2 {
+		t.Fatalf("expected at least 2 ListProducts calls, got %d", len(mockClient.listProductsCalls))
+	}
+	if mockClient.listProductsCalls[0].Page != 1 || mockClient.listProductsCalls[1].Page != 2 {
+		t.Fatalf("expected calls for pages 1 and 2, got %+v", mockClient.listProductsCalls)
+	}
+
+	var resp api.ProductsListResponse
+	if err := json.Unmarshal(buf.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to unmarshal JSON output: %v", err)
+	}
+	if len(resp.Items) != 30 {
+		t.Fatalf("expected 30 items, got %d", len(resp.Items))
 	}
 }
 

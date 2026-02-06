@@ -29,6 +29,7 @@ var productsListCmd = &cobra.Command{
 		productType, _ := cmd.Flags().GetString("product-type")
 		page, _ := cmd.Flags().GetInt("page")
 		pageSize, _ := cmd.Flags().GetInt("page-size")
+		limit, _ := cmd.Flags().GetInt("limit")
 
 		opts := &api.ProductsListOptions{
 			Page:        page,
@@ -42,9 +43,60 @@ var productsListCmd = &cobra.Command{
 			opts.SortOrder = sortOrder
 		}
 
-		resp, err := client.ListProducts(cmd.Context(), opts)
-		if err != nil {
-			return fmt.Errorf("failed to list products: %w", err)
+		resp := &api.ProductsListResponse{}
+		if limit > 0 {
+			curPage := opts.Page
+			perPage := opts.PageSize
+			if perPage <= 0 || perPage > limit {
+				perPage = limit
+			}
+
+			items := make([]api.Product, 0, limit)
+			totalCount := 0
+			hasMore := false
+			var pagination api.Pagination
+
+			for len(items) < limit {
+				pageOpts := *opts
+				pageOpts.Page = curPage
+				pageOpts.PageSize = perPage
+
+				pageResp, err := client.ListProducts(cmd.Context(), &pageOpts)
+				if err != nil {
+					return fmt.Errorf("failed to list products: %w", err)
+				}
+				if totalCount == 0 {
+					totalCount = pageResp.TotalCount
+					pagination = pageResp.Pagination
+				}
+				items = append(items, pageResp.Items...)
+				hasMore = pageResp.HasMore
+
+				if !pageResp.HasMore || len(pageResp.Items) == 0 {
+					break
+				}
+				curPage++
+			}
+
+			if len(items) > limit {
+				items = items[:limit]
+				hasMore = true
+			}
+
+			resp.Items = items
+			resp.Page = opts.Page
+			resp.PageSize = perPage
+			resp.TotalCount = totalCount
+			resp.HasMore = hasMore
+			resp.Pagination = pagination
+			resp.Pagination.CurrentPage = opts.Page
+			resp.Pagination.PerPage = perPage
+		} else {
+			r, err := client.ListProducts(cmd.Context(), opts)
+			if err != nil {
+				return fmt.Errorf("failed to list products: %w", err)
+			}
+			resp = r
 		}
 
 		formatter := getFormatter(cmd)
@@ -73,7 +125,7 @@ var productsListCmd = &cobra.Command{
 		}
 
 		formatter.Table(headers, rows)
-		fmt.Printf("\nShowing %d of %d products\n", len(resp.Items), resp.TotalCount)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d products\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
@@ -100,21 +152,22 @@ var productsGetCmd = &cobra.Command{
 			return formatter.JSON(product)
 		}
 
-		fmt.Printf("Product ID:     %s\n", product.ID)
-		fmt.Printf("Title:          %s\n", product.Title)
-		fmt.Printf("Handle:         %s\n", product.Handle)
-		fmt.Printf("Status:         %s\n", product.Status)
-		fmt.Printf("Description:    %s\n", product.Description)
-		fmt.Printf("Vendor:         %s\n", product.Vendor)
-		fmt.Printf("Product Type:   %s\n", product.ProductType)
-		fmt.Printf("Tags:           %s\n", strings.Join(product.Tags, ", "))
+		out := outWriter(cmd)
+		_, _ = fmt.Fprintf(out, "Product ID:     %s\n", product.ID)
+		_, _ = fmt.Fprintf(out, "Title:          %s\n", product.Title)
+		_, _ = fmt.Fprintf(out, "Handle:         %s\n", product.Handle)
+		_, _ = fmt.Fprintf(out, "Status:         %s\n", product.Status)
+		_, _ = fmt.Fprintf(out, "Description:    %s\n", product.Description)
+		_, _ = fmt.Fprintf(out, "Vendor:         %s\n", product.Vendor)
+		_, _ = fmt.Fprintf(out, "Product Type:   %s\n", product.ProductType)
+		_, _ = fmt.Fprintf(out, "Tags:           %s\n", strings.Join(product.Tags, ", "))
 		priceStr := ""
 		if product.Price != nil {
 			priceStr = product.Price.Label
 		}
-		fmt.Printf("Price:          %s\n", priceStr)
-		fmt.Printf("Created:        %s\n", product.CreatedAt.Format(time.RFC3339))
-		fmt.Printf("Updated:        %s\n", product.UpdatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(out, "Price:          %s\n", priceStr)
+		_, _ = fmt.Fprintf(out, "Created:        %s\n", product.CreatedAt.Format(time.RFC3339))
+		_, _ = fmt.Fprintf(out, "Updated:        %s\n", product.UpdatedAt.Format(time.RFC3339))
 		return nil
 	},
 }

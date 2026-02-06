@@ -23,6 +23,7 @@ func Execute(version, commit, date string) error {
 func init() {
 	rootCmd.PersistentFlags().StringP("store", "s", "", "Store profile name (or set SHOPLINE_STORE)")
 	rootCmd.PersistentFlags().StringP("output", "o", getDefaultOutput(), "Output format: text, json (or set SHOPLINE_OUTPUT)")
+	rootCmd.PersistentFlags().Bool("json", false, "Shorthand for --output json")
 	rootCmd.PersistentFlags().String("color", "auto", "Color mode: auto, always, never")
 	rootCmd.PersistentFlags().String("query", "", "JQ filter for JSON output")
 	rootCmd.PersistentFlags().String("jq", "", "Alias for --query (JQ filter for JSON output)")
@@ -79,11 +80,12 @@ func preRunApplyLimit(cmd *cobra.Command, _ []string) error {
 func preRunSetupQuery(cmd *cobra.Command, _ []string) error {
 	// If any jq/fields are used, ensure JSON output so the flags "do something".
 	output, _ := cmd.Flags().GetString("output")
+	jsonOut, _ := cmd.Flags().GetBool("json")
 	query, _ := cmd.Flags().GetString("query")
 	jq, _ := cmd.Flags().GetString("jq")
 	fields, _ := cmd.Flags().GetString("fields")
 
-	needsJSON := query != "" || jq != "" || fields != ""
+	needsJSON := jsonOut || query != "" || jq != "" || fields != ""
 	if needsJSON && output != "json" {
 		if cmd.Flags().Changed("output") {
 			return fmt.Errorf("--jq/--query/--fields require --output json")
@@ -106,7 +108,7 @@ func preRunSetupQuery(cmd *cobra.Command, _ []string) error {
 		if effective != "" {
 			return fmt.Errorf("--fields and --query/--jq cannot be used together (use one)")
 		}
-		fs, err := parseFieldsFlag(fields)
+		fs, err := parseFieldsWithPresets(cmd, fields)
 		if err != nil {
 			return err
 		}

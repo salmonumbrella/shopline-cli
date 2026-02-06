@@ -106,6 +106,7 @@ var ordersListCmd = &cobra.Command{
 			items := make([]api.OrderSummary, 0, limit)
 			totalCount := 0
 			hasMore := false
+			var pagination api.Pagination
 
 			for len(items) < limit {
 				pageOpts := *opts
@@ -118,6 +119,7 @@ var ordersListCmd = &cobra.Command{
 				}
 				if totalCount == 0 {
 					totalCount = pageResp.TotalCount
+					pagination = pageResp.Pagination
 				}
 				items = append(items, pageResp.Items...)
 				hasMore = pageResp.HasMore
@@ -138,6 +140,9 @@ var ordersListCmd = &cobra.Command{
 			resp.PageSize = perPage
 			resp.TotalCount = totalCount
 			resp.HasMore = hasMore
+			resp.Pagination = pagination
+			resp.Pagination.CurrentPage = opts.Page
+			resp.Pagination.PerPage = perPage
 		} else {
 			r, err := client.ListOrders(cmd.Context(), opts)
 			if err != nil {

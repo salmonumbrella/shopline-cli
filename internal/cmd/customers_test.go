@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -266,10 +267,14 @@ type customersMockAPIClient struct {
 	api.MockClient
 	listCustomersResp               *api.CustomersListResponse
 	listCustomersErr                error
+	listCustomersByPage             map[int]*api.CustomersListResponse
+	listCustomersCalls              []*api.CustomersListOptions
 	getCustomerResp                 *api.Customer
 	getCustomerErr                  error
 	searchCustomersResp             *api.CustomersListResponse
 	searchCustomersErr              error
+	searchCustomersByPage           map[int]*api.CustomersListResponse
+	searchCustomersCalls            []*api.CustomerSearchOptions
 	createCustomerResp              *api.Customer
 	createCustomerErr               error
 	updateCustomerResp              *api.Customer
@@ -286,6 +291,15 @@ type customersMockAPIClient struct {
 }
 
 func (m *customersMockAPIClient) ListCustomers(ctx context.Context, opts *api.CustomersListOptions) (*api.CustomersListResponse, error) {
+	if opts != nil {
+		cp := *opts
+		m.listCustomersCalls = append(m.listCustomersCalls, &cp)
+		if m.listCustomersByPage != nil {
+			if resp, ok := m.listCustomersByPage[opts.Page]; ok {
+				return resp, m.listCustomersErr
+			}
+		}
+	}
 	return m.listCustomersResp, m.listCustomersErr
 }
 
@@ -294,6 +308,15 @@ func (m *customersMockAPIClient) GetCustomer(ctx context.Context, id string) (*a
 }
 
 func (m *customersMockAPIClient) SearchCustomers(ctx context.Context, opts *api.CustomerSearchOptions) (*api.CustomersListResponse, error) {
+	if opts != nil {
+		cp := *opts
+		m.searchCustomersCalls = append(m.searchCustomersCalls, &cp)
+		if m.searchCustomersByPage != nil {
+			if resp, ok := m.searchCustomersByPage[opts.Page]; ok {
+				return resp, m.searchCustomersErr
+			}
+		}
+	}
 	return m.searchCustomersResp, m.searchCustomersErr
 }
 
@@ -624,6 +647,125 @@ func TestCustomersSearchRunEWithJSON(t *testing.T) {
 	}
 	if !strings.Contains(buf.String(), "cust_s") {
 		t.Fatalf("expected output to contain customer id, got: %s", buf.String())
+	}
+}
+
+func TestCustomersListRunELimitPaginates(t *testing.T) {
+	page1 := &api.CustomersListResponse{
+		Items:      make([]api.Customer, 24),
+		TotalCount: 100,
+		HasMore:    true,
+	}
+	for i := range page1.Items {
+		page1.Items[i] = api.Customer{ID: "cust_p1_" + strconv.Itoa(i)}
+	}
+
+	page2 := &api.CustomersListResponse{
+		Items:      make([]api.Customer, 24),
+		TotalCount: 100,
+		HasMore:    false,
+	}
+	for i := range page2.Items {
+		page2.Items[i] = api.Customer{ID: "cust_p2_" + strconv.Itoa(i)}
+	}
+
+	mockClient := &customersMockAPIClient{
+		listCustomersByPage: map[int]*api.CustomersListResponse{
+			1: page1,
+			2: page2,
+		},
+	}
+	cleanup, buf := setupCustomersMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newCustomersTestCmd()
+	_ = cmd.Flags().Set("output", "json")
+	cmd.Flags().Bool("items-only", false, "")
+	cmd.Flags().Int("limit", 0, "")
+	_ = cmd.Flags().Set("limit", "30")
+	cmd.Flags().String("email", "", "")
+	cmd.Flags().String("state", "", "")
+	cmd.Flags().String("tags", "", "")
+	cmd.Flags().Int("page", 1, "")
+	cmd.Flags().Int("page-size", 20, "")
+
+	if err := customersListCmd.RunE(cmd, []string{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if len(mockClient.listCustomersCalls) < 2 {
+		t.Fatalf("expected at least 2 ListCustomers calls, got %d", len(mockClient.listCustomersCalls))
+	}
+	if mockClient.listCustomersCalls[0].Page != 1 || mockClient.listCustomersCalls[1].Page != 2 {
+		t.Fatalf("expected calls for pages 1 and 2, got %+v", mockClient.listCustomersCalls)
+	}
+
+	var resp api.CustomersListResponse
+	if err := json.Unmarshal(buf.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to unmarshal JSON output: %v", err)
+	}
+	if len(resp.Items) != 30 {
+		t.Fatalf("expected 30 items, got %d", len(resp.Items))
+	}
+}
+
+func TestCustomersSearchRunELimitPaginates(t *testing.T) {
+	page1 := &api.CustomersListResponse{
+		Items:      make([]api.Customer, 24),
+		TotalCount: 100,
+		HasMore:    true,
+	}
+	for i := range page1.Items {
+		page1.Items[i] = api.Customer{ID: "cust_s1_" + strconv.Itoa(i)}
+	}
+
+	page2 := &api.CustomersListResponse{
+		Items:      make([]api.Customer, 24),
+		TotalCount: 100,
+		HasMore:    false,
+	}
+	for i := range page2.Items {
+		page2.Items[i] = api.Customer{ID: "cust_s2_" + strconv.Itoa(i)}
+	}
+
+	mockClient := &customersMockAPIClient{
+		searchCustomersByPage: map[int]*api.CustomersListResponse{
+			1: page1,
+			2: page2,
+		},
+	}
+	cleanup, buf := setupCustomersMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newCustomersTestCmd()
+	_ = cmd.Flags().Set("output", "json")
+	cmd.Flags().Bool("items-only", false, "")
+	cmd.Flags().Int("limit", 0, "")
+	_ = cmd.Flags().Set("limit", "30")
+	cmd.Flags().String("q", "", "")
+	_ = cmd.Flags().Set("q", "alice")
+	cmd.Flags().String("email", "", "")
+	cmd.Flags().String("phone", "", "")
+	cmd.Flags().Int("page", 1, "")
+	cmd.Flags().Int("page-size", 20, "")
+
+	if err := customersSearchCmd.RunE(cmd, []string{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if len(mockClient.searchCustomersCalls) < 2 {
+		t.Fatalf("expected at least 2 SearchCustomers calls, got %d", len(mockClient.searchCustomersCalls))
+	}
+	if mockClient.searchCustomersCalls[0].Page != 1 || mockClient.searchCustomersCalls[1].Page != 2 {
+		t.Fatalf("expected calls for pages 1 and 2, got %+v", mockClient.searchCustomersCalls)
+	}
+
+	var resp api.CustomersListResponse
+	if err := json.Unmarshal(buf.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to unmarshal JSON output: %v", err)
+	}
+	if len(resp.Items) != 30 {
+		t.Fatalf("expected 30 items, got %d", len(resp.Items))
 	}
 }
 
