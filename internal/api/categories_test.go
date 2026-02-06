@@ -8,6 +8,37 @@ import (
 	"testing"
 )
 
+func TestCategoriesBulkUpdateProductSorting(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
+		}
+		if r.URL.Path != "/categories/cat_123/products_sorting" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("Failed to decode request body: %v", err)
+		}
+		if body["op"] != "move" {
+			t.Errorf("Unexpected body: %v", body)
+		}
+
+		_ = json.NewEncoder(w).Encode(map[string]any{"ok": true})
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	_, err := client.BulkUpdateCategoryProductSorting(context.Background(), "cat_123", map[string]any{"op": "move"})
+	if err != nil {
+		t.Fatalf("BulkUpdateCategoryProductSorting failed: %v", err)
+	}
+}
+
 func TestCategoriesList(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {

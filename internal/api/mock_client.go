@@ -26,7 +26,6 @@ func (m *MockClient) SetHandler(method string, handler interface{}) {
 	m.handlers[method] = handler
 }
 
-
 // notImplemented returns an error for methods without handlers.
 func (m *MockClient) notImplemented(method string) error {
 	return fmt.Errorf("mock: %s not implemented", method)
@@ -160,6 +159,10 @@ func (m *MockClient) CreateCategory(ctx context.Context, req *CategoryCreateRequ
 
 func (m *MockClient) CreateChannel(ctx context.Context, req *ChannelCreateRequest) (*Channel, error) {
 	return nil, m.notImplemented("CreateChannel")
+}
+
+func (m *MockClient) CreateChannelProductPrice(ctx context.Context, channelID, productID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("CreateChannelProductPrice")
 }
 
 func (m *MockClient) CreateCollection(ctx context.Context, req *CollectionCreateRequest) (*Collection, error) {
@@ -776,6 +779,10 @@ func (m *MockClient) GetCDPSegment(ctx context.Context, id string) (*CDPSegment,
 
 func (m *MockClient) GetChannel(ctx context.Context, id string) (*Channel, error) {
 	return nil, m.notImplemented("GetChannel")
+}
+
+func (m *MockClient) GetChannelPrices(ctx context.Context, channelID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetChannelPrices")
 }
 
 func (m *MockClient) GetChannelProductListing(ctx context.Context, channelID, productID string) (*ChannelProductListing, error) {
@@ -1686,8 +1693,16 @@ func (m *MockClient) UpdateCategory(ctx context.Context, id string, req *Categor
 	return nil, m.notImplemented("UpdateCategory")
 }
 
+func (m *MockClient) BulkUpdateCategoryProductSorting(ctx context.Context, id string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("BulkUpdateCategoryProductSorting")
+}
+
 func (m *MockClient) UpdateChannel(ctx context.Context, id string, req *ChannelUpdateRequest) (*Channel, error) {
 	return nil, m.notImplemented("UpdateChannel")
+}
+
+func (m *MockClient) UpdateChannelProductPrice(ctx context.Context, channelID, productID, priceID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateChannelProductPrice")
 }
 
 func (m *MockClient) UpdateChannelProductListing(ctx context.Context, channelID, productID string, req *ChannelProductUpdateRequest) (*ChannelProductListing, error) {

@@ -31,7 +31,7 @@
   },
   {
     "method": "PUT",
-    "path": "/addon_products/update-quantity",
+    "path": "/addon_products/update_quantity",
     "source": "internal/api/addon_products.go"
   },
   {
@@ -61,7 +61,7 @@
   },
   {
     "method": "PUT",
-    "path": "/addon_products/{}/update-quantity",
+    "path": "/addon_products/{}/update_quantity",
     "source": "internal/api/addon_products.go"
   },
   {
@@ -275,6 +275,11 @@
     "source": "internal/api/categories.go"
   },
   {
+    "method": "PUT",
+    "path": "/categories/{}/products_sorting",
+    "source": "internal/api/categories.go"
+  },
+  {
     "method": "GET",
     "path": "/cdp/events",
     "source": "internal/api/cdp.go"
@@ -331,6 +336,11 @@
   },
   {
     "method": "GET",
+    "path": "/channels/{}/prices",
+    "source": "internal/api/channel_prices.go"
+  },
+  {
+    "method": "GET",
     "path": "/channels/{}/product_listings",
     "source": "internal/api/channel_products.go"
   },
@@ -368,6 +378,16 @@
     "method": "DELETE",
     "path": "/channels/{}/products/{}",
     "source": "internal/api/channels.go"
+  },
+  {
+    "method": "POST",
+    "path": "/channels/{}/products/{}/prices",
+    "source": "internal/api/channel_prices.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/channels/{}/products/{}/prices/{}",
+    "source": "internal/api/channel_prices.go"
   },
   {
     "method": "GET",

@@ -27,10 +27,11 @@ func TestCategoriesCommandSetup(t *testing.T) {
 // TestCategoriesSubcommands verifies all subcommands are registered
 func TestCategoriesSubcommands(t *testing.T) {
 	subcommands := map[string]string{
-		"list":   "List categories",
-		"get":    "Get category details",
-		"create": "Create a category",
-		"delete": "Delete a category",
+		"list":             "List categories",
+		"get":              "Get category details",
+		"create":           "Create a category",
+		"delete":           "Delete a category",
+		"products-sorting": "Manage category product sorting",
 	}
 
 	for name, short := range subcommands {
@@ -276,13 +277,13 @@ func TestCategoriesWithMockStore(t *testing.T) {
 // categoriesMockAPIClient is a mock implementation of api.APIClient for categories tests.
 type categoriesMockAPIClient struct {
 	api.MockClient
-	listCategoriesResp  *api.CategoriesListResponse
-	listCategoriesErr   error
-	getCategoryResp     *api.Category
-	getCategoryErr      error
-	createCategoryResp  *api.Category
-	createCategoryErr   error
-	deleteCategoryErr   error
+	listCategoriesResp *api.CategoriesListResponse
+	listCategoriesErr  error
+	getCategoryResp    *api.Category
+	getCategoryErr     error
+	createCategoryResp *api.Category
+	createCategoryErr  error
+	deleteCategoryErr  error
 }
 
 func (m *categoriesMockAPIClient) ListCategories(ctx context.Context, opts *api.CategoriesListOptions) (*api.CategoriesListResponse, error) {
@@ -681,8 +682,8 @@ func TestCategoriesCreateRunE(t *testing.T) {
 			wantOutput: "cat_child",
 		},
 		{
-			name:    "create with minimal fields",
-			title:   "Books",
+			name:  "create with minimal fields",
+			title: "Books",
 			mockResp: &api.Category{
 				ID:        "cat_minimal",
 				Title:     "Books",

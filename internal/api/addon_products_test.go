@@ -8,6 +8,74 @@ import (
 	"testing"
 )
 
+func TestAddonProductsUpdateQuantity(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
+		}
+		if r.URL.Path != "/addon_products/ap_123/update_quantity" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+
+		var req AddonProductQuantityRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			t.Fatalf("Failed to decode request: %v", err)
+		}
+		if req.Quantity != 7 {
+			t.Errorf("Expected quantity 7, got %d", req.Quantity)
+		}
+
+		_ = json.NewEncoder(w).Encode(AddonProduct{ID: "ap_123", Quantity: req.Quantity})
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	ap, err := client.UpdateAddonProductQuantity(context.Background(), "ap_123", &AddonProductQuantityRequest{Quantity: 7})
+	if err != nil {
+		t.Fatalf("UpdateAddonProductQuantity failed: %v", err)
+	}
+	if ap.ID != "ap_123" {
+		t.Errorf("Unexpected addon product ID: %s", ap.ID)
+	}
+	if ap.Quantity != 7 {
+		t.Errorf("Unexpected quantity: %d", ap.Quantity)
+	}
+}
+
+func TestAddonProductsBulkUpdateQuantityBySKU(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("Expected PUT, got %s", r.Method)
+		}
+		if r.URL.Path != "/addon_products/update_quantity" {
+			t.Errorf("Unexpected path: %s", r.URL.Path)
+		}
+
+		var req AddonProductQuantityBySKURequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			t.Fatalf("Failed to decode request: %v", err)
+		}
+		if req.SKU != "SKU-1" || req.Quantity != 9 {
+			t.Errorf("Unexpected request: sku=%q quantity=%d", req.SKU, req.Quantity)
+		}
+
+		_ = json.NewEncoder(w).Encode(AddonProduct{ID: "ap_bulk"})
+	}))
+	defer server.Close()
+
+	client := NewClient("test", "token")
+	client.BaseURL = server.URL
+	client.SetUseOpenAPI(false)
+
+	_, err := client.UpdateAddonProductsQuantityBySKU(context.Background(), &AddonProductQuantityBySKURequest{SKU: "SKU-1", Quantity: 9})
+	if err != nil {
+		t.Fatalf("UpdateAddonProductsQuantityBySKU failed: %v", err)
+	}
+}
+
 func TestAddonProductsList(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {

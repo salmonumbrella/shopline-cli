@@ -182,7 +182,7 @@ func (c *Client) UpdateAddonProductQuantity(ctx context.Context, id string, req 
 		return nil, fmt.Errorf("addon product id is required")
 	}
 	var addonProduct AddonProduct
-	if err := c.Put(ctx, fmt.Sprintf("/addon_products/%s/update-quantity", id), req, &addonProduct); err != nil {
+	if err := c.Put(ctx, fmt.Sprintf("/addon_products/%s/update_quantity", id), req, &addonProduct); err != nil {
 		return nil, err
 	}
 	return &addonProduct, nil
@@ -191,7 +191,7 @@ func (c *Client) UpdateAddonProductQuantity(ctx context.Context, id string, req 
 // UpdateAddonProductsQuantityBySKU updates the quantity of addon products by SKU (bulk operation).
 func (c *Client) UpdateAddonProductsQuantityBySKU(ctx context.Context, req *AddonProductQuantityBySKURequest) (*AddonProduct, error) {
 	var addonProduct AddonProduct
-	if err := c.Put(ctx, "/addon_products/update-quantity", req, &addonProduct); err != nil {
+	if err := c.Put(ctx, "/addon_products/update_quantity", req, &addonProduct); err != nil {
 		return nil, err
 	}
 	return &addonProduct, nil

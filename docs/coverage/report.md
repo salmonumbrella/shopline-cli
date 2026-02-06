@@ -3,9 +3,9 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 573
-- Missing in code: 142
-- Extra in code: 407
+- Code endpoints detected: 577
+- Missing in code: 136
+- Extra in code: 405
 - Unparsed doc pages: 55
 
 ## Unparsed Doc Pages
@@ -68,8 +68,6 @@
 
 ## Missing In Code
 
-- `PUT /addon_products/update_quantity` (https://open-api.docs.shoplineapp.com/reference/put_addon-products-update-quantity-1)
-- `PUT /addon_products/{}/update_quantity` (https://open-api.docs.shoplineapp.com/reference/put_addon-products-id-update-quantity-1)
 - `POST /affiliate_campaigns/{}/export_report` (https://open-api.docs.shoplineapp.com/reference/post_affiliate-campaigns-id-export-report)
 - `GET /affiliate_campaigns/{}/get_products_sales_ranking` (https://open-api.docs.shoplineapp.com/reference/get_affiliate-campaigns-id-get-products-sales-ranking)
 - `GET /affiliate_campaigns/{}/orders` (https://open-api.docs.shoplineapp.com/reference/get_affiliate-campaigns-id-orders)
@@ -87,10 +85,6 @@
 - `POST /carts/{}/items/metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/post_carts-cart-id-items-metafields-bulk)
 - `PUT /carts/{}/items/metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/put_carts-cart-id-items-metafields-bulk)
 - `POST /carts/{}/prepare` (https://open-api.docs.shoplineapp.com/reference/post_carts-cart-id-prepare)
-- `PUT /categories/{}/products_sorting` (https://open-api.docs.shoplineapp.com/reference/put_categories-id-products-sorting)
-- `GET /channels/{}/prices` (https://open-api.docs.shoplineapp.com/reference/get_channels-id-prices)
-- `POST /channels/{}/products/{}/prices` (https://open-api.docs.shoplineapp.com/reference/post_channels-channel-id-products-id-prices)
-- `PUT /channels/{}/products/{}/prices/{}` (https://open-api.docs.shoplineapp.com/reference/put_channels-channel-id-products-product-id-prices-id)
 - `POST /conversations/message` (https://open-api.docs.shoplineapp.com/reference/post_conversations-message)
 - `GET /customer_groups/{}/customer_group_children` (https://open-api.docs.shoplineapp.com/reference/get_customer-groups-parentcustomergroupid-customer-group-children)
 - `GET /customer_groups/{}/customer_group_children/{}/customer_ids` (https://open-api.docs.shoplineapp.com/reference/get_customer-groups-parentcustomergroupid-customer-group-children-id-customer-ids)
@@ -216,9 +210,7 @@
 - `GET /abandoned_checkouts` (internal/api/abandoned_checkouts.go)
 - `GET /abandoned_checkouts/{}` (internal/api/abandoned_checkouts.go)
 - `POST /abandoned_checkouts/{}/send_recovery_email` (internal/api/abandoned_checkouts.go)
-- `PUT /addon_products/update-quantity` (internal/api/addon_products.go)
 - `DELETE /addon_products/{}` (internal/api/addon_products.go)
-- `PUT /addon_products/{}/update-quantity` (internal/api/addon_products.go)
 - `GET /agents` (internal/api/agents.go)
 - `GET /agents/{}` (internal/api/agents.go)
 - `GET /articles` (internal/api/articles.go)

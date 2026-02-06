@@ -32,6 +32,7 @@ func TestChannelsSubcommands(t *testing.T) {
 		"create":    "Create a sales channel",
 		"delete":    "Delete a sales channel",
 		"products":  "List products in a channel",
+		"prices":    "Manage product channel prices",
 		"publish":   "Publish a product to a channel",
 		"unpublish": "Unpublish a product from a channel",
 	}
@@ -400,17 +401,17 @@ func TestChannelsWithMockStore(t *testing.T) {
 // channelsMockAPIClient is a mock implementation of api.APIClient for channels tests.
 type channelsMockAPIClient struct {
 	api.MockClient
-	listChannelsResp          *api.ChannelsListResponse
-	listChannelsErr           error
-	getChannelResp            *api.Channel
-	getChannelErr             error
-	createChannelResp         *api.Channel
-	createChannelErr          error
-	deleteChannelErr          error
-	listChannelProductsResp   *api.ChannelProductsResponse
-	listChannelProductsErr    error
-	publishProductErr         error
-	unpublishProductErr       error
+	listChannelsResp        *api.ChannelsListResponse
+	listChannelsErr         error
+	getChannelResp          *api.Channel
+	getChannelErr           error
+	createChannelResp       *api.Channel
+	createChannelErr        error
+	deleteChannelErr        error
+	listChannelProductsResp *api.ChannelProductsResponse
+	listChannelProductsErr  error
+	publishProductErr       error
+	unpublishProductErr     error
 }
 
 func (m *channelsMockAPIClient) ListChannels(ctx context.Context, opts *api.ChannelsListOptions) (*api.ChannelsListResponse, error) {

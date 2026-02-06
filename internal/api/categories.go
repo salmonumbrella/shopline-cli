@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"strconv"
@@ -122,4 +123,19 @@ func (c *Client) DeleteCategory(ctx context.Context, id string) error {
 		return fmt.Errorf("category id is required")
 	}
 	return c.Delete(ctx, fmt.Sprintf("/categories/%s", id))
+}
+
+// BulkUpdateCategoryProductSorting updates the product sorting within a category.
+//
+// Docs: PUT /categories/{id}/products_sorting
+func (c *Client) BulkUpdateCategoryProductSorting(ctx context.Context, id string, body any) (json.RawMessage, error) {
+	if strings.TrimSpace(id) == "" {
+		return nil, fmt.Errorf("category id is required")
+	}
+
+	var resp json.RawMessage
+	if err := c.Put(ctx, fmt.Sprintf("/categories/%s/products_sorting", id), body, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
