@@ -3,8 +3,8 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 604
-- Missing in code: 108
+- Code endpoints detected: 618
+- Missing in code: 94
 - Extra in code: 404
 - Unparsed doc pages: 55
 
@@ -72,19 +72,6 @@
 - `GET /affiliate_campaigns/{}/get_products_sales_ranking` (https://open-api.docs.shoplineapp.com/reference/get_affiliate-campaigns-id-get-products-sales-ranking)
 - `GET /affiliate_campaigns/{}/orders` (https://open-api.docs.shoplineapp.com/reference/get_affiliate-campaigns-id-orders)
 - `GET /affiliate_campaigns/{}/summary` (https://open-api.docs.shoplineapp.com/reference/get_affiliate-campaigns-id-summary)
-- `POST /carts/exchange` (https://open-api.docs.shoplineapp.com/reference/post_carts-exchange)
-- `DELETE /carts/{}/items` (https://open-api.docs.shoplineapp.com/reference/delete_carts-cart-id-items)
-- `PATCH /carts/{}/items` (https://open-api.docs.shoplineapp.com/reference/patch_carts-cart-id-items)
-- `POST /carts/{}/items` (https://open-api.docs.shoplineapp.com/reference/post_carts-cart-id-items)
-- `GET /carts/{}/items/app_metafields` (https://open-api.docs.shoplineapp.com/reference/get_carts-cart-id-items-app-metafields)
-- `DELETE /carts/{}/items/app_metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/delete_carts-cart-id-items-app-metafields-bulk)
-- `POST /carts/{}/items/app_metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/post_carts-cart-id-items-app-metafields-bulk)
-- `PUT /carts/{}/items/app_metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/put_carts-cart-id-items-app-metafields-bulk)
-- `GET /carts/{}/items/metafields` (https://open-api.docs.shoplineapp.com/reference/get_carts-cart-id-items-metafields)
-- `DELETE /carts/{}/items/metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/delete_carts-cart-id-items-metafields-bulk)
-- `POST /carts/{}/items/metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/post_carts-cart-id-items-metafields-bulk)
-- `PUT /carts/{}/items/metafields/bulk` (https://open-api.docs.shoplineapp.com/reference/put_carts-cart-id-items-metafields-bulk)
-- `POST /carts/{}/prepare` (https://open-api.docs.shoplineapp.com/reference/post_carts-cart-id-prepare)
 - `POST /conversations/message` (https://open-api.docs.shoplineapp.com/reference/post_conversations-message)
 - `GET /customer_groups/{}/customer_group_children` (https://open-api.docs.shoplineapp.com/reference/get_customer-groups-parentcustomergroupid-customer-group-children)
 - `GET /customer_groups/{}/customer_group_children/{}/customer_ids` (https://open-api.docs.shoplineapp.com/reference/get_customer-groups-parentcustomergroupid-customer-group-children-id-customer-ids)
@@ -163,7 +150,6 @@
 - `POST /settings/theme/publish` (https://open-api.docs.shoplineapp.com/reference/post_settings-theme-publish-1)
 - `GET /settings/third_party_ads` (https://open-api.docs.shoplineapp.com/reference/get_settings-third-party-ads-1)
 - `GET /settings/users` (https://open-api.docs.shoplineapp.com/reference/get_settings-users-1)
-- `GET /staffs/{}/permissions` (https://open-api.docs.shoplineapp.com/reference/get_staffs-id-permissions-1)
 - `GET /storefront/oauth_applications` (https://open-api.docs.shoplineapp.com/reference/get_storefront-oauth-applications)
 - `POST /storefront/oauth_applications` (https://open-api.docs.shoplineapp.com/reference/post_storefront-oauth-applications)
 - `DELETE /storefront/oauth_applications/{}` (https://open-api.docs.shoplineapp.com/reference/delete_storefront-oauth-applications-id)

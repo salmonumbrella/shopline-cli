@@ -89,6 +89,21 @@ type APIClient interface {
 	CreateSizeChart(ctx context.Context, req *SizeChartCreateRequest) (*SizeChart, error)
 	CreateSmartCollection(ctx context.Context, req *SmartCollectionCreateRequest) (*SmartCollection, error)
 	CreateStoreCredit(ctx context.Context, req *StoreCreditCreateRequest) (*StoreCredit, error)
+	// Carts (Open API, /carts/...)
+	ExchangeCart(ctx context.Context, body any) (json.RawMessage, error)
+	PrepareCart(ctx context.Context, cartID string, body any) (json.RawMessage, error)
+	AddCartItems(ctx context.Context, cartID string, body any) (json.RawMessage, error)
+	UpdateCartItems(ctx context.Context, cartID string, body any) (json.RawMessage, error)
+	DeleteCartItems(ctx context.Context, cartID string, body any) (json.RawMessage, error)
+	// Cart item metafields (Open API, /carts/{cart_id}/items/*_metafields)
+	ListCartItemMetafields(ctx context.Context, cartID string) (json.RawMessage, error)
+	BulkCreateCartItemMetafields(ctx context.Context, cartID string, body any) error
+	BulkUpdateCartItemMetafields(ctx context.Context, cartID string, body any) error
+	BulkDeleteCartItemMetafields(ctx context.Context, cartID string, body any) error
+	ListCartItemAppMetafields(ctx context.Context, cartID string) (json.RawMessage, error)
+	BulkCreateCartItemAppMetafields(ctx context.Context, cartID string, body any) error
+	BulkUpdateCartItemAppMetafields(ctx context.Context, cartID string, body any) error
+	BulkDeleteCartItemAppMetafields(ctx context.Context, cartID string, body any) error
 	CreateStorefrontCart(ctx context.Context, req *StorefrontCartCreateRequest) (*StorefrontCart, error)
 	CreateStorefrontOAuthClient(ctx context.Context, req *StorefrontOAuthClientCreateRequest) (*StorefrontOAuthClient, error)
 	CreateStorefrontToken(ctx context.Context, req *StorefrontTokenCreateRequest) (*StorefrontToken, error)
@@ -331,6 +346,7 @@ type APIClient interface {
 	GetSizeChart(ctx context.Context, id string) (*SizeChart, error)
 	GetSmartCollection(ctx context.Context, id string) (*SmartCollection, error)
 	GetStaff(ctx context.Context, id string) (*Staff, error)
+	GetStaffPermissions(ctx context.Context, staffID string) (json.RawMessage, error)
 	GetStoreCredit(ctx context.Context, id string) (*StoreCredit, error)
 	GetStorefrontCart(ctx context.Context, id string) (*StorefrontCart, error)
 	GetStorefrontOAuthClient(ctx context.Context, id string) (*StorefrontOAuthClient, error)

@@ -2108,3 +2108,59 @@ func (m *MockClient) ListMemberPointRules(ctx context.Context) (json.RawMessage,
 func (m *MockClient) BulkUpdateMemberPoints(ctx context.Context, body any) (json.RawMessage, error) {
 	return nil, m.notImplemented("BulkUpdateMemberPoints")
 }
+
+func (m *MockClient) ExchangeCart(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("ExchangeCart")
+}
+
+func (m *MockClient) PrepareCart(ctx context.Context, cartID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("PrepareCart")
+}
+
+func (m *MockClient) AddCartItems(ctx context.Context, cartID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("AddCartItems")
+}
+
+func (m *MockClient) UpdateCartItems(ctx context.Context, cartID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateCartItems")
+}
+
+func (m *MockClient) DeleteCartItems(ctx context.Context, cartID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("DeleteCartItems")
+}
+
+func (m *MockClient) ListCartItemMetafields(ctx context.Context, cartID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListCartItemMetafields")
+}
+
+func (m *MockClient) BulkCreateCartItemMetafields(ctx context.Context, cartID string, body any) error {
+	return m.notImplemented("BulkCreateCartItemMetafields")
+}
+
+func (m *MockClient) BulkUpdateCartItemMetafields(ctx context.Context, cartID string, body any) error {
+	return m.notImplemented("BulkUpdateCartItemMetafields")
+}
+
+func (m *MockClient) BulkDeleteCartItemMetafields(ctx context.Context, cartID string, body any) error {
+	return m.notImplemented("BulkDeleteCartItemMetafields")
+}
+
+func (m *MockClient) ListCartItemAppMetafields(ctx context.Context, cartID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListCartItemAppMetafields")
+}
+
+func (m *MockClient) BulkCreateCartItemAppMetafields(ctx context.Context, cartID string, body any) error {
+	return m.notImplemented("BulkCreateCartItemAppMetafields")
+}
+
+func (m *MockClient) BulkUpdateCartItemAppMetafields(ctx context.Context, cartID string, body any) error {
+	return m.notImplemented("BulkUpdateCartItemAppMetafields")
+}
+
+func (m *MockClient) BulkDeleteCartItemAppMetafields(ctx context.Context, cartID string, body any) error {
+	return m.notImplemented("BulkDeleteCartItemAppMetafields")
+}
+
+func (m *MockClient) GetStaffPermissions(ctx context.Context, staffID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetStaffPermissions")
+}

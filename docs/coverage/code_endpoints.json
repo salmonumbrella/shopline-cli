@@ -220,6 +220,71 @@
     "source": "internal/api/carrier_services.go"
   },
   {
+    "method": "POST",
+    "path": "/carts/exchange",
+    "source": "internal/api/carts.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/carts/{}/items",
+    "source": "internal/api/carts.go"
+  },
+  {
+    "method": "PATCH",
+    "path": "/carts/{}/items",
+    "source": "internal/api/carts.go"
+  },
+  {
+    "method": "POST",
+    "path": "/carts/{}/items",
+    "source": "internal/api/carts.go"
+  },
+  {
+    "method": "GET",
+    "path": "/carts/{}/items/app_metafields",
+    "source": "internal/api/cart_item_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/carts/{}/items/app_metafields/bulk",
+    "source": "internal/api/cart_item_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/carts/{}/items/app_metafields/bulk",
+    "source": "internal/api/cart_item_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/carts/{}/items/app_metafields/bulk",
+    "source": "internal/api/cart_item_metafields.go"
+  },
+  {
+    "method": "GET",
+    "path": "/carts/{}/items/metafields",
+    "source": "internal/api/cart_item_metafields.go"
+  },
+  {
+    "method": "DELETE",
+    "path": "/carts/{}/items/metafields/bulk",
+    "source": "internal/api/cart_item_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/carts/{}/items/metafields/bulk",
+    "source": "internal/api/cart_item_metafields.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/carts/{}/items/metafields/bulk",
+    "source": "internal/api/cart_item_metafields.go"
+  },
+  {
+    "method": "POST",
+    "path": "/carts/{}/prepare",
+    "source": "internal/api/carts.go"
+  },
+  {
     "method": "GET",
     "path": "/catalog_pricing",
     "source": "internal/api/catalog_pricing.go"
@@ -2608,6 +2673,11 @@
     "method": "PUT",
     "path": "/staffs/{}",
     "source": "internal/api/staffs.go"
+  },
+  {
+    "method": "GET",
+    "path": "/staffs/{}/permissions",
+    "source": "internal/api/staff_permissions.go"
   },
   {
     "method": "GET",

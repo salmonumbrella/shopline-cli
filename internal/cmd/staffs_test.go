@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"os"
 	"strings"
@@ -20,7 +21,7 @@ func TestStaffsCmdStructure(t *testing.T) {
 	}
 
 	subcommands := staffsCmd.Commands()
-	expectedSubs := []string{"list", "get", "invite", "update", "delete"}
+	expectedSubs := []string{"list", "get", "invite", "update", "delete", "permissions"}
 
 	for _, exp := range expectedSubs {
 		found := false
@@ -229,6 +230,8 @@ type staffsMockAPIClient struct {
 	listStaffsErr   error
 	getStaffResp    *api.Staff
 	getStaffErr     error
+	getPermsResp    json.RawMessage
+	getPermsErr     error
 	updateStaffResp *api.Staff
 	updateStaffErr  error
 	deleteStaffErr  error
@@ -240,6 +243,10 @@ func (m *staffsMockAPIClient) ListStaffs(ctx context.Context, opts *api.StaffsLi
 
 func (m *staffsMockAPIClient) GetStaff(ctx context.Context, id string) (*api.Staff, error) {
 	return m.getStaffResp, m.getStaffErr
+}
+
+func (m *staffsMockAPIClient) GetStaffPermissions(ctx context.Context, staffID string) (json.RawMessage, error) {
+	return m.getPermsResp, m.getPermsErr
 }
 
 func (m *staffsMockAPIClient) UpdateStaff(ctx context.Context, id string, req *api.StaffUpdateRequest) (*api.Staff, error) {
@@ -940,5 +947,25 @@ func TestStaffsGetWithPhone(t *testing.T) {
 	err := staffsGetCmd.RunE(cmd, []string{"staff_phone"})
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+func TestStaffsPermissionsGetRunEJSON(t *testing.T) {
+	mockClient := &staffsMockAPIClient{
+		getPermsResp: json.RawMessage(`{"permissions":["orders","products"]}`),
+	}
+	cleanup, buf := setupStaffsMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newStaffsTestCmd()
+	_ = cmd.Flags().Set("output", "json")
+
+	err := staffsPermissionsGetCmd.RunE(cmd, []string{"staff_123"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	out := buf.String()
+	if !strings.Contains(out, "\"orders\"") {
+		t.Fatalf("expected orders permission in output, got: %s", out)
 	}
 }

@@ -162,8 +162,8 @@ go run ./cmd/shopline-coverage
 
 ### Phase 4: Storefront API (Carts, Tokens, OAuth)
 
-- [ ] Fill storefront carts endpoints
-- [ ] Add cart item metafields endpoints
+- [x] Fill Storefront API carts endpoints (`/storefront/carts`, `shopline storefront-carts ...`)
+- [x] Fill Open API carts endpoints (`/carts/...`, `shopline carts ...`) including cart item metafields/app_metafields
 - [ ] CLI coverage + tests
 
 ### Phase 5: Everything Else + Polish
