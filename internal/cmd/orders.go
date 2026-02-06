@@ -1,11 +1,13 @@
 package cmd
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
@@ -146,6 +148,155 @@ var ordersListCmd = &cobra.Command{
 
 		formatter := getFormatter(cmd)
 		outputFormat, _ := cmd.Flags().GetString("output")
+
+		// Optional expansion/enrichment for list JSON output.
+		//
+		// Notes:
+		// - List endpoints do not include line items, so expanding products/customers
+		//   requires per-order detail calls.
+		// - We keep this JSON-only to avoid changing the default table output.
+		expands, _ := cmd.Flags().GetStringSlice("expand")
+		jobs, _ := cmd.Flags().GetInt("jobs")
+		if jobs <= 0 {
+			jobs = 4
+		}
+
+		expandDetails := false
+		expandCustomer := false
+		expandProducts := false
+		for _, e := range expands {
+			switch strings.ToLower(strings.TrimSpace(e)) {
+			case "":
+				continue
+			case "details", "detail", "order":
+				expandDetails = true
+			case "customer":
+				expandCustomer = true
+			case "products", "product":
+				expandProducts = true
+			default:
+				return fmt.Errorf("invalid --expand value %q (supported: details, customer, products)", e)
+			}
+		}
+		if expandCustomer || expandProducts {
+			expandDetails = true
+		}
+
+		if outputFormat == "json" && expandDetails && len(resp.Items) > 0 {
+			ctx, cancel := context.WithCancel(cmd.Context())
+			defer cancel()
+
+			sem := make(chan struct{}, jobs)
+			var wg sync.WaitGroup
+			var mu sync.Mutex
+			var firstErr error
+
+			details := make([]api.Order, len(resp.Items))
+
+			productCache := map[string]*api.Product{}
+			var productMu sync.Mutex
+
+			customerCache := map[string]*api.Customer{}
+			var customerMu sync.Mutex
+
+			for i := range resp.Items {
+				wg.Add(1)
+				sem <- struct{}{}
+				go func(i int, orderID string) {
+					defer wg.Done()
+					defer func() { <-sem }()
+
+					if firstErr != nil {
+						return
+					}
+
+					o, err := client.GetOrder(ctx, orderID)
+					if err != nil {
+						mu.Lock()
+						if firstErr == nil {
+							firstErr = fmt.Errorf("failed to expand order details for %s: %w", orderID, err)
+							cancel()
+						}
+						mu.Unlock()
+						return
+					}
+
+					if expandCustomer && o.Customer == nil && o.CustomerID != "" {
+						cid := o.CustomerID
+						var c *api.Customer
+						customerMu.Lock()
+						c = customerCache[cid]
+						customerMu.Unlock()
+						if c == nil {
+							cc, err := client.GetCustomer(ctx, cid)
+							if err != nil {
+								mu.Lock()
+								if firstErr == nil {
+									firstErr = fmt.Errorf("failed to expand customer for order %s: %w", orderID, err)
+									cancel()
+								}
+								mu.Unlock()
+								return
+							}
+							c = cc
+							customerMu.Lock()
+							customerCache[cid] = cc
+							customerMu.Unlock()
+						}
+						o.Customer = c
+					}
+
+					if expandProducts && len(o.LineItems) > 0 {
+						for li := range o.LineItems {
+							pid := strings.TrimSpace(o.LineItems[li].ProductID)
+							if pid == "" {
+								continue
+							}
+
+							var p *api.Product
+							productMu.Lock()
+							p = productCache[pid]
+							productMu.Unlock()
+							if p == nil {
+								pp, err := client.GetProduct(ctx, pid)
+								if err != nil {
+									mu.Lock()
+									if firstErr == nil {
+										firstErr = fmt.Errorf("failed to expand products for order %s: %w", orderID, err)
+										cancel()
+									}
+									mu.Unlock()
+									return
+								}
+								p = pp
+								productMu.Lock()
+								productCache[pid] = pp
+								productMu.Unlock()
+							}
+							o.LineItems[li].Product = p
+						}
+					}
+
+					// Copy out to maintain original ordering.
+					details[i] = *o
+				}(i, resp.Items[i].ID)
+			}
+
+			wg.Wait()
+			if firstErr != nil {
+				return firstErr
+			}
+
+			expanded := &api.ListResponse[api.Order]{
+				Items:      details,
+				Pagination: resp.Pagination,
+				Page:       resp.Page,
+				PageSize:   resp.PageSize,
+				TotalCount: resp.TotalCount,
+				HasMore:    resp.HasMore,
+			}
+			return formatter.JSON(expanded)
+		}
 
 		if outputFormat == "json" {
 			return formatter.JSON(resp)
@@ -434,6 +585,8 @@ func init() {
 	ordersListCmd.Flags().String("to", "", "Filter by created date to (YYYY-MM-DD or RFC3339)")
 	ordersListCmd.Flags().Int("page", 1, "Page number")
 	ordersListCmd.Flags().Int("page-size", 20, "Results per page")
+	ordersListCmd.Flags().StringSlice("expand", nil, "Expand related resources: details, customer, products (adds API calls)")
+	ordersListCmd.Flags().Int("jobs", 4, "Max concurrent API calls for --expand details")
 
 	ordersCmd.AddCommand(ordersGetCmd)
 	ordersGetCmd.Flags().StringSlice("expand", nil, "Expand related resources: customer, products (adds API calls)")

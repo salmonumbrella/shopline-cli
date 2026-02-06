@@ -21,6 +21,7 @@ This plan is the living checklist for bringing `shopline-cli` to:
   - `--output json`, `--query` (jq), structured IDs in text tables
   - `--items-only` for JSON list commands (unwrap `items`)
   - `orders get --expand customer,products`
+  - `orders list --expand details[,customer,products]` (pulls order details per list item; JSON output)
   - Order items surfaced correctly via `subtotal_items` => `line_items`
 
 ## Guiding Principles (Borrowed From `chatwoot-cli`)

@@ -30,6 +30,8 @@ type mockAPIClient struct {
 
 	getOrderResp *api.Order
 	getOrderErr  error
+	getOrderByID map[string]*api.Order
+	getOrderIDs  []string
 
 	cancelOrderErr error
 }
@@ -48,6 +50,12 @@ func (m *mockAPIClient) ListOrders(ctx context.Context, opts *api.OrdersListOpti
 }
 
 func (m *mockAPIClient) GetOrder(ctx context.Context, id string) (*api.Order, error) {
+	m.getOrderIDs = append(m.getOrderIDs, id)
+	if m.getOrderByID != nil {
+		if o, ok := m.getOrderByID[id]; ok {
+			return o, m.getOrderErr
+		}
+	}
 	return m.getOrderResp, m.getOrderErr
 }
 
@@ -855,6 +863,72 @@ func TestOrdersListRunELimitPaginates(t *testing.T) {
 	}
 	if len(resp.Items) != 30 {
 		t.Fatalf("expected 30 items, got %d", len(resp.Items))
+	}
+}
+
+func TestOrdersListRunEJSONExpandDetails(t *testing.T) {
+	mockClient := &mockAPIClient{
+		listOrdersResp: &api.OrdersListResponse{
+			Items: []api.OrderSummary{
+				{ID: "ord_1", OrderNumber: "1001"},
+				{ID: "ord_2", OrderNumber: "1002"},
+			},
+			TotalCount: 2,
+			HasMore:    false,
+		},
+		getOrderByID: map[string]*api.Order{
+			"ord_1": {
+				ID:          "ord_1",
+				OrderNumber: "1001",
+				LineItems:   []api.OrderLineItem{{ID: "li_1", ProductID: "prod_1", Quantity: 1}},
+			},
+			"ord_2": {
+				ID:          "ord_2",
+				OrderNumber: "1002",
+				LineItems:   []api.OrderLineItem{{ID: "li_2", ProductID: "prod_2", Quantity: 2}},
+			},
+		},
+	}
+	cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+	defer cleanup()
+
+	var buf bytes.Buffer
+	formatterWriter = &buf
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "json", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+	cmd.Flags().Bool("items-only", false, "")
+	cmd.Flags().String("status", "", "")
+	cmd.Flags().Int("page", 1, "")
+	cmd.Flags().Int("page-size", 20, "")
+	cmd.Flags().StringSlice("expand", nil, "")
+	cmd.Flags().Int("jobs", 2, "")
+	_ = cmd.Flags().Set("expand", "details")
+
+	if err := ordersListCmd.RunE(cmd, []string{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if len(mockClient.getOrderIDs) != 2 {
+		t.Fatalf("expected 2 GetOrder calls, got %d (%v)", len(mockClient.getOrderIDs), mockClient.getOrderIDs)
+	}
+
+	var resp api.ListResponse[api.Order]
+	if err := json.Unmarshal(buf.Bytes(), &resp); err != nil {
+		t.Fatalf("failed to unmarshal JSON output: %v", err)
+	}
+	if len(resp.Items) != 2 {
+		t.Fatalf("expected 2 items, got %d", len(resp.Items))
+	}
+	if resp.Items[0].ID != "ord_1" || resp.Items[1].ID != "ord_2" {
+		t.Fatalf("unexpected item IDs: %+v", []string{resp.Items[0].ID, resp.Items[1].ID})
+	}
+	if len(resp.Items[0].LineItems) != 1 || len(resp.Items[1].LineItems) != 1 {
+		t.Fatalf("expected line items on expanded orders, got %+v", resp.Items)
 	}
 }
 

@@ -15,6 +15,7 @@
 - Use `--query` for JQ-style filtering on JSON output.
 - List commands return a pagination envelope (`{ items, pagination, ... }`). Use `--items-only` to emit just the `items` array.
 - Data goes to stdout; errors go to stderr.
+- Avoid `2>&1 | jq ...` unless you *want* stderr mixed into your JSON stream.
 
 ## Pagination + Sorting
 - `--limit` sets page size for list commands (0 uses API defaults).
@@ -52,6 +53,9 @@ shopline orders list --from 2024-01-01 --to 2024-01-31
 
 # JSON list convenience (items only)
 shopline orders list --limit 50 -o json --items-only
+
+# Orders with line items (extra API calls; pulls order details for each list item)
+shopline orders list --limit 20 --desc -o json --items-only --expand details
 
 # Order detail with expanded customer + product info on line items (extra API calls)
 shopline orders get [order:$ord_123] -o json --expand customer,products
