@@ -146,12 +146,26 @@ func unwrapItemsField(data interface{}) (interface{}, bool) {
 }
 
 func (f *Formatter) filteredJSON(data interface{}) error {
+	// gojq's type system is based on dynamic JSON values (map[string]any, []any, etc).
+	// Passing typed Go structs/slices can trigger panics in TypeOf().
+	//
+	// To keep agent workflows safe (no panics, predictable jq behavior), we normalize
+	// the input to a generic JSON value first.
+	b, err := json.Marshal(data)
+	if err != nil {
+		return fmt.Errorf("failed to marshal data for query: %w", err)
+	}
+	var normalized any
+	if err := json.Unmarshal(b, &normalized); err != nil {
+		return fmt.Errorf("failed to unmarshal data for query: %w", err)
+	}
+
 	query, err := gojq.Parse(f.query)
 	if err != nil {
 		return fmt.Errorf("invalid query: %w", err)
 	}
 
-	iter := query.Run(data)
+	iter := query.Run(normalized)
 	for {
 		v, ok := iter.Next()
 		if !ok {

@@ -93,6 +93,26 @@ func TestFormatterJSON(t *testing.T) {
 	}
 }
 
+func TestFormatterJSONQueryDoesNotPanicOnTypedSlice(t *testing.T) {
+	type order struct {
+		ID string `json:"id"`
+	}
+
+	var buf bytes.Buffer
+	f := New(&buf, FormatJSON, "never").WithQuery("length")
+	if err := f.JSON([]order{{ID: "o1"}, {ID: "o2"}}); err != nil {
+		t.Fatalf("JSON() returned error: %v", err)
+	}
+
+	var got int
+	if err := json.Unmarshal(buf.Bytes(), &got); err != nil {
+		t.Fatalf("Failed to parse JSON output: %v", err)
+	}
+	if got != 2 {
+		t.Fatalf("expected 2, got %d", got)
+	}
+}
+
 func TestWithQuery(t *testing.T) {
 	var buf bytes.Buffer
 	f := New(&buf, FormatJSON, "never")
