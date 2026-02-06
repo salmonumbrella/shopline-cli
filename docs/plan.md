@@ -104,6 +104,7 @@ Candidate improvements (in priority order):
 
 1. `help --json` parity
    - Machine-readable help output for every command/flag
+   - Add compatibility keys for common tooling expectations (e.g. `commands` alias of `subcommands`)
 2. `schema` improvements
    - Ensure every resource registers schema + ID prefix
    - Add “field presets” like `chatwoot-cli --fields minimal/default/debug` (optional)

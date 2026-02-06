@@ -29,6 +29,8 @@ type helpCommand struct {
 	Deprecated  string        `json:"deprecated,omitempty"`
 	Flags       []helpFlag    `json:"flags,omitempty"`
 	Subcommands []helpCommand `json:"subcommands,omitempty"`
+	// Commands is an alias of subcommands for agent-friendliness (some tooling expects "commands").
+	Commands []helpCommand `json:"commands,omitempty"`
 }
 
 var helpCmd = &cobra.Command{
@@ -91,6 +93,7 @@ func buildHelpCommand(cmd *cobra.Command) helpCommand {
 
 	sort.Slice(info.Flags, func(i, j int) bool { return info.Flags[i].Name < info.Flags[j].Name })
 	sort.Slice(info.Subcommands, func(i, j int) bool { return info.Subcommands[i].Name < info.Subcommands[j].Name })
+	info.Commands = append([]helpCommand{}, info.Subcommands...)
 	return info
 }
 

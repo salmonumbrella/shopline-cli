@@ -67,6 +67,9 @@ func TestBuildHelpCommand(t *testing.T) {
 		if len(info.Subcommands) != 3 {
 			t.Fatalf("expected 3 subcommands, got %d", len(info.Subcommands))
 		}
+		if len(info.Commands) != 3 {
+			t.Fatalf("expected 3 commands alias entries, got %d", len(info.Commands))
+		}
 		if info.Subcommands[0].Name != "alpha" {
 			t.Errorf("first subcommand = %q, want 'alpha'", info.Subcommands[0].Name)
 		}

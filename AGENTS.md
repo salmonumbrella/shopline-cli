@@ -12,7 +12,8 @@
 
 ## Output + Filtering
 - Use `--output json` for machine-readable results.
-- Use `--query` for JQ-style filtering on JSON output.
+- Use `--query` (or `--jq`) for JQ-style filtering on JSON output.
+- Use `--fields id,order_number,...` as a shorthand for common projections (builds an internal jq query).
 - List commands return a pagination envelope (`{ items, pagination, ... }`). Use `--items-only` to emit just the `items` array.
 - Data goes to stdout; errors go to stderr.
 - Avoid `2>&1 | jq ...` unless you *want* stderr mixed into your JSON stream.

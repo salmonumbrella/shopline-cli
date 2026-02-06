@@ -25,6 +25,8 @@ func init() {
 	rootCmd.PersistentFlags().StringP("output", "o", getDefaultOutput(), "Output format: text, json (or set SHOPLINE_OUTPUT)")
 	rootCmd.PersistentFlags().String("color", "auto", "Color mode: auto, always, never")
 	rootCmd.PersistentFlags().String("query", "", "JQ filter for JSON output")
+	rootCmd.PersistentFlags().String("jq", "", "Alias for --query (JQ filter for JSON output)")
+	rootCmd.PersistentFlags().String("fields", "", "Select fields in JSON output (shorthand for --query)")
 	rootCmd.PersistentFlags().Bool("items-only", false, "For JSON list output, emit only the items array (no pagination envelope)")
 	rootCmd.PersistentFlags().BoolP("yes", "y", false, "Skip confirmation prompts")
 	rootCmd.PersistentFlags().Int("limit", 0, "Limit number of results (sets page size for list commands)")
@@ -38,7 +40,7 @@ var rootSetupOnce sync.Once
 func setupRootCommand() {
 	rootSetupOnce.Do(func() {
 		rootCmd.SetHelpCommand(helpCmd)
-		rootCmd.PersistentPreRunE = chainPersistentPreRunE(rootCmd.PersistentPreRunE, preRunNormalizeIDs, preRunApplyLimit)
+		rootCmd.PersistentPreRunE = chainPersistentPreRunE(rootCmd.PersistentPreRunE, preRunNormalizeIDs, preRunApplyLimit, preRunSetupQuery)
 		applyDesirePathAliases(rootCmd)
 	})
 }
@@ -72,6 +74,53 @@ func preRunNormalizeIDs(cmd *cobra.Command, args []string) error {
 
 func preRunApplyLimit(cmd *cobra.Command, _ []string) error {
 	return applyLimitToPageSize(cmd)
+}
+
+func preRunSetupQuery(cmd *cobra.Command, _ []string) error {
+	// If any jq/fields are used, ensure JSON output so the flags "do something".
+	output, _ := cmd.Flags().GetString("output")
+	query, _ := cmd.Flags().GetString("query")
+	jq, _ := cmd.Flags().GetString("jq")
+	fields, _ := cmd.Flags().GetString("fields")
+
+	needsJSON := query != "" || jq != "" || fields != ""
+	if needsJSON && output != "json" {
+		if cmd.Flags().Changed("output") {
+			return fmt.Errorf("--jq/--query/--fields require --output json")
+		}
+		if err := cmd.Flags().Set("output", "json"); err != nil {
+			return err
+		}
+	}
+
+	if query != "" && jq != "" {
+		return fmt.Errorf("--jq and --query cannot be used together (use one)")
+	}
+
+	effective := query
+	if jq != "" {
+		effective = jq
+	}
+
+	if fields != "" {
+		if effective != "" {
+			return fmt.Errorf("--fields and --query/--jq cannot be used together (use one)")
+		}
+		fs, err := parseFieldsFlag(fields)
+		if err != nil {
+			return err
+		}
+		effective = buildFieldsQuery(fs)
+	}
+
+	// Normalize to --query so the rest of the code only needs to read one flag.
+	if effective != "" && effective != query {
+		if err := cmd.Flags().Set("query", effective); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // getDefaultOutput returns the default output format from SHOPLINE_OUTPUT env var or "text".
