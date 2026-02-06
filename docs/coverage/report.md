@@ -3,8 +3,8 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 618
-- Missing in code: 94
+- Code endpoints detected: 639
+- Missing in code: 73
 - Extra in code: 404
 - Unparsed doc pages: 55
 
@@ -129,27 +129,6 @@
 - `PUT /product_review_comments/{}` (https://open-api.docs.shoplineapp.com/reference/put_product-review-comments-id-1)
 - `GET /promotions/coupon-center` (https://open-api.docs.shoplineapp.com/reference/get_promotions-coupon-center)
 - `POST /sales/{}/delete_products` (https://open-api.docs.shoplineapp.com/reference/post_sales-saleid-delete-products)
-- `GET /settings/checkout` (https://open-api.docs.shoplineapp.com/reference/get_settings-checkout-1)
-- `GET /settings/domains` (https://open-api.docs.shoplineapp.com/reference/get_settings-domains)
-- `PUT /settings/domains` (https://open-api.docs.shoplineapp.com/reference/put_settings-domains)
-- `GET /settings/layouts` (https://open-api.docs.shoplineapp.com/reference/get_settings-layouts-1)
-- `GET /settings/layouts/draft` (https://open-api.docs.shoplineapp.com/reference/get_settings-layouts-draft-1)
-- `PUT /settings/layouts/draft` (https://open-api.docs.shoplineapp.com/reference/put_settings-layouts-draft-1)
-- `POST /settings/layouts/publish` (https://open-api.docs.shoplineapp.com/reference/post_settings-layouts-publish-1)
-- `GET /settings/orders` (https://open-api.docs.shoplineapp.com/reference/get_settings-orders-1)
-- `GET /settings/payments` (https://open-api.docs.shoplineapp.com/reference/get_settings-payments)
-- `GET /settings/pos` (https://open-api.docs.shoplineapp.com/reference/get_settings-pos)
-- `GET /settings/product_review` (https://open-api.docs.shoplineapp.com/reference/get_settings-product-review)
-- `GET /settings/products` (https://open-api.docs.shoplineapp.com/reference/get_settings-products)
-- `GET /settings/promotions` (https://open-api.docs.shoplineapp.com/reference/get_settings-promotions)
-- `GET /settings/shop` (https://open-api.docs.shoplineapp.com/reference/get_settings-shop)
-- `GET /settings/tax` (https://open-api.docs.shoplineapp.com/reference/get_settings-tax-1)
-- `GET /settings/theme` (https://open-api.docs.shoplineapp.com/reference/get_settings-theme-1)
-- `GET /settings/theme/draft` (https://open-api.docs.shoplineapp.com/reference/get_settings-theme-draft-1)
-- `PUT /settings/theme/draft` (https://open-api.docs.shoplineapp.com/reference/put_settings-theme-draft-1)
-- `POST /settings/theme/publish` (https://open-api.docs.shoplineapp.com/reference/post_settings-theme-publish-1)
-- `GET /settings/third_party_ads` (https://open-api.docs.shoplineapp.com/reference/get_settings-third-party-ads-1)
-- `GET /settings/users` (https://open-api.docs.shoplineapp.com/reference/get_settings-users-1)
 - `GET /storefront/oauth_applications` (https://open-api.docs.shoplineapp.com/reference/get_storefront-oauth-applications)
 - `POST /storefront/oauth_applications` (https://open-api.docs.shoplineapp.com/reference/post_storefront-oauth-applications)
 - `DELETE /storefront/oauth_applications/{}` (https://open-api.docs.shoplineapp.com/reference/delete_storefront-oauth-applications-id)

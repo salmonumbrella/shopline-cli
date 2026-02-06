@@ -2546,6 +2546,111 @@
   },
   {
     "method": "GET",
+    "path": "/settings/checkout",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/domains",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/settings/domains",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/layouts",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/layouts/draft",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/settings/layouts/draft",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "POST",
+    "path": "/settings/layouts/publish",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/orders",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/payments",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/pos",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/product_review",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/products",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/promotions",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/shop",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/tax",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/theme",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/theme/draft",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "PUT",
+    "path": "/settings/theme/draft",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "POST",
+    "path": "/settings/theme/publish",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/third_party_ads",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "GET",
+    "path": "/settings/users",
+    "source": "internal/api/settings_endpoints.go"
+  },
+  {
+    "method": "GET",
     "path": "/shipments",
     "source": "internal/api/shipments.go"
   },

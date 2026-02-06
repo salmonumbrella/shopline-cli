@@ -25,6 +25,8 @@ go run ./cmd/shopline-coverage
 - Staff permissions (`GET /staffs/{id}/permissions`) (done)
 - [x] Carts
 - Cart items (`POST/PATCH/DELETE /carts/{cart_id}/items`) + prepare/exchange + item metafields/app_metafields (done)
+- [x] Settings
+- /settings/* documented endpoints (checkout/domains/layouts/theme/users/etc.) (done)
 - [ ] Webhooks
 
 ## Storefront API

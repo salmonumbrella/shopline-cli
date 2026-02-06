@@ -2164,3 +2164,87 @@ func (m *MockClient) BulkDeleteCartItemAppMetafields(ctx context.Context, cartID
 func (m *MockClient) GetStaffPermissions(ctx context.Context, staffID string) (json.RawMessage, error) {
 	return nil, m.notImplemented("GetStaffPermissions")
 }
+
+func (m *MockClient) GetSettingsCheckout(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetSettingsCheckout")
+}
+
+func (m *MockClient) GetSettingsDomains(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetSettingsDomains")
+}
+
+func (m *MockClient) UpdateSettingsDomains(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateSettingsDomains")
+}
+
+func (m *MockClient) GetSettingsLayouts(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetSettingsLayouts")
+}
+
+func (m *MockClient) GetSettingsLayoutsDraft(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetSettingsLayoutsDraft")
+}
+
+func (m *MockClient) UpdateSettingsLayoutsDraft(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateSettingsLayoutsDraft")
+}
+
+func (m *MockClient) PublishSettingsLayouts(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("PublishSettingsLayouts")
+}
+
+func (m *MockClient) GetSettingsOrders(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetSettingsOrders")
+}
+
+func (m *MockClient) GetSettingsPayments(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetSettingsPayments")
+}
+
+func (m *MockClient) GetSettingsPOS(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetSettingsPOS")
+}
+
+func (m *MockClient) GetSettingsProductReview(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetSettingsProductReview")
+}
+
+func (m *MockClient) GetSettingsProducts(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetSettingsProducts")
+}
+
+func (m *MockClient) GetSettingsPromotions(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetSettingsPromotions")
+}
+
+func (m *MockClient) GetSettingsShop(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetSettingsShop")
+}
+
+func (m *MockClient) GetSettingsTax(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetSettingsTax")
+}
+
+func (m *MockClient) GetSettingsTheme(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetSettingsTheme")
+}
+
+func (m *MockClient) GetSettingsThemeDraft(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetSettingsThemeDraft")
+}
+
+func (m *MockClient) UpdateSettingsThemeDraft(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateSettingsThemeDraft")
+}
+
+func (m *MockClient) PublishSettingsTheme(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("PublishSettingsTheme")
+}
+
+func (m *MockClient) GetSettingsThirdPartyAds(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetSettingsThirdPartyAds")
+}
+
+func (m *MockClient) GetSettingsUsers(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetSettingsUsers")
+}
