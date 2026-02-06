@@ -18,6 +18,7 @@
 
 ## Pagination + Sorting
 - `--limit` sets page size for list commands (0 uses API defaults).
+- `orders list` special-case: `--limit N` is treated as “return up to N orders” and will auto-paginate across pages to reach N (useful when the API caps/ignores `page_size`).
 - `--page` and `--page-size` remain available on list commands.
 - `--sort-by` and `--desc` work on list commands that support sorting.
 
