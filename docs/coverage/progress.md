@@ -60,9 +60,13 @@ go run ./cmd/shopline-coverage
 - `POST /media` (done)
 - [x] Sales (docs endpoints)
 - `POST /sales/{saleId}/delete_products` (done)
+- [x] Affiliate campaigns (docs endpoints)
+- `GET /affiliate_campaigns/{id}/orders` + `GET /affiliate_campaigns/{id}/summary` + `GET /affiliate_campaigns/{id}/get_products_sales_ranking` + `POST /affiliate_campaigns/{id}/export_report` (done)
+- [x] Conversations (docs endpoints)
+- `POST /conversations/message` (done)
 
 ## Storefront API
 
 - [x] Carts
-- [ ] Storefront tokens
+- [x] Storefront tokens
 - [x] Storefront OAuth applications

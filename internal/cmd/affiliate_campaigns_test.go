@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -24,6 +25,15 @@ type affiliateCampaignsMockAPIClient struct {
 	createAffiliateCampaignResp *api.AffiliateCampaign
 	createAffiliateCampaignErr  error
 	deleteAffiliateCampaignErr  error
+
+	getOrdersResp  json.RawMessage
+	getOrdersErr   error
+	getSummaryResp json.RawMessage
+	getSummaryErr  error
+	getRankingResp json.RawMessage
+	getRankingErr  error
+	exportResp     json.RawMessage
+	exportErr      error
 }
 
 func (m *affiliateCampaignsMockAPIClient) ListAffiliateCampaigns(ctx context.Context, opts *api.AffiliateCampaignsListOptions) (*api.AffiliateCampaignsListResponse, error) {
@@ -40,6 +50,22 @@ func (m *affiliateCampaignsMockAPIClient) CreateAffiliateCampaign(ctx context.Co
 
 func (m *affiliateCampaignsMockAPIClient) DeleteAffiliateCampaign(ctx context.Context, id string) error {
 	return m.deleteAffiliateCampaignErr
+}
+
+func (m *affiliateCampaignsMockAPIClient) GetAffiliateCampaignOrders(ctx context.Context, id string, opts *api.AffiliateCampaignOrdersOptions) (json.RawMessage, error) {
+	return m.getOrdersResp, m.getOrdersErr
+}
+
+func (m *affiliateCampaignsMockAPIClient) GetAffiliateCampaignSummary(ctx context.Context, id string) (json.RawMessage, error) {
+	return m.getSummaryResp, m.getSummaryErr
+}
+
+func (m *affiliateCampaignsMockAPIClient) GetAffiliateCampaignProductsSalesRanking(ctx context.Context, id string, opts *api.AffiliateCampaignProductsSalesRankingOptions) (json.RawMessage, error) {
+	return m.getRankingResp, m.getRankingErr
+}
+
+func (m *affiliateCampaignsMockAPIClient) ExportAffiliateCampaignReport(ctx context.Context, id string, body any) (json.RawMessage, error) {
+	return m.exportResp, m.exportErr
 }
 
 // setupAffiliateCampaignsMockFactories sets up mock factories for affiliate campaigns tests.
@@ -678,10 +704,14 @@ func TestAffiliateCampaignsCommandStructure(t *testing.T) {
 
 	subcommands := affiliateCampaignsCmd.Commands()
 	expectedCmds := map[string]bool{
-		"list":   false,
-		"get":    false,
-		"create": false,
-		"delete": false,
+		"list":                   false,
+		"get":                    false,
+		"create":                 false,
+		"delete":                 false,
+		"orders":                 false,
+		"summary":                false,
+		"products-sales-ranking": false,
+		"export-report":          false,
 	}
 
 	for _, cmd := range subcommands {
@@ -700,10 +730,14 @@ func TestAffiliateCampaignsCommandStructure(t *testing.T) {
 // TestAffiliateCampaignsSubcommandDescriptions verifies subcommand descriptions.
 func TestAffiliateCampaignsSubcommandDescriptions(t *testing.T) {
 	subcommands := map[string]string{
-		"list":   "List affiliate campaigns",
-		"get":    "Get affiliate campaign details",
-		"create": "Create an affiliate campaign",
-		"delete": "Delete an affiliate campaign",
+		"list":                   "List affiliate campaigns",
+		"get":                    "Get affiliate campaign details",
+		"create":                 "Create an affiliate campaign",
+		"delete":                 "Delete an affiliate campaign",
+		"orders":                 "Get affiliate campaign orders (documented endpoint; raw JSON)",
+		"summary":                "Get affiliate campaign summary (documented endpoint; raw JSON)",
+		"products-sales-ranking": "Get products sales ranking of campaign (documented endpoint; raw JSON)",
+		"export-report":          "Export affiliate campaign report to partner (documented endpoint; raw JSON body)",
 	}
 
 	for use, short := range subcommands {
@@ -772,5 +806,83 @@ func TestAffiliateCampaignsDeleteArgsValidation(t *testing.T) {
 	err = affiliateCampaignsDeleteCmd.Args(affiliateCampaignsDeleteCmd, []string{"id1"})
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+func TestAffiliateCampaignsOrdersRunE(t *testing.T) {
+	mockClient := &affiliateCampaignsMockAPIClient{
+		getOrdersResp: json.RawMessage(`{"items":[]}`),
+	}
+	cleanup, buf := setupAffiliateCampaignsMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newAffiliateCampaignsTestCmd()
+	cmd.Flags().Int("page", 1, "")
+	cmd.Flags().Int("page-size", 20, "")
+	_ = cmd.Flags().Set("output", "json")
+
+	if err := affiliateCampaignsOrdersCmd.RunE(cmd, []string{"camp_123"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "\"items\"") {
+		t.Fatalf("expected items in output, got %q", buf.String())
+	}
+}
+
+func TestAffiliateCampaignsSummaryRunE(t *testing.T) {
+	mockClient := &affiliateCampaignsMockAPIClient{
+		getSummaryResp: json.RawMessage(`{"ok":true}`),
+	}
+	cleanup, buf := setupAffiliateCampaignsMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newAffiliateCampaignsTestCmd()
+	_ = cmd.Flags().Set("output", "json")
+
+	if err := affiliateCampaignsSummaryCmd.RunE(cmd, []string{"camp_123"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "\"ok\"") {
+		t.Fatalf("expected ok in output, got %q", buf.String())
+	}
+}
+
+func TestAffiliateCampaignsProductsSalesRankingRunE(t *testing.T) {
+	mockClient := &affiliateCampaignsMockAPIClient{
+		getRankingResp: json.RawMessage(`{"items":[]}`),
+	}
+	cleanup, buf := setupAffiliateCampaignsMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newAffiliateCampaignsTestCmd()
+	cmd.Flags().Int("page", 1, "")
+	cmd.Flags().Int("page-size", 20, "")
+	_ = cmd.Flags().Set("output", "json")
+
+	if err := affiliateCampaignsProductsSalesRankingCmd.RunE(cmd, []string{"camp_123"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "\"items\"") {
+		t.Fatalf("expected items in output, got %q", buf.String())
+	}
+}
+
+func TestAffiliateCampaignsExportReportRunE(t *testing.T) {
+	mockClient := &affiliateCampaignsMockAPIClient{
+		exportResp: json.RawMessage(`{"job_id":"job_1"}`),
+	}
+	cleanup, buf := setupAffiliateCampaignsMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newAffiliateCampaignsTestCmd()
+	addJSONBodyFlags(cmd)
+	_ = cmd.Flags().Set("output", "json")
+	_ = cmd.Flags().Set("body", `{"email":"test@example.com"}`)
+
+	if err := affiliateCampaignsExportReportCmd.RunE(cmd, []string{"camp_123"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "\"job_id\"") {
+		t.Fatalf("expected job_id in output, got %q", buf.String())
 	}
 }

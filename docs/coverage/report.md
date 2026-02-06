@@ -3,8 +3,8 @@
 ## Summary
 
 - Docs endpoints parsed: 308
-- Code endpoints detected: 687
-- Missing in code: 24
+- Code endpoints detected: 692
+- Missing in code: 19
 - Extra in code: 403
 - Unparsed doc pages: 55
 
@@ -68,11 +68,6 @@
 
 ## Missing In Code
 
-- `POST /affiliate_campaigns/{}/export_report` (https://open-api.docs.shoplineapp.com/reference/post_affiliate-campaigns-id-export-report)
-- `GET /affiliate_campaigns/{}/get_products_sales_ranking` (https://open-api.docs.shoplineapp.com/reference/get_affiliate-campaigns-id-get-products-sales-ranking)
-- `GET /affiliate_campaigns/{}/orders` (https://open-api.docs.shoplineapp.com/reference/get_affiliate-campaigns-id-orders)
-- `GET /affiliate_campaigns/{}/summary` (https://open-api.docs.shoplineapp.com/reference/get_affiliate-campaigns-id-summary)
-- `POST /conversations/message` (https://open-api.docs.shoplineapp.com/reference/post_conversations-message)
 - `PUT /gifts/update_quantity` (https://open-api.docs.shoplineapp.com/reference/put_gifts-update-quantity-1)
 - `PUT /gifts/{}` (https://open-api.docs.shoplineapp.com/reference/put_gifts-id)
 - `GET /gifts/{}/stocks` (https://open-api.docs.shoplineapp.com/reference/get_gifts-id-stocks-1)

@@ -190,6 +190,101 @@ var affiliateCampaignsDeleteCmd = &cobra.Command{
 	},
 }
 
+var affiliateCampaignsOrdersCmd = &cobra.Command{
+	Use:   "orders <id>",
+	Short: "Get affiliate campaign orders (documented endpoint; raw JSON)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+
+		resp, err := client.GetAffiliateCampaignOrders(cmd.Context(), args[0], &api.AffiliateCampaignOrdersOptions{
+			Page:     page,
+			PageSize: pageSize,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to get affiliate campaign orders: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var affiliateCampaignsSummaryCmd = &cobra.Command{
+	Use:   "summary <id>",
+	Short: "Get affiliate campaign summary (documented endpoint; raw JSON)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.GetAffiliateCampaignSummary(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to get affiliate campaign summary: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var affiliateCampaignsProductsSalesRankingCmd = &cobra.Command{
+	Use:   "products-sales-ranking <id>",
+	Short: "Get products sales ranking of campaign (documented endpoint; raw JSON)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+
+		resp, err := client.GetAffiliateCampaignProductsSalesRanking(cmd.Context(), args[0], &api.AffiliateCampaignProductsSalesRankingOptions{
+			Page:     page,
+			PageSize: pageSize,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to get affiliate campaign products sales ranking: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var affiliateCampaignsExportReportCmd = &cobra.Command{
+	Use:   "export-report <id>",
+	Short: "Export affiliate campaign report to partner (documented endpoint; raw JSON body)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			fmt.Printf("[DRY-RUN] Would export affiliate campaign report for %s\n", args[0])
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.ExportAffiliateCampaignReport(cmd.Context(), args[0], body)
+		if err != nil {
+			return fmt.Errorf("failed to export affiliate campaign report: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(affiliateCampaignsCmd)
 
@@ -210,4 +305,17 @@ func init() {
 
 	affiliateCampaignsCmd.AddCommand(affiliateCampaignsDeleteCmd)
 	affiliateCampaignsDeleteCmd.Flags().Bool("yes", false, "Skip confirmation prompt")
+
+	affiliateCampaignsCmd.AddCommand(affiliateCampaignsOrdersCmd)
+	affiliateCampaignsOrdersCmd.Flags().Int("page", 1, "Page number")
+	affiliateCampaignsOrdersCmd.Flags().Int("page-size", 20, "Results per page")
+
+	affiliateCampaignsCmd.AddCommand(affiliateCampaignsSummaryCmd)
+
+	affiliateCampaignsCmd.AddCommand(affiliateCampaignsProductsSalesRankingCmd)
+	affiliateCampaignsProductsSalesRankingCmd.Flags().Int("page", 1, "Page number")
+	affiliateCampaignsProductsSalesRankingCmd.Flags().Int("page-size", 20, "Results per page")
+
+	affiliateCampaignsCmd.AddCommand(affiliateCampaignsExportReportCmd)
+	addJSONBodyFlags(affiliateCampaignsExportReportCmd)
 }

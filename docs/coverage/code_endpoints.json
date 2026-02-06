@@ -90,6 +90,26 @@
     "source": "internal/api/affiliate_campaigns.go"
   },
   {
+    "method": "POST",
+    "path": "/affiliate_campaigns/{}/export_report",
+    "source": "internal/api/affiliate_campaigns_docs.go"
+  },
+  {
+    "method": "GET",
+    "path": "/affiliate_campaigns/{}/get_products_sales_ranking",
+    "source": "internal/api/affiliate_campaigns_docs.go"
+  },
+  {
+    "method": "GET",
+    "path": "/affiliate_campaigns/{}/orders",
+    "source": "internal/api/affiliate_campaigns_docs.go"
+  },
+  {
+    "method": "GET",
+    "path": "/affiliate_campaigns/{}/summary",
+    "source": "internal/api/affiliate_campaigns_docs.go"
+  },
+  {
     "method": "GET",
     "path": "/agents",
     "source": "internal/api/agents.go"
@@ -563,6 +583,11 @@
     "method": "POST",
     "path": "/conversations",
     "source": "internal/api/conversations.go"
+  },
+  {
+    "method": "POST",
+    "path": "/conversations/message",
+    "source": "internal/api/conversations_message_docs.go"
   },
   {
     "method": "POST",

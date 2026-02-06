@@ -129,6 +129,10 @@ func (m *MockClient) CreateAffiliateCampaign(ctx context.Context, req *Affiliate
 	return nil, m.notImplemented("CreateAffiliateCampaign")
 }
 
+func (m *MockClient) ExportAffiliateCampaignReport(ctx context.Context, id string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("ExportAffiliateCampaignReport")
+}
+
 func (m *MockClient) CreateArticle(ctx context.Context, req *ArticleCreateRequest) (*Article, error) {
 	return nil, m.notImplemented("CreateArticle")
 }
@@ -179,6 +183,10 @@ func (m *MockClient) CreateCompanyCredit(ctx context.Context, req *CompanyCredit
 
 func (m *MockClient) CreateConversation(ctx context.Context, req *ConversationCreateRequest) (*Conversation, error) {
 	return nil, m.notImplemented("CreateConversation")
+}
+
+func (m *MockClient) CreateConversationShopMessage(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("CreateConversationShopMessage")
 }
 
 func (m *MockClient) CreateCoupon(ctx context.Context, req *CouponCreateRequest) (*Coupon, error) {
@@ -735,6 +743,18 @@ func (m *MockClient) GetAddonProduct(ctx context.Context, id string) (*AddonProd
 
 func (m *MockClient) GetAffiliateCampaign(ctx context.Context, id string) (*AffiliateCampaign, error) {
 	return nil, m.notImplemented("GetAffiliateCampaign")
+}
+
+func (m *MockClient) GetAffiliateCampaignOrders(ctx context.Context, id string, opts *AffiliateCampaignOrdersOptions) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetAffiliateCampaignOrders")
+}
+
+func (m *MockClient) GetAffiliateCampaignProductsSalesRanking(ctx context.Context, id string, opts *AffiliateCampaignProductsSalesRankingOptions) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetAffiliateCampaignProductsSalesRanking")
+}
+
+func (m *MockClient) GetAffiliateCampaignSummary(ctx context.Context, id string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetAffiliateCampaignSummary")
 }
 
 func (m *MockClient) GetArticle(ctx context.Context, id string) (*Article, error) {

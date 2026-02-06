@@ -3,6 +3,7 @@ package cmd
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"os"
 	"strings"
@@ -25,12 +26,13 @@ func TestConversationsCommandSetup(t *testing.T) {
 
 func TestConversationsSubcommands(t *testing.T) {
 	subcommands := map[string]string{
-		"list":     "List conversations",
-		"get":      "Get conversation details",
-		"create":   "Create a conversation",
-		"delete":   "Delete a conversation",
-		"messages": "List messages in a conversation",
-		"send":     "Send a message to a conversation",
+		"list":         "List conversations",
+		"get":          "Get conversation details",
+		"create":       "Create a conversation",
+		"delete":       "Delete a conversation",
+		"messages":     "List messages in a conversation",
+		"send":         "Send a message to a conversation",
+		"shop-message": "Create shop message (documented endpoint; raw JSON body)",
 	}
 
 	for name, short := range subcommands {
@@ -198,6 +200,8 @@ type conversationsMockAPIClient struct {
 	listMessagesErr        error
 	sendMessageResp        *api.ConversationMessage
 	sendMessageErr         error
+	shopMessageResp        json.RawMessage
+	shopMessageErr         error
 }
 
 func (m *conversationsMockAPIClient) ListConversations(ctx context.Context, opts *api.ConversationsListOptions) (*api.ConversationsListResponse, error) {
@@ -222,6 +226,10 @@ func (m *conversationsMockAPIClient) ListConversationMessages(ctx context.Contex
 
 func (m *conversationsMockAPIClient) SendConversationMessage(ctx context.Context, conversationID string, req *api.ConversationMessageCreateRequest) (*api.ConversationMessage, error) {
 	return m.sendMessageResp, m.sendMessageErr
+}
+
+func (m *conversationsMockAPIClient) CreateConversationShopMessage(ctx context.Context, body any) (json.RawMessage, error) {
+	return m.shopMessageResp, m.shopMessageErr
 }
 
 // setupConversationsMockFactories sets up mock factories for conversations tests.
@@ -1214,5 +1222,25 @@ func TestConversationsGetMultipleProfiles(t *testing.T) {
 	err := conversationsGetCmd.RunE(cmd, []string{"conv-id"})
 	if err == nil {
 		t.Error("expected error for multiple profiles")
+	}
+}
+
+func TestConversationsShopMessageRunE(t *testing.T) {
+	mockClient := &conversationsMockAPIClient{
+		shopMessageResp: json.RawMessage(`{"id":"msg_1"}`),
+	}
+	cleanup, buf := setupConversationsMockFactories(mockClient)
+	defer cleanup()
+
+	cmd := newConversationsTestCmd()
+	addJSONBodyFlags(cmd)
+	_ = cmd.Flags().Set("output", "json")
+	_ = cmd.Flags().Set("body", `{"ok":true}`)
+
+	if err := conversationsShopMessageCmd.RunE(cmd, []string{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "\"msg_1\"") {
+		t.Fatalf("expected msg_1 in output, got %q", buf.String())
 	}
 }

@@ -285,6 +285,34 @@ var conversationsSendCmd = &cobra.Command{
 	},
 }
 
+var conversationsShopMessageCmd = &cobra.Command{
+	Use:   "shop-message",
+	Short: "Create shop message (documented endpoint; raw JSON body)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			fmt.Printf("[DRY-RUN] Would create shop message\n")
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.CreateConversationShopMessage(cmd.Context(), body)
+		if err != nil {
+			return fmt.Errorf("failed to create shop message: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(conversationsCmd)
 
@@ -315,4 +343,7 @@ func init() {
 	conversationsCmd.AddCommand(conversationsSendCmd)
 	conversationsSendCmd.Flags().String("body", "", "Message body (required)")
 	_ = conversationsSendCmd.MarkFlagRequired("body")
+
+	conversationsCmd.AddCommand(conversationsShopMessageCmd)
+	addJSONBodyFlags(conversationsShopMessageCmd)
 }
