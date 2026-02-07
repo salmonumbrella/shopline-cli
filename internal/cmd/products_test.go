@@ -136,6 +136,9 @@ type productsMockAPIClient struct {
 	listProductsCalls  []*api.ProductsListOptions
 	getProductResp     *api.Product
 	getProductErr      error
+
+	searchProductsResp *api.ProductsListResponse
+	searchProductsErr  error
 }
 
 func (m *productsMockAPIClient) ListProducts(ctx context.Context, opts *api.ProductsListOptions) (*api.ProductsListResponse, error) {
@@ -153,6 +156,10 @@ func (m *productsMockAPIClient) ListProducts(ctx context.Context, opts *api.Prod
 
 func (m *productsMockAPIClient) GetProduct(ctx context.Context, id string) (*api.Product, error) {
 	return m.getProductResp, m.getProductErr
+}
+
+func (m *productsMockAPIClient) SearchProducts(ctx context.Context, opts *api.ProductSearchOptions) (*api.ProductsListResponse, error) {
+	return m.searchProductsResp, m.searchProductsErr
 }
 
 // setupProductsMockFactories sets up mock factories for products tests.
@@ -396,4 +403,153 @@ func TestProductsGetRunE(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestProductsGetByFlag tests the --by flag on the products get command.
+func TestProductsGetByFlag(t *testing.T) {
+	t.Run("resolves product by title", func(t *testing.T) {
+		mockClient := &productsMockAPIClient{
+			searchProductsResp: &api.ProductsListResponse{
+				Items:      []api.Product{{ID: "prod_found", Title: "Cool Widget"}},
+				TotalCount: 1,
+			},
+			getProductResp: &api.Product{
+				ID:    "prod_found",
+				Title: "Cool Widget",
+			},
+		}
+		cleanup, buf := setupProductsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newProductsTestCmd()
+		_ = cmd.Flags().Set("output", "json")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "Cool Widget")
+
+		if err := productsGetCmd.RunE(cmd, nil); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "prod_found") {
+			t.Errorf("expected output to contain 'prod_found', got: %s", buf.String())
+		}
+	})
+
+	t.Run("errors when no match", func(t *testing.T) {
+		mockClient := &productsMockAPIClient{
+			searchProductsResp: &api.ProductsListResponse{
+				Items:      []api.Product{},
+				TotalCount: 0,
+			},
+		}
+		cleanup, _ := setupProductsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newProductsTestCmd()
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "Nonexistent Product")
+
+		err := productsGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error when no product found")
+		}
+		if !strings.Contains(err.Error(), "no product found") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("errors when search fails", func(t *testing.T) {
+		mockClient := &productsMockAPIClient{
+			searchProductsErr: errors.New("API error"),
+		}
+		cleanup, _ := setupProductsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newProductsTestCmd()
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "Widget")
+
+		err := productsGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error when search fails")
+		}
+		if !strings.Contains(err.Error(), "search failed") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("warns on multiple matches", func(t *testing.T) {
+		mockClient := &productsMockAPIClient{
+			searchProductsResp: &api.ProductsListResponse{
+				Items: []api.Product{
+					{ID: "prod_1", Title: "Widget A"},
+					{ID: "prod_2", Title: "Widget B"},
+				},
+				TotalCount: 2,
+			},
+			getProductResp: &api.Product{
+				ID:    "prod_1",
+				Title: "Widget A",
+			},
+		}
+		cleanup, buf := setupProductsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newProductsTestCmd()
+		_ = cmd.Flags().Set("output", "json")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "Widget")
+
+		stderr := new(bytes.Buffer)
+		cmd.SetErr(stderr)
+
+		if err := productsGetCmd.RunE(cmd, nil); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "prod_1") {
+			t.Errorf("expected output to contain 'prod_1', got: %s", buf.String())
+		}
+		if !strings.Contains(stderr.String(), "2 products matched") {
+			t.Errorf("expected stderr warning about multiple matches, got: %s", stderr.String())
+		}
+	})
+
+	t.Run("positional arg takes precedence over --by", func(t *testing.T) {
+		mockClient := &productsMockAPIClient{
+			getProductResp: &api.Product{
+				ID:    "prod_direct",
+				Title: "Direct Product",
+			},
+		}
+		cleanup, buf := setupProductsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newProductsTestCmd()
+		_ = cmd.Flags().Set("output", "json")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "should-not-be-used")
+
+		if err := productsGetCmd.RunE(cmd, []string{"prod_direct"}); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "prod_direct") {
+			t.Errorf("expected output to contain 'prod_direct', got: %s", buf.String())
+		}
+	})
+
+	t.Run("errors with no arg and no --by", func(t *testing.T) {
+		mockClient := &productsMockAPIClient{}
+		cleanup, _ := setupProductsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newProductsTestCmd()
+		cmd.Flags().String("by", "", "")
+
+		err := productsGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error with no arg and no --by")
+		}
+		if !strings.Contains(err.Error(), "provide a resource ID") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
 }

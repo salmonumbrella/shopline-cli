@@ -255,16 +255,36 @@ var customersListCmd = &cobra.Command{
 }
 
 var customersGetCmd = &cobra.Command{
-	Use:   "get <id>",
+	Use:   "get [id]",
 	Short: "Get customer details",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
 		}
 
-		customer, err := client.GetCustomer(cmd.Context(), args[0])
+		customerID, err := resolveOrArg(cmd, args, func(query string) (string, error) {
+			resp, err := client.SearchCustomers(cmd.Context(), &api.CustomerSearchOptions{
+				Email:    query,
+				PageSize: 5,
+			})
+			if err != nil {
+				return "", fmt.Errorf("search failed: %w", err)
+			}
+			if len(resp.Items) == 0 {
+				return "", fmt.Errorf("no customer found matching %q", query)
+			}
+			if len(resp.Items) > 1 {
+				_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Warning: %d customers matched, using first\n", len(resp.Items))
+			}
+			return resp.Items[0].ID, nil
+		})
+		if err != nil {
+			return err
+		}
+
+		customer, err := client.GetCustomer(cmd.Context(), customerID)
 		if err != nil {
 			return fmt.Errorf("failed to get customer: %w", err)
 		}
@@ -645,6 +665,7 @@ func init() {
 	customersListCmd.Flags().Int("page-size", 20, "Results per page")
 
 	customersCmd.AddCommand(customersGetCmd)
+	customersGetCmd.Flags().String("by", "", "Find customer by email instead of ID")
 
 	customersCmd.AddCommand(customersCreateCmd)
 	customersCreateCmd.Flags().String("email", "", "Customer email")

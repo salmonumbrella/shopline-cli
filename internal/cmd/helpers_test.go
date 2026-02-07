@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"bytes"
+	"errors"
 	"strings"
 	"testing"
 	"time"
@@ -549,4 +551,82 @@ func TestParseTimeFlag(t *testing.T) {
 			}
 		})
 	}
+}
+
+// ---------------------------------------------------------------------------
+// resolveOrArg (helpers.go)
+// ---------------------------------------------------------------------------
+
+func TestResolveOrArg(t *testing.T) {
+	t.Run("returns positional arg when provided", func(t *testing.T) {
+		cmd := &cobra.Command{Use: "test"}
+		cmd.Flags().String("by", "", "")
+
+		id, err := resolveOrArg(cmd, []string{"my-id"}, func(q string) (string, error) {
+			t.Fatal("resolver should not be called when positional arg given")
+			return "", nil
+		})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if id != "my-id" {
+			t.Errorf("expected 'my-id', got %q", id)
+		}
+	})
+
+	t.Run("errors when no arg and no --by", func(t *testing.T) {
+		cmd := &cobra.Command{Use: "test"}
+		cmd.Flags().String("by", "", "")
+
+		_, err := resolveOrArg(cmd, nil, func(q string) (string, error) {
+			return "", nil
+		})
+		if err == nil {
+			t.Fatal("expected error when no arg and no --by")
+		}
+		if !strings.Contains(err.Error(), "provide a resource ID") {
+			t.Errorf("unexpected error message: %v", err)
+		}
+	})
+
+	t.Run("calls resolver with --by value", func(t *testing.T) {
+		cmd := &cobra.Command{Use: "test"}
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "alice@example.com")
+
+		stderr := new(bytes.Buffer)
+		cmd.SetErr(stderr)
+
+		id, err := resolveOrArg(cmd, nil, func(q string) (string, error) {
+			if q != "alice@example.com" {
+				t.Errorf("expected query 'alice@example.com', got %q", q)
+			}
+			return "cust_123", nil
+		})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if id != "cust_123" {
+			t.Errorf("expected 'cust_123', got %q", id)
+		}
+		if !strings.Contains(stderr.String(), "Resolved to cust_123") {
+			t.Errorf("expected stderr to contain 'Resolved to cust_123', got %q", stderr.String())
+		}
+	})
+
+	t.Run("propagates resolver error", func(t *testing.T) {
+		cmd := &cobra.Command{Use: "test"}
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "query")
+
+		_, err := resolveOrArg(cmd, nil, func(q string) (string, error) {
+			return "", errors.New("not found")
+		})
+		if err == nil {
+			t.Fatal("expected error from resolver")
+		}
+		if !strings.Contains(err.Error(), "not found") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
 }

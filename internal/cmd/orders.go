@@ -331,16 +331,35 @@ var ordersListCmd = &cobra.Command{
 }
 
 var ordersGetCmd = &cobra.Command{
-	Use:   "get <id>",
+	Use:   "get [id]",
 	Short: "Get order details",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := getClient(cmd)
 		if err != nil {
 			return handleError(cmd, err, "orders", "")
 		}
 
-		orderID := args[0]
+		orderID, err := resolveOrArg(cmd, args, func(query string) (string, error) {
+			resp, err := client.SearchOrders(cmd.Context(), &api.OrderSearchOptions{
+				Query:    query,
+				PageSize: 5,
+			})
+			if err != nil {
+				return "", fmt.Errorf("search failed: %w", err)
+			}
+			if len(resp.Items) == 0 {
+				return "", fmt.Errorf("no order found matching %q", query)
+			}
+			if len(resp.Items) > 1 {
+				_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Warning: %d orders matched, using first\n", len(resp.Items))
+			}
+			return resp.Items[0].ID, nil
+		})
+		if err != nil {
+			return err
+		}
+
 		order, err := client.GetOrder(cmd.Context(), orderID)
 		if err != nil {
 			return handleError(cmd, err, "orders", orderID)
@@ -1340,6 +1359,7 @@ func init() {
 	ordersListCmd.Flags().Int("jobs", 4, "Max concurrent API calls for --expand details")
 
 	ordersCmd.AddCommand(ordersGetCmd)
+	ordersGetCmd.Flags().String("by", "", "Find order by order number or query instead of ID")
 	ordersGetCmd.Flags().StringSlice("expand", nil, "Expand related resources: customer, products (adds API calls)")
 	ordersCmd.AddCommand(ordersCancelCmd)
 	ordersCancelCmd.Flags().String("batch", "", "Batch input file (JSON array or NDJSON)")

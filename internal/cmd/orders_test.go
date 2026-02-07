@@ -45,6 +45,9 @@ type mockAPIClient struct {
 	updateOrderErr  error
 	updateOrderReq  *api.OrderUpdateRequest
 	updateOrderID   string
+
+	searchOrdersResp *api.OrdersListResponse
+	searchOrdersErr  error
 }
 
 func (m *mockAPIClient) ListOrders(ctx context.Context, opts *api.OrdersListOptions) (*api.OrdersListResponse, error) {
@@ -85,6 +88,10 @@ func (m *mockAPIClient) UpdateOrder(ctx context.Context, id string, req *api.Ord
 	m.updateOrderID = id
 	m.updateOrderReq = req
 	return m.updateOrderResp, m.updateOrderErr
+}
+
+func (m *mockAPIClient) SearchOrders(ctx context.Context, opts *api.OrderSearchOptions) (*api.OrdersListResponse, error) {
+	return m.searchOrdersResp, m.searchOrdersErr
 }
 
 // mockStore is a mock implementation of CredentialStore for testing.
@@ -1100,6 +1107,150 @@ func TestOrdersGetGetClientError(t *testing.T) {
 	if !strings.Contains(err.Error(), "credential store") {
 		t.Errorf("expected credential store error, got: %v", err)
 	}
+}
+
+// TestOrdersGetByFlag tests the --by flag on the orders get command.
+func TestOrdersGetByFlag(t *testing.T) {
+	t.Run("resolves order by query", func(t *testing.T) {
+		mockClient := &mockAPIClient{
+			searchOrdersResp: &api.OrdersListResponse{
+				Items: []api.OrderSummary{
+					{ID: "ord_found", OrderNumber: "1001", CustomerEmail: "alice@example.com"},
+				},
+				TotalCount: 1,
+			},
+			getOrderResp: &api.Order{
+				ID:          "ord_found",
+				OrderNumber: "1001",
+			},
+		}
+		cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+		defer cleanup()
+
+		var buf bytes.Buffer
+		formatterWriter = &buf
+
+		cmd := &cobra.Command{Use: "test"}
+		cmd.SetContext(context.Background())
+		cmd.Flags().String("store", "", "")
+		cmd.Flags().String("output", "json", "")
+		cmd.Flags().String("color", "never", "")
+		cmd.Flags().String("query", "", "")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "1001")
+
+		if err := ordersGetCmd.RunE(cmd, nil); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "ord_found") {
+			t.Errorf("expected output to contain 'ord_found', got: %s", buf.String())
+		}
+	})
+
+	t.Run("errors when no match", func(t *testing.T) {
+		mockClient := &mockAPIClient{
+			searchOrdersResp: &api.OrdersListResponse{
+				Items:      []api.OrderSummary{},
+				TotalCount: 0,
+			},
+		}
+		cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+		defer cleanup()
+
+		cmd := &cobra.Command{Use: "test"}
+		cmd.SetContext(context.Background())
+		cmd.Flags().String("store", "", "")
+		cmd.Flags().String("output", "", "")
+		cmd.Flags().String("color", "never", "")
+		cmd.Flags().String("query", "", "")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "nonexistent")
+
+		err := ordersGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error when no order found")
+		}
+		if !strings.Contains(err.Error(), "no order found") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("errors when search fails", func(t *testing.T) {
+		mockClient := &mockAPIClient{
+			searchOrdersErr: errors.New("API error"),
+		}
+		cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+		defer cleanup()
+
+		cmd := &cobra.Command{Use: "test"}
+		cmd.SetContext(context.Background())
+		cmd.Flags().String("store", "", "")
+		cmd.Flags().String("output", "", "")
+		cmd.Flags().String("color", "never", "")
+		cmd.Flags().String("query", "", "")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "1001")
+
+		err := ordersGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error when search fails")
+		}
+		if !strings.Contains(err.Error(), "search failed") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("positional arg takes precedence over --by", func(t *testing.T) {
+		mockClient := &mockAPIClient{
+			getOrderResp: &api.Order{
+				ID:          "ord_direct",
+				OrderNumber: "999",
+			},
+		}
+		cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+		defer cleanup()
+
+		var buf bytes.Buffer
+		formatterWriter = &buf
+
+		cmd := &cobra.Command{Use: "test"}
+		cmd.SetContext(context.Background())
+		cmd.Flags().String("store", "", "")
+		cmd.Flags().String("output", "json", "")
+		cmd.Flags().String("color", "never", "")
+		cmd.Flags().String("query", "", "")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "should-not-be-used")
+
+		if err := ordersGetCmd.RunE(cmd, []string{"ord_direct"}); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "ord_direct") {
+			t.Errorf("expected output to contain 'ord_direct', got: %s", buf.String())
+		}
+	})
+
+	t.Run("errors with no arg and no --by", func(t *testing.T) {
+		mockClient := &mockAPIClient{}
+		cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+		defer cleanup()
+
+		cmd := &cobra.Command{Use: "test"}
+		cmd.SetContext(context.Background())
+		cmd.Flags().String("store", "", "")
+		cmd.Flags().String("output", "", "")
+		cmd.Flags().String("color", "never", "")
+		cmd.Flags().String("query", "", "")
+		cmd.Flags().String("by", "", "")
+
+		err := ordersGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error with no arg and no --by")
+		}
+		if !strings.Contains(err.Error(), "provide a resource ID") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
 }
 
 // TestOrdersCancelRunE tests the orders cancel command execution.

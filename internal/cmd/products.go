@@ -133,16 +133,36 @@ var productsListCmd = &cobra.Command{
 }
 
 var productsGetCmd = &cobra.Command{
-	Use:   "get <id>",
+	Use:   "get [id]",
 	Short: "Get product details",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
 		}
 
-		product, err := client.GetProduct(cmd.Context(), args[0])
+		productID, err := resolveOrArg(cmd, args, func(query string) (string, error) {
+			resp, err := client.SearchProducts(cmd.Context(), &api.ProductSearchOptions{
+				Query:    query,
+				PageSize: 5,
+			})
+			if err != nil {
+				return "", fmt.Errorf("search failed: %w", err)
+			}
+			if len(resp.Items) == 0 {
+				return "", fmt.Errorf("no product found matching %q", query)
+			}
+			if len(resp.Items) > 1 {
+				_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Warning: %d products matched, using first\n", len(resp.Items))
+			}
+			return resp.Items[0].ID, nil
+		})
+		if err != nil {
+			return err
+		}
+
+		product, err := client.GetProduct(cmd.Context(), productID)
 		if err != nil {
 			return fmt.Errorf("failed to get product: %w", err)
 		}
@@ -1147,6 +1167,7 @@ func init() {
 	productsListCmd.Flags().Int("page-size", 20, "Results per page")
 
 	productsCmd.AddCommand(productsGetCmd)
+	productsGetCmd.Flags().String("by", "", "Find product by title instead of ID")
 
 	productsCmd.AddCommand(productsCreateCmd)
 	productsCreateCmd.Flags().String("title", "", "Product title (required)")
