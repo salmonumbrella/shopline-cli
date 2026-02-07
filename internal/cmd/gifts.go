@@ -46,35 +46,7 @@ var giftsListCmd = &cobra.Command{
 			return formatter.JSON(resp)
 		}
 
-		headers := []string{"ID", "TITLE", "GIFT PRODUCT", "TRIGGER", "USED", "STATUS", "STARTS", "ENDS"}
-		var rows [][]string
-		for _, g := range resp.Items {
-			trigger := fmt.Sprintf("%s: %.2f", g.TriggerType, g.TriggerValue)
-			used := fmt.Sprintf("%d", g.QuantityUsed)
-			if g.Quantity > 0 {
-				used = fmt.Sprintf("%d/%d", g.QuantityUsed, g.Quantity)
-			}
-			startsAt := "-"
-			if !g.StartsAt.IsZero() {
-				startsAt = g.StartsAt.Format("2006-01-02")
-			}
-			endsAt := "-"
-			if !g.EndsAt.IsZero() {
-				endsAt = g.EndsAt.Format("2006-01-02")
-			}
-			rows = append(rows, []string{
-				g.ID,
-				g.Title,
-				g.GiftProductName,
-				trigger,
-				used,
-				g.Status,
-				startsAt,
-				endsAt,
-			})
-		}
-
-		formatter.Table(headers, rows)
+		renderGiftsTable(formatter, resp.Items)
 		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d gifts\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
@@ -449,38 +421,42 @@ var giftsSearchCmd = &cobra.Command{
 			return formatter.JSON(resp)
 		}
 
-		headers := []string{"ID", "TITLE", "GIFT PRODUCT", "TRIGGER", "USED", "STATUS", "STARTS", "ENDS"}
-		var rows [][]string
-		for _, g := range resp.Items {
-			trigger := fmt.Sprintf("%s: %.2f", g.TriggerType, g.TriggerValue)
-			used := fmt.Sprintf("%d", g.QuantityUsed)
-			if g.Quantity > 0 {
-				used = fmt.Sprintf("%d/%d", g.QuantityUsed, g.Quantity)
-			}
-			startsAt := "-"
-			if !g.StartsAt.IsZero() {
-				startsAt = g.StartsAt.Format("2006-01-02")
-			}
-			endsAt := "-"
-			if !g.EndsAt.IsZero() {
-				endsAt = g.EndsAt.Format("2006-01-02")
-			}
-			rows = append(rows, []string{
-				outfmt.FormatID("gift", g.ID),
-				g.Title,
-				g.GiftProductName,
-				trigger,
-				used,
-				g.Status,
-				startsAt,
-				endsAt,
-			})
-		}
-
-		formatter.Table(headers, rows)
+		renderGiftsTable(formatter, resp.Items)
 		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d gifts\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
+}
+
+// renderGiftsTable renders a table of gift promotions using the given formatter.
+func renderGiftsTable(formatter *outfmt.Formatter, gifts []api.Gift) {
+	headers := []string{"ID", "TITLE", "GIFT PRODUCT", "TRIGGER", "USED", "STATUS", "STARTS", "ENDS"}
+	var rows [][]string
+	for _, g := range gifts {
+		trigger := fmt.Sprintf("%s: %.2f", g.TriggerType, g.TriggerValue)
+		used := fmt.Sprintf("%d", g.QuantityUsed)
+		if g.Quantity > 0 {
+			used = fmt.Sprintf("%d/%d", g.QuantityUsed, g.Quantity)
+		}
+		startsAt := "-"
+		if !g.StartsAt.IsZero() {
+			startsAt = g.StartsAt.Format("2006-01-02")
+		}
+		endsAt := "-"
+		if !g.EndsAt.IsZero() {
+			endsAt = g.EndsAt.Format("2006-01-02")
+		}
+		rows = append(rows, []string{
+			g.ID,
+			g.Title,
+			g.GiftProductName,
+			trigger,
+			used,
+			g.Status,
+			startsAt,
+			endsAt,
+		})
+	}
+	formatter.Table(headers, rows)
 }
 
 var giftsStocksCmd = &cobra.Command{

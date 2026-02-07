@@ -48,23 +48,7 @@ var customerGroupsListCmd = &cobra.Command{
 			return formatter.JSON(resp)
 		}
 
-		headers := []string{"ID", "NAME", "DESCRIPTION", "CUSTOMERS", "CREATED"}
-		var rows [][]string
-		for _, g := range resp.Items {
-			desc := g.Description
-			if len(desc) > 30 {
-				desc = desc[:27] + "..."
-			}
-			rows = append(rows, []string{
-				g.ID,
-				g.Name,
-				desc,
-				fmt.Sprintf("%d", g.CustomerCount),
-				g.CreatedAt.Format("2006-01-02 15:04"),
-			})
-		}
-
-		formatter.Table(headers, rows)
+		renderCustomerGroupsTable(formatter, resp.Items)
 		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d customer groups\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
@@ -235,26 +219,30 @@ var customerGroupsSearchCmd = &cobra.Command{
 			return formatter.JSON(resp)
 		}
 
-		headers := []string{"ID", "NAME", "DESCRIPTION", "CUSTOMERS", "CREATED"}
-		var rows [][]string
-		for _, g := range resp.Items {
-			desc := g.Description
-			if len(desc) > 30 {
-				desc = desc[:27] + "..."
-			}
-			rows = append(rows, []string{
-				outfmt.FormatID("customer_group", g.ID),
-				g.Name,
-				desc,
-				fmt.Sprintf("%d", g.CustomerCount),
-				g.CreatedAt.Format("2006-01-02 15:04"),
-			})
-		}
-
-		formatter.Table(headers, rows)
+		renderCustomerGroupsTable(formatter, resp.Items)
 		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d customer groups\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
+}
+
+// renderCustomerGroupsTable renders a table of customer groups using the given formatter.
+func renderCustomerGroupsTable(formatter *outfmt.Formatter, groups []api.CustomerGroup) {
+	headers := []string{"ID", "NAME", "DESCRIPTION", "CUSTOMERS", "CREATED"}
+	var rows [][]string
+	for _, g := range groups {
+		desc := g.Description
+		if len(desc) > 30 {
+			desc = desc[:27] + "..."
+		}
+		rows = append(rows, []string{
+			g.ID,
+			g.Name,
+			desc,
+			fmt.Sprintf("%d", g.CustomerCount),
+			g.CreatedAt.Format("2006-01-02 15:04"),
+		})
+	}
+	formatter.Table(headers, rows)
 }
 
 var customerGroupsChildrenCmd = &cobra.Command{
