@@ -11,6 +11,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func formatCustomerName(first, last string) string {
+	return strings.TrimSpace(strings.TrimSpace(first) + " " + strings.TrimSpace(last))
+}
+
 var customersCmd = &cobra.Command{
 	Use:   "customers",
 	Short: "Manage customers",
@@ -112,7 +116,7 @@ var customersSearchCmd = &cobra.Command{
 		headers := []string{"ID", "EMAIL", "NAME", "STATE", "ORDERS", "TOTAL SPENT", "CREATED"}
 		var rows [][]string
 		for _, c := range resp.Items {
-			name := strings.TrimSpace(strings.TrimSpace(c.FirstName) + " " + strings.TrimSpace(c.LastName))
+			name := formatCustomerName(c.FirstName, c.LastName)
 			totalSpent := c.TotalSpent
 			if c.Currency != "" && c.TotalSpent != "" {
 				totalSpent = c.TotalSpent + " " + c.Currency
@@ -228,13 +232,7 @@ var customersListCmd = &cobra.Command{
 		headers := []string{"ID", "EMAIL", "NAME", "STATE", "ORDERS", "TOTAL SPENT", "CREATED"}
 		var rows [][]string
 		for _, c := range resp.Items {
-			name := c.FirstName
-			if c.LastName != "" {
-				if name != "" {
-					name += " "
-				}
-				name += c.LastName
-			}
+			name := formatCustomerName(c.FirstName, c.LastName)
 			totalSpent := c.TotalSpent
 			if c.Currency != "" {
 				totalSpent = c.TotalSpent + " " + c.Currency
@@ -278,13 +276,7 @@ var customersGetCmd = &cobra.Command{
 			return formatter.JSON(customer)
 		}
 
-		name := customer.FirstName
-		if customer.LastName != "" {
-			if name != "" {
-				name += " "
-			}
-			name += customer.LastName
-		}
+		name := formatCustomerName(customer.FirstName, customer.LastName)
 
 		out := outWriter(cmd)
 		_, _ = fmt.Fprintf(out, "Customer ID:      %s\n", customer.ID)
