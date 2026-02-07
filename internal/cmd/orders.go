@@ -661,6 +661,9 @@ var ordersSplitCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		lineItemIDsStr, _ := cmd.Flags().GetString("line-item-ids")
+		if lineItemIDsStr == "" {
+			return fmt.Errorf("--line-item-ids must not be empty")
+		}
 		lineItemIDs := strings.Split(lineItemIDsStr, ",")
 
 		client, err := getClient(cmd)
@@ -797,6 +800,9 @@ var ordersBulkExecuteShipmentCmd = &cobra.Command{
 	Short: "Execute shipments for multiple orders",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		idsStr, _ := cmd.Flags().GetString("order-ids")
+		if idsStr == "" {
+			return fmt.Errorf("--order-ids must not be empty")
+		}
 		orderIDs := strings.Split(idsStr, ",")
 
 		client, err := getClient(cmd)
@@ -876,6 +882,9 @@ var ordersTagsUpdateCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		tagsStr, _ := cmd.Flags().GetString("tags")
+		if tagsStr == "" {
+			return fmt.Errorf("--tags must not be empty")
+		}
 		tags := strings.Split(tagsStr, ",")
 
 		client, err := getClient(cmd)
