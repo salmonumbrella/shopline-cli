@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -229,6 +230,109 @@ var promotionsDeleteCmd = &cobra.Command{
 	},
 }
 
+var promotionsUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a promotion",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update promotion %s\n", args[0])
+			return nil
+		}
+
+		var req api.PromotionUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		promotion, err := client.UpdatePromotion(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update promotion: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(promotion)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated promotion %s (status: %s)\n", promotion.ID, promotion.Status)
+		return nil
+	},
+}
+
+var promotionsSearchCmd = &cobra.Command{
+	Use:   "search",
+	Short: "Search promotions",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		query, _ := cmd.Flags().GetString("query")
+		status, _ := cmd.Flags().GetString("status")
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+
+		opts := &api.PromotionSearchOptions{
+			Query:    query,
+			Status:   status,
+			Page:     page,
+			PageSize: pageSize,
+		}
+
+		resp, err := client.SearchPromotions(cmd.Context(), opts)
+		if err != nil {
+			return fmt.Errorf("failed to search promotions: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		headers := []string{"ID", "TITLE", "TYPE", "STATUS", "DISCOUNT", "USAGE", "STARTS", "ENDS"}
+		var rows [][]string
+		for _, p := range resp.Items {
+			discount := fmt.Sprintf("%.0f", p.DiscountValue)
+			if p.DiscountType == "percentage" {
+				discount += "%"
+			}
+			usage := fmt.Sprintf("%d", p.UsageCount)
+			if p.UsageLimit > 0 {
+				usage = fmt.Sprintf("%d/%d", p.UsageCount, p.UsageLimit)
+			}
+			endsAt := "-"
+			if !p.EndsAt.IsZero() {
+				endsAt = p.EndsAt.Format("2006-01-02")
+			}
+			rows = append(rows, []string{
+				p.ID,
+				p.Title,
+				p.Type,
+				p.Status,
+				discount,
+				usage,
+				p.StartsAt.Format("2006-01-02"),
+				endsAt,
+			})
+		}
+
+		formatter.Table(headers, rows)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d promotions\n", len(resp.Items), resp.TotalCount)
+		return nil
+	},
+}
+
 var promotionsCouponCenterCmd = &cobra.Command{
 	Use:   "coupon-center",
 	Short: "Get coupon center promotions (documented endpoint; raw JSON)",
@@ -257,8 +361,25 @@ func init() {
 	promotionsCmd.AddCommand(promotionsGetCmd)
 	promotionsCmd.AddCommand(promotionsCreateCmd)
 	addJSONBodyFlags(promotionsCreateCmd)
+
+	promotionsCmd.AddCommand(promotionsUpdateCmd)
+	addJSONBodyFlags(promotionsUpdateCmd)
+
+	promotionsCmd.AddCommand(promotionsSearchCmd)
+	promotionsSearchCmd.Flags().String("query", "", "Search query")
+	promotionsSearchCmd.Flags().String("status", "", "Filter by status (active, scheduled, expired, inactive)")
+	promotionsSearchCmd.Flags().Int("page", 1, "Page number")
+	promotionsSearchCmd.Flags().Int("page-size", 20, "Results per page")
+
 	promotionsCmd.AddCommand(promotionsActivateCmd)
 	promotionsCmd.AddCommand(promotionsDeactivateCmd)
 	promotionsCmd.AddCommand(promotionsDeleteCmd)
 	promotionsCmd.AddCommand(promotionsCouponCenterCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "promotions",
+		Description: "Manage promotions",
+		Commands:    []string{"list", "get", "create", "update", "search", "activate", "deactivate", "delete", "coupon-center"},
+		IDPrefix:    "promotion",
+	})
 }

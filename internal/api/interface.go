@@ -259,6 +259,7 @@ type APIClient interface {
 	GetCustomer(ctx context.Context, id string) (*Customer, error)
 	// Customer coupon promotions (documented)
 	GetCustomerCouponPromotions(ctx context.Context, id string) (json.RawMessage, error)
+	GetCustomerPromotions(ctx context.Context, id string) (*CustomerPromotionsResponse, error)
 	GetLineCustomer(ctx context.Context, lineID string) (*Customer, error)
 	GetCustomerAddress(ctx context.Context, customerID, addressID string) (*CustomerAddress, error)
 	GetCustomerBlacklist(ctx context.Context, id string) (*CustomerBlacklist, error)
@@ -524,10 +525,13 @@ type APIClient interface {
 	ListCustomerGroups(ctx context.Context, opts *CustomerGroupsListOptions) (*CustomerGroupsListResponse, error)
 	ListCustomers(ctx context.Context, opts *CustomersListOptions) (*CustomersListResponse, error)
 	SearchAddonProducts(ctx context.Context, opts *AddonProductSearchOptions) (*AddonProductsListResponse, error)
+	SearchCustomerGroups(ctx context.Context, opts *CustomerGroupSearchOptions) (*CustomerGroupsListResponse, error)
 	SearchCustomers(ctx context.Context, opts *CustomerSearchOptions) (*CustomersListResponse, error)
+	SearchGifts(ctx context.Context, opts *GiftSearchOptions) (*GiftsListResponse, error)
 	SearchOrders(ctx context.Context, opts *OrderSearchOptions) (*OrdersListResponse, error)
 	SearchProducts(ctx context.Context, opts *ProductSearchOptions) (*ProductsListResponse, error)
 	SearchProductsPost(ctx context.Context, req *ProductSearchRequest) (*ProductsListResponse, error)
+	SearchPromotions(ctx context.Context, opts *PromotionSearchOptions) (*PromotionsListResponse, error)
 	ListCustomerSavedSearches(ctx context.Context, opts *CustomerSavedSearchesListOptions) (*CustomerSavedSearchesListResponse, error)
 	ListCustomFields(ctx context.Context, opts *CustomFieldsListOptions) (*CustomFieldsListResponse, error)
 	ListDeliveryOptions(ctx context.Context, opts *DeliveryOptionsListOptions) (*DeliveryOptionsListResponse, error)
@@ -717,6 +721,7 @@ type APIClient interface {
 	UpdateProductsLabelsBulk(ctx context.Context, body any) error
 	UpdateProductsRetailStatusBulk(ctx context.Context, body any) error
 	UpdateProductsStatusBulk(ctx context.Context, body any) error
+	UpdatePromotion(ctx context.Context, id string, req *PromotionUpdateRequest) (*Promotion, error)
 	UpdateRedirect(ctx context.Context, id string, req *RedirectUpdateRequest) (*Redirect, error)
 	UpdateReturnOrder(ctx context.Context, id string, req *ReturnOrderUpdateRequest) (*ReturnOrder, error)
 	UpdateScriptTag(ctx context.Context, id string, req *ScriptTagUpdateRequest) (*ScriptTag, error)

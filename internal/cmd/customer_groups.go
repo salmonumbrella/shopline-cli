@@ -203,6 +203,59 @@ var customerGroupsDeleteCmd = &cobra.Command{
 	},
 }
 
+var customerGroupsSearchCmd = &cobra.Command{
+	Use:   "search",
+	Short: "Search customer groups",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		query, _ := cmd.Flags().GetString("query")
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+
+		opts := &api.CustomerGroupSearchOptions{
+			Query:    query,
+			Page:     page,
+			PageSize: pageSize,
+		}
+
+		resp, err := client.SearchCustomerGroups(cmd.Context(), opts)
+		if err != nil {
+			return fmt.Errorf("failed to search customer groups: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		headers := []string{"ID", "NAME", "DESCRIPTION", "CUSTOMERS", "CREATED"}
+		var rows [][]string
+		for _, g := range resp.Items {
+			desc := g.Description
+			if len(desc) > 30 {
+				desc = desc[:27] + "..."
+			}
+			rows = append(rows, []string{
+				g.ID,
+				g.Name,
+				desc,
+				fmt.Sprintf("%d", g.CustomerCount),
+				g.CreatedAt.Format("2006-01-02 15:04"),
+			})
+		}
+
+		formatter.Table(headers, rows)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d customer groups\n", len(resp.Items), resp.TotalCount)
+		return nil
+	},
+}
+
 var customerGroupsChildrenCmd = &cobra.Command{
 	Use:   "children",
 	Short: "Work with child customer groups (documented endpoints)",
@@ -277,6 +330,11 @@ func init() {
 
 	customerGroupsCmd.AddCommand(customerGroupsDeleteCmd)
 
+	customerGroupsCmd.AddCommand(customerGroupsSearchCmd)
+	customerGroupsSearchCmd.Flags().String("query", "", "Search query")
+	customerGroupsSearchCmd.Flags().Int("page", 1, "Page number")
+	customerGroupsSearchCmd.Flags().Int("page-size", 20, "Results per page")
+
 	customerGroupsCmd.AddCommand(customerGroupsChildrenCmd)
 	customerGroupsChildrenCmd.AddCommand(customerGroupsChildrenListCmd)
 	customerGroupsChildrenCmd.AddCommand(customerGroupsChildrenCustomerIDsCmd)
@@ -284,7 +342,7 @@ func init() {
 	schema.Register(schema.Resource{
 		Name:        "customer-groups",
 		Description: "Manage customer groups",
-		Commands:    []string{"list", "get", "create", "update", "delete", "children"},
+		Commands:    []string{"list", "get", "search", "create", "update", "delete", "children"},
 		IDPrefix:    "customer_group",
 	})
 }

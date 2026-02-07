@@ -2847,3 +2847,23 @@ func (m *MockClient) GetOrderDelivery(ctx context.Context, orderID string) (*Ord
 func (m *MockClient) UpdateOrderDelivery(ctx context.Context, orderID string, req *OrderDeliveryUpdateRequest) (*OrderDelivery, error) {
 	return nil, m.notImplemented("UpdateOrderDelivery")
 }
+
+func (m *MockClient) UpdatePromotion(ctx context.Context, id string, req *PromotionUpdateRequest) (*Promotion, error) {
+	return nil, m.notImplemented("UpdatePromotion")
+}
+
+func (m *MockClient) SearchPromotions(ctx context.Context, opts *PromotionSearchOptions) (*PromotionsListResponse, error) {
+	return nil, m.notImplemented("SearchPromotions")
+}
+
+func (m *MockClient) SearchGifts(ctx context.Context, opts *GiftSearchOptions) (*GiftsListResponse, error) {
+	return nil, m.notImplemented("SearchGifts")
+}
+
+func (m *MockClient) SearchCustomerGroups(ctx context.Context, opts *CustomerGroupSearchOptions) (*CustomerGroupsListResponse, error) {
+	return nil, m.notImplemented("SearchCustomerGroups")
+}
+
+func (m *MockClient) GetCustomerPromotions(ctx context.Context, id string) (*CustomerPromotionsResponse, error) {
+	return nil, m.notImplemented("GetCustomerPromotions")
+}

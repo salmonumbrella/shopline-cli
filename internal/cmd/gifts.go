@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -414,6 +415,73 @@ var giftsUpdateQuantityBySKUCmd = &cobra.Command{
 	},
 }
 
+var giftsSearchCmd = &cobra.Command{
+	Use:   "search",
+	Short: "Search gift promotions",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		query, _ := cmd.Flags().GetString("query")
+		status, _ := cmd.Flags().GetString("status")
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+
+		opts := &api.GiftSearchOptions{
+			Query:    query,
+			Status:   status,
+			Page:     page,
+			PageSize: pageSize,
+		}
+
+		resp, err := client.SearchGifts(cmd.Context(), opts)
+		if err != nil {
+			return fmt.Errorf("failed to search gifts: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		headers := []string{"ID", "TITLE", "GIFT PRODUCT", "TRIGGER", "USED", "STATUS", "STARTS", "ENDS"}
+		var rows [][]string
+		for _, g := range resp.Items {
+			trigger := fmt.Sprintf("%s: %.2f", g.TriggerType, g.TriggerValue)
+			used := fmt.Sprintf("%d", g.QuantityUsed)
+			if g.Quantity > 0 {
+				used = fmt.Sprintf("%d/%d", g.QuantityUsed, g.Quantity)
+			}
+			startsAt := "-"
+			if !g.StartsAt.IsZero() {
+				startsAt = g.StartsAt.Format("2006-01-02")
+			}
+			endsAt := "-"
+			if !g.EndsAt.IsZero() {
+				endsAt = g.EndsAt.Format("2006-01-02")
+			}
+			rows = append(rows, []string{
+				g.ID,
+				g.Title,
+				g.GiftProductName,
+				trigger,
+				used,
+				g.Status,
+				startsAt,
+				endsAt,
+			})
+		}
+
+		formatter.Table(headers, rows)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d gifts\n", len(resp.Items), resp.TotalCount)
+		return nil
+	},
+}
+
 var giftsStocksCmd = &cobra.Command{
 	Use:   "stocks",
 	Short: "Manage gift stocks (documented endpoints)",
@@ -492,6 +560,12 @@ func init() {
 	_ = giftsCreateCmd.MarkFlagRequired("trigger-type")
 	_ = giftsCreateCmd.MarkFlagRequired("trigger-value")
 
+	giftsCmd.AddCommand(giftsSearchCmd)
+	giftsSearchCmd.Flags().String("query", "", "Search query")
+	giftsSearchCmd.Flags().String("status", "", "Filter by status (active, scheduled, expired, inactive)")
+	giftsSearchCmd.Flags().Int("page", 1, "Page number")
+	giftsSearchCmd.Flags().Int("page-size", 20, "Results per page")
+
 	giftsCmd.AddCommand(giftsActivateCmd)
 	giftsCmd.AddCommand(giftsDeactivateCmd)
 
@@ -524,4 +598,11 @@ func init() {
 	giftsStocksCmd.AddCommand(giftsStocksGetCmd)
 	giftsStocksCmd.AddCommand(giftsStocksUpdateCmd)
 	addJSONBodyFlags(giftsStocksUpdateCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "gifts",
+		Description: "Manage gift promotions",
+		Commands:    []string{"list", "get", "search", "create", "update", "activate", "deactivate", "delete", "update-quantity", "update-quantity-by-sku", "stocks"},
+		IDPrefix:    "gift",
+	})
 }
