@@ -858,7 +858,33 @@ var productsBulkDeleteCmd = &cobra.Command{
 	Short: "Delete multiple products",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		idsStr, _ := cmd.Flags().GetString("ids")
-		ids := strings.Split(idsStr, ",")
+		var ids []string
+		for _, id := range strings.Split(idsStr, ",") {
+			id = strings.TrimSpace(id)
+			if id != "" {
+				ids = append(ids, id)
+			}
+		}
+		if len(ids) == 0 {
+			return fmt.Errorf("no product IDs provided")
+		}
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete %d product(s)\n", len(ids))
+			return nil
+		}
+
+		yes, _ := cmd.Flags().GetBool("yes")
+		if !yes {
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete %d product(s)? [y/N] ", len(ids))
+			var confirm string
+			_, _ = fmt.Scanln(&confirm)
+			if confirm != "y" && confirm != "Y" {
+				_, _ = fmt.Fprintln(outWriter(cmd), "Cancelled.")
+				return nil
+			}
+		}
 
 		client, err := getClient(cmd)
 		if err != nil {
@@ -1103,6 +1129,8 @@ func init() {
 	productsCmd.AddCommand(productsBulkDeleteCmd)
 	productsBulkDeleteCmd.Flags().String("ids", "", "Comma-separated product IDs (required)")
 	_ = productsBulkDeleteCmd.MarkFlagRequired("ids")
+	productsBulkDeleteCmd.Flags().Bool("yes", false, "Skip confirmation prompt")
+	productsBulkDeleteCmd.Flags().Bool("dry-run", false, "Show what would be deleted without making changes")
 
 	productsCmd.AddCommand(productsBulkStatusCmd)
 	addJSONBodyFlags(productsBulkStatusCmd)
