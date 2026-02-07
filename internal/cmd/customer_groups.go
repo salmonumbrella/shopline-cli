@@ -48,7 +48,7 @@ var customerGroupsListCmd = &cobra.Command{
 			return formatter.JSON(resp)
 		}
 
-		renderCustomerGroupsTable(formatter, resp.Items)
+		renderCustomerGroupsTable(formatter, resp.Items, "")
 		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d customer groups\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
@@ -219,14 +219,15 @@ var customerGroupsSearchCmd = &cobra.Command{
 			return formatter.JSON(resp)
 		}
 
-		renderCustomerGroupsTable(formatter, resp.Items)
+		renderCustomerGroupsTable(formatter, resp.Items, "customer_group")
 		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d customer groups\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
 
-// renderCustomerGroupsTable renders a table of customer groups using the given formatter.
-func renderCustomerGroupsTable(formatter *outfmt.Formatter, groups []api.CustomerGroup) {
+// renderCustomerGroupsTable renders a table of customer groups.
+// idPrefix is used for FormatID on search commands; pass "" for list commands (auto-prefix handles it).
+func renderCustomerGroupsTable(formatter *outfmt.Formatter, groups []api.CustomerGroup, idPrefix string) {
 	headers := []string{"ID", "NAME", "DESCRIPTION", "CUSTOMERS", "CREATED"}
 	var rows [][]string
 	for _, g := range groups {
@@ -234,8 +235,12 @@ func renderCustomerGroupsTable(formatter *outfmt.Formatter, groups []api.Custome
 		if len(desc) > 30 {
 			desc = desc[:27] + "..."
 		}
+		id := g.ID
+		if idPrefix != "" {
+			id = outfmt.FormatID(idPrefix, g.ID)
+		}
 		rows = append(rows, []string{
-			g.ID,
+			id,
 			g.Name,
 			desc,
 			fmt.Sprintf("%d", g.CustomerCount),

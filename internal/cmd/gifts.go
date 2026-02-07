@@ -46,7 +46,7 @@ var giftsListCmd = &cobra.Command{
 			return formatter.JSON(resp)
 		}
 
-		renderGiftsTable(formatter, resp.Items)
+		renderGiftsTable(formatter, resp.Items, "")
 		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d gifts\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
@@ -421,14 +421,15 @@ var giftsSearchCmd = &cobra.Command{
 			return formatter.JSON(resp)
 		}
 
-		renderGiftsTable(formatter, resp.Items)
+		renderGiftsTable(formatter, resp.Items, "gift")
 		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d gifts\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
 
 // renderGiftsTable renders a table of gift promotions using the given formatter.
-func renderGiftsTable(formatter *outfmt.Formatter, gifts []api.Gift) {
+// idPrefix is used for FormatID on search commands; pass "" for list commands (auto-prefix handles it).
+func renderGiftsTable(formatter *outfmt.Formatter, gifts []api.Gift, idPrefix string) {
 	headers := []string{"ID", "TITLE", "GIFT PRODUCT", "TRIGGER", "USED", "STATUS", "STARTS", "ENDS"}
 	var rows [][]string
 	for _, g := range gifts {
@@ -445,8 +446,12 @@ func renderGiftsTable(formatter *outfmt.Formatter, gifts []api.Gift) {
 		if !g.EndsAt.IsZero() {
 			endsAt = g.EndsAt.Format("2006-01-02")
 		}
+		id := g.ID
+		if idPrefix != "" {
+			id = outfmt.FormatID(idPrefix, g.ID)
+		}
 		rows = append(rows, []string{
-			g.ID,
+			id,
 			g.Title,
 			g.GiftProductName,
 			trigger,

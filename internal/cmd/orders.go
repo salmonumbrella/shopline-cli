@@ -311,7 +311,7 @@ var ordersListCmd = &cobra.Command{
 		var rows [][]string
 		for _, o := range resp.Items {
 			rows = append(rows, []string{
-				o.ID,
+				outfmt.FormatID("order", o.ID),
 				o.OrderNumber,
 				o.Status,
 				o.TotalPrice + " " + o.Currency,
