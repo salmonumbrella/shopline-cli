@@ -530,6 +530,12 @@ var ordersCreateCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create an order (raw JSON body)",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create order\n")
+			return nil
+		}
+
 		var req api.OrderCreateRequest
 		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
 			return err
@@ -560,6 +566,12 @@ var ordersUpdateCmd = &cobra.Command{
 	Short: "Update an order (raw JSON body)",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update order %s\n", args[0])
+			return nil
+		}
+
 		var req api.OrderUpdateRequest
 		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
 			return err
@@ -693,6 +705,12 @@ var ordersUpdateStatusCmd = &cobra.Command{
 	Short: "Update order status",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update status for order %s\n", args[0])
+			return nil
+		}
+
 		status, _ := cmd.Flags().GetString("status")
 
 		client, err := getClient(cmd)
@@ -720,6 +738,12 @@ var ordersUpdateDeliveryStatusCmd = &cobra.Command{
 	Short: "Update order delivery status",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update delivery status for order %s\n", args[0])
+			return nil
+		}
+
 		status, _ := cmd.Flags().GetString("status")
 
 		client, err := getClient(cmd)
@@ -747,6 +771,12 @@ var ordersUpdatePaymentStatusCmd = &cobra.Command{
 	Short: "Update order payment status",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update payment status for order %s\n", args[0])
+			return nil
+		}
+
 		status, _ := cmd.Flags().GetString("status")
 
 		client, err := getClient(cmd)
@@ -881,6 +911,12 @@ var ordersTagsUpdateCmd = &cobra.Command{
 	Short: "Update tags for an order",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update tags for order %s\n", args[0])
+			return nil
+		}
+
 		tagsStr, _ := cmd.Flags().GetString("tags")
 		if tagsStr == "" {
 			return fmt.Errorf("--tags must not be empty")
@@ -969,6 +1005,12 @@ var ordersCreateMessageCmd = &cobra.Command{
 	Short: "Create a message on an order (raw JSON body)",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create message for order %s\n", args[0])
+			return nil
+		}
+
 		body, err := readJSONBodyFlags(cmd)
 		if err != nil {
 			return err
@@ -1061,6 +1103,12 @@ var ordersArchivedCreateCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create an archived orders report (raw JSON body)",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create archived orders report\n")
+			return nil
+		}
+
 		body, err := readJSONBodyFlags(cmd)
 		if err != nil {
 			return err
@@ -1126,6 +1174,12 @@ var ordersDeliveryUpdateCmd = &cobra.Command{
 	Short: "Update delivery information for an order (raw JSON body)",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update delivery for order %s\n", args[0])
+			return nil
+		}
+
 		var req api.OrderDeliveryUpdateRequest
 		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
 			return err
