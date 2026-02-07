@@ -528,7 +528,8 @@ func cancelOrdersBatch(cmd *cobra.Command, filename string) error {
 
 var ordersCreateCmd = &cobra.Command{
 	Use:   "create",
-	Short: "Create an order (raw JSON body)",
+	Short: "Create an order",
+	Long:  "Create an order using either --body/--body-file (raw JSON) or individual flags (--email, --note, --tags).",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
@@ -536,9 +537,31 @@ var ordersCreateCmd = &cobra.Command{
 			return nil
 		}
 
+		hasBody := cmd.Flags().Changed("body") || cmd.Flags().Changed("body-file")
+		hasFlags := cmd.Flags().Changed("email") || cmd.Flags().Changed("note") || cmd.Flags().Changed("tags")
+
+		if hasBody && hasFlags {
+			return fmt.Errorf("use either --body/--body-file or individual flags, not both")
+		}
+		if !hasBody && !hasFlags {
+			return fmt.Errorf("provide order data via --body/--body-file or individual flags (--email, --note, --tags)")
+		}
+
 		var req api.OrderCreateRequest
-		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
-			return err
+		if hasBody {
+			if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+				return err
+			}
+		} else {
+			email, _ := cmd.Flags().GetString("email")
+			note, _ := cmd.Flags().GetString("note")
+			tagsStr, _ := cmd.Flags().GetString("tags")
+
+			req.CustomerEmail = email
+			req.Note = note
+			if tagsStr != "" {
+				req.Tags = splitTags(tagsStr)
+			}
 		}
 
 		client, err := getClient(cmd)
@@ -563,7 +586,8 @@ var ordersCreateCmd = &cobra.Command{
 
 var ordersUpdateCmd = &cobra.Command{
 	Use:   "update <id>",
-	Short: "Update an order (raw JSON body)",
+	Short: "Update an order",
+	Long:  "Update an order using either --body/--body-file (raw JSON) or individual flags (--note, --tags).",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -572,9 +596,30 @@ var ordersUpdateCmd = &cobra.Command{
 			return nil
 		}
 
+		hasBody := cmd.Flags().Changed("body") || cmd.Flags().Changed("body-file")
+		hasFlags := cmd.Flags().Changed("note") || cmd.Flags().Changed("tags")
+
+		if hasBody && hasFlags {
+			return fmt.Errorf("use either --body/--body-file or individual flags, not both")
+		}
+		if !hasBody && !hasFlags {
+			return fmt.Errorf("provide order data via --body/--body-file or individual flags (--note, --tags)")
+		}
+
 		var req api.OrderUpdateRequest
-		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
-			return err
+		if hasBody {
+			if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+				return err
+			}
+		} else {
+			if cmd.Flags().Changed("note") {
+				note, _ := cmd.Flags().GetString("note")
+				req.Note = &note
+			}
+			if cmd.Flags().Changed("tags") {
+				tagsStr, _ := cmd.Flags().GetString("tags")
+				req.Tags = splitTags(tagsStr)
+			}
 		}
 
 		client, err := getClient(cmd)
@@ -595,6 +640,18 @@ var ordersUpdateCmd = &cobra.Command{
 		_, _ = fmt.Fprintf(outWriter(cmd), "Updated order %s\n", order.ID)
 		return nil
 	},
+}
+
+// splitTags splits a comma-separated tags string into a trimmed slice.
+func splitTags(s string) []string {
+	parts := strings.Split(s, ",")
+	tags := make([]string, 0, len(parts))
+	for _, p := range parts {
+		if t := strings.TrimSpace(p); t != "" {
+			tags = append(tags, t)
+		}
+	}
+	return tags
 }
 
 // --- Search ---
@@ -1290,9 +1347,14 @@ func init() {
 	// Create / Update
 	ordersCmd.AddCommand(ordersCreateCmd)
 	addJSONBodyFlags(ordersCreateCmd)
+	ordersCreateCmd.Flags().String("email", "", "Customer email")
+	ordersCreateCmd.Flags().String("note", "", "Order note")
+	ordersCreateCmd.Flags().String("tags", "", "Comma-separated tags")
 
 	ordersCmd.AddCommand(ordersUpdateCmd)
 	addJSONBodyFlags(ordersUpdateCmd)
+	ordersUpdateCmd.Flags().String("note", "", "Order note")
+	ordersUpdateCmd.Flags().String("tags", "", "Comma-separated tags")
 
 	// Search
 	ordersCmd.AddCommand(ordersSearchCmd)
