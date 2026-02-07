@@ -59,6 +59,10 @@ var promotionsListCmd = &cobra.Command{
 			if p.UsageLimit > 0 {
 				usage = fmt.Sprintf("%d/%d", p.UsageCount, p.UsageLimit)
 			}
+			startsAt := "-"
+			if !p.StartsAt.IsZero() {
+				startsAt = p.StartsAt.Format("2006-01-02")
+			}
 			endsAt := "-"
 			if !p.EndsAt.IsZero() {
 				endsAt = p.EndsAt.Format("2006-01-02")
@@ -70,7 +74,7 @@ var promotionsListCmd = &cobra.Command{
 				p.Status,
 				discount,
 				usage,
-				p.StartsAt.Format("2006-01-02"),
+				startsAt,
 				endsAt,
 			})
 		}
@@ -312,6 +316,10 @@ var promotionsSearchCmd = &cobra.Command{
 			if p.UsageLimit > 0 {
 				usage = fmt.Sprintf("%d/%d", p.UsageCount, p.UsageLimit)
 			}
+			startsAt := "-"
+			if !p.StartsAt.IsZero() {
+				startsAt = p.StartsAt.Format("2006-01-02")
+			}
 			endsAt := "-"
 			if !p.EndsAt.IsZero() {
 				endsAt = p.EndsAt.Format("2006-01-02")
@@ -323,7 +331,7 @@ var promotionsSearchCmd = &cobra.Command{
 				p.Status,
 				discount,
 				usage,
-				p.StartsAt.Format("2006-01-02"),
+				startsAt,
 				endsAt,
 			})
 		}
