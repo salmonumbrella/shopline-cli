@@ -871,13 +871,13 @@ var productsBulkDeleteCmd = &cobra.Command{
 
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
-			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete %d product(s)\n", len(ids))
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete %d product(s): %s\n", len(ids), strings.Join(ids, ", "))
 			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			_, _ = fmt.Fprintf(outWriter(cmd), "Delete %d product(s)? [y/N] ", len(ids))
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete %d product(s) (%s)? [y/N] ", len(ids), strings.Join(ids, ", "))
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
