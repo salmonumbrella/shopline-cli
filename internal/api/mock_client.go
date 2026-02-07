@@ -57,6 +57,14 @@ func (m *MockClient) ActivateSale(ctx context.Context, id string) (*Sale, error)
 	return nil, m.notImplemented("ActivateSale")
 }
 
+func (m *MockClient) AddProductImages(ctx context.Context, productID string, req *ProductAddImagesRequest) ([]ProductImage, error) {
+	return nil, m.notImplemented("AddProductImages")
+}
+
+func (m *MockClient) AddProductVariation(ctx context.Context, productID string, req *ProductVariationCreateRequest) (*ProductVariation, error) {
+	return nil, m.notImplemented("AddProductVariation")
+}
+
 func (m *MockClient) AddProductsToCollection(ctx context.Context, id string, productIDs []string) error {
 	return m.notImplemented("AddProductsToCollection")
 }
@@ -299,6 +307,10 @@ func (m *MockClient) CreatePickupLocation(ctx context.Context, req *PickupCreate
 
 func (m *MockClient) CreatePriceRule(ctx context.Context, req *PriceRuleCreateRequest) (*PriceRule, error) {
 	return nil, m.notImplemented("CreatePriceRule")
+}
+
+func (m *MockClient) CreateProduct(ctx context.Context, req *ProductCreateRequest) (*Product, error) {
+	return nil, m.notImplemented("CreateProduct")
 }
 
 func (m *MockClient) CreateProductListing(ctx context.Context, productID string) (*ProductListing, error) {
@@ -621,6 +633,14 @@ func (m *MockClient) DeletePriceRule(ctx context.Context, id string) error {
 	return m.notImplemented("DeletePriceRule")
 }
 
+func (m *MockClient) DeleteProduct(ctx context.Context, id string) error {
+	return m.notImplemented("DeleteProduct")
+}
+
+func (m *MockClient) DeleteProductImages(ctx context.Context, productID string, imageIDs []string) error {
+	return m.notImplemented("DeleteProductImages")
+}
+
 func (m *MockClient) DeleteProductListing(ctx context.Context, id string) error {
 	return m.notImplemented("DeleteProductListing")
 }
@@ -635,6 +655,10 @@ func (m *MockClient) DeleteProductReviewComment(ctx context.Context, id string) 
 
 func (m *MockClient) DeleteProductSubscription(ctx context.Context, id string) error {
 	return m.notImplemented("DeleteProductSubscription")
+}
+
+func (m *MockClient) DeleteProductVariation(ctx context.Context, productID string, variationID string) error {
+	return m.notImplemented("DeleteProductVariation")
 }
 
 func (m *MockClient) DeletePromotion(ctx context.Context, id string) error {
@@ -969,6 +993,10 @@ func (m *MockClient) GetLabel(ctx context.Context, id string) (*Label, error) {
 	return nil, m.notImplemented("GetLabel")
 }
 
+func (m *MockClient) GetLockedInventoryCount(ctx context.Context, productID string) (*LockedInventoryCount, error) {
+	return nil, m.notImplemented("GetLockedInventoryCount")
+}
+
 func (m *MockClient) GetLocalDeliveryOption(ctx context.Context, id string) (*LocalDeliveryOption, error) {
 	return nil, m.notImplemented("GetLocalDeliveryOption")
 }
@@ -1067,6 +1095,14 @@ func (m *MockClient) GetProductReview(ctx context.Context, id string) (*ProductR
 
 func (m *MockClient) GetProductReviewComment(ctx context.Context, id string) (json.RawMessage, error) {
 	return nil, m.notImplemented("GetProductReviewComment")
+}
+
+func (m *MockClient) GetProductPromotions(ctx context.Context, productID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetProductPromotions")
+}
+
+func (m *MockClient) GetProductStocks(ctx context.Context, productID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetProductStocks")
 }
 
 func (m *MockClient) GetProductSubscription(ctx context.Context, id string) (*ProductSubscription, error) {
@@ -1343,6 +1379,14 @@ func (m *MockClient) ListCustomers(ctx context.Context, opts *CustomersListOptio
 
 func (m *MockClient) SearchCustomers(ctx context.Context, opts *CustomerSearchOptions) (*CustomersListResponse, error) {
 	return nil, m.notImplemented("SearchCustomers")
+}
+
+func (m *MockClient) SearchProducts(ctx context.Context, opts *ProductSearchOptions) (*ProductsListResponse, error) {
+	return nil, m.notImplemented("SearchProducts")
+}
+
+func (m *MockClient) SearchProductsPost(ctx context.Context, req *ProductSearchRequest) (*ProductsListResponse, error) {
+	return nil, m.notImplemented("SearchProductsPost")
 }
 
 func (m *MockClient) ListCustomerSavedSearches(ctx context.Context, opts *CustomerSavedSearchesListOptions) (*CustomerSavedSearchesListResponse, error) {
@@ -1697,6 +1741,10 @@ func (m *MockClient) RemoveWishListItem(ctx context.Context, wishListID, itemID 
 	return m.notImplemented("RemoveWishListItem")
 }
 
+func (m *MockClient) ReplaceProductTags(ctx context.Context, id string, tags []string) (*Product, error) {
+	return nil, m.notImplemented("ReplaceProductTags")
+}
+
 func (m *MockClient) RevokeUserCoupon(ctx context.Context, id string) error {
 	return m.notImplemented("RevokeUserCoupon")
 }
@@ -1923,6 +1971,54 @@ func (m *MockClient) UpdatePickupLocation(ctx context.Context, id string, req *P
 
 func (m *MockClient) UpdatePriceRule(ctx context.Context, id string, req *PriceRuleUpdateRequest) (*PriceRule, error) {
 	return nil, m.notImplemented("UpdatePriceRule")
+}
+
+func (m *MockClient) UpdateProduct(ctx context.Context, id string, req *ProductUpdateRequest) (*Product, error) {
+	return nil, m.notImplemented("UpdateProduct")
+}
+
+func (m *MockClient) UpdateProductPrice(ctx context.Context, id string, price float64) (*Product, error) {
+	return nil, m.notImplemented("UpdateProductPrice")
+}
+
+func (m *MockClient) UpdateProductQuantity(ctx context.Context, id string, quantity int) (*Product, error) {
+	return nil, m.notImplemented("UpdateProductQuantity")
+}
+
+func (m *MockClient) UpdateProductQuantityBySKU(ctx context.Context, sku string, quantity int) error {
+	return m.notImplemented("UpdateProductQuantityBySKU")
+}
+
+func (m *MockClient) UpdateProductStocks(ctx context.Context, productID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateProductStocks")
+}
+
+func (m *MockClient) UpdateProductTags(ctx context.Context, id string, req *ProductTagsUpdateRequest) (*Product, error) {
+	return nil, m.notImplemented("UpdateProductTags")
+}
+
+func (m *MockClient) UpdateProductVariation(ctx context.Context, productID string, variationID string, req *ProductVariationUpdateRequest) (*ProductVariation, error) {
+	return nil, m.notImplemented("UpdateProductVariation")
+}
+
+func (m *MockClient) UpdateProductVariationPrice(ctx context.Context, productID string, variationID string, price float64) (*Product, error) {
+	return nil, m.notImplemented("UpdateProductVariationPrice")
+}
+
+func (m *MockClient) UpdateProductVariationQuantity(ctx context.Context, productID string, variationID string, quantity int) (*Product, error) {
+	return nil, m.notImplemented("UpdateProductVariationQuantity")
+}
+
+func (m *MockClient) UpdateProductsLabelsBulk(ctx context.Context, body any) error {
+	return m.notImplemented("UpdateProductsLabelsBulk")
+}
+
+func (m *MockClient) UpdateProductsRetailStatusBulk(ctx context.Context, body any) error {
+	return m.notImplemented("UpdateProductsRetailStatusBulk")
+}
+
+func (m *MockClient) UpdateProductsStatusBulk(ctx context.Context, body any) error {
+	return m.notImplemented("UpdateProductsStatusBulk")
 }
 
 func (m *MockClient) UpdateRedirect(ctx context.Context, id string, req *RedirectUpdateRequest) (*Redirect, error) {
@@ -2199,6 +2295,14 @@ func (m *MockClient) UpdateProductReviewComment(ctx context.Context, id string, 
 
 func (m *MockClient) BulkUpdateProductReviewComments(ctx context.Context, body any) (json.RawMessage, error) {
 	return nil, m.notImplemented("BulkUpdateProductReviewComments")
+}
+
+func (m *MockClient) BulkUpdateProductStocks(ctx context.Context, body any) error {
+	return m.notImplemented("BulkUpdateProductStocks")
+}
+
+func (m *MockClient) BulkDeleteProducts(ctx context.Context, productIDs []string) error {
+	return m.notImplemented("BulkDeleteProducts")
 }
 
 func (m *MockClient) BulkDeleteProductReviewComments(ctx context.Context, body any) (json.RawMessage, error) {
