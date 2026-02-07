@@ -178,6 +178,12 @@ var productsCreateCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create a product",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create product\n")
+			return nil
+		}
+
 		title, _ := cmd.Flags().GetString("title")
 		description, _ := cmd.Flags().GetString("description")
 		vendor, _ := cmd.Flags().GetString("vendor")
@@ -222,6 +228,12 @@ var productsUpdateCmd = &cobra.Command{
 	Short: "Update a product",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update product %s\n", args[0])
+			return nil
+		}
+
 		req := &api.ProductUpdateRequest{}
 		if cmd.Flags().Changed("title") {
 			v, _ := cmd.Flags().GetString("title")
@@ -274,6 +286,12 @@ var productsDeleteCmd = &cobra.Command{
 	Short: "Delete a product",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete product %s\n", args[0])
+			return nil
+		}
+
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
 			_, _ = fmt.Fprintf(outWriter(cmd), "Delete product %s? [y/N] ", args[0])
@@ -364,6 +382,12 @@ var productsTagsReplaceCmd = &cobra.Command{
 	Short: "Replace all tags for a product",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would replace tags for product %s\n", args[0])
+			return nil
+		}
+
 		tagsStr, _ := cmd.Flags().GetString("tags")
 		var tags []string
 		if tagsStr != "" {
@@ -396,6 +420,12 @@ var productsTagsUpdateCmd = &cobra.Command{
 	Short: "Add or remove tags from a product",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update tags for product %s\n", args[0])
+			return nil
+		}
+
 		addStr, _ := cmd.Flags().GetString("add")
 		removeStr, _ := cmd.Flags().GetString("remove")
 
@@ -435,6 +465,12 @@ var productsUpdateQuantityCmd = &cobra.Command{
 	Short: "Update product quantity",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update quantity for product %s\n", args[0])
+			return nil
+		}
+
 		qty, _ := cmd.Flags().GetInt("quantity")
 
 		client, err := getClient(cmd)
@@ -463,6 +499,12 @@ var productsUpdatePriceCmd = &cobra.Command{
 	Short: "Update product price",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update price for product %s\n", args[0])
+			return nil
+		}
+
 		price, _ := cmd.Flags().GetFloat64("price")
 
 		client, err := getClient(cmd)
@@ -490,6 +532,12 @@ var productsUpdateQuantityBySKUCmd = &cobra.Command{
 	Use:   "update-quantity-by-sku",
 	Short: "Update product quantity by SKU",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update product quantity by SKU\n")
+			return nil
+		}
+
 		sku, _ := cmd.Flags().GetString("sku")
 		qty, _ := cmd.Flags().GetInt("quantity")
 
@@ -543,6 +591,12 @@ var productsStocksUpdateCmd = &cobra.Command{
 	Short: "Update product stocks (raw JSON body)",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update stocks for product %s\n", args[0])
+			return nil
+		}
+
 		body, err := readJSONBodyFlags(cmd)
 		if err != nil {
 			return err
@@ -565,6 +619,12 @@ var productsBulkUpdateStocksCmd = &cobra.Command{
 	Use:   "bulk-update-stocks",
 	Short: "Bulk update product stocks (raw JSON body)",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would bulk update product stocks\n")
+			return nil
+		}
+
 		body, err := readJSONBodyFlags(cmd)
 		if err != nil {
 			return err
@@ -633,6 +693,12 @@ var productsImagesAddCmd = &cobra.Command{
 	Short: "Add images to a product",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would add images to product %s\n", args[0])
+			return nil
+		}
+
 		srcs, _ := cmd.Flags().GetStringSlice("src")
 		position, _ := cmd.Flags().GetInt("position")
 
@@ -671,6 +737,12 @@ var productsImagesDeleteCmd = &cobra.Command{
 	Short: "Delete images from a product",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete images from product %s\n", args[0])
+			return nil
+		}
+
 		imageIDsStr, _ := cmd.Flags().GetString("image-ids")
 		imageIDs := strings.Split(imageIDsStr, ",")
 
@@ -700,6 +772,12 @@ var productsVariationsCreateCmd = &cobra.Command{
 	Short: "Create a product variation",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create variation for product %s\n", args[0])
+			return nil
+		}
+
 		title, _ := cmd.Flags().GetString("title")
 		sku, _ := cmd.Flags().GetString("sku")
 		price, _ := cmd.Flags().GetFloat64("price")
@@ -738,6 +816,12 @@ var productsVariationsUpdateCmd = &cobra.Command{
 	Short: "Update a product variation",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update variation %s for product %s\n", args[1], args[0])
+			return nil
+		}
+
 		req := &api.ProductVariationUpdateRequest{}
 		if cmd.Flags().Changed("title") {
 			v, _ := cmd.Flags().GetString("title")
@@ -782,6 +866,12 @@ var productsVariationsDeleteCmd = &cobra.Command{
 	Short: "Delete a product variation",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete variation %s from product %s\n", args[1], args[0])
+			return nil
+		}
+
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
@@ -801,6 +891,12 @@ var productsVariationsUpdateQuantityCmd = &cobra.Command{
 	Short: "Update variation quantity",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update quantity for variation %s of product %s\n", args[1], args[0])
+			return nil
+		}
+
 		qty, _ := cmd.Flags().GetInt("quantity")
 
 		client, err := getClient(cmd)
@@ -829,6 +925,12 @@ var productsVariationsUpdatePriceCmd = &cobra.Command{
 	Short: "Update variation price",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update price for variation %s of product %s\n", args[1], args[0])
+			return nil
+		}
+
 		price, _ := cmd.Flags().GetFloat64("price")
 
 		client, err := getClient(cmd)
@@ -905,6 +1007,12 @@ var productsBulkStatusCmd = &cobra.Command{
 	Use:   "bulk-status",
 	Short: "Bulk update product online-store status (raw JSON body)",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would bulk update product status\n")
+			return nil
+		}
+
 		body, err := readJSONBodyFlags(cmd)
 		if err != nil {
 			return err
@@ -928,6 +1036,12 @@ var productsBulkRetailStatusCmd = &cobra.Command{
 	Use:   "bulk-retail-status",
 	Short: "Bulk update product retail-store status (raw JSON body)",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would bulk update product retail status\n")
+			return nil
+		}
+
 		body, err := readJSONBodyFlags(cmd)
 		if err != nil {
 			return err
@@ -951,6 +1065,12 @@ var productsLabelsUpdateCmd = &cobra.Command{
 	Use:   "labels-update",
 	Short: "Update product labels (raw JSON body)",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update product labels\n")
+			return nil
+		}
+
 		body, err := readJSONBodyFlags(cmd)
 		if err != nil {
 			return err
@@ -1036,6 +1156,7 @@ func init() {
 	productsCreateCmd.Flags().String("tags", "", "Comma-separated tags")
 	productsCreateCmd.Flags().String("status", "", "Product status (active, draft, archived)")
 	_ = productsCreateCmd.MarkFlagRequired("title")
+	productsCreateCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	productsCmd.AddCommand(productsUpdateCmd)
 	productsUpdateCmd.Flags().String("title", "", "Product title")
@@ -1044,9 +1165,11 @@ func init() {
 	productsUpdateCmd.Flags().String("product-type", "", "Product type")
 	productsUpdateCmd.Flags().String("tags", "", "Comma-separated tags")
 	productsUpdateCmd.Flags().String("status", "", "Product status")
+	productsUpdateCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	productsCmd.AddCommand(productsDeleteCmd)
 	productsDeleteCmd.Flags().Bool("yes", false, "Skip confirmation prompt")
+	productsDeleteCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	productsCmd.AddCommand(productsSearchCmd)
 	productsSearchCmd.Flags().String("query", "", "Search query")
@@ -1060,34 +1183,41 @@ func init() {
 	productsTagsCmd.AddCommand(productsTagsReplaceCmd)
 	productsTagsReplaceCmd.Flags().String("tags", "", "Comma-separated tags (required)")
 	_ = productsTagsReplaceCmd.MarkFlagRequired("tags")
+	productsTagsReplaceCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	productsTagsCmd.AddCommand(productsTagsUpdateCmd)
 	productsTagsUpdateCmd.Flags().String("add", "", "Comma-separated tags to add")
 	productsTagsUpdateCmd.Flags().String("remove", "", "Comma-separated tags to remove")
+	productsTagsUpdateCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	// Quantity / Price commands
 	productsCmd.AddCommand(productsUpdateQuantityCmd)
 	productsUpdateQuantityCmd.Flags().Int("quantity", 0, "Quantity (required)")
 	_ = productsUpdateQuantityCmd.MarkFlagRequired("quantity")
+	productsUpdateQuantityCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	productsCmd.AddCommand(productsUpdatePriceCmd)
 	productsUpdatePriceCmd.Flags().Float64("price", 0, "Price (required)")
 	_ = productsUpdatePriceCmd.MarkFlagRequired("price")
+	productsUpdatePriceCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	productsCmd.AddCommand(productsUpdateQuantityBySKUCmd)
 	productsUpdateQuantityBySKUCmd.Flags().String("sku", "", "Product SKU (required)")
 	productsUpdateQuantityBySKUCmd.Flags().Int("quantity", 0, "Quantity (required)")
 	_ = productsUpdateQuantityBySKUCmd.MarkFlagRequired("sku")
 	_ = productsUpdateQuantityBySKUCmd.MarkFlagRequired("quantity")
+	productsUpdateQuantityBySKUCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	// Stocks subcommands
 	productsCmd.AddCommand(productsStocksCmd)
 	productsStocksCmd.AddCommand(productsStocksGetCmd)
 	productsStocksCmd.AddCommand(productsStocksUpdateCmd)
 	addJSONBodyFlags(productsStocksUpdateCmd)
+	productsStocksUpdateCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	productsCmd.AddCommand(productsBulkUpdateStocksCmd)
 	addJSONBodyFlags(productsBulkUpdateStocksCmd)
+	productsBulkUpdateStocksCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	productsCmd.AddCommand(productsLockedInventoryCmd)
 
@@ -1097,10 +1227,12 @@ func init() {
 	productsImagesAddCmd.Flags().StringSlice("src", nil, "Image source URL (can be repeated; required)")
 	productsImagesAddCmd.Flags().Int("position", 0, "Image position")
 	_ = productsImagesAddCmd.MarkFlagRequired("src")
+	productsImagesAddCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	productsImagesCmd.AddCommand(productsImagesDeleteCmd)
 	productsImagesDeleteCmd.Flags().String("image-ids", "", "Comma-separated image IDs (required)")
 	_ = productsImagesDeleteCmd.MarkFlagRequired("image-ids")
+	productsImagesDeleteCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	// Variations subcommands
 	productsCmd.AddCommand(productsVariationsCmd)
@@ -1109,22 +1241,27 @@ func init() {
 	productsVariationsCreateCmd.Flags().String("sku", "", "Variation SKU")
 	productsVariationsCreateCmd.Flags().Float64("price", 0, "Variation price")
 	productsVariationsCreateCmd.Flags().Int("quantity", 0, "Variation quantity")
+	productsVariationsCreateCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	productsVariationsCmd.AddCommand(productsVariationsUpdateCmd)
 	productsVariationsUpdateCmd.Flags().String("title", "", "Variation title")
 	productsVariationsUpdateCmd.Flags().String("sku", "", "Variation SKU")
 	productsVariationsUpdateCmd.Flags().Float64("price", 0, "Variation price")
 	productsVariationsUpdateCmd.Flags().Int("quantity", 0, "Variation quantity")
+	productsVariationsUpdateCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	productsVariationsCmd.AddCommand(productsVariationsDeleteCmd)
+	productsVariationsDeleteCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	productsVariationsCmd.AddCommand(productsVariationsUpdateQuantityCmd)
 	productsVariationsUpdateQuantityCmd.Flags().Int("quantity", 0, "Quantity (required)")
 	_ = productsVariationsUpdateQuantityCmd.MarkFlagRequired("quantity")
+	productsVariationsUpdateQuantityCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	productsVariationsCmd.AddCommand(productsVariationsUpdatePriceCmd)
 	productsVariationsUpdatePriceCmd.Flags().Float64("price", 0, "Price (required)")
 	_ = productsVariationsUpdatePriceCmd.MarkFlagRequired("price")
+	productsVariationsUpdatePriceCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	// Bulk commands
 	productsCmd.AddCommand(productsBulkDeleteCmd)
@@ -1135,12 +1272,15 @@ func init() {
 
 	productsCmd.AddCommand(productsBulkStatusCmd)
 	addJSONBodyFlags(productsBulkStatusCmd)
+	productsBulkStatusCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	productsCmd.AddCommand(productsBulkRetailStatusCmd)
 	addJSONBodyFlags(productsBulkRetailStatusCmd)
+	productsBulkRetailStatusCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	productsCmd.AddCommand(productsLabelsUpdateCmd)
 	addJSONBodyFlags(productsLabelsUpdateCmd)
+	productsLabelsUpdateCmd.Flags().Bool("dry-run", false, "Preview without making changes")
 
 	productsCmd.AddCommand(productsPromotionsCmd)
 
