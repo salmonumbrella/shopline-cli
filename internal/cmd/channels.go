@@ -158,6 +158,11 @@ var channelsCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create channel\n")
+			return nil
+		}
 
 		name, _ := cmd.Flags().GetString("name")
 		handle, _ := cmd.Flags().GetString("handle")
@@ -240,6 +245,11 @@ var channelsDeleteCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete channel %s\n", args[0])
+			return nil
+		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
@@ -310,6 +320,11 @@ var channelsPublishCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would publish product to channel\n")
+			return nil
+		}
 
 		req := &api.ChannelPublishProductRequest{
 			ProductID: args[1],
@@ -332,6 +347,11 @@ var channelsUnpublishCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would unpublish product from channel\n")
+			return nil
 		}
 
 		if err := client.UnpublishProductFromChannel(cmd.Context(), args[0], args[1]); err != nil {

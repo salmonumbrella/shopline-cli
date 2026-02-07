@@ -20,6 +20,11 @@ var categoriesProductsSortingUpdateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update category product sorting for %s\n", args[0])
+			return nil
+		}
 
 		body, err := readJSONBodyFlags(cmd)
 		if err != nil {

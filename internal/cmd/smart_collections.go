@@ -120,6 +120,11 @@ var smartCollectionsCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create smart collection\n")
+			return nil
+		}
 
 		title, _ := cmd.Flags().GetString("title")
 		handle, _ := cmd.Flags().GetString("handle")

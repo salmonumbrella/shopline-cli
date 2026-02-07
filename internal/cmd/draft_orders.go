@@ -147,6 +147,11 @@ var draftOrdersDeleteCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete draft order %s\n", args[0])
+			return nil
+		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
@@ -212,6 +217,11 @@ var draftOrdersCompleteCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would complete draft order %s\n", args[0])
+			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")

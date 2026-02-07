@@ -123,6 +123,11 @@ var shipmentsCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create shipment for order %s\n", args[0])
+			return nil
+		}
 
 		orderID, _ := cmd.Flags().GetString("order-id")
 		fulfillmentID, _ := cmd.Flags().GetString("fulfillment-id")
@@ -168,6 +173,11 @@ var shipmentsUpdateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update shipment %s\n", args[0])
+			return nil
+		}
 
 		trackingCompany, _ := cmd.Flags().GetString("tracking-company")
 		trackingNumber, _ := cmd.Flags().GetString("tracking-number")
@@ -209,6 +219,11 @@ var shipmentsDeleteCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete shipment %s\n", args[0])
+			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")

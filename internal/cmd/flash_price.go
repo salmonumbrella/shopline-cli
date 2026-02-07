@@ -139,6 +139,11 @@ var flashPriceCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create flash price campaign\n")
+			return nil
+		}
 
 		productID, _ := cmd.Flags().GetString("product-id")
 		variantID, _ := cmd.Flags().GetString("variant-id")
@@ -198,6 +203,11 @@ var flashPriceActivateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would activate flash price %s\n", args[0])
+			return nil
+		}
 
 		flashPrice, err := client.ActivateFlashPrice(cmd.Context(), args[0])
 		if err != nil {
@@ -218,6 +228,11 @@ var flashPriceDeactivateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would deactivate flash price %s\n", args[0])
+			return nil
+		}
 
 		flashPrice, err := client.DeactivateFlashPrice(cmd.Context(), args[0])
 		if err != nil {
@@ -237,6 +252,11 @@ var flashPriceUpdateCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update flash price %s\n", args[0])
+			return nil
 		}
 
 		req := &api.FlashPriceUpdateRequest{}
@@ -297,6 +317,11 @@ var flashPriceDeleteCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete flash price %s\n", args[0])
+			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")

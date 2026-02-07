@@ -102,6 +102,11 @@ var marketsCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create market\n")
+			return nil
+		}
 
 		name, _ := cmd.Flags().GetString("name")
 		handle, _ := cmd.Flags().GetString("handle")
@@ -140,6 +145,11 @@ var marketsDeleteCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete market %s\n", args[0])
+			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")

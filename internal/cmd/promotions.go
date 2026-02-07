@@ -174,6 +174,11 @@ var promotionsActivateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would activate promotion %s\n", args[0])
+			return nil
+		}
 
 		promotion, err := client.ActivatePromotion(cmd.Context(), args[0])
 		if err != nil {
@@ -194,6 +199,11 @@ var promotionsDeactivateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would deactivate promotion %s\n", args[0])
+			return nil
+		}
 
 		promotion, err := client.DeactivatePromotion(cmd.Context(), args[0])
 		if err != nil {
@@ -213,6 +223,11 @@ var promotionsDeleteCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete promotion %s\n", args[0])
+			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")

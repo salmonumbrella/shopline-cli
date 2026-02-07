@@ -94,6 +94,11 @@ var currenciesUpdateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update currency %s\n", args[0])
+			return nil
+		}
 
 		req := &api.CurrencyUpdateRequest{}
 

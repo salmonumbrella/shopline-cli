@@ -111,6 +111,11 @@ var giftsCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create gift\n")
+			return nil
+		}
 
 		title, _ := cmd.Flags().GetString("title")
 		description, _ := cmd.Flags().GetString("description")
@@ -176,6 +181,11 @@ var giftsActivateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would activate gift %s\n", args[0])
+			return nil
+		}
 
 		gift, err := client.ActivateGift(cmd.Context(), args[0])
 		if err != nil {
@@ -196,6 +206,11 @@ var giftsDeactivateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would deactivate gift %s\n", args[0])
+			return nil
+		}
 
 		gift, err := client.DeactivateGift(cmd.Context(), args[0])
 		if err != nil {
@@ -215,6 +230,11 @@ var giftsDeleteCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete gift %s\n", args[0])
+			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")

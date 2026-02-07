@@ -132,6 +132,11 @@ var salesCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create sale\n")
+			return nil
+		}
 
 		title, _ := cmd.Flags().GetString("title")
 		description, _ := cmd.Flags().GetString("description")
@@ -195,6 +200,11 @@ var salesActivateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would activate sale %s\n", args[0])
+			return nil
+		}
 
 		sale, err := client.ActivateSale(cmd.Context(), args[0])
 		if err != nil {
@@ -215,6 +225,11 @@ var salesDeactivateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would deactivate sale %s\n", args[0])
+			return nil
+		}
 
 		sale, err := client.DeactivateSale(cmd.Context(), args[0])
 		if err != nil {
@@ -234,6 +249,11 @@ var salesDeleteCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete sale %s\n", args[0])
+			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")

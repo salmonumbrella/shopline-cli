@@ -170,6 +170,11 @@ var discountCodesCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create discount code\n")
+			return nil
+		}
 
 		code, _ := cmd.Flags().GetString("code")
 		priceRuleID, _ := cmd.Flags().GetString("price-rule-id")
@@ -230,6 +235,11 @@ var discountCodesDeleteCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete discount code\n")
+			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")

@@ -107,6 +107,11 @@ var scriptTagsCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create script tag\n")
+			return nil
+		}
 
 		req := &api.ScriptTagCreateRequest{
 			Src:          src,

@@ -152,6 +152,11 @@ var bulkOperationsQueryCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create bulk query operation\n")
+			return nil
+		}
 
 		query, _ := cmd.Flags().GetString("graphql")
 
@@ -184,6 +189,11 @@ var bulkOperationsMutationCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create bulk mutation operation\n")
+			return nil
 		}
 
 		mutation, _ := cmd.Flags().GetString("graphql")
@@ -219,6 +229,11 @@ var bulkOperationsCancelCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would cancel bulk operation %s\n", args[0])
+			return nil
 		}
 
 		op, err := client.CancelBulkOperation(cmd.Context(), args[0])

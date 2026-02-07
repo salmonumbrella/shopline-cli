@@ -46,6 +46,13 @@ var wishListItemsCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create wish list item\n")
+			return nil
+		}
+
 		body, err := readJSONBodyFlags(cmd)
 		if err != nil {
 			return err
@@ -63,6 +70,12 @@ var wishListItemsDeleteCmd = &cobra.Command{
 	Aliases: []string{"del", "rm"},
 	Short:   "Delete wish list items",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete wish list items\n")
+			return nil
+		}
+
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
 			_, _ = fmt.Fprintf(outWriter(cmd), "Delete wish list items? (use --yes to confirm)\n")
