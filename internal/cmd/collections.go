@@ -154,6 +154,7 @@ var collectionsCreateCmd = &cobra.Command{
 var collectionsUpdateCmd = &cobra.Command{
 	Use:   "update <id>",
 	Short: "Update a collection",
+	Long:  "Update a collection using either --body/--body-file (raw JSON) or individual flags (--title, --handle, --description, --sort-order).",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -162,9 +163,35 @@ var collectionsUpdateCmd = &cobra.Command{
 			return nil
 		}
 
+		hasBody := cmd.Flags().Changed("body") || cmd.Flags().Changed("body-file")
+		hasFlags := cmd.Flags().Changed("title") || cmd.Flags().Changed("handle") ||
+			cmd.Flags().Changed("description") || cmd.Flags().Changed("sort-order")
+
+		if hasBody && hasFlags {
+			return fmt.Errorf("use either --body/--body-file or individual flags, not both")
+		}
+		if !hasBody && !hasFlags {
+			return fmt.Errorf("provide collection data via --body/--body-file or individual flags (--title, --handle, --description, --sort-order)")
+		}
+
 		var req api.CollectionUpdateRequest
-		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
-			return err
+		if hasBody {
+			if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+				return err
+			}
+		} else {
+			if cmd.Flags().Changed("title") {
+				req.Title, _ = cmd.Flags().GetString("title")
+			}
+			if cmd.Flags().Changed("handle") {
+				req.Handle, _ = cmd.Flags().GetString("handle")
+			}
+			if cmd.Flags().Changed("description") {
+				req.Description, _ = cmd.Flags().GetString("description")
+			}
+			if cmd.Flags().Changed("sort-order") {
+				req.SortOrder, _ = cmd.Flags().GetString("sort-order")
+			}
 		}
 
 		client, err := getClient(cmd)
@@ -298,6 +325,10 @@ func init() {
 
 	collectionsCmd.AddCommand(collectionsUpdateCmd)
 	addJSONBodyFlags(collectionsUpdateCmd)
+	collectionsUpdateCmd.Flags().String("title", "", "Collection title")
+	collectionsUpdateCmd.Flags().String("handle", "", "Collection handle (URL slug)")
+	collectionsUpdateCmd.Flags().String("description", "", "Collection description")
+	collectionsUpdateCmd.Flags().String("sort-order", "", "Product sort order (alpha-asc, alpha-desc, best-selling, etc)")
 
 	collectionsCmd.AddCommand(collectionsAddProductsCmd)
 	collectionsAddProductsCmd.Flags().StringSlice("product-id", nil, "Product IDs to add (repeatable)")
