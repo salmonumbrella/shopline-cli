@@ -109,8 +109,8 @@ func TestAddonProductsCreateFlags(t *testing.T) {
 
 // TestAddonProductsGetCmd verifies get command configuration
 func TestAddonProductsGetCmd(t *testing.T) {
-	if addonProductsGetCmd.Use != "get <id>" {
-		t.Errorf("expected Use 'get <id>', got %q", addonProductsGetCmd.Use)
+	if addonProductsGetCmd.Use != "get [id]" {
+		t.Errorf("expected Use 'get [id]', got %q", addonProductsGetCmd.Use)
 	}
 	if addonProductsGetCmd.Args == nil {
 		t.Error("expected Args validator to be set")
@@ -130,17 +130,23 @@ func TestAddonProductsDeleteCmd(t *testing.T) {
 // addonProductsMockAPIClient is a mock implementation of api.APIClient for addon products tests.
 type addonProductsMockAPIClient struct {
 	api.MockClient
-	listAddonProductsResp  *api.AddonProductsListResponse
-	listAddonProductsErr   error
-	getAddonProductResp    *api.AddonProduct
-	getAddonProductErr     error
-	createAddonProductResp *api.AddonProduct
-	createAddonProductErr  error
-	deleteAddonProductErr  error
+	listAddonProductsResp   *api.AddonProductsListResponse
+	listAddonProductsErr    error
+	searchAddonProductsResp *api.AddonProductsListResponse
+	searchAddonProductsErr  error
+	getAddonProductResp     *api.AddonProduct
+	getAddonProductErr      error
+	createAddonProductResp  *api.AddonProduct
+	createAddonProductErr   error
+	deleteAddonProductErr   error
 }
 
 func (m *addonProductsMockAPIClient) ListAddonProducts(ctx context.Context, opts *api.AddonProductsListOptions) (*api.AddonProductsListResponse, error) {
 	return m.listAddonProductsResp, m.listAddonProductsErr
+}
+
+func (m *addonProductsMockAPIClient) SearchAddonProducts(ctx context.Context, opts *api.AddonProductSearchOptions) (*api.AddonProductsListResponse, error) {
+	return m.searchAddonProductsResp, m.searchAddonProductsErr
 }
 
 func (m *addonProductsMockAPIClient) GetAddonProduct(ctx context.Context, id string) (*api.AddonProduct, error) {
@@ -457,4 +463,153 @@ func TestAddonProductsDeleteRunE(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestAddonProductsGetByFlag tests the --by flag on the addon-products get command.
+func TestAddonProductsGetByFlag(t *testing.T) {
+	t.Run("resolves addon product by title", func(t *testing.T) {
+		mockClient := &addonProductsMockAPIClient{
+			searchAddonProductsResp: &api.AddonProductsListResponse{
+				Items:      []api.AddonProduct{{ID: "addon_found", Title: "Extra Warranty"}},
+				TotalCount: 1,
+			},
+			getAddonProductResp: &api.AddonProduct{
+				ID:    "addon_found",
+				Title: "Extra Warranty",
+			},
+		}
+		cleanup, buf := setupAddonProductsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newAddonProductsTestCmd()
+		_ = cmd.Flags().Set("output", "json")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "Extra Warranty")
+
+		if err := addonProductsGetCmd.RunE(cmd, nil); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "addon_found") {
+			t.Errorf("expected output to contain 'addon_found', got: %s", buf.String())
+		}
+	})
+
+	t.Run("errors when no match", func(t *testing.T) {
+		mockClient := &addonProductsMockAPIClient{
+			searchAddonProductsResp: &api.AddonProductsListResponse{
+				Items:      []api.AddonProduct{},
+				TotalCount: 0,
+			},
+		}
+		cleanup, _ := setupAddonProductsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newAddonProductsTestCmd()
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "nonexistent")
+
+		err := addonProductsGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error when no addon product found")
+		}
+		if !strings.Contains(err.Error(), "no addon product found") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("errors when search fails", func(t *testing.T) {
+		mockClient := &addonProductsMockAPIClient{
+			searchAddonProductsErr: errors.New("API error"),
+		}
+		cleanup, _ := setupAddonProductsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newAddonProductsTestCmd()
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "Extra Warranty")
+
+		err := addonProductsGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error when search fails")
+		}
+		if !strings.Contains(err.Error(), "search failed") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("warns on multiple matches", func(t *testing.T) {
+		mockClient := &addonProductsMockAPIClient{
+			searchAddonProductsResp: &api.AddonProductsListResponse{
+				Items: []api.AddonProduct{
+					{ID: "addon_1", Title: "Extra Warranty A"},
+					{ID: "addon_2", Title: "Extra Warranty B"},
+				},
+				TotalCount: 2,
+			},
+			getAddonProductResp: &api.AddonProduct{
+				ID:    "addon_1",
+				Title: "Extra Warranty A",
+			},
+		}
+		cleanup, buf := setupAddonProductsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newAddonProductsTestCmd()
+		_ = cmd.Flags().Set("output", "json")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "Extra Warranty")
+
+		stderr := new(bytes.Buffer)
+		cmd.SetErr(stderr)
+
+		if err := addonProductsGetCmd.RunE(cmd, nil); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "addon_1") {
+			t.Errorf("expected output to contain 'addon_1', got: %s", buf.String())
+		}
+		if !strings.Contains(stderr.String(), "2 matches found") {
+			t.Errorf("expected stderr warning about multiple matches, got: %s", stderr.String())
+		}
+	})
+
+	t.Run("positional arg takes precedence over --by", func(t *testing.T) {
+		mockClient := &addonProductsMockAPIClient{
+			getAddonProductResp: &api.AddonProduct{
+				ID:    "addon_direct",
+				Title: "Direct Addon",
+			},
+		}
+		cleanup, buf := setupAddonProductsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newAddonProductsTestCmd()
+		_ = cmd.Flags().Set("output", "json")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "should-not-be-used")
+
+		if err := addonProductsGetCmd.RunE(cmd, []string{"addon_direct"}); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "addon_direct") {
+			t.Errorf("expected output to contain 'addon_direct', got: %s", buf.String())
+		}
+	})
+
+	t.Run("errors with no arg and no --by", func(t *testing.T) {
+		mockClient := &addonProductsMockAPIClient{}
+		cleanup, _ := setupAddonProductsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newAddonProductsTestCmd()
+		cmd.Flags().String("by", "", "")
+
+		err := addonProductsGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error with no arg and no --by")
+		}
+		if !strings.Contains(err.Error(), "provide a resource ID") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
 }

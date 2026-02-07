@@ -53,16 +53,35 @@ var giftsListCmd = &cobra.Command{
 }
 
 var giftsGetCmd = &cobra.Command{
-	Use:   "get <id>",
+	Use:   "get [id]",
 	Short: "Get gift details",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
 		}
 
-		gift, err := client.GetGift(cmd.Context(), args[0])
+		giftID, err := resolveOrArg(cmd, args, func(query string) (string, error) {
+			resp, err := client.SearchGifts(cmd.Context(), &api.GiftSearchOptions{
+				Query: query, PageSize: 1,
+			})
+			if err != nil {
+				return "", fmt.Errorf("search failed: %w", err)
+			}
+			if len(resp.Items) == 0 {
+				return "", fmt.Errorf("no gift found matching %q", query)
+			}
+			if len(resp.Items) > 1 {
+				_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Warning: %d matches found, using first\n", len(resp.Items))
+			}
+			return resp.Items[0].ID, nil
+		})
+		if err != nil {
+			return err
+		}
+
+		gift, err := client.GetGift(cmd.Context(), giftID)
 		if err != nil {
 			return fmt.Errorf("failed to get gift: %w", err)
 		}
@@ -545,6 +564,7 @@ func init() {
 	giftsListCmd.Flags().String("status", "", "Filter by status (active, scheduled, expired, inactive)")
 
 	giftsCmd.AddCommand(giftsGetCmd)
+	giftsGetCmd.Flags().String("by", "", "Find gift by title instead of ID")
 
 	giftsCmd.AddCommand(giftsCreateCmd)
 	giftsCreateCmd.Flags().String("title", "", "Gift title (required)")

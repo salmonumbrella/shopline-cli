@@ -23,6 +23,9 @@ type mockPromotionsClient struct {
 	listPromotionsResp *api.PromotionsListResponse
 	listPromotionsErr  error
 
+	searchPromotionsResp *api.PromotionsListResponse
+	searchPromotionsErr  error
+
 	getPromotionResp *api.Promotion
 	getPromotionErr  error
 
@@ -48,6 +51,10 @@ type mockPromotionsClient struct {
 
 func (m *mockPromotionsClient) ListPromotions(ctx context.Context, opts *api.PromotionsListOptions) (*api.PromotionsListResponse, error) {
 	return m.listPromotionsResp, m.listPromotionsErr
+}
+
+func (m *mockPromotionsClient) SearchPromotions(ctx context.Context, opts *api.PromotionSearchOptions) (*api.PromotionsListResponse, error) {
+	return m.searchPromotionsResp, m.searchPromotionsErr
 }
 
 func (m *mockPromotionsClient) GetPromotion(ctx context.Context, id string) (*api.Promotion, error) {
@@ -214,8 +221,8 @@ func TestPromotionsListFlags(t *testing.T) {
 
 // TestPromotionsGetCmd verifies get command setup
 func TestPromotionsGetCmd(t *testing.T) {
-	if promotionsGetCmd.Use != "get <id>" {
-		t.Errorf("expected Use 'get <id>', got %q", promotionsGetCmd.Use)
+	if promotionsGetCmd.Use != "get [id]" {
+		t.Errorf("expected Use 'get [id]', got %q", promotionsGetCmd.Use)
 	}
 }
 
@@ -1414,6 +1421,170 @@ func TestParsePromotionTime(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestPromotionsGetByFlag tests the --by flag on the promotions get command.
+func TestPromotionsGetByFlag(t *testing.T) {
+	t.Run("resolves promotion by title", func(t *testing.T) {
+		mockClient := &mockPromotionsClient{
+			searchPromotionsResp: &api.PromotionsListResponse{
+				Items:      []api.Promotion{{ID: "promo_found", Title: "Summer Sale"}},
+				TotalCount: 1,
+			},
+			getPromotionResp: &api.Promotion{
+				ID:        "promo_found",
+				Title:     "Summer Sale",
+				StartsAt:  time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
+				CreatedAt: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
+			},
+		}
+		restore := setupPromotionsTest(t, mockClient)
+		defer restore()
+
+		var buf bytes.Buffer
+		formatterWriter = &buf
+
+		cmd := newPromotionsTestCmd()
+		_ = cmd.Flags().Set("output", "json")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "Summer Sale")
+
+		if err := promotionsGetCmd.RunE(cmd, nil); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "promo_found") {
+			t.Errorf("expected output to contain 'promo_found', got: %s", buf.String())
+		}
+	})
+
+	t.Run("errors when no match", func(t *testing.T) {
+		mockClient := &mockPromotionsClient{
+			searchPromotionsResp: &api.PromotionsListResponse{
+				Items:      []api.Promotion{},
+				TotalCount: 0,
+			},
+		}
+		restore := setupPromotionsTest(t, mockClient)
+		defer restore()
+
+		cmd := newPromotionsTestCmd()
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "nonexistent")
+
+		err := promotionsGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error when no promotion found")
+		}
+		if !strings.Contains(err.Error(), "no promotion found") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("errors when search fails", func(t *testing.T) {
+		mockClient := &mockPromotionsClient{
+			searchPromotionsErr: errors.New("API error"),
+		}
+		restore := setupPromotionsTest(t, mockClient)
+		defer restore()
+
+		cmd := newPromotionsTestCmd()
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "Summer Sale")
+
+		err := promotionsGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error when search fails")
+		}
+		if !strings.Contains(err.Error(), "search failed") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("warns on multiple matches", func(t *testing.T) {
+		mockClient := &mockPromotionsClient{
+			searchPromotionsResp: &api.PromotionsListResponse{
+				Items: []api.Promotion{
+					{ID: "promo_1", Title: "Summer Sale A"},
+					{ID: "promo_2", Title: "Summer Sale B"},
+				},
+				TotalCount: 2,
+			},
+			getPromotionResp: &api.Promotion{
+				ID:        "promo_1",
+				Title:     "Summer Sale A",
+				StartsAt:  time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
+				CreatedAt: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
+			},
+		}
+		restore := setupPromotionsTest(t, mockClient)
+		defer restore()
+
+		var buf bytes.Buffer
+		formatterWriter = &buf
+
+		cmd := newPromotionsTestCmd()
+		_ = cmd.Flags().Set("output", "json")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "Summer Sale")
+
+		stderr := new(bytes.Buffer)
+		cmd.SetErr(stderr)
+
+		if err := promotionsGetCmd.RunE(cmd, nil); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "promo_1") {
+			t.Errorf("expected output to contain 'promo_1', got: %s", buf.String())
+		}
+		if !strings.Contains(stderr.String(), "2 matches found") {
+			t.Errorf("expected stderr warning about multiple matches, got: %s", stderr.String())
+		}
+	})
+
+	t.Run("positional arg takes precedence over --by", func(t *testing.T) {
+		mockClient := &mockPromotionsClient{
+			getPromotionResp: &api.Promotion{
+				ID:        "promo_direct",
+				Title:     "Direct Promo",
+				StartsAt:  time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
+				CreatedAt: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
+			},
+		}
+		restore := setupPromotionsTest(t, mockClient)
+		defer restore()
+
+		var buf bytes.Buffer
+		formatterWriter = &buf
+
+		cmd := newPromotionsTestCmd()
+		_ = cmd.Flags().Set("output", "json")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "should-not-be-used")
+
+		if err := promotionsGetCmd.RunE(cmd, []string{"promo_direct"}); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "promo_direct") {
+			t.Errorf("expected output to contain 'promo_direct', got: %s", buf.String())
+		}
+	})
+
+	t.Run("errors with no arg and no --by", func(t *testing.T) {
+		mockClient := &mockPromotionsClient{}
+		restore := setupPromotionsTest(t, mockClient)
+		defer restore()
+
+		cmd := newPromotionsTestCmd()
+		cmd.Flags().String("by", "", "")
+
+		err := promotionsGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error with no arg and no --by")
+		}
+		if !strings.Contains(err.Error(), "provide a resource ID") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
 }
 
 // Pointer helper functions for test assertions.

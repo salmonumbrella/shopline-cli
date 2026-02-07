@@ -55,16 +55,35 @@ var customerGroupsListCmd = &cobra.Command{
 }
 
 var customerGroupsGetCmd = &cobra.Command{
-	Use:   "get <id>",
+	Use:   "get [id]",
 	Short: "Get customer group details",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
 		}
 
-		group, err := client.GetCustomerGroup(cmd.Context(), args[0])
+		groupID, err := resolveOrArg(cmd, args, func(query string) (string, error) {
+			resp, err := client.SearchCustomerGroups(cmd.Context(), &api.CustomerGroupSearchOptions{
+				Query: query, PageSize: 1,
+			})
+			if err != nil {
+				return "", fmt.Errorf("search failed: %w", err)
+			}
+			if len(resp.Items) == 0 {
+				return "", fmt.Errorf("no customer group found matching %q", query)
+			}
+			if len(resp.Items) > 1 {
+				_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Warning: %d matches found, using first\n", len(resp.Items))
+			}
+			return resp.Items[0].ID, nil
+		})
+		if err != nil {
+			return err
+		}
+
+		group, err := client.GetCustomerGroup(cmd.Context(), groupID)
 		if err != nil {
 			return fmt.Errorf("failed to get customer group: %w", err)
 		}
@@ -323,6 +342,7 @@ func init() {
 	customerGroupsListCmd.Flags().Int("page-size", 20, "Results per page")
 
 	customerGroupsCmd.AddCommand(customerGroupsGetCmd)
+	customerGroupsGetCmd.Flags().String("by", "", "Find customer group by name instead of ID")
 
 	customerGroupsCmd.AddCommand(customerGroupsCreateCmd)
 	customerGroupsCreateCmd.Flags().String("name", "", "Group name")

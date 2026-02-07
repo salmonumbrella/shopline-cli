@@ -27,8 +27,8 @@ func TestCustomerGroupsListCmd(t *testing.T) {
 }
 
 func TestCustomerGroupsGetCmd(t *testing.T) {
-	if customerGroupsGetCmd.Use != "get <id>" {
-		t.Errorf("Expected Use to be 'get <id>', got %q", customerGroupsGetCmd.Use)
+	if customerGroupsGetCmd.Use != "get [id]" {
+		t.Errorf("Expected Use to be 'get [id]', got %q", customerGroupsGetCmd.Use)
 	}
 }
 
@@ -139,6 +139,8 @@ type groupsMockClient struct {
 	api.MockClient
 	listResp   *api.CustomerGroupsListResponse
 	listErr    error
+	searchResp *api.CustomerGroupsListResponse
+	searchErr  error
 	getResp    *api.CustomerGroup
 	getErr     error
 	createResp *api.CustomerGroup
@@ -148,6 +150,10 @@ type groupsMockClient struct {
 
 func (m *groupsMockClient) ListCustomerGroups(ctx context.Context, opts *api.CustomerGroupsListOptions) (*api.CustomerGroupsListResponse, error) {
 	return m.listResp, m.listErr
+}
+
+func (m *groupsMockClient) SearchCustomerGroups(ctx context.Context, opts *api.CustomerGroupSearchOptions) (*api.CustomerGroupsListResponse, error) {
+	return m.searchResp, m.searchErr
 }
 
 func (m *groupsMockClient) GetCustomerGroup(ctx context.Context, id string) (*api.CustomerGroup, error) {
@@ -420,6 +426,50 @@ func TestCustomerGroupsCreateRunE_WithMockAPI(t *testing.T) {
 	}
 }
 
+// setupGroupsMockFactories sets up mock factories for customer groups tests.
+func setupGroupsMockFactories(mockClient *groupsMockClient) (func(), *bytes.Buffer) {
+	origClientFactory := clientFactory
+	origSecretsFactory := secretsStoreFactory
+	origWriter := formatterWriter
+
+	buf := new(bytes.Buffer)
+	formatterWriter = buf
+
+	secretsStoreFactory = func() (CredentialStore, error) {
+		return &mockStore{
+			names: []string{"test"},
+			creds: map[string]*secrets.StoreCredentials{
+				"test": {Handle: "test", AccessToken: "token"},
+			},
+		}, nil
+	}
+
+	clientFactory = func(handle, accessToken string) api.APIClient {
+		return mockClient
+	}
+
+	cleanup := func() {
+		clientFactory = origClientFactory
+		secretsStoreFactory = origSecretsFactory
+		formatterWriter = origWriter
+	}
+
+	return cleanup, buf
+}
+
+// newGroupsTestCmd creates a test command with common flags for customer groups tests.
+func newGroupsTestCmd() *cobra.Command {
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+	cmd.Flags().Bool("dry-run", false, "")
+	cmd.Flags().Bool("yes", true, "")
+	return cmd
+}
+
 func TestCustomerGroupsDeleteRunE_WithMockAPI(t *testing.T) {
 	tests := []struct {
 		name       string
@@ -492,4 +542,158 @@ func TestCustomerGroupsDeleteRunE_WithMockAPI(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestCustomerGroupsGetByFlag tests the --by flag on the customer-groups get command.
+func TestCustomerGroupsGetByFlag(t *testing.T) {
+	now := time.Now()
+
+	t.Run("resolves customer group by name", func(t *testing.T) {
+		mockClient := &groupsMockClient{
+			searchResp: &api.CustomerGroupsListResponse{
+				Items:      []api.CustomerGroup{{ID: "grp_found", Name: "VIP Customers"}},
+				TotalCount: 1,
+			},
+			getResp: &api.CustomerGroup{
+				ID:        "grp_found",
+				Name:      "VIP Customers",
+				CreatedAt: now,
+			},
+		}
+		cleanup, buf := setupGroupsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newGroupsTestCmd()
+		_ = cmd.Flags().Set("output", "json")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "VIP Customers")
+
+		if err := customerGroupsGetCmd.RunE(cmd, nil); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "grp_found") {
+			t.Errorf("expected output to contain 'grp_found', got: %s", buf.String())
+		}
+	})
+
+	t.Run("errors when no match", func(t *testing.T) {
+		mockClient := &groupsMockClient{
+			searchResp: &api.CustomerGroupsListResponse{
+				Items:      []api.CustomerGroup{},
+				TotalCount: 0,
+			},
+		}
+		cleanup, _ := setupGroupsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newGroupsTestCmd()
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "nonexistent")
+
+		err := customerGroupsGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error when no customer group found")
+		}
+		if !strings.Contains(err.Error(), "no customer group found") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("errors when search fails", func(t *testing.T) {
+		mockClient := &groupsMockClient{
+			searchErr: errors.New("API error"),
+		}
+		cleanup, _ := setupGroupsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newGroupsTestCmd()
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "VIP Customers")
+
+		err := customerGroupsGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error when search fails")
+		}
+		if !strings.Contains(err.Error(), "search failed") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("warns on multiple matches", func(t *testing.T) {
+		mockClient := &groupsMockClient{
+			searchResp: &api.CustomerGroupsListResponse{
+				Items: []api.CustomerGroup{
+					{ID: "grp_1", Name: "VIP A"},
+					{ID: "grp_2", Name: "VIP B"},
+				},
+				TotalCount: 2,
+			},
+			getResp: &api.CustomerGroup{
+				ID:        "grp_1",
+				Name:      "VIP A",
+				CreatedAt: now,
+			},
+		}
+		cleanup, buf := setupGroupsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newGroupsTestCmd()
+		_ = cmd.Flags().Set("output", "json")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "VIP")
+
+		stderr := new(bytes.Buffer)
+		cmd.SetErr(stderr)
+
+		if err := customerGroupsGetCmd.RunE(cmd, nil); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "grp_1") {
+			t.Errorf("expected output to contain 'grp_1', got: %s", buf.String())
+		}
+		if !strings.Contains(stderr.String(), "2 matches found") {
+			t.Errorf("expected stderr warning about multiple matches, got: %s", stderr.String())
+		}
+	})
+
+	t.Run("positional arg takes precedence over --by", func(t *testing.T) {
+		mockClient := &groupsMockClient{
+			getResp: &api.CustomerGroup{
+				ID:        "grp_direct",
+				Name:      "Direct Group",
+				CreatedAt: now,
+			},
+		}
+		cleanup, buf := setupGroupsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newGroupsTestCmd()
+		_ = cmd.Flags().Set("output", "json")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "should-not-be-used")
+
+		if err := customerGroupsGetCmd.RunE(cmd, []string{"grp_direct"}); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "grp_direct") {
+			t.Errorf("expected output to contain 'grp_direct', got: %s", buf.String())
+		}
+	})
+
+	t.Run("errors with no arg and no --by", func(t *testing.T) {
+		mockClient := &groupsMockClient{}
+		cleanup, _ := setupGroupsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newGroupsTestCmd()
+		cmd.Flags().String("by", "", "")
+
+		err := customerGroupsGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error with no arg and no --by")
+		}
+		if !strings.Contains(err.Error(), "provide a resource ID") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
 }

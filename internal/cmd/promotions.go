@@ -86,16 +86,35 @@ var promotionsListCmd = &cobra.Command{
 }
 
 var promotionsGetCmd = &cobra.Command{
-	Use:   "get <id>",
+	Use:   "get [id]",
 	Short: "Get promotion details",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
 		}
 
-		promotion, err := client.GetPromotion(cmd.Context(), args[0])
+		promotionID, err := resolveOrArg(cmd, args, func(query string) (string, error) {
+			resp, err := client.SearchPromotions(cmd.Context(), &api.PromotionSearchOptions{
+				Query: query, PageSize: 1,
+			})
+			if err != nil {
+				return "", fmt.Errorf("search failed: %w", err)
+			}
+			if len(resp.Items) == 0 {
+				return "", fmt.Errorf("no promotion found matching %q", query)
+			}
+			if len(resp.Items) > 1 {
+				_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Warning: %d matches found, using first\n", len(resp.Items))
+			}
+			return resp.Items[0].ID, nil
+		})
+		if err != nil {
+			return err
+		}
+
+		promotion, err := client.GetPromotion(cmd.Context(), promotionID)
 		if err != nil {
 			return fmt.Errorf("failed to get promotion: %w", err)
 		}
@@ -497,6 +516,8 @@ func init() {
 	promotionsListCmd.Flags().Int("page-size", 20, "Results per page")
 
 	promotionsCmd.AddCommand(promotionsGetCmd)
+	promotionsGetCmd.Flags().String("by", "", "Find promotion by title instead of ID")
+
 	promotionsCmd.AddCommand(promotionsCreateCmd)
 	addJSONBodyFlags(promotionsCreateCmd)
 	promotionsCreateCmd.Flags().String("title", "", "Promotion title")
