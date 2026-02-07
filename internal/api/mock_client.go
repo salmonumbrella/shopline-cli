@@ -785,6 +785,10 @@ func (m *MockClient) GetAddonProduct(ctx context.Context, id string) (*AddonProd
 	return nil, m.notImplemented("GetAddonProduct")
 }
 
+func (m *MockClient) GetAddonProductStocks(ctx context.Context, id string) (*AddonProductStocksResponse, error) {
+	return nil, m.notImplemented("GetAddonProductStocks")
+}
+
 func (m *MockClient) GetAffiliateCampaign(ctx context.Context, id string) (*AffiliateCampaign, error) {
 	return nil, m.notImplemented("GetAffiliateCampaign")
 }
@@ -1377,6 +1381,10 @@ func (m *MockClient) ListCustomers(ctx context.Context, opts *CustomersListOptio
 	return nil, m.notImplemented("ListCustomers")
 }
 
+func (m *MockClient) SearchAddonProducts(ctx context.Context, opts *AddonProductSearchOptions) (*AddonProductsListResponse, error) {
+	return nil, m.notImplemented("SearchAddonProducts")
+}
+
 func (m *MockClient) SearchCustomers(ctx context.Context, opts *CustomerSearchOptions) (*CustomersListResponse, error) {
 	return nil, m.notImplemented("SearchCustomers")
 }
@@ -1791,6 +1799,22 @@ func (m *MockClient) UnpublishProductFromChannel(ctx context.Context, channelID,
 
 func (m *MockClient) UnpublishProductFromChannelListing(ctx context.Context, channelID, productID string) error {
 	return m.notImplemented("UnpublishProductFromChannelListing")
+}
+
+func (m *MockClient) UpdateAddonProduct(ctx context.Context, id string, req *AddonProductUpdateRequest) (*AddonProduct, error) {
+	return nil, m.notImplemented("UpdateAddonProduct")
+}
+
+func (m *MockClient) UpdateAddonProductQuantity(ctx context.Context, id string, req *AddonProductQuantityRequest) (*AddonProduct, error) {
+	return nil, m.notImplemented("UpdateAddonProductQuantity")
+}
+
+func (m *MockClient) UpdateAddonProductsQuantityBySKU(ctx context.Context, req *AddonProductQuantityBySKURequest) (*AddonProduct, error) {
+	return nil, m.notImplemented("UpdateAddonProductsQuantityBySKU")
+}
+
+func (m *MockClient) UpdateAddonProductStocks(ctx context.Context, id string, req *AddonProductStocksUpdateRequest) (*AddonProductStocksResponse, error) {
+	return nil, m.notImplemented("UpdateAddonProductStocks")
 }
 
 func (m *MockClient) UpdateAffiliateCampaign(ctx context.Context, id string, req *AffiliateCampaignUpdateRequest) (*AffiliateCampaign, error) {

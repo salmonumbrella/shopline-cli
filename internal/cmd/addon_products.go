@@ -185,6 +185,253 @@ var addonProductsDeleteCmd = &cobra.Command{
 	},
 }
 
+var addonProductsSearchCmd = &cobra.Command{
+	Use:   "search",
+	Short: "Search add-on products",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		query, _ := cmd.Flags().GetString("query")
+		productID, _ := cmd.Flags().GetString("product-id")
+		status, _ := cmd.Flags().GetString("status")
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+
+		opts := &api.AddonProductSearchOptions{
+			Query:     query,
+			ProductID: productID,
+			Status:    status,
+			Page:      page,
+			PageSize:  pageSize,
+		}
+
+		resp, err := client.SearchAddonProducts(cmd.Context(), opts)
+		if err != nil {
+			return fmt.Errorf("failed to search addon products: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		headers := []string{"ID", "TITLE", "PRODUCT ID", "PRICE", "STATUS", "CREATED"}
+		var rows [][]string
+		for _, ap := range resp.Items {
+			price := ap.Price
+			if ap.Currency != "" {
+				price = ap.Price + " " + ap.Currency
+			}
+			rows = append(rows, []string{
+				ap.ID,
+				ap.Title,
+				ap.ProductID,
+				price,
+				ap.Status,
+				ap.CreatedAt.Format("2006-01-02 15:04"),
+			})
+		}
+
+		formatter.Table(headers, rows)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d addon products\n", len(resp.Items), resp.TotalCount)
+		return nil
+	},
+}
+
+var addonProductsUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update an add-on product",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update addon product %s\n", args[0])
+			return nil
+		}
+
+		req := &api.AddonProductUpdateRequest{}
+		if cmd.Flags().Changed("title") {
+			v, _ := cmd.Flags().GetString("title")
+			req.Title = &v
+		}
+		if cmd.Flags().Changed("price") {
+			v, _ := cmd.Flags().GetString("price")
+			req.Price = &v
+		}
+		if cmd.Flags().Changed("quantity") {
+			v, _ := cmd.Flags().GetInt("quantity")
+			req.Quantity = &v
+		}
+		if cmd.Flags().Changed("status") {
+			v, _ := cmd.Flags().GetString("status")
+			req.Status = &v
+		}
+		if cmd.Flags().Changed("description") {
+			v, _ := cmd.Flags().GetString("description")
+			req.Description = &v
+		}
+		if cmd.Flags().Changed("product-id") {
+			v, _ := cmd.Flags().GetString("product-id")
+			req.ProductID = &v
+		}
+		if cmd.Flags().Changed("variant-id") {
+			v, _ := cmd.Flags().GetString("variant-id")
+			req.VariantID = &v
+		}
+		if cmd.Flags().Changed("position") {
+			v, _ := cmd.Flags().GetInt("position")
+			req.Position = &v
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		addonProduct, err := client.UpdateAddonProduct(cmd.Context(), args[0], req)
+		if err != nil {
+			return fmt.Errorf("failed to update addon product: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(addonProduct)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated addon product %s\n", addonProduct.ID)
+		return nil
+	},
+}
+
+var addonProductsUpdateQuantityCmd = &cobra.Command{
+	Use:   "update-quantity <id>",
+	Short: "Update add-on product quantity",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		qty, _ := cmd.Flags().GetInt("quantity")
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update addon product quantity for %s\n", args[0])
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		req := &api.AddonProductQuantityRequest{Quantity: qty}
+		addonProduct, err := client.UpdateAddonProductQuantity(cmd.Context(), args[0], req)
+		if err != nil {
+			return fmt.Errorf("failed to update addon product quantity: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(addonProduct)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated addon product %s quantity to %d\n", addonProduct.ID, addonProduct.Quantity)
+		return nil
+	},
+}
+
+var addonProductsUpdateQuantityBySKUCmd = &cobra.Command{
+	Use:   "update-quantity-by-sku",
+	Short: "Bulk update add-on product quantity by SKU",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		sku, _ := cmd.Flags().GetString("sku")
+		qty, _ := cmd.Flags().GetInt("quantity")
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update addon product quantity for SKU %s\n", sku)
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		req := &api.AddonProductQuantityBySKURequest{SKU: sku, Quantity: qty}
+		addonProduct, err := client.UpdateAddonProductsQuantityBySKU(cmd.Context(), req)
+		if err != nil {
+			return fmt.Errorf("failed to update addon products quantity by sku: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(addonProduct)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated addon product quantity for SKU %s\n", sku)
+		return nil
+	},
+}
+
+var addonProductsStocksCmd = &cobra.Command{
+	Use:   "stocks",
+	Short: "Manage add-on product stocks",
+}
+
+var addonProductsStocksGetCmd = &cobra.Command{
+	Use:   "get <id>",
+	Short: "Get add-on product stocks (raw JSON)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.GetAddonProductStocks(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to get addon product stocks: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var addonProductsStocksUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update add-on product stocks (raw JSON body)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update addon product stocks for %s\n", args[0])
+			return nil
+		}
+
+		var req api.AddonProductStocksUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.UpdateAddonProductStocks(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update addon product stocks: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(addonProductsCmd)
 
@@ -208,4 +455,36 @@ func init() {
 	_ = addonProductsCreateCmd.MarkFlagRequired("product-id")
 
 	addonProductsCmd.AddCommand(addonProductsDeleteCmd)
+
+	addonProductsCmd.AddCommand(addonProductsSearchCmd)
+	addonProductsSearchCmd.Flags().String("query", "", "Search query")
+	addonProductsSearchCmd.Flags().String("product-id", "", "Filter by parent product ID")
+	addonProductsSearchCmd.Flags().String("status", "", "Filter by status (active, inactive)")
+	addonProductsSearchCmd.Flags().Int("page", 1, "Page number")
+	addonProductsSearchCmd.Flags().Int("page-size", 20, "Results per page")
+
+	addonProductsCmd.AddCommand(addonProductsUpdateCmd)
+	addonProductsUpdateCmd.Flags().String("title", "", "Add-on product title")
+	addonProductsUpdateCmd.Flags().String("price", "", "Price")
+	addonProductsUpdateCmd.Flags().Int("quantity", 0, "Quantity")
+	addonProductsUpdateCmd.Flags().String("status", "", "Status (active, inactive)")
+	addonProductsUpdateCmd.Flags().String("description", "", "Description")
+	addonProductsUpdateCmd.Flags().String("product-id", "", "Parent product ID")
+	addonProductsUpdateCmd.Flags().String("variant-id", "", "Variant ID")
+	addonProductsUpdateCmd.Flags().Int("position", 0, "Display position")
+
+	addonProductsCmd.AddCommand(addonProductsUpdateQuantityCmd)
+	addonProductsUpdateQuantityCmd.Flags().Int("quantity", 0, "Quantity (required)")
+	_ = addonProductsUpdateQuantityCmd.MarkFlagRequired("quantity")
+
+	addonProductsCmd.AddCommand(addonProductsUpdateQuantityBySKUCmd)
+	addonProductsUpdateQuantityBySKUCmd.Flags().String("sku", "", "Add-on product SKU (required)")
+	addonProductsUpdateQuantityBySKUCmd.Flags().Int("quantity", 0, "Quantity (required)")
+	_ = addonProductsUpdateQuantityBySKUCmd.MarkFlagRequired("sku")
+	_ = addonProductsUpdateQuantityBySKUCmd.MarkFlagRequired("quantity")
+
+	addonProductsCmd.AddCommand(addonProductsStocksCmd)
+	addonProductsStocksCmd.AddCommand(addonProductsStocksGetCmd)
+	addonProductsStocksCmd.AddCommand(addonProductsStocksUpdateCmd)
+	addJSONBodyFlags(addonProductsStocksUpdateCmd)
 }
