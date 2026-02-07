@@ -2309,6 +2309,70 @@ func (m *MockClient) BulkDeleteProductReviewComments(ctx context.Context, body a
 	return nil, m.notImplemented("BulkDeleteProductReviewComments")
 }
 
+func (m *MockClient) ListProductMetafields(ctx context.Context, productID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListProductMetafields")
+}
+
+func (m *MockClient) GetProductMetafield(ctx context.Context, productID, metafieldID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetProductMetafield")
+}
+
+func (m *MockClient) CreateProductMetafield(ctx context.Context, productID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("CreateProductMetafield")
+}
+
+func (m *MockClient) UpdateProductMetafield(ctx context.Context, productID, metafieldID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateProductMetafield")
+}
+
+func (m *MockClient) DeleteProductMetafield(ctx context.Context, productID, metafieldID string) error {
+	return m.notImplemented("DeleteProductMetafield")
+}
+
+func (m *MockClient) BulkCreateProductMetafields(ctx context.Context, productID string, body any) error {
+	return m.notImplemented("BulkCreateProductMetafields")
+}
+
+func (m *MockClient) BulkUpdateProductMetafields(ctx context.Context, productID string, body any) error {
+	return m.notImplemented("BulkUpdateProductMetafields")
+}
+
+func (m *MockClient) BulkDeleteProductMetafields(ctx context.Context, productID string, body any) error {
+	return m.notImplemented("BulkDeleteProductMetafields")
+}
+
+func (m *MockClient) ListProductAppMetafields(ctx context.Context, productID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListProductAppMetafields")
+}
+
+func (m *MockClient) GetProductAppMetafield(ctx context.Context, productID, metafieldID string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetProductAppMetafield")
+}
+
+func (m *MockClient) CreateProductAppMetafield(ctx context.Context, productID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("CreateProductAppMetafield")
+}
+
+func (m *MockClient) UpdateProductAppMetafield(ctx context.Context, productID, metafieldID string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("UpdateProductAppMetafield")
+}
+
+func (m *MockClient) DeleteProductAppMetafield(ctx context.Context, productID, metafieldID string) error {
+	return m.notImplemented("DeleteProductAppMetafield")
+}
+
+func (m *MockClient) BulkCreateProductAppMetafields(ctx context.Context, productID string, body any) error {
+	return m.notImplemented("BulkCreateProductAppMetafields")
+}
+
+func (m *MockClient) BulkUpdateProductAppMetafields(ctx context.Context, productID string, body any) error {
+	return m.notImplemented("BulkUpdateProductAppMetafields")
+}
+
+func (m *MockClient) BulkDeleteProductAppMetafields(ctx context.Context, productID string, body any) error {
+	return m.notImplemented("BulkDeleteProductAppMetafields")
+}
+
 func (m *MockClient) ExchangeCart(ctx context.Context, body any) (json.RawMessage, error) {
 	return nil, m.notImplemented("ExchangeCart")
 }

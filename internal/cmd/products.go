@@ -1132,6 +1132,7 @@ func init() {
 			"variations update-quantity", "variations update-price",
 			"bulk-delete", "bulk-status", "bulk-retail-status",
 			"labels-update", "promotions",
+			"metafields", "app-metafields",
 		},
 		IDPrefix: "product",
 	})

@@ -384,6 +384,26 @@ type APIClient interface {
 	BulkUpdateCustomerAppMetafields(ctx context.Context, customerID string, body any) error
 	BulkDeleteCustomerAppMetafields(ctx context.Context, customerID string, body any) error
 
+	// Product metafields (nested endpoints under /products/{id}/...)
+	ListProductMetafields(ctx context.Context, productID string) (json.RawMessage, error)
+	GetProductMetafield(ctx context.Context, productID, metafieldID string) (json.RawMessage, error)
+	CreateProductMetafield(ctx context.Context, productID string, body any) (json.RawMessage, error)
+	UpdateProductMetafield(ctx context.Context, productID, metafieldID string, body any) (json.RawMessage, error)
+	DeleteProductMetafield(ctx context.Context, productID, metafieldID string) error
+	BulkCreateProductMetafields(ctx context.Context, productID string, body any) error
+	BulkUpdateProductMetafields(ctx context.Context, productID string, body any) error
+	BulkDeleteProductMetafields(ctx context.Context, productID string, body any) error
+
+	// Product app metafields (nested endpoints under /products/{id}/...)
+	ListProductAppMetafields(ctx context.Context, productID string) (json.RawMessage, error)
+	GetProductAppMetafield(ctx context.Context, productID, metafieldID string) (json.RawMessage, error)
+	CreateProductAppMetafield(ctx context.Context, productID string, body any) (json.RawMessage, error)
+	UpdateProductAppMetafield(ctx context.Context, productID, metafieldID string, body any) (json.RawMessage, error)
+	DeleteProductAppMetafield(ctx context.Context, productID, metafieldID string) error
+	BulkCreateProductAppMetafields(ctx context.Context, productID string, body any) error
+	BulkUpdateProductAppMetafields(ctx context.Context, productID string, body any) error
+	BulkDeleteProductAppMetafields(ctx context.Context, productID string, body any) error
+
 	// Customer store credits (nested endpoints under /customers/{id}/...)
 	GetCustomerStoreCredits(ctx context.Context, customerID string) (json.RawMessage, error)
 	CreateCustomerStoreCredits(ctx context.Context, customerID string, body any) (json.RawMessage, error)
