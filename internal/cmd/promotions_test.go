@@ -26,6 +26,14 @@ type mockPromotionsClient struct {
 	getPromotionResp *api.Promotion
 	getPromotionErr  error
 
+	createPromotionResp *api.Promotion
+	createPromotionErr  error
+	createPromotionReq  *api.PromotionCreateRequest
+
+	updatePromotionResp *api.Promotion
+	updatePromotionErr  error
+	updatePromotionReq  *api.PromotionUpdateRequest
+
 	activatePromotionResp *api.Promotion
 	activatePromotionErr  error
 
@@ -56,6 +64,16 @@ func (m *mockPromotionsClient) DeactivatePromotion(ctx context.Context, id strin
 
 func (m *mockPromotionsClient) DeletePromotion(ctx context.Context, id string) error {
 	return m.deletePromotionErr
+}
+
+func (m *mockPromotionsClient) CreatePromotion(ctx context.Context, req *api.PromotionCreateRequest) (*api.Promotion, error) {
+	m.createPromotionReq = req
+	return m.createPromotionResp, m.createPromotionErr
+}
+
+func (m *mockPromotionsClient) UpdatePromotion(ctx context.Context, id string, req *api.PromotionUpdateRequest) (*api.Promotion, error) {
+	m.updatePromotionReq = req
+	return m.updatePromotionResp, m.updatePromotionErr
 }
 
 func (m *mockPromotionsClient) GetPromotionsCouponCenter(ctx context.Context) (json.RawMessage, error) {
@@ -858,3 +876,547 @@ func TestPromotionsDeleteRunE_ConfirmUpperY(t *testing.T) {
 		t.Errorf("unexpected error: %v", err)
 	}
 }
+
+// --- Create shorthand flags tests ---
+
+// newPromotionsCreateTestCmd creates a test command with all flags needed for promotions create.
+func newPromotionsCreateTestCmd() *cobra.Command {
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+	cmd.Flags().Bool("items-only", false, "")
+	cmd.Flags().Bool("dry-run", false, "")
+	addJSONBodyFlags(cmd)
+	cmd.Flags().String("title", "", "")
+	cmd.Flags().String("discount-type", "", "")
+	cmd.Flags().Float64("discount-value", 0, "")
+	cmd.Flags().String("starts-at", "", "")
+	cmd.Flags().String("ends-at", "", "")
+	cmd.Flags().Int("usage-limit", 0, "")
+	cmd.Flags().String("status", "", "")
+	return cmd
+}
+
+// newPromotionsUpdateTestCmd creates a test command with all flags needed for promotions update.
+func newPromotionsUpdateTestCmd() *cobra.Command {
+	cmd := newPromotionsCreateTestCmd() // same flags
+	return cmd
+}
+
+// TestPromotionsCreateShorthandFlags tests the create command with shorthand flags.
+func TestPromotionsCreateShorthandFlags(t *testing.T) {
+	tests := []struct {
+		name              string
+		flags             map[string]string
+		wantTitle         string
+		wantDiscountType  string
+		wantDiscountValue float64
+		wantUsageLimit    int
+		wantErr           bool
+		wantErrMsg        string
+	}{
+		{
+			name: "all flags",
+			flags: map[string]string{
+				"title":          "Summer Sale",
+				"discount-type":  "percentage",
+				"discount-value": "20",
+				"starts-at":      "2026-03-01",
+				"ends-at":        "2026-06-01",
+				"usage-limit":    "100",
+				"status":         "active",
+			},
+			wantTitle:         "Summer Sale",
+			wantDiscountType:  "percentage",
+			wantDiscountValue: 20,
+			wantUsageLimit:    100,
+		},
+		{
+			name:             "title only",
+			flags:            map[string]string{"title": "Flash Sale"},
+			wantTitle:        "Flash Sale",
+			wantDiscountType: "",
+		},
+		{
+			name:              "discount flags only",
+			flags:             map[string]string{"discount-type": "fixed_amount", "discount-value": "10.5"},
+			wantDiscountType:  "fixed_amount",
+			wantDiscountValue: 10.5,
+		},
+		{
+			name:       "body and flags conflict",
+			flags:      map[string]string{"body": `{"title":"x"}`, "title": "y"},
+			wantErr:    true,
+			wantErrMsg: "use either --body/--body-file or individual flags, not both",
+		},
+		{
+			name:       "no input at all",
+			flags:      map[string]string{},
+			wantErr:    true,
+			wantErrMsg: "provide promotion data via --body/--body-file or individual flags",
+		},
+		{
+			name:       "invalid starts-at date",
+			flags:      map[string]string{"title": "Bad Date", "starts-at": "not-a-date"},
+			wantErr:    true,
+			wantErrMsg: "invalid --starts-at format",
+		},
+		{
+			name:       "invalid ends-at date",
+			flags:      map[string]string{"title": "Bad Date", "ends-at": "not-a-date"},
+			wantErr:    true,
+			wantErrMsg: "invalid --ends-at format",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockClient := &mockPromotionsClient{
+				createPromotionResp: &api.Promotion{
+					ID:     "promo_new",
+					Status: "active",
+				},
+			}
+
+			restore := setupPromotionsTest(t, mockClient)
+			defer restore()
+
+			var buf bytes.Buffer
+			formatterWriter = &buf
+
+			cmd := newPromotionsCreateTestCmd()
+			for k, v := range tt.flags {
+				_ = cmd.Flags().Set(k, v)
+			}
+
+			err := promotionsCreateCmd.RunE(cmd, []string{})
+
+			if tt.wantErr {
+				if err == nil {
+					t.Fatal("expected error, got nil")
+				}
+				if !strings.Contains(err.Error(), tt.wantErrMsg) {
+					t.Errorf("error %q should contain %q", err.Error(), tt.wantErrMsg)
+				}
+				return
+			}
+
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			req := mockClient.createPromotionReq
+			if req == nil {
+				t.Fatal("expected CreatePromotion to be called")
+			}
+			if tt.wantTitle != "" && req.Title != tt.wantTitle {
+				t.Errorf("title = %q, want %q", req.Title, tt.wantTitle)
+			}
+			if tt.wantDiscountType != "" && req.DiscountType != tt.wantDiscountType {
+				t.Errorf("discount_type = %q, want %q", req.DiscountType, tt.wantDiscountType)
+			}
+			if tt.wantDiscountValue != 0 && req.DiscountValue != tt.wantDiscountValue {
+				t.Errorf("discount_value = %f, want %f", req.DiscountValue, tt.wantDiscountValue)
+			}
+			if tt.wantUsageLimit != 0 && req.UsageLimit != tt.wantUsageLimit {
+				t.Errorf("usage_limit = %d, want %d", req.UsageLimit, tt.wantUsageLimit)
+			}
+		})
+	}
+}
+
+// TestPromotionsCreateWithBody tests that --body still works for create.
+func TestPromotionsCreateWithBody(t *testing.T) {
+	mockClient := &mockPromotionsClient{
+		createPromotionResp: &api.Promotion{
+			ID:     "promo_body",
+			Status: "active",
+		},
+	}
+	restore := setupPromotionsTest(t, mockClient)
+	defer restore()
+
+	var buf bytes.Buffer
+	formatterWriter = &buf
+
+	cmd := newPromotionsCreateTestCmd()
+	_ = cmd.Flags().Set("output", "json")
+	_ = cmd.Flags().Set("body", `{"title":"Body Promo","discount_type":"percentage","discount_value":15,"starts_at":"2026-03-01T00:00:00Z"}`)
+
+	err := promotionsCreateCmd.RunE(cmd, []string{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	req := mockClient.createPromotionReq
+	if req == nil {
+		t.Fatal("expected CreatePromotion to be called")
+	}
+	if req.Title != "Body Promo" {
+		t.Errorf("title = %q, want %q", req.Title, "Body Promo")
+	}
+	if req.DiscountType != "percentage" {
+		t.Errorf("discount_type = %q, want %q", req.DiscountType, "percentage")
+	}
+}
+
+// TestPromotionsCreateDryRun tests that dry-run skips shorthand flag validation.
+func TestPromotionsCreateDryRun(t *testing.T) {
+	mockClient := &mockPromotionsClient{}
+	restore := setupPromotionsTest(t, mockClient)
+	defer restore()
+
+	var buf bytes.Buffer
+	cmd := newPromotionsCreateTestCmd()
+	cmd.SetOut(&buf)
+	_ = cmd.Flags().Set("dry-run", "true")
+
+	err := promotionsCreateCmd.RunE(cmd, []string{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if mockClient.createPromotionReq != nil {
+		t.Error("expected CreatePromotion NOT to be called in dry-run mode")
+	}
+	if !strings.Contains(buf.String(), "[DRY-RUN]") {
+		t.Errorf("expected dry-run output, got %q", buf.String())
+	}
+}
+
+// TestPromotionsCreateWithDateFormats tests both RFC3339 and YYYY-MM-DD date parsing.
+func TestPromotionsCreateWithDateFormats(t *testing.T) {
+	tests := []struct {
+		name     string
+		startsAt string
+		endsAt   string
+		wantYear int
+	}{
+		{
+			name:     "YYYY-MM-DD format",
+			startsAt: "2026-03-01",
+			endsAt:   "2026-06-01",
+			wantYear: 2026,
+		},
+		{
+			name:     "RFC3339 format",
+			startsAt: "2026-03-01T10:00:00Z",
+			endsAt:   "2026-06-01T23:59:59Z",
+			wantYear: 2026,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockClient := &mockPromotionsClient{
+				createPromotionResp: &api.Promotion{
+					ID:     "promo_date",
+					Status: "active",
+				},
+			}
+			restore := setupPromotionsTest(t, mockClient)
+			defer restore()
+
+			var buf bytes.Buffer
+			formatterWriter = &buf
+
+			cmd := newPromotionsCreateTestCmd()
+			_ = cmd.Flags().Set("title", "Date Test")
+			_ = cmd.Flags().Set("starts-at", tt.startsAt)
+			_ = cmd.Flags().Set("ends-at", tt.endsAt)
+
+			err := promotionsCreateCmd.RunE(cmd, []string{})
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			req := mockClient.createPromotionReq
+			if req == nil {
+				t.Fatal("expected CreatePromotion to be called")
+			}
+			if req.StartsAt.Year() != tt.wantYear {
+				t.Errorf("starts_at year = %d, want %d", req.StartsAt.Year(), tt.wantYear)
+			}
+			if req.EndsAt.Year() != tt.wantYear {
+				t.Errorf("ends_at year = %d, want %d", req.EndsAt.Year(), tt.wantYear)
+			}
+		})
+	}
+}
+
+// --- Update shorthand flags tests ---
+
+// TestPromotionsUpdateShorthandFlags tests the update command with shorthand flags.
+func TestPromotionsUpdateShorthandFlags(t *testing.T) {
+	tests := []struct {
+		name              string
+		flags             map[string]string
+		wantTitle         *string
+		wantDiscountType  *string
+		wantDiscountValue *float64
+		wantUsageLimit    *int
+		wantErr           bool
+		wantErrMsg        string
+	}{
+		{
+			name: "all flags",
+			flags: map[string]string{
+				"title":          "Updated Sale",
+				"discount-type":  "fixed_amount",
+				"discount-value": "25",
+				"starts-at":      "2026-04-01",
+				"ends-at":        "2026-07-01",
+				"usage-limit":    "200",
+				"status":         "inactive",
+			},
+			wantTitle:         ptrString("Updated Sale"),
+			wantDiscountType:  ptrString("fixed_amount"),
+			wantDiscountValue: ptrFloat64(25),
+			wantUsageLimit:    ptrInt(200),
+		},
+		{
+			name:      "title only (partial update)",
+			flags:     map[string]string{"title": "New Title"},
+			wantTitle: ptrString("New Title"),
+		},
+		{
+			name:              "discount-value only (partial update)",
+			flags:             map[string]string{"discount-value": "30.5"},
+			wantDiscountValue: ptrFloat64(30.5),
+		},
+		{
+			name:       "body and flags conflict",
+			flags:      map[string]string{"body": `{"title":"x"}`, "title": "y"},
+			wantErr:    true,
+			wantErrMsg: "use either --body/--body-file or individual flags, not both",
+		},
+		{
+			name:       "no input at all",
+			flags:      map[string]string{},
+			wantErr:    true,
+			wantErrMsg: "provide promotion data via --body/--body-file or individual flags",
+		},
+		{
+			name:       "invalid starts-at date",
+			flags:      map[string]string{"starts-at": "bad-date"},
+			wantErr:    true,
+			wantErrMsg: "invalid --starts-at format",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockClient := &mockPromotionsClient{
+				updatePromotionResp: &api.Promotion{
+					ID:     "promo_upd",
+					Status: "active",
+				},
+			}
+
+			restore := setupPromotionsTest(t, mockClient)
+			defer restore()
+
+			var buf bytes.Buffer
+			formatterWriter = &buf
+
+			cmd := newPromotionsUpdateTestCmd()
+			for k, v := range tt.flags {
+				_ = cmd.Flags().Set(k, v)
+			}
+
+			err := promotionsUpdateCmd.RunE(cmd, []string{"promo_123"})
+
+			if tt.wantErr {
+				if err == nil {
+					t.Fatal("expected error, got nil")
+				}
+				if !strings.Contains(err.Error(), tt.wantErrMsg) {
+					t.Errorf("error %q should contain %q", err.Error(), tt.wantErrMsg)
+				}
+				return
+			}
+
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			req := mockClient.updatePromotionReq
+			if req == nil {
+				t.Fatal("expected UpdatePromotion to be called")
+			}
+
+			if tt.wantTitle != nil {
+				if req.Title == nil {
+					t.Error("expected Title to be set")
+				} else if *req.Title != *tt.wantTitle {
+					t.Errorf("title = %q, want %q", *req.Title, *tt.wantTitle)
+				}
+			}
+			if tt.wantDiscountType != nil {
+				if req.DiscountType == nil {
+					t.Error("expected DiscountType to be set")
+				} else if *req.DiscountType != *tt.wantDiscountType {
+					t.Errorf("discount_type = %q, want %q", *req.DiscountType, *tt.wantDiscountType)
+				}
+			}
+			if tt.wantDiscountValue != nil {
+				if req.DiscountValue == nil {
+					t.Error("expected DiscountValue to be set")
+				} else if *req.DiscountValue != *tt.wantDiscountValue {
+					t.Errorf("discount_value = %f, want %f", *req.DiscountValue, *tt.wantDiscountValue)
+				}
+			}
+			if tt.wantUsageLimit != nil {
+				if req.UsageLimit == nil {
+					t.Error("expected UsageLimit to be set")
+				} else if *req.UsageLimit != *tt.wantUsageLimit {
+					t.Errorf("usage_limit = %d, want %d", *req.UsageLimit, *tt.wantUsageLimit)
+				}
+			}
+		})
+	}
+}
+
+// TestPromotionsUpdateWithBody tests that --body still works for update.
+func TestPromotionsUpdateWithBody(t *testing.T) {
+	mockClient := &mockPromotionsClient{
+		updatePromotionResp: &api.Promotion{
+			ID:     "promo_body_upd",
+			Status: "active",
+		},
+	}
+	restore := setupPromotionsTest(t, mockClient)
+	defer restore()
+
+	var buf bytes.Buffer
+	formatterWriter = &buf
+
+	cmd := newPromotionsUpdateTestCmd()
+	_ = cmd.Flags().Set("output", "json")
+	_ = cmd.Flags().Set("body", `{"title":"Body Update"}`)
+
+	err := promotionsUpdateCmd.RunE(cmd, []string{"promo_123"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	req := mockClient.updatePromotionReq
+	if req == nil {
+		t.Fatal("expected UpdatePromotion to be called")
+	}
+	if req.Title == nil || *req.Title != "Body Update" {
+		t.Errorf("title = %v, want %q", req.Title, "Body Update")
+	}
+}
+
+// TestPromotionsUpdateDryRun tests that dry-run skips shorthand flag validation for update.
+func TestPromotionsUpdateDryRun(t *testing.T) {
+	mockClient := &mockPromotionsClient{}
+	restore := setupPromotionsTest(t, mockClient)
+	defer restore()
+
+	var buf bytes.Buffer
+	cmd := newPromotionsUpdateTestCmd()
+	cmd.SetOut(&buf)
+	_ = cmd.Flags().Set("dry-run", "true")
+
+	err := promotionsUpdateCmd.RunE(cmd, []string{"promo_123"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if mockClient.updatePromotionReq != nil {
+		t.Error("expected UpdatePromotion NOT to be called in dry-run mode")
+	}
+	if !strings.Contains(buf.String(), "[DRY-RUN]") {
+		t.Errorf("expected dry-run output, got %q", buf.String())
+	}
+}
+
+// TestPromotionsUpdatePartialFlags tests that only Changed() flags are set in the update request.
+func TestPromotionsUpdatePartialFlags(t *testing.T) {
+	mockClient := &mockPromotionsClient{
+		updatePromotionResp: &api.Promotion{
+			ID:     "promo_partial",
+			Status: "active",
+		},
+	}
+	restore := setupPromotionsTest(t, mockClient)
+	defer restore()
+
+	var buf bytes.Buffer
+	formatterWriter = &buf
+
+	cmd := newPromotionsUpdateTestCmd()
+	// Only set title -- other fields should remain nil
+	_ = cmd.Flags().Set("title", "Partial Update")
+
+	err := promotionsUpdateCmd.RunE(cmd, []string{"promo_123"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	req := mockClient.updatePromotionReq
+	if req == nil {
+		t.Fatal("expected UpdatePromotion to be called")
+	}
+	if req.Title == nil || *req.Title != "Partial Update" {
+		t.Errorf("title = %v, want %q", req.Title, "Partial Update")
+	}
+	if req.DiscountType != nil {
+		t.Errorf("discount_type should be nil, got %v", req.DiscountType)
+	}
+	if req.DiscountValue != nil {
+		t.Errorf("discount_value should be nil, got %v", req.DiscountValue)
+	}
+	if req.UsageLimit != nil {
+		t.Errorf("usage_limit should be nil, got %v", req.UsageLimit)
+	}
+	if req.StartsAt != nil {
+		t.Errorf("starts_at should be nil, got %v", req.StartsAt)
+	}
+	if req.EndsAt != nil {
+		t.Errorf("ends_at should be nil, got %v", req.EndsAt)
+	}
+}
+
+// TestParsePromotionTime tests the time parsing helper.
+func TestParsePromotionTime(t *testing.T) {
+	tests := []struct {
+		input   string
+		wantErr bool
+		wantY   int
+		wantM   time.Month
+		wantD   int
+	}{
+		{"2026-03-01", false, 2026, time.March, 1},
+		{"2026-03-01T10:00:00Z", false, 2026, time.March, 1},
+		{"not-a-date", true, 0, 0, 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			got, err := parsePromotionTime(tt.input, "test")
+			if tt.wantErr {
+				if err == nil {
+					t.Fatal("expected error, got nil")
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if got.Year() != tt.wantY || got.Month() != tt.wantM || got.Day() != tt.wantD {
+				t.Errorf("got %v, want %d-%02d-%02d", got, tt.wantY, tt.wantM, tt.wantD)
+			}
+		})
+	}
+}
+
+// Pointer helper functions for test assertions.
+func ptrString(s string) *string    { return &s }
+func ptrFloat64(f float64) *float64 { return &f }
+func ptrInt(i int) *int             { return &i }
