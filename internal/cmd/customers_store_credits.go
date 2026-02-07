@@ -40,6 +40,12 @@ var customersStoreCreditsUpdateCmd = &cobra.Command{
 	Short: "Update customer store credits",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update store credits for customer %s\n", args[0])
+			return nil
+		}
+
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
