@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/outfmt"
 	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
@@ -337,7 +338,7 @@ var productsSearchCmd = &cobra.Command{
 		var rows [][]string
 		for _, p := range resp.Items {
 			rows = append(rows, []string{
-				p.ID,
+				outfmt.FormatID("product", p.ID),
 				p.Title,
 				p.Status,
 				p.Vendor,
