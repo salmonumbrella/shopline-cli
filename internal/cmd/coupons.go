@@ -170,6 +170,11 @@ var couponsCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create coupon\n")
+			return nil
+		}
 
 		code, _ := cmd.Flags().GetString("code")
 		discountType, _ := cmd.Flags().GetString("discount-type")
@@ -252,6 +257,11 @@ var couponsActivateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would activate coupon %s\n", args[0])
+			return nil
+		}
 
 		coupon, err := client.ActivateCoupon(cmd.Context(), args[0])
 		if err != nil {
@@ -272,6 +282,11 @@ var couponsDeactivateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would deactivate coupon %s\n", args[0])
+			return nil
+		}
 
 		coupon, err := client.DeactivateCoupon(cmd.Context(), args[0])
 		if err != nil {
@@ -291,6 +306,11 @@ var couponsDeleteCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete coupon %s\n", args[0])
+			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")

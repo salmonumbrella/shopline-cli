@@ -69,3 +69,55 @@ shopline customers list --limit 20 --desc --json --items-only --fields debug
 # Order detail with expanded customer + product info on line items (extra API calls)
 shopline orders get [order:$ord_123] -o json --expand customer,products
 ```
+
+## Name-to-ID Resolution (`--by`)
+
+Instead of searching and extracting IDs manually, use `--by` on get commands to resolve a human-readable name/email/number to an ID in a single step:
+
+```bash
+# Old way (2 steps)
+shopline customers search --q "john@example.com" --output json | jq -r '.items[0].id'
+shopline customers get cust_abc123
+
+# New way (1 step)
+shopline customers get --by john@example.com
+shopline orders get --by ORD-12345
+shopline products get --by "Widget Pro"
+shopline gifts get --by "Summer Gift"
+shopline promotions get --by "Flash Sale"
+shopline addon-products get --by "Bundle Deal"
+shopline customer-groups get --by "VIP Members"
+```
+
+Available on: `customers` (by email), `orders` (by number/query), `products` (by title), `gifts` (by title), `promotions` (by title), `addon-products` (by title), `customer-groups` (by name).
+
+If the lookup matches multiple results, the first match is returned.
+
+## Shorthand Flags (Orders & Promotions)
+
+Orders and promotions accept individual property flags on create/update, so you don't need to build raw JSON payloads:
+
+```bash
+# Orders
+shopline orders create --email user@example.com --note "Test order" --tags "vip,rush"
+shopline orders update ord_123 --note "Updated note" --tags "priority"
+
+# Promotions
+shopline promotions create --title "Sale" --discount-type percentage --discount-value 20 --starts-at 2026-03-01
+shopline promotions update promo_123 --title "New Title" --discount-value 30
+```
+
+These flags are merged into the request body alongside any `--data` JSON you provide.
+
+## Dry-Run Support
+
+All write commands (create, update, delete, cancel, activate, deactivate, etc.) support `--dry-run`. It prints the HTTP method, URL, and request body without sending the request:
+
+```bash
+shopline orders create --dry-run --email test@example.com
+shopline products delete prod_123 --dry-run
+shopline promotions activate promo_123 --dry-run
+shopline customers update cust_456 --dry-run --data '{"first_name":"Jane"}'
+```
+
+Use `--dry-run` to verify what the CLI will send before making real changes.

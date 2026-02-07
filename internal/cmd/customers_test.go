@@ -91,16 +91,21 @@ func TestCustomersListFlags(t *testing.T) {
 	}
 }
 
-// TestCustomersGetArgs verifies get command requires exactly 1 argument
+// TestCustomersGetArgs verifies get command accepts 0 or 1 arguments
 func TestCustomersGetArgs(t *testing.T) {
 	err := customersGetCmd.Args(customersGetCmd, []string{})
-	if err == nil {
-		t.Error("expected error when no args provided")
+	if err != nil {
+		t.Errorf("expected no error with 0 args (--by mode), got: %v", err)
 	}
 
 	err = customersGetCmd.Args(customersGetCmd, []string{"cust-id"})
 	if err != nil {
 		t.Errorf("expected no error with 1 arg, got: %v", err)
+	}
+
+	err = customersGetCmd.Args(customersGetCmd, []string{"a", "b"})
+	if err == nil {
+		t.Error("expected error with 2 args")
 	}
 }
 
@@ -914,6 +919,155 @@ func TestCustomersGetRunEWithJSON(t *testing.T) {
 // ptr returns a pointer to the given value.
 func ptr[T any](v T) *T {
 	return &v
+}
+
+// TestCustomersGetByFlag tests the --by flag on the customers get command.
+func TestCustomersGetByFlag(t *testing.T) {
+	t.Run("resolves customer by email", func(t *testing.T) {
+		mockClient := &customersMockAPIClient{
+			searchCustomersResp: &api.CustomersListResponse{
+				Items:      []api.Customer{{ID: "cust_found", Email: "alice@example.com"}},
+				TotalCount: 1,
+			},
+			getCustomerResp: &api.Customer{
+				ID:    "cust_found",
+				Email: "alice@example.com",
+			},
+		}
+		cleanup, buf := setupCustomersMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newCustomersTestCmd()
+		_ = cmd.Flags().Set("output", "json")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "alice@example.com")
+
+		if err := customersGetCmd.RunE(cmd, nil); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "cust_found") {
+			t.Errorf("expected output to contain 'cust_found', got: %s", buf.String())
+		}
+	})
+
+	t.Run("errors when no match", func(t *testing.T) {
+		mockClient := &customersMockAPIClient{
+			searchCustomersResp: &api.CustomersListResponse{
+				Items:      []api.Customer{},
+				TotalCount: 0,
+			},
+		}
+		cleanup, _ := setupCustomersMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newCustomersTestCmd()
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "nobody@example.com")
+
+		err := customersGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error when no customer found")
+		}
+		if !strings.Contains(err.Error(), "no customer found") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("errors when search fails", func(t *testing.T) {
+		mockClient := &customersMockAPIClient{
+			searchCustomersErr: errors.New("API error"),
+		}
+		cleanup, _ := setupCustomersMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newCustomersTestCmd()
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "alice@example.com")
+
+		err := customersGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error when search fails")
+		}
+		if !strings.Contains(err.Error(), "search failed") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("warns on multiple matches", func(t *testing.T) {
+		mockClient := &customersMockAPIClient{
+			searchCustomersResp: &api.CustomersListResponse{
+				Items: []api.Customer{
+					{ID: "cust_1", Email: "alice@example.com"},
+					{ID: "cust_2", Email: "alice+2@example.com"},
+				},
+				TotalCount: 2,
+			},
+			getCustomerResp: &api.Customer{
+				ID:    "cust_1",
+				Email: "alice@example.com",
+			},
+		}
+		cleanup, buf := setupCustomersMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newCustomersTestCmd()
+		_ = cmd.Flags().Set("output", "json")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "alice")
+
+		stderr := new(bytes.Buffer)
+		cmd.SetErr(stderr)
+
+		if err := customersGetCmd.RunE(cmd, nil); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "cust_1") {
+			t.Errorf("expected output to contain 'cust_1', got: %s", buf.String())
+		}
+		if !strings.Contains(stderr.String(), "2 customers matched") {
+			t.Errorf("expected stderr warning about multiple matches, got: %s", stderr.String())
+		}
+	})
+
+	t.Run("positional arg takes precedence over --by", func(t *testing.T) {
+		mockClient := &customersMockAPIClient{
+			getCustomerResp: &api.Customer{
+				ID:    "cust_direct",
+				Email: "direct@example.com",
+			},
+		}
+		cleanup, buf := setupCustomersMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newCustomersTestCmd()
+		_ = cmd.Flags().Set("output", "json")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "should-not-be-used")
+
+		if err := customersGetCmd.RunE(cmd, []string{"cust_direct"}); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "cust_direct") {
+			t.Errorf("expected output to contain 'cust_direct', got: %s", buf.String())
+		}
+	})
+
+	t.Run("errors with no arg and no --by", func(t *testing.T) {
+		mockClient := &customersMockAPIClient{}
+		cleanup, _ := setupCustomersMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newCustomersTestCmd()
+		cmd.Flags().String("by", "", "")
+
+		err := customersGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error with no arg and no --by")
+		}
+		if !strings.Contains(err.Error(), "provide a resource ID") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
 }
 
 // TestFormatCustomerCreditBalance tests the formatCustomerCreditBalance function.

@@ -117,6 +117,11 @@ var themesCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create theme\n")
+			return nil
+		}
 
 		req := &api.ThemeCreateRequest{
 			Name: name,

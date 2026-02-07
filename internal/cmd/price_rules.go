@@ -125,6 +125,11 @@ var priceRulesCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create price rule\n")
+			return nil
+		}
 
 		title, _ := cmd.Flags().GetString("title")
 		valueType, _ := cmd.Flags().GetString("value-type")

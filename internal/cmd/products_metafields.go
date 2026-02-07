@@ -7,51 +7,51 @@ import (
 )
 
 // ============================
-// customers metafields (non-app)
+// products metafields (non-app)
 // ============================
 
-var customersMetafieldsCmd = &cobra.Command{
+var productsMetafieldsCmd = &cobra.Command{
 	Use:   "metafields",
-	Short: "Manage customer metafields",
+	Short: "Manage product metafields",
 }
 
-var customersMetafieldsListCmd = &cobra.Command{
-	Use:   "list <customer-id>",
-	Short: "List metafields attached to a customer",
+var productsMetafieldsListCmd = &cobra.Command{
+	Use:   "list <product-id>",
+	Short: "List metafields attached to a product",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
 		}
-		resp, err := client.ListCustomerMetafields(cmd.Context(), args[0])
+		resp, err := client.ListProductMetafields(cmd.Context(), args[0])
 		if err != nil {
-			return fmt.Errorf("failed to list customer metafields: %w", err)
+			return fmt.Errorf("failed to list product metafields: %w", err)
 		}
 		return getFormatter(cmd).JSON(resp)
 	},
 }
 
-var customersMetafieldsGetCmd = &cobra.Command{
-	Use:   "get <customer-id> <metafield-id>",
-	Short: "Get a specific customer metafield",
+var productsMetafieldsGetCmd = &cobra.Command{
+	Use:   "get <product-id> <metafield-id>",
+	Short: "Get a specific product metafield",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
 		}
-		resp, err := client.GetCustomerMetafield(cmd.Context(), args[0], args[1])
+		resp, err := client.GetProductMetafield(cmd.Context(), args[0], args[1])
 		if err != nil {
-			return fmt.Errorf("failed to get customer metafield: %w", err)
+			return fmt.Errorf("failed to get product metafield: %w", err)
 		}
 		return getFormatter(cmd).JSON(resp)
 	},
 }
 
-var customersMetafieldsCreateCmd = &cobra.Command{
-	Use:   "create <customer-id>",
-	Short: "Create a customer metafield",
+var productsMetafieldsCreateCmd = &cobra.Command{
+	Use:   "create <product-id>",
+	Short: "Create a product metafield",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -67,17 +67,17 @@ var customersMetafieldsCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		resp, err := client.CreateCustomerMetafield(cmd.Context(), args[0], body)
+		resp, err := client.CreateProductMetafield(cmd.Context(), args[0], body)
 		if err != nil {
-			return fmt.Errorf("failed to create customer metafield: %w", err)
+			return fmt.Errorf("failed to create product metafield: %w", err)
 		}
 		return getFormatter(cmd).JSON(resp)
 	},
 }
 
-var customersMetafieldsUpdateCmd = &cobra.Command{
-	Use:   "update <customer-id> <metafield-id>",
-	Short: "Update a customer metafield",
+var productsMetafieldsUpdateCmd = &cobra.Command{
+	Use:   "update <product-id> <metafield-id>",
+	Short: "Update a product metafield",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -93,17 +93,17 @@ var customersMetafieldsUpdateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		resp, err := client.UpdateCustomerMetafield(cmd.Context(), args[0], args[1], body)
+		resp, err := client.UpdateProductMetafield(cmd.Context(), args[0], args[1], body)
 		if err != nil {
-			return fmt.Errorf("failed to update customer metafield: %w", err)
+			return fmt.Errorf("failed to update product metafield: %w", err)
 		}
 		return getFormatter(cmd).JSON(resp)
 	},
 }
 
-var customersMetafieldsDeleteCmd = &cobra.Command{
-	Use:   "delete <customer-id> <metafield-id>",
-	Short: "Delete a customer metafield",
+var productsMetafieldsDeleteCmd = &cobra.Command{
+	Use:   "delete <product-id> <metafield-id>",
+	Short: "Delete a product metafield",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -117,7 +117,7 @@ var customersMetafieldsDeleteCmd = &cobra.Command{
 		}
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			_, _ = fmt.Fprintf(outWriter(cmd), "Delete customer metafield %s for customer %s? [y/N] ", args[1], args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete product metafield %s for product %s? [y/N] ", args[1], args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
@@ -125,17 +125,17 @@ var customersMetafieldsDeleteCmd = &cobra.Command{
 				return nil
 			}
 		}
-		if err := client.DeleteCustomerMetafield(cmd.Context(), args[0], args[1]); err != nil {
-			return fmt.Errorf("failed to delete customer metafield: %w", err)
+		if err := client.DeleteProductMetafield(cmd.Context(), args[0], args[1]); err != nil {
+			return fmt.Errorf("failed to delete product metafield: %w", err)
 		}
-		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted customer metafield %s (customer %s)\n", args[1], args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted product metafield %s (product %s)\n", args[1], args[0])
 		return nil
 	},
 }
 
-var customersMetafieldsBulkCreateCmd = &cobra.Command{
-	Use:   "bulk-create <customer-id>",
-	Short: "Bulk create customer metafields",
+var productsMetafieldsBulkCreateCmd = &cobra.Command{
+	Use:   "bulk-create <product-id>",
+	Short: "Bulk create product metafields",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -151,17 +151,17 @@ var customersMetafieldsBulkCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := client.BulkCreateCustomerMetafields(cmd.Context(), args[0], body); err != nil {
-			return fmt.Errorf("failed to bulk create customer metafields: %w", err)
+		if err := client.BulkCreateProductMetafields(cmd.Context(), args[0], body); err != nil {
+			return fmt.Errorf("failed to bulk create product metafields: %w", err)
 		}
 		_, _ = fmt.Fprintln(outWriter(cmd), "OK")
 		return nil
 	},
 }
 
-var customersMetafieldsBulkUpdateCmd = &cobra.Command{
-	Use:   "bulk-update <customer-id>",
-	Short: "Bulk update customer metafields",
+var productsMetafieldsBulkUpdateCmd = &cobra.Command{
+	Use:   "bulk-update <product-id>",
+	Short: "Bulk update product metafields",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -177,17 +177,17 @@ var customersMetafieldsBulkUpdateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := client.BulkUpdateCustomerMetafields(cmd.Context(), args[0], body); err != nil {
-			return fmt.Errorf("failed to bulk update customer metafields: %w", err)
+		if err := client.BulkUpdateProductMetafields(cmd.Context(), args[0], body); err != nil {
+			return fmt.Errorf("failed to bulk update product metafields: %w", err)
 		}
 		_, _ = fmt.Fprintln(outWriter(cmd), "OK")
 		return nil
 	},
 }
 
-var customersMetafieldsBulkDeleteCmd = &cobra.Command{
-	Use:   "bulk-delete <customer-id>",
-	Short: "Bulk delete customer metafields",
+var productsMetafieldsBulkDeleteCmd = &cobra.Command{
+	Use:   "bulk-delete <product-id>",
+	Short: "Bulk delete product metafields",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -203,8 +203,8 @@ var customersMetafieldsBulkDeleteCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := client.BulkDeleteCustomerMetafields(cmd.Context(), args[0], body); err != nil {
-			return fmt.Errorf("failed to bulk delete customer metafields: %w", err)
+		if err := client.BulkDeleteProductMetafields(cmd.Context(), args[0], body); err != nil {
+			return fmt.Errorf("failed to bulk delete product metafields: %w", err)
 		}
 		_, _ = fmt.Fprintln(outWriter(cmd), "OK")
 		return nil
@@ -212,51 +212,51 @@ var customersMetafieldsBulkDeleteCmd = &cobra.Command{
 }
 
 // ============================
-// customers app-metafields (app)
+// products app-metafields (app)
 // ============================
 
-var customersAppMetafieldsCmd = &cobra.Command{
+var productsAppMetafieldsCmd = &cobra.Command{
 	Use:   "app-metafields",
-	Short: "Manage customer app metafields",
+	Short: "Manage product app metafields",
 }
 
-var customersAppMetafieldsListCmd = &cobra.Command{
-	Use:   "list <customer-id>",
-	Short: "List app metafields attached to a customer",
+var productsAppMetafieldsListCmd = &cobra.Command{
+	Use:   "list <product-id>",
+	Short: "List app metafields attached to a product",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
 		}
-		resp, err := client.ListCustomerAppMetafields(cmd.Context(), args[0])
+		resp, err := client.ListProductAppMetafields(cmd.Context(), args[0])
 		if err != nil {
-			return fmt.Errorf("failed to list customer app metafields: %w", err)
+			return fmt.Errorf("failed to list product app metafields: %w", err)
 		}
 		return getFormatter(cmd).JSON(resp)
 	},
 }
 
-var customersAppMetafieldsGetCmd = &cobra.Command{
-	Use:   "get <customer-id> <metafield-id>",
-	Short: "Get a specific customer app metafield",
+var productsAppMetafieldsGetCmd = &cobra.Command{
+	Use:   "get <product-id> <metafield-id>",
+	Short: "Get a specific product app metafield",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
 		}
-		resp, err := client.GetCustomerAppMetafield(cmd.Context(), args[0], args[1])
+		resp, err := client.GetProductAppMetafield(cmd.Context(), args[0], args[1])
 		if err != nil {
-			return fmt.Errorf("failed to get customer app metafield: %w", err)
+			return fmt.Errorf("failed to get product app metafield: %w", err)
 		}
 		return getFormatter(cmd).JSON(resp)
 	},
 }
 
-var customersAppMetafieldsCreateCmd = &cobra.Command{
-	Use:   "create <customer-id>",
-	Short: "Create a customer app metafield",
+var productsAppMetafieldsCreateCmd = &cobra.Command{
+	Use:   "create <product-id>",
+	Short: "Create a product app metafield",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -272,17 +272,17 @@ var customersAppMetafieldsCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		resp, err := client.CreateCustomerAppMetafield(cmd.Context(), args[0], body)
+		resp, err := client.CreateProductAppMetafield(cmd.Context(), args[0], body)
 		if err != nil {
-			return fmt.Errorf("failed to create customer app metafield: %w", err)
+			return fmt.Errorf("failed to create product app metafield: %w", err)
 		}
 		return getFormatter(cmd).JSON(resp)
 	},
 }
 
-var customersAppMetafieldsUpdateCmd = &cobra.Command{
-	Use:   "update <customer-id> <metafield-id>",
-	Short: "Update a customer app metafield",
+var productsAppMetafieldsUpdateCmd = &cobra.Command{
+	Use:   "update <product-id> <metafield-id>",
+	Short: "Update a product app metafield",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -298,17 +298,17 @@ var customersAppMetafieldsUpdateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		resp, err := client.UpdateCustomerAppMetafield(cmd.Context(), args[0], args[1], body)
+		resp, err := client.UpdateProductAppMetafield(cmd.Context(), args[0], args[1], body)
 		if err != nil {
-			return fmt.Errorf("failed to update customer app metafield: %w", err)
+			return fmt.Errorf("failed to update product app metafield: %w", err)
 		}
 		return getFormatter(cmd).JSON(resp)
 	},
 }
 
-var customersAppMetafieldsDeleteCmd = &cobra.Command{
-	Use:   "delete <customer-id> <metafield-id>",
-	Short: "Delete a customer app metafield",
+var productsAppMetafieldsDeleteCmd = &cobra.Command{
+	Use:   "delete <product-id> <metafield-id>",
+	Short: "Delete a product app metafield",
 	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -322,7 +322,7 @@ var customersAppMetafieldsDeleteCmd = &cobra.Command{
 		}
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
-			_, _ = fmt.Fprintf(outWriter(cmd), "Delete customer app metafield %s for customer %s? [y/N] ", args[1], args[0])
+			_, _ = fmt.Fprintf(outWriter(cmd), "Delete product app metafield %s for product %s? [y/N] ", args[1], args[0])
 			var confirm string
 			_, _ = fmt.Scanln(&confirm)
 			if confirm != "y" && confirm != "Y" {
@@ -330,17 +330,17 @@ var customersAppMetafieldsDeleteCmd = &cobra.Command{
 				return nil
 			}
 		}
-		if err := client.DeleteCustomerAppMetafield(cmd.Context(), args[0], args[1]); err != nil {
-			return fmt.Errorf("failed to delete customer app metafield: %w", err)
+		if err := client.DeleteProductAppMetafield(cmd.Context(), args[0], args[1]); err != nil {
+			return fmt.Errorf("failed to delete product app metafield: %w", err)
 		}
-		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted customer app metafield %s (customer %s)\n", args[1], args[0])
+		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted product app metafield %s (product %s)\n", args[1], args[0])
 		return nil
 	},
 }
 
-var customersAppMetafieldsBulkCreateCmd = &cobra.Command{
-	Use:   "bulk-create <customer-id>",
-	Short: "Bulk create customer app metafields",
+var productsAppMetafieldsBulkCreateCmd = &cobra.Command{
+	Use:   "bulk-create <product-id>",
+	Short: "Bulk create product app metafields",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -356,17 +356,17 @@ var customersAppMetafieldsBulkCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := client.BulkCreateCustomerAppMetafields(cmd.Context(), args[0], body); err != nil {
-			return fmt.Errorf("failed to bulk create customer app metafields: %w", err)
+		if err := client.BulkCreateProductAppMetafields(cmd.Context(), args[0], body); err != nil {
+			return fmt.Errorf("failed to bulk create product app metafields: %w", err)
 		}
 		_, _ = fmt.Fprintln(outWriter(cmd), "OK")
 		return nil
 	},
 }
 
-var customersAppMetafieldsBulkUpdateCmd = &cobra.Command{
-	Use:   "bulk-update <customer-id>",
-	Short: "Bulk update customer app metafields",
+var productsAppMetafieldsBulkUpdateCmd = &cobra.Command{
+	Use:   "bulk-update <product-id>",
+	Short: "Bulk update product app metafields",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -382,17 +382,17 @@ var customersAppMetafieldsBulkUpdateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := client.BulkUpdateCustomerAppMetafields(cmd.Context(), args[0], body); err != nil {
-			return fmt.Errorf("failed to bulk update customer app metafields: %w", err)
+		if err := client.BulkUpdateProductAppMetafields(cmd.Context(), args[0], body); err != nil {
+			return fmt.Errorf("failed to bulk update product app metafields: %w", err)
 		}
 		_, _ = fmt.Fprintln(outWriter(cmd), "OK")
 		return nil
 	},
 }
 
-var customersAppMetafieldsBulkDeleteCmd = &cobra.Command{
-	Use:   "bulk-delete <customer-id>",
-	Short: "Bulk delete customer app metafields",
+var productsAppMetafieldsBulkDeleteCmd = &cobra.Command{
+	Use:   "bulk-delete <product-id>",
+	Short: "Bulk delete product app metafields",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -408,8 +408,8 @@ var customersAppMetafieldsBulkDeleteCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		if err := client.BulkDeleteCustomerAppMetafields(cmd.Context(), args[0], body); err != nil {
-			return fmt.Errorf("failed to bulk delete customer app metafields: %w", err)
+		if err := client.BulkDeleteProductAppMetafields(cmd.Context(), args[0], body); err != nil {
+			return fmt.Errorf("failed to bulk delete product app metafields: %w", err)
 		}
 		_, _ = fmt.Fprintln(outWriter(cmd), "OK")
 		return nil
@@ -417,44 +417,44 @@ var customersAppMetafieldsBulkDeleteCmd = &cobra.Command{
 }
 
 func init() {
-	// customers metafields
-	customersCmd.AddCommand(customersMetafieldsCmd)
-	customersMetafieldsCmd.AddCommand(customersMetafieldsListCmd)
-	customersMetafieldsCmd.AddCommand(customersMetafieldsGetCmd)
-	customersMetafieldsCmd.AddCommand(customersMetafieldsCreateCmd)
-	customersMetafieldsCmd.AddCommand(customersMetafieldsUpdateCmd)
-	customersMetafieldsCmd.AddCommand(customersMetafieldsDeleteCmd)
-	customersMetafieldsCmd.AddCommand(customersMetafieldsBulkCreateCmd)
-	customersMetafieldsCmd.AddCommand(customersMetafieldsBulkUpdateCmd)
-	customersMetafieldsCmd.AddCommand(customersMetafieldsBulkDeleteCmd)
+	// products metafields
+	productsCmd.AddCommand(productsMetafieldsCmd)
+	productsMetafieldsCmd.AddCommand(productsMetafieldsListCmd)
+	productsMetafieldsCmd.AddCommand(productsMetafieldsGetCmd)
+	productsMetafieldsCmd.AddCommand(productsMetafieldsCreateCmd)
+	productsMetafieldsCmd.AddCommand(productsMetafieldsUpdateCmd)
+	productsMetafieldsCmd.AddCommand(productsMetafieldsDeleteCmd)
+	productsMetafieldsCmd.AddCommand(productsMetafieldsBulkCreateCmd)
+	productsMetafieldsCmd.AddCommand(productsMetafieldsBulkUpdateCmd)
+	productsMetafieldsCmd.AddCommand(productsMetafieldsBulkDeleteCmd)
 
 	for _, c := range []*cobra.Command{
-		customersMetafieldsCreateCmd,
-		customersMetafieldsUpdateCmd,
-		customersMetafieldsBulkCreateCmd,
-		customersMetafieldsBulkUpdateCmd,
-		customersMetafieldsBulkDeleteCmd,
+		productsMetafieldsCreateCmd,
+		productsMetafieldsUpdateCmd,
+		productsMetafieldsBulkCreateCmd,
+		productsMetafieldsBulkUpdateCmd,
+		productsMetafieldsBulkDeleteCmd,
 	} {
 		addJSONBodyFlags(c)
 	}
 
-	// customers app-metafields
-	customersCmd.AddCommand(customersAppMetafieldsCmd)
-	customersAppMetafieldsCmd.AddCommand(customersAppMetafieldsListCmd)
-	customersAppMetafieldsCmd.AddCommand(customersAppMetafieldsGetCmd)
-	customersAppMetafieldsCmd.AddCommand(customersAppMetafieldsCreateCmd)
-	customersAppMetafieldsCmd.AddCommand(customersAppMetafieldsUpdateCmd)
-	customersAppMetafieldsCmd.AddCommand(customersAppMetafieldsDeleteCmd)
-	customersAppMetafieldsCmd.AddCommand(customersAppMetafieldsBulkCreateCmd)
-	customersAppMetafieldsCmd.AddCommand(customersAppMetafieldsBulkUpdateCmd)
-	customersAppMetafieldsCmd.AddCommand(customersAppMetafieldsBulkDeleteCmd)
+	// products app-metafields
+	productsCmd.AddCommand(productsAppMetafieldsCmd)
+	productsAppMetafieldsCmd.AddCommand(productsAppMetafieldsListCmd)
+	productsAppMetafieldsCmd.AddCommand(productsAppMetafieldsGetCmd)
+	productsAppMetafieldsCmd.AddCommand(productsAppMetafieldsCreateCmd)
+	productsAppMetafieldsCmd.AddCommand(productsAppMetafieldsUpdateCmd)
+	productsAppMetafieldsCmd.AddCommand(productsAppMetafieldsDeleteCmd)
+	productsAppMetafieldsCmd.AddCommand(productsAppMetafieldsBulkCreateCmd)
+	productsAppMetafieldsCmd.AddCommand(productsAppMetafieldsBulkUpdateCmd)
+	productsAppMetafieldsCmd.AddCommand(productsAppMetafieldsBulkDeleteCmd)
 
 	for _, c := range []*cobra.Command{
-		customersAppMetafieldsCreateCmd,
-		customersAppMetafieldsUpdateCmd,
-		customersAppMetafieldsBulkCreateCmd,
-		customersAppMetafieldsBulkUpdateCmd,
-		customersAppMetafieldsBulkDeleteCmd,
+		productsAppMetafieldsCreateCmd,
+		productsAppMetafieldsUpdateCmd,
+		productsAppMetafieldsBulkCreateCmd,
+		productsAppMetafieldsBulkUpdateCmd,
+		productsAppMetafieldsBulkDeleteCmd,
 	} {
 		addJSONBodyFlags(c)
 	}

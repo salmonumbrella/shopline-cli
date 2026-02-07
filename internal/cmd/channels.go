@@ -158,6 +158,11 @@ var channelsCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create channel\n")
+			return nil
+		}
 
 		name, _ := cmd.Flags().GetString("name")
 		handle, _ := cmd.Flags().GetString("handle")
@@ -193,6 +198,7 @@ var channelsCreateCmd = &cobra.Command{
 var channelsUpdateCmd = &cobra.Command{
 	Use:   "update <id>",
 	Short: "Update a sales channel",
+	Long:  "Update a sales channel using either --body/--body-file (raw JSON) or individual flags (--name, --active).",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -201,9 +207,30 @@ var channelsUpdateCmd = &cobra.Command{
 			return nil
 		}
 
+		hasBody := cmd.Flags().Changed("body") || cmd.Flags().Changed("body-file")
+		hasFlags := cmd.Flags().Changed("name") || cmd.Flags().Changed("active")
+
+		if hasBody && hasFlags {
+			return fmt.Errorf("use either --body/--body-file or individual flags, not both")
+		}
+		if !hasBody && !hasFlags {
+			return fmt.Errorf("provide channel data via --body/--body-file or individual flags (--name, --active)")
+		}
+
 		var req api.ChannelUpdateRequest
-		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
-			return err
+		if hasBody {
+			if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+				return err
+			}
+		} else {
+			if cmd.Flags().Changed("name") {
+				name, _ := cmd.Flags().GetString("name")
+				req.Name = &name
+			}
+			if cmd.Flags().Changed("active") {
+				active, _ := cmd.Flags().GetBool("active")
+				req.Active = &active
+			}
 		}
 
 		client, err := getClient(cmd)
@@ -239,6 +266,11 @@ var channelsDeleteCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete channel %s\n", args[0])
+			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
@@ -310,6 +342,11 @@ var channelsPublishCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would publish product to channel\n")
+			return nil
+		}
 
 		req := &api.ChannelPublishProductRequest{
 			ProductID: args[1],
@@ -332,6 +369,11 @@ var channelsUnpublishCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would unpublish product from channel\n")
+			return nil
 		}
 
 		if err := client.UnpublishProductFromChannel(cmd.Context(), args[0], args[1]); err != nil {
@@ -362,6 +404,8 @@ func init() {
 
 	channelsCmd.AddCommand(channelsUpdateCmd)
 	addJSONBodyFlags(channelsUpdateCmd)
+	channelsUpdateCmd.Flags().String("name", "", "Channel name")
+	channelsUpdateCmd.Flags().Bool("active", false, "Channel active status")
 
 	channelsCmd.AddCommand(channelsDeleteCmd)
 

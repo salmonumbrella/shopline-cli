@@ -122,6 +122,11 @@ var companyCatalogsCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create company catalog\n")
+			return nil
+		}
 
 		companyID, _ := cmd.Flags().GetString("company-id")
 		name, _ := cmd.Flags().GetString("name")
@@ -162,6 +167,11 @@ var companyCatalogsUpdateCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update company catalog %s\n", args[0])
+			return nil
 		}
 
 		req := &api.CompanyCatalogUpdateRequest{}
@@ -208,6 +218,11 @@ var companyCatalogsDeleteCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete company catalog %s\n", args[0])
+			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")

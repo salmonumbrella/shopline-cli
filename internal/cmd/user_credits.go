@@ -45,6 +45,12 @@ var userCreditsBulkUpdateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would bulk update user credits\n")
+			return nil
+		}
+
 		body, err := readJSONBodyFlags(cmd)
 		if err != nil {
 			return err

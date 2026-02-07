@@ -123,6 +123,11 @@ var memberPointsAdjustCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would adjust member points\n")
+			return nil
+		}
 
 		customerID, _ := cmd.Flags().GetString("customer-id")
 		if strings.TrimSpace(customerID) == "" {
@@ -179,6 +184,12 @@ var memberPointsUpdateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update customer member points\n")
+			return nil
+		}
+
 		customerID, _ := cmd.Flags().GetString("customer-id")
 		if strings.TrimSpace(customerID) == "" {
 			return fmt.Errorf("customer id is required (use --customer-id)")
@@ -246,6 +257,12 @@ var memberPointsBulkUpdateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would bulk update member points\n")
+			return nil
+		}
+
 		body, err := readJSONBodyFlags(cmd)
 		if err != nil {
 			return err

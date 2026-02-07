@@ -11,6 +11,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func formatCustomerName(first, last string) string {
+	return strings.TrimSpace(strings.TrimSpace(first) + " " + strings.TrimSpace(last))
+}
+
 var customersCmd = &cobra.Command{
 	Use:   "customers",
 	Short: "Manage customers",
@@ -112,7 +116,7 @@ var customersSearchCmd = &cobra.Command{
 		headers := []string{"ID", "EMAIL", "NAME", "STATE", "ORDERS", "TOTAL SPENT", "CREATED"}
 		var rows [][]string
 		for _, c := range resp.Items {
-			name := strings.TrimSpace(strings.TrimSpace(c.FirstName) + " " + strings.TrimSpace(c.LastName))
+			name := formatCustomerName(c.FirstName, c.LastName)
 			totalSpent := c.TotalSpent
 			if c.Currency != "" && c.TotalSpent != "" {
 				totalSpent = c.TotalSpent + " " + c.Currency
@@ -228,13 +232,7 @@ var customersListCmd = &cobra.Command{
 		headers := []string{"ID", "EMAIL", "NAME", "STATE", "ORDERS", "TOTAL SPENT", "CREATED"}
 		var rows [][]string
 		for _, c := range resp.Items {
-			name := c.FirstName
-			if c.LastName != "" {
-				if name != "" {
-					name += " "
-				}
-				name += c.LastName
-			}
+			name := formatCustomerName(c.FirstName, c.LastName)
 			totalSpent := c.TotalSpent
 			if c.Currency != "" {
 				totalSpent = c.TotalSpent + " " + c.Currency
@@ -257,16 +255,36 @@ var customersListCmd = &cobra.Command{
 }
 
 var customersGetCmd = &cobra.Command{
-	Use:   "get <id>",
+	Use:   "get [id]",
 	Short: "Get customer details",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
 		}
 
-		customer, err := client.GetCustomer(cmd.Context(), args[0])
+		customerID, err := resolveOrArg(cmd, args, func(query string) (string, error) {
+			resp, err := client.SearchCustomers(cmd.Context(), &api.CustomerSearchOptions{
+				Email:    query,
+				PageSize: 5,
+			})
+			if err != nil {
+				return "", fmt.Errorf("search failed: %w", err)
+			}
+			if len(resp.Items) == 0 {
+				return "", fmt.Errorf("no customer found matching %q", query)
+			}
+			if len(resp.Items) > 1 {
+				_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Warning: %d customers matched, using first\n", len(resp.Items))
+			}
+			return resp.Items[0].ID, nil
+		})
+		if err != nil {
+			return err
+		}
+
+		customer, err := client.GetCustomer(cmd.Context(), customerID)
 		if err != nil {
 			return fmt.Errorf("failed to get customer: %w", err)
 		}
@@ -278,13 +296,7 @@ var customersGetCmd = &cobra.Command{
 			return formatter.JSON(customer)
 		}
 
-		name := customer.FirstName
-		if customer.LastName != "" {
-			if name != "" {
-				name += " "
-			}
-			name += customer.LastName
-		}
+		name := formatCustomerName(customer.FirstName, customer.LastName)
 
 		out := outWriter(cmd)
 		_, _ = fmt.Fprintf(out, "Customer ID:      %s\n", customer.ID)
@@ -498,6 +510,12 @@ var customersTagsRemoveCmd = &cobra.Command{
 	Short: "Remove customer tags",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would remove tags for customer %s\n", args[0])
+			return nil
+		}
+
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
@@ -521,6 +539,12 @@ var customersSubscriptionsUpdateCmd = &cobra.Command{
 	Short: "Update customer subscriptions (raw JSON body)",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update subscriptions for customer %s\n", args[0])
+			return nil
+		}
+
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
@@ -554,6 +578,23 @@ var customersLineGetCmd = &cobra.Command{
 		resp, err := client.GetLineCustomer(cmd.Context(), args[0])
 		if err != nil {
 			return fmt.Errorf("failed to get line customer: %w", err)
+		}
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var customersPromotionsCmd = &cobra.Command{
+	Use:   "promotions <customer-id>",
+	Short: "Get promotions available to a customer",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+		resp, err := client.GetCustomerPromotions(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to get customer promotions: %w", err)
 		}
 		return getFormatter(cmd).JSON(resp)
 	},
@@ -624,6 +665,7 @@ func init() {
 	customersListCmd.Flags().Int("page-size", 20, "Results per page")
 
 	customersCmd.AddCommand(customersGetCmd)
+	customersGetCmd.Flags().String("by", "", "Find customer by email instead of ID")
 
 	customersCmd.AddCommand(customersCreateCmd)
 	customersCreateCmd.Flags().String("email", "", "Customer email")
@@ -661,12 +703,13 @@ func init() {
 	customersCmd.AddCommand(customersLineCmd)
 	customersLineCmd.AddCommand(customersLineGetCmd)
 
+	customersCmd.AddCommand(customersPromotionsCmd)
 	customersCmd.AddCommand(customersCouponPromotionsCmd)
 
 	schema.Register(schema.Resource{
 		Name:        "customers",
 		Description: "Manage customer accounts",
-		Commands:    []string{"list", "get", "search", "create", "update", "delete", "tags", "subscriptions", "line", "coupon-promotions", "metafields", "app-metafields", "store-credits", "membership-info", "membership-tier"},
+		Commands:    []string{"list", "get", "search", "create", "update", "delete", "tags", "promotions", "subscriptions", "line", "coupon-promotions", "metafields", "app-metafields", "store-credits", "membership-info", "membership-tier"},
 		IDPrefix:    "customer",
 	})
 }

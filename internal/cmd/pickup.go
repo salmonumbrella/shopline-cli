@@ -152,6 +152,11 @@ var pickupCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create pickup location\n")
+			return nil
+		}
 
 		name, _ := cmd.Flags().GetString("name")
 		address1, _ := cmd.Flags().GetString("address1")

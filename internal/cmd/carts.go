@@ -26,6 +26,12 @@ var cartsExchangeCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would exchange cart\n")
+			return nil
+		}
+
 		body, err := readJSONBodyFlags(cmd)
 		if err != nil {
 			return err
@@ -46,6 +52,11 @@ var cartsPrepareCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would prepare cart %s\n", args[0])
+			return nil
 		}
 
 		// Some stores may require a body, some may not. Allow optional JSON.
@@ -92,6 +103,13 @@ var cartsItemsAddCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would add items to cart %s\n", args[0])
+			return nil
+		}
+
 		body, err := readJSONBodyFlags(cmd)
 		if err != nil {
 			return err
@@ -114,6 +132,13 @@ var cartsItemsUpdateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update items in cart %s\n", args[0])
+			return nil
+		}
+
 		body, err := readJSONBodyFlags(cmd)
 		if err != nil {
 			return err
@@ -135,6 +160,12 @@ var cartsItemsDeleteCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete items from cart %s\n", args[0])
+			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
@@ -193,6 +224,12 @@ var cartsItemsMetafieldsBulkCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would bulk create cart item metafields for %s\n", args[0])
+			return nil
+		}
+
 		body, err := readJSONBodyFlags(cmd)
 		if err != nil {
 			return err
@@ -214,6 +251,12 @@ var cartsItemsMetafieldsBulkUpdateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would bulk update cart item metafields for %s\n", args[0])
+			return nil
+		}
+
 		body, err := readJSONBodyFlags(cmd)
 		if err != nil {
 			return err
@@ -234,6 +277,11 @@ var cartsItemsMetafieldsBulkDeleteCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would bulk delete cart item metafields for %s\n", args[0])
+			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
@@ -293,6 +341,12 @@ var cartsItemsAppMetafieldsBulkCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would bulk create cart item app metafields for %s\n", args[0])
+			return nil
+		}
+
 		body, err := readJSONBodyFlags(cmd)
 		if err != nil {
 			return err
@@ -314,6 +368,12 @@ var cartsItemsAppMetafieldsBulkUpdateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would bulk update cart item app metafields for %s\n", args[0])
+			return nil
+		}
+
 		body, err := readJSONBodyFlags(cmd)
 		if err != nil {
 			return err
@@ -334,6 +394,11 @@ var cartsItemsAppMetafieldsBulkDeleteCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would bulk delete cart item app metafields for %s\n", args[0])
+			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")

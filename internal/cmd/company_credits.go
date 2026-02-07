@@ -113,6 +113,11 @@ var companyCreditsCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create company credit\n")
+			return nil
+		}
 
 		companyID, _ := cmd.Flags().GetString("company-id")
 		creditLimit, _ := cmd.Flags().GetFloat64("credit-limit")
@@ -149,6 +154,11 @@ var companyCreditsAdjustCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would adjust company credit %s\n", args[0])
+			return nil
 		}
 
 		amount, _ := cmd.Flags().GetFloat64("amount")
@@ -235,6 +245,11 @@ var companyCreditsDeleteCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete company credit %s\n", args[0])
+			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")

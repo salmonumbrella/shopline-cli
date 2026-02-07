@@ -55,6 +55,11 @@ var merchantsMetafieldsCreateCmd = &cobra.Command{
 	Aliases: []string{"new", "add"},
 	Short:   "Create a merchant metafield",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintln(outWriter(cmd), "[DRY-RUN] Would create metafield for current merchant")
+			return nil
+		}
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
@@ -77,6 +82,11 @@ var merchantsMetafieldsUpdateCmd = &cobra.Command{
 	Short:   "Update a merchant metafield",
 	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update metafield for %s\n", args[0])
+			return nil
+		}
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
@@ -99,6 +109,11 @@ var merchantsMetafieldsDeleteCmd = &cobra.Command{
 	Short:   "Delete a merchant metafield",
 	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete metafield for %s\n", args[0])
+			return nil
+		}
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
@@ -125,6 +140,11 @@ var merchantsMetafieldsBulkCreateCmd = &cobra.Command{
 	Use:   "bulk-create",
 	Short: "Bulk create merchant metafields",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintln(outWriter(cmd), "[DRY-RUN] Would bulk-create metafield for current merchant")
+			return nil
+		}
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
@@ -145,6 +165,11 @@ var merchantsMetafieldsBulkUpdateCmd = &cobra.Command{
 	Use:   "bulk-update",
 	Short: "Bulk update merchant metafields",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintln(outWriter(cmd), "[DRY-RUN] Would bulk-update metafield for current merchant")
+			return nil
+		}
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
@@ -165,6 +190,11 @@ var merchantsMetafieldsBulkDeleteCmd = &cobra.Command{
 	Use:   "bulk-delete",
 	Short: "Bulk delete merchant metafields",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintln(outWriter(cmd), "[DRY-RUN] Would bulk-delete metafield for current merchant")
+			return nil
+		}
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
@@ -230,6 +260,11 @@ var merchantsAppMetafieldsCreateCmd = &cobra.Command{
 	Aliases: []string{"new", "add"},
 	Short:   "Create a merchant app metafield",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintln(outWriter(cmd), "[DRY-RUN] Would create app-metafield for current merchant")
+			return nil
+		}
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
@@ -252,6 +287,11 @@ var merchantsAppMetafieldsUpdateCmd = &cobra.Command{
 	Short:   "Update a merchant app metafield",
 	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update app-metafield for %s\n", args[0])
+			return nil
+		}
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
@@ -274,6 +314,11 @@ var merchantsAppMetafieldsDeleteCmd = &cobra.Command{
 	Short:   "Delete a merchant app metafield",
 	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete app-metafield for %s\n", args[0])
+			return nil
+		}
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
@@ -300,6 +345,11 @@ var merchantsAppMetafieldsBulkCreateCmd = &cobra.Command{
 	Use:   "bulk-create",
 	Short: "Bulk create merchant app metafields",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintln(outWriter(cmd), "[DRY-RUN] Would bulk-create app-metafield for current merchant")
+			return nil
+		}
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
@@ -320,6 +370,11 @@ var merchantsAppMetafieldsBulkUpdateCmd = &cobra.Command{
 	Use:   "bulk-update",
 	Short: "Bulk update merchant app metafields",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintln(outWriter(cmd), "[DRY-RUN] Would bulk-update app-metafield for current merchant")
+			return nil
+		}
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
@@ -340,6 +395,11 @@ var merchantsAppMetafieldsBulkDeleteCmd = &cobra.Command{
 	Use:   "bulk-delete",
 	Short: "Bulk delete merchant app metafields",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintln(outWriter(cmd), "[DRY-RUN] Would bulk-delete app-metafield for current merchant")
+			return nil
+		}
 		client, err := getClient(cmd)
 		if err != nil {
 			return err

@@ -306,11 +306,13 @@ type OrderCreateRequest struct {
 	ShippingAddress *Address    `json:"shipping_address,omitempty"`
 	BillingAddress  *Address    `json:"billing_address,omitempty"`
 	Note            string      `json:"note,omitempty"`
+	Tags            []string    `json:"tags,omitempty"`
 }
 
 // OrderUpdateRequest contains the request body for updating an order.
 type OrderUpdateRequest struct {
 	Note            *string  `json:"note,omitempty"`
+	Tags            []string `json:"tags,omitempty"`
 	ShippingAddress *Address `json:"shipping_address,omitempty"`
 	BillingAddress  *Address `json:"billing_address,omitempty"`
 }

@@ -14,6 +14,8 @@ type APIClient interface {
 	ActivateGift(ctx context.Context, id string) (*Gift, error)
 	ActivatePromotion(ctx context.Context, id string) (*Promotion, error)
 	ActivateSale(ctx context.Context, id string) (*Sale, error)
+	AddProductImages(ctx context.Context, productID string, req *ProductAddImagesRequest) ([]ProductImage, error)
+	AddProductVariation(ctx context.Context, productID string, req *ProductVariationCreateRequest) (*ProductVariation, error)
 	AddProductsToCollection(ctx context.Context, id string, productIDs []string) error
 	AddWishListItem(ctx context.Context, wishListID string, req *WishListItemCreateRequest) (*WishListItem, error)
 	AdjustCompanyCredit(ctx context.Context, id string, req *CompanyCreditAdjustRequest) (*CompanyCredit, error)
@@ -24,7 +26,10 @@ type APIClient interface {
 	ClaimUserCoupon(ctx context.Context, couponCode string, body any) (json.RawMessage, error)
 	CancelBulkOperation(ctx context.Context, id string) (*BulkOperation, error)
 	CancelFulfillmentOrder(ctx context.Context, id string) (*FulfillmentOrder, error)
+	BulkExecuteShipment(ctx context.Context, orderIDs []string) (*BulkShipmentResponse, error)
 	CancelOrder(ctx context.Context, id string) error
+	CreateArchivedOrdersReport(ctx context.Context, body any) (json.RawMessage, error)
+	CreateOrder(ctx context.Context, req *OrderCreateRequest) (*Order, error)
 	CancelPurchaseOrder(ctx context.Context, id string) (*PurchaseOrder, error)
 	CancelReturnOrder(ctx context.Context, id string) error
 	CapturePayment(ctx context.Context, id string, amount string) (*Payment, error)
@@ -79,6 +84,7 @@ type APIClient interface {
 	CreatePage(ctx context.Context, req *PageCreateRequest) (*Page, error)
 	CreatePickupLocation(ctx context.Context, req *PickupCreateRequest) (*PickupLocation, error)
 	CreatePriceRule(ctx context.Context, req *PriceRuleCreateRequest) (*PriceRule, error)
+	CreateProduct(ctx context.Context, req *ProductCreateRequest) (*Product, error)
 	CreateProductListing(ctx context.Context, productID string) (*ProductListing, error)
 	CreateProductReview(ctx context.Context, req *ProductReviewCreateRequest) (*ProductReview, error)
 	// Product review comments (documented endpoints)
@@ -180,10 +186,13 @@ type APIClient interface {
 	DeletePage(ctx context.Context, id string) error
 	DeletePickupLocation(ctx context.Context, id string) error
 	DeletePriceRule(ctx context.Context, id string) error
+	DeleteProduct(ctx context.Context, id string) error
+	DeleteProductImages(ctx context.Context, productID string, imageIDs []string) error
 	DeleteProductListing(ctx context.Context, id string) error
 	DeleteProductReview(ctx context.Context, id string) error
 	DeleteProductReviewComment(ctx context.Context, id string) (json.RawMessage, error)
 	DeleteProductSubscription(ctx context.Context, id string) error
+	DeleteProductVariation(ctx context.Context, productID string, variationID string) error
 	DeletePromotion(ctx context.Context, id string) error
 	DeletePurchaseOrder(ctx context.Context, id string) error
 	DeleteRedirect(ctx context.Context, id string) error
@@ -217,6 +226,7 @@ type APIClient interface {
 	Get(ctx context.Context, path string, result interface{}) error
 	GetAbandonedCheckout(ctx context.Context, id string) (*AbandonedCheckout, error)
 	GetAddonProduct(ctx context.Context, id string) (*AddonProduct, error)
+	GetAddonProductStocks(ctx context.Context, id string) (*AddonProductStocksResponse, error)
 	GetAffiliateCampaign(ctx context.Context, id string) (*AffiliateCampaign, error)
 	GetAffiliateCampaignOrders(ctx context.Context, id string, opts *AffiliateCampaignOrdersOptions) (json.RawMessage, error)
 	GetAffiliateCampaignProductsSalesRanking(ctx context.Context, id string, opts *AffiliateCampaignProductsSalesRankingOptions) (json.RawMessage, error)
@@ -249,6 +259,7 @@ type APIClient interface {
 	GetCustomer(ctx context.Context, id string) (*Customer, error)
 	// Customer coupon promotions (documented)
 	GetCustomerCouponPromotions(ctx context.Context, id string) (json.RawMessage, error)
+	GetCustomerPromotions(ctx context.Context, id string) (*CustomerPromotionsResponse, error)
 	GetLineCustomer(ctx context.Context, lineID string) (*Customer, error)
 	GetCustomerAddress(ctx context.Context, customerID, addressID string) (*CustomerAddress, error)
 	GetCustomerBlacklist(ctx context.Context, id string) (*CustomerBlacklist, error)
@@ -279,6 +290,7 @@ type APIClient interface {
 	GetGiftCard(ctx context.Context, id string) (*GiftCard, error)
 	GetInventoryLevel(ctx context.Context, id string) (*InventoryLevel, error)
 	GetLabel(ctx context.Context, id string) (*Label, error)
+	GetLockedInventoryCount(ctx context.Context, productID string) (*LockedInventoryCount, error)
 	GetLocalDeliveryOption(ctx context.Context, id string) (*LocalDeliveryOption, error)
 	GetLocation(ctx context.Context, id string) (*Location, error)
 	GetMarket(ctx context.Context, id string) (*Market, error)
@@ -323,8 +335,14 @@ type APIClient interface {
 	UpdateMultipassCustomerLinking(ctx context.Context, customerID string, body any) (json.RawMessage, error)
 	DeleteMultipassCustomerLinking(ctx context.Context, customerID string) (json.RawMessage, error)
 	GetOperationLog(ctx context.Context, id string) (*OperationLog, error)
+	ExecuteShipment(ctx context.Context, id string, body any) (json.RawMessage, error)
 	GetOrder(ctx context.Context, id string) (*Order, error)
+	GetOrderActionLogs(ctx context.Context, id string) (json.RawMessage, error)
+	GetOrderDelivery(ctx context.Context, orderID string) (*OrderDelivery, error)
 	GetOrderAttribution(ctx context.Context, orderID string) (*OrderAttribution, error)
+	GetOrderLabels(ctx context.Context, opts any) (json.RawMessage, error)
+	GetOrderTags(ctx context.Context, id string) (*OrderTagsResponse, error)
+	GetOrderTransactions(ctx context.Context, opts any) (json.RawMessage, error)
 	// Order metafields (nested endpoints under /orders/{id}/...)
 	ListOrderMetafields(ctx context.Context, orderID string) (json.RawMessage, error)
 	GetOrderMetafield(ctx context.Context, orderID, metafieldID string) (json.RawMessage, error)
@@ -377,6 +395,26 @@ type APIClient interface {
 	BulkUpdateCustomerAppMetafields(ctx context.Context, customerID string, body any) error
 	BulkDeleteCustomerAppMetafields(ctx context.Context, customerID string, body any) error
 
+	// Product metafields (nested endpoints under /products/{id}/...)
+	ListProductMetafields(ctx context.Context, productID string) (json.RawMessage, error)
+	GetProductMetafield(ctx context.Context, productID, metafieldID string) (json.RawMessage, error)
+	CreateProductMetafield(ctx context.Context, productID string, body any) (json.RawMessage, error)
+	UpdateProductMetafield(ctx context.Context, productID, metafieldID string, body any) (json.RawMessage, error)
+	DeleteProductMetafield(ctx context.Context, productID, metafieldID string) error
+	BulkCreateProductMetafields(ctx context.Context, productID string, body any) error
+	BulkUpdateProductMetafields(ctx context.Context, productID string, body any) error
+	BulkDeleteProductMetafields(ctx context.Context, productID string, body any) error
+
+	// Product app metafields (nested endpoints under /products/{id}/...)
+	ListProductAppMetafields(ctx context.Context, productID string) (json.RawMessage, error)
+	GetProductAppMetafield(ctx context.Context, productID, metafieldID string) (json.RawMessage, error)
+	CreateProductAppMetafield(ctx context.Context, productID string, body any) (json.RawMessage, error)
+	UpdateProductAppMetafield(ctx context.Context, productID, metafieldID string, body any) (json.RawMessage, error)
+	DeleteProductAppMetafield(ctx context.Context, productID, metafieldID string) error
+	BulkCreateProductAppMetafields(ctx context.Context, productID string, body any) error
+	BulkUpdateProductAppMetafields(ctx context.Context, productID string, body any) error
+	BulkDeleteProductAppMetafields(ctx context.Context, productID string, body any) error
+
 	// Customer store credits (nested endpoints under /customers/{id}/...)
 	GetCustomerStoreCredits(ctx context.Context, customerID string) (json.RawMessage, error)
 	CreateCustomerStoreCredits(ctx context.Context, customerID string, body any) (json.RawMessage, error)
@@ -390,6 +428,8 @@ type APIClient interface {
 	GetProductListing(ctx context.Context, id string) (*ProductListing, error)
 	GetProductReview(ctx context.Context, id string) (*ProductReview, error)
 	GetProductReviewComment(ctx context.Context, id string) (json.RawMessage, error)
+	GetProductPromotions(ctx context.Context, productID string) (json.RawMessage, error)
+	GetProductStocks(ctx context.Context, productID string) (json.RawMessage, error)
 	GetProductSubscription(ctx context.Context, id string) (*ProductSubscription, error)
 	GetPromotion(ctx context.Context, id string) (*Promotion, error)
 	GetPurchaseOrder(ctx context.Context, id string) (*PurchaseOrder, error)
@@ -398,6 +438,11 @@ type APIClient interface {
 	GetRefund(ctx context.Context, id string) (*Refund, error)
 	GetReturnOrder(ctx context.Context, id string) (*ReturnOrder, error)
 	GetSale(ctx context.Context, id string) (*Sale, error)
+	GetSaleProducts(ctx context.Context, saleID string, opts *SaleProductsListOptions) (*SaleProductsListResponse, error)
+	AddSaleProducts(ctx context.Context, saleID string, req *SaleAddProductsRequest) (*SaleProductsListResponse, error)
+	UpdateSaleProducts(ctx context.Context, saleID string, req *SaleUpdateProductsRequest) (*SaleProductsListResponse, error)
+	GetSaleComments(ctx context.Context, saleID string, opts *SaleCommentsListOptions) (*SaleCommentsListResponse, error)
+	GetSaleCustomers(ctx context.Context, saleID string, opts *SaleCustomersListOptions) (*SaleCustomersListResponse, error)
 	GetScriptTag(ctx context.Context, id string) (*ScriptTag, error)
 	GetSellingPlan(ctx context.Context, id string) (*SellingPlan, error)
 	GetSettings(ctx context.Context) (*SettingsResponse, error)
@@ -451,6 +496,7 @@ type APIClient interface {
 	ListAbandonedCheckouts(ctx context.Context, opts *AbandonedCheckoutsListOptions) (*AbandonedCheckoutsListResponse, error)
 	ListAddonProducts(ctx context.Context, opts *AddonProductsListOptions) (*AddonProductsListResponse, error)
 	ListAffiliateCampaigns(ctx context.Context, opts *AffiliateCampaignsListOptions) (*AffiliateCampaignsListResponse, error)
+	ListArchivedOrders(ctx context.Context, opts *ArchivedOrdersListOptions) (*OrdersListResponse, error)
 	ListArticles(ctx context.Context, opts *ArticlesListOptions) (*ArticlesListResponse, error)
 	ListAssets(ctx context.Context, themeID string) (*AssetsListResponse, error)
 	ListBalanceTransactions(ctx context.Context, opts *BalanceTransactionsListOptions) (*BalanceTransactionsListResponse, error)
@@ -478,7 +524,14 @@ type APIClient interface {
 	ListCustomerBlacklist(ctx context.Context, opts *CustomerBlacklistListOptions) (*CustomerBlacklistListResponse, error)
 	ListCustomerGroups(ctx context.Context, opts *CustomerGroupsListOptions) (*CustomerGroupsListResponse, error)
 	ListCustomers(ctx context.Context, opts *CustomersListOptions) (*CustomersListResponse, error)
+	SearchAddonProducts(ctx context.Context, opts *AddonProductSearchOptions) (*AddonProductsListResponse, error)
+	SearchCustomerGroups(ctx context.Context, opts *CustomerGroupSearchOptions) (*CustomerGroupsListResponse, error)
 	SearchCustomers(ctx context.Context, opts *CustomerSearchOptions) (*CustomersListResponse, error)
+	SearchGifts(ctx context.Context, opts *GiftSearchOptions) (*GiftsListResponse, error)
+	SearchOrders(ctx context.Context, opts *OrderSearchOptions) (*OrdersListResponse, error)
+	SearchProducts(ctx context.Context, opts *ProductSearchOptions) (*ProductsListResponse, error)
+	SearchProductsPost(ctx context.Context, req *ProductSearchRequest) (*ProductsListResponse, error)
+	SearchPromotions(ctx context.Context, opts *PromotionSearchOptions) (*PromotionsListResponse, error)
 	ListCustomerSavedSearches(ctx context.Context, opts *CustomerSavedSearchesListOptions) (*CustomerSavedSearchesListResponse, error)
 	ListCustomFields(ctx context.Context, opts *CustomFieldsListOptions) (*CustomFieldsListResponse, error)
 	ListDeliveryOptions(ctx context.Context, opts *DeliveryOptionsListOptions) (*DeliveryOptionsListResponse, error)
@@ -515,6 +568,7 @@ type APIClient interface {
 	ListOrderPayments(ctx context.Context, orderID string) (*PaymentsListResponse, error)
 	ListOrderRefunds(ctx context.Context, orderID string) (*RefundsListResponse, error)
 	ListOrderRisks(ctx context.Context, orderID string, opts *OrderRisksListOptions) (*OrderRisksListResponse, error)
+	ListOrderTags(ctx context.Context) (json.RawMessage, error)
 	ListOrders(ctx context.Context, opts *OrdersListOptions) (*OrdersListResponse, error)
 	ListOrderTransactions(ctx context.Context, orderID string) (*TransactionsListResponse, error)
 	ListPages(ctx context.Context, opts *PagesListOptions) (*PagesListResponse, error)
@@ -567,6 +621,7 @@ type APIClient interface {
 	ListWishLists(ctx context.Context, opts *WishListsListOptions) (*WishListsListResponse, error)
 	ListWishListItems(ctx context.Context, opts *WishListItemsListOptions) (json.RawMessage, error)
 	MoveFulfillmentOrder(ctx context.Context, id string, newLocationID string) (*FulfillmentOrder, error)
+	PostOrderMessage(ctx context.Context, id string, body any) (json.RawMessage, error)
 	Post(ctx context.Context, path string, body, result interface{}) error
 	PublishProductToChannel(ctx context.Context, channelID string, req *ChannelPublishProductRequest) error
 	PublishProductToChannelListing(ctx context.Context, channelID string, req *ChannelProductPublishRequest) (*ChannelProductListing, error)
@@ -576,6 +631,7 @@ type APIClient interface {
 	RefundPayment(ctx context.Context, id string, amount string, reason string) (*Payment, error)
 	RemoveProductFromCollection(ctx context.Context, id, productID string) error
 	RemoveWishListItem(ctx context.Context, wishListID, itemID string) error
+	ReplaceProductTags(ctx context.Context, id string, tags []string) (*Product, error)
 	RevokeUserCoupon(ctx context.Context, id string) error
 	RedeemUserCoupon(ctx context.Context, couponCode string, body any) (json.RawMessage, error)
 	RotateMultipassSecret(ctx context.Context) (*Multipass, error)
@@ -586,10 +642,21 @@ type APIClient interface {
 	SetDefaultCustomerAddress(ctx context.Context, customerID, addressID string) (*CustomerAddress, error)
 	SetCustomerTags(ctx context.Context, id string, tags []string) (*Customer, error)
 	SetInventoryLevel(ctx context.Context, req *InventoryLevelSetRequest) (*InventoryLevel, error)
+	SplitOrder(ctx context.Context, id string, lineItemIDs []string) (*OrderSplitResponse, error)
 	SubmitDispute(ctx context.Context, id string) (*Dispute, error)
 	UnpublishProductFromChannel(ctx context.Context, channelID, productID string) error
 	UnpublishProductFromChannelListing(ctx context.Context, channelID, productID string) error
 	UpdateCustomer(ctx context.Context, id string, req *CustomerUpdateRequest) (*Customer, error)
+	UpdateOrder(ctx context.Context, id string, req *OrderUpdateRequest) (*Order, error)
+	UpdateOrderDelivery(ctx context.Context, orderID string, req *OrderDeliveryUpdateRequest) (*OrderDelivery, error)
+	UpdateOrderDeliveryStatus(ctx context.Context, id string, status string) (*Order, error)
+	UpdateOrderPaymentStatus(ctx context.Context, id string, status string) (*Order, error)
+	UpdateOrderStatus(ctx context.Context, id string, status string) (*Order, error)
+	UpdateOrderTags(ctx context.Context, id string, tags []string) (*Order, error)
+	UpdateAddonProduct(ctx context.Context, id string, req *AddonProductUpdateRequest) (*AddonProduct, error)
+	UpdateAddonProductQuantity(ctx context.Context, id string, req *AddonProductQuantityRequest) (*AddonProduct, error)
+	UpdateAddonProductsQuantityBySKU(ctx context.Context, req *AddonProductQuantityBySKURequest) (*AddonProduct, error)
+	UpdateAddonProductStocks(ctx context.Context, id string, req *AddonProductStocksUpdateRequest) (*AddonProductStocksResponse, error)
 	UpdateAffiliateCampaign(ctx context.Context, id string, req *AffiliateCampaignUpdateRequest) (*AffiliateCampaign, error)
 	UpdateArticle(ctx context.Context, id string, req *ArticleUpdateRequest) (*Article, error)
 	UpdateAsset(ctx context.Context, themeID string, req *AssetUpdateRequest) (*Asset, error)
@@ -614,6 +681,8 @@ type APIClient interface {
 	BulkUpdateMemberPoints(ctx context.Context, body any) (json.RawMessage, error)
 	UpdateProductReviewComment(ctx context.Context, id string, body any) (json.RawMessage, error)
 	BulkUpdateProductReviewComments(ctx context.Context, body any) (json.RawMessage, error)
+	BulkUpdateProductStocks(ctx context.Context, body any) error
+	BulkDeleteProducts(ctx context.Context, productIDs []string) error
 	BulkDeleteProductReviewComments(ctx context.Context, body any) (json.RawMessage, error)
 	UpdateCustomField(ctx context.Context, id string, req *CustomFieldUpdateRequest) (*CustomField, error)
 	UpdateDeliveryOptionPickupStore(ctx context.Context, id string, req *PickupStoreUpdateRequest) (*DeliveryOption, error)
@@ -640,6 +709,19 @@ type APIClient interface {
 	UpdatePage(ctx context.Context, id string, req *PageUpdateRequest) (*Page, error)
 	UpdatePickupLocation(ctx context.Context, id string, req *PickupUpdateRequest) (*PickupLocation, error)
 	UpdatePriceRule(ctx context.Context, id string, req *PriceRuleUpdateRequest) (*PriceRule, error)
+	UpdateProduct(ctx context.Context, id string, req *ProductUpdateRequest) (*Product, error)
+	UpdateProductPrice(ctx context.Context, id string, price float64) (*Product, error)
+	UpdateProductQuantity(ctx context.Context, id string, quantity int) (*Product, error)
+	UpdateProductQuantityBySKU(ctx context.Context, sku string, quantity int) error
+	UpdateProductStocks(ctx context.Context, productID string, body any) (json.RawMessage, error)
+	UpdateProductTags(ctx context.Context, id string, req *ProductTagsUpdateRequest) (*Product, error)
+	UpdateProductVariation(ctx context.Context, productID string, variationID string, req *ProductVariationUpdateRequest) (*ProductVariation, error)
+	UpdateProductVariationPrice(ctx context.Context, productID string, variationID string, price float64) (*Product, error)
+	UpdateProductVariationQuantity(ctx context.Context, productID string, variationID string, quantity int) (*Product, error)
+	UpdateProductsLabelsBulk(ctx context.Context, body any) error
+	UpdateProductsRetailStatusBulk(ctx context.Context, body any) error
+	UpdateProductsStatusBulk(ctx context.Context, body any) error
+	UpdatePromotion(ctx context.Context, id string, req *PromotionUpdateRequest) (*Promotion, error)
 	UpdateRedirect(ctx context.Context, id string, req *RedirectUpdateRequest) (*Redirect, error)
 	UpdateReturnOrder(ctx context.Context, id string, req *ReturnOrderUpdateRequest) (*ReturnOrder, error)
 	UpdateScriptTag(ctx context.Context, id string, req *ScriptTagUpdateRequest) (*ScriptTag, error)

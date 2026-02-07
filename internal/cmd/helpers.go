@@ -13,6 +13,23 @@ import (
 	"github.com/spf13/pflag"
 )
 
+// resolveOrArg returns the first positional arg, or resolves via --by flag.
+func resolveOrArg(cmd *cobra.Command, args []string, resolver func(query string) (string, error)) (string, error) {
+	if len(args) > 0 {
+		return args[0], nil
+	}
+	by, _ := cmd.Flags().GetString("by")
+	if by == "" {
+		return "", fmt.Errorf("provide a resource ID as argument, or use --by to search by name/email")
+	}
+	id, err := resolver(by)
+	if err != nil {
+		return "", err
+	}
+	_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Resolved to %s\n", id)
+	return id, nil
+}
+
 // enrichError wraps an API error with suggestions based on resource context.
 func enrichError(err error, resource, resourceID string) error {
 	return api.EnrichError(err, resource, resourceID)

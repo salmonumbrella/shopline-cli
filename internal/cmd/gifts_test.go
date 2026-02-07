@@ -64,8 +64,8 @@ func TestGiftsListCmd(t *testing.T) {
 }
 
 func TestGiftsGetCmd(t *testing.T) {
-	if giftsGetCmd.Use != "get <id>" {
-		t.Errorf("Expected Use 'get <id>', got %q", giftsGetCmd.Use)
+	if giftsGetCmd.Use != "get [id]" {
+		t.Errorf("Expected Use 'get [id]', got %q", giftsGetCmd.Use)
 	}
 }
 
@@ -310,6 +310,8 @@ type giftsMockAPIClient struct {
 	api.MockClient
 	listGiftsResp      *api.GiftsListResponse
 	listGiftsErr       error
+	searchGiftsResp    *api.GiftsListResponse
+	searchGiftsErr     error
 	getGiftResp        *api.Gift
 	getGiftErr         error
 	createGiftResp     *api.Gift
@@ -332,6 +334,10 @@ type giftsMockAPIClient struct {
 
 func (m *giftsMockAPIClient) ListGifts(ctx context.Context, opts *api.GiftsListOptions) (*api.GiftsListResponse, error) {
 	return m.listGiftsResp, m.listGiftsErr
+}
+
+func (m *giftsMockAPIClient) SearchGifts(ctx context.Context, opts *api.GiftSearchOptions) (*api.GiftsListResponse, error) {
+	return m.searchGiftsResp, m.searchGiftsErr
 }
 
 func (m *giftsMockAPIClient) GetGift(ctx context.Context, id string) (*api.Gift, error) {
@@ -1111,4 +1117,156 @@ func TestGiftsStocksUpdateRunE_JSON(t *testing.T) {
 	if !strings.Contains(buf.String(), "\"updated\"") {
 		t.Fatalf("expected updated in output, got %q", buf.String())
 	}
+}
+
+// TestGiftsGetByFlag tests the --by flag on the gifts get command.
+func TestGiftsGetByFlag(t *testing.T) {
+	t.Run("resolves gift by title", func(t *testing.T) {
+		mockClient := &giftsMockAPIClient{
+			searchGiftsResp: &api.GiftsListResponse{
+				Items:      []api.Gift{{ID: "gift_found", Title: "Free Item"}},
+				TotalCount: 1,
+			},
+			getGiftResp: &api.Gift{
+				ID:        "gift_found",
+				Title:     "Free Item",
+				CreatedAt: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
+			},
+		}
+		cleanup, buf := setupGiftsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newGiftsTestCmd()
+		_ = cmd.Flags().Set("output", "json")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "Free Item")
+
+		if err := giftsGetCmd.RunE(cmd, nil); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "gift_found") {
+			t.Errorf("expected output to contain 'gift_found', got: %s", buf.String())
+		}
+	})
+
+	t.Run("errors when no match", func(t *testing.T) {
+		mockClient := &giftsMockAPIClient{
+			searchGiftsResp: &api.GiftsListResponse{
+				Items:      []api.Gift{},
+				TotalCount: 0,
+			},
+		}
+		cleanup, _ := setupGiftsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newGiftsTestCmd()
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "nonexistent")
+
+		err := giftsGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error when no gift found")
+		}
+		if !strings.Contains(err.Error(), "no gift found") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("errors when search fails", func(t *testing.T) {
+		mockClient := &giftsMockAPIClient{
+			searchGiftsErr: errors.New("API error"),
+		}
+		cleanup, _ := setupGiftsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newGiftsTestCmd()
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "Free Item")
+
+		err := giftsGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error when search fails")
+		}
+		if !strings.Contains(err.Error(), "search failed") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("warns on multiple matches", func(t *testing.T) {
+		mockClient := &giftsMockAPIClient{
+			searchGiftsResp: &api.GiftsListResponse{
+				Items: []api.Gift{
+					{ID: "gift_1", Title: "Free Item A"},
+					{ID: "gift_2", Title: "Free Item B"},
+				},
+				TotalCount: 2,
+			},
+			getGiftResp: &api.Gift{
+				ID:        "gift_1",
+				Title:     "Free Item A",
+				CreatedAt: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
+			},
+		}
+		cleanup, buf := setupGiftsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newGiftsTestCmd()
+		_ = cmd.Flags().Set("output", "json")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "Free Item")
+
+		stderr := new(bytes.Buffer)
+		cmd.SetErr(stderr)
+
+		if err := giftsGetCmd.RunE(cmd, nil); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "gift_1") {
+			t.Errorf("expected output to contain 'gift_1', got: %s", buf.String())
+		}
+		if !strings.Contains(stderr.String(), "2 matches found") {
+			t.Errorf("expected stderr warning about multiple matches, got: %s", stderr.String())
+		}
+	})
+
+	t.Run("positional arg takes precedence over --by", func(t *testing.T) {
+		mockClient := &giftsMockAPIClient{
+			getGiftResp: &api.Gift{
+				ID:        "gift_direct",
+				Title:     "Direct Gift",
+				CreatedAt: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
+			},
+		}
+		cleanup, buf := setupGiftsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newGiftsTestCmd()
+		_ = cmd.Flags().Set("output", "json")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "should-not-be-used")
+
+		if err := giftsGetCmd.RunE(cmd, []string{"gift_direct"}); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "gift_direct") {
+			t.Errorf("expected output to contain 'gift_direct', got: %s", buf.String())
+		}
+	})
+
+	t.Run("errors with no arg and no --by", func(t *testing.T) {
+		mockClient := &giftsMockAPIClient{}
+		cleanup, _ := setupGiftsMockFactories(mockClient)
+		defer cleanup()
+
+		cmd := newGiftsTestCmd()
+		cmd.Flags().String("by", "", "")
+
+		err := giftsGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error with no arg and no --by")
+		}
+		if !strings.Contains(err.Error(), "provide a resource ID") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
 }

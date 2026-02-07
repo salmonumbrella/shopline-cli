@@ -126,6 +126,11 @@ var customerAddressesCreateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create customer address\n")
+			return nil
+		}
 
 		customerID, _ := cmd.Flags().GetString("customer-id")
 		firstName, _ := cmd.Flags().GetString("first-name")
@@ -173,6 +178,11 @@ var customerAddressesSetDefaultCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would set default customer address\n")
+			return nil
+		}
 
 		customerID, _ := cmd.Flags().GetString("customer-id")
 
@@ -194,6 +204,11 @@ var customerAddressesDeleteCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete customer address\n")
+			return nil
 		}
 
 		customerID, _ := cmd.Flags().GetString("customer-id")

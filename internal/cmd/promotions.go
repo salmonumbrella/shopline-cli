@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/outfmt"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -57,6 +59,10 @@ var promotionsListCmd = &cobra.Command{
 			if p.UsageLimit > 0 {
 				usage = fmt.Sprintf("%d/%d", p.UsageCount, p.UsageLimit)
 			}
+			startsAt := "-"
+			if !p.StartsAt.IsZero() {
+				startsAt = p.StartsAt.Format("2006-01-02")
+			}
 			endsAt := "-"
 			if !p.EndsAt.IsZero() {
 				endsAt = p.EndsAt.Format("2006-01-02")
@@ -68,7 +74,7 @@ var promotionsListCmd = &cobra.Command{
 				p.Status,
 				discount,
 				usage,
-				p.StartsAt.Format("2006-01-02"),
+				startsAt,
 				endsAt,
 			})
 		}
@@ -80,16 +86,35 @@ var promotionsListCmd = &cobra.Command{
 }
 
 var promotionsGetCmd = &cobra.Command{
-	Use:   "get <id>",
+	Use:   "get [id]",
 	Short: "Get promotion details",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
 		}
 
-		promotion, err := client.GetPromotion(cmd.Context(), args[0])
+		promotionID, err := resolveOrArg(cmd, args, func(query string) (string, error) {
+			resp, err := client.SearchPromotions(cmd.Context(), &api.PromotionSearchOptions{
+				Query: query, PageSize: 1,
+			})
+			if err != nil {
+				return "", fmt.Errorf("search failed: %w", err)
+			}
+			if len(resp.Items) == 0 {
+				return "", fmt.Errorf("no promotion found matching %q", query)
+			}
+			if len(resp.Items) > 1 {
+				_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Warning: %d matches found, using first\n", len(resp.Items))
+			}
+			return resp.Items[0].ID, nil
+		})
+		if err != nil {
+			return err
+		}
+
+		promotion, err := client.GetPromotion(cmd.Context(), promotionID)
 		if err != nil {
 			return fmt.Errorf("failed to get promotion: %w", err)
 		}
@@ -126,6 +151,7 @@ var promotionsGetCmd = &cobra.Command{
 var promotionsCreateCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create a promotion",
+	Long:  "Create a promotion using either --body/--body-file (raw JSON) or individual flags (--title, --discount-type, --discount-value, etc.).",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 		if dryRun {
@@ -133,9 +159,57 @@ var promotionsCreateCmd = &cobra.Command{
 			return nil
 		}
 
+		hasBody := cmd.Flags().Changed("body") || cmd.Flags().Changed("body-file")
+		hasFlags := cmd.Flags().Changed("title") || cmd.Flags().Changed("discount-type") ||
+			cmd.Flags().Changed("discount-value") || cmd.Flags().Changed("starts-at") ||
+			cmd.Flags().Changed("ends-at") || cmd.Flags().Changed("usage-limit") ||
+			cmd.Flags().Changed("status")
+
+		if hasBody && hasFlags {
+			return fmt.Errorf("use either --body/--body-file or individual flags, not both")
+		}
+		if !hasBody && !hasFlags {
+			return fmt.Errorf("provide promotion data via --body/--body-file or individual flags (--title, --discount-type, --discount-value, --starts-at)")
+		}
+
 		var req api.PromotionCreateRequest
-		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
-			return err
+		if hasBody {
+			if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+				return err
+			}
+		} else {
+			title, _ := cmd.Flags().GetString("title")
+			discountType, _ := cmd.Flags().GetString("discount-type")
+			discountValue, _ := cmd.Flags().GetFloat64("discount-value")
+			startsAtStr, _ := cmd.Flags().GetString("starts-at")
+			endsAtStr, _ := cmd.Flags().GetString("ends-at")
+			usageLimit, _ := cmd.Flags().GetInt("usage-limit")
+			status, _ := cmd.Flags().GetString("status")
+
+			req.Title = title
+			req.DiscountType = discountType
+			req.DiscountValue = discountValue
+			if status != "" {
+				req.Type = status
+			}
+			if usageLimit > 0 {
+				req.UsageLimit = usageLimit
+			}
+
+			if startsAtStr != "" {
+				t, err := parsePromotionTime(startsAtStr, "starts-at")
+				if err != nil {
+					return err
+				}
+				req.StartsAt = t
+			}
+			if endsAtStr != "" {
+				t, err := parsePromotionTime(endsAtStr, "ends-at")
+				if err != nil {
+					return err
+				}
+				req.EndsAt = t
+			}
 		}
 
 		client, err := getClient(cmd)
@@ -168,6 +242,11 @@ var promotionsActivateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would activate promotion %s\n", args[0])
+			return nil
+		}
 
 		promotion, err := client.ActivatePromotion(cmd.Context(), args[0])
 		if err != nil {
@@ -188,6 +267,11 @@ var promotionsDeactivateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would deactivate promotion %s\n", args[0])
+			return nil
+		}
 
 		promotion, err := client.DeactivatePromotion(cmd.Context(), args[0])
 		if err != nil {
@@ -207,6 +291,11 @@ var promotionsDeleteCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete promotion %s\n", args[0])
+			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
@@ -229,6 +318,166 @@ var promotionsDeleteCmd = &cobra.Command{
 	},
 }
 
+var promotionsUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update a promotion",
+	Long:  "Update a promotion using either --body/--body-file (raw JSON) or individual flags (--title, --discount-type, --discount-value, etc.).",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update promotion %s\n", args[0])
+			return nil
+		}
+
+		hasBody := cmd.Flags().Changed("body") || cmd.Flags().Changed("body-file")
+		hasFlags := cmd.Flags().Changed("title") || cmd.Flags().Changed("discount-type") ||
+			cmd.Flags().Changed("discount-value") || cmd.Flags().Changed("starts-at") ||
+			cmd.Flags().Changed("ends-at") || cmd.Flags().Changed("usage-limit") ||
+			cmd.Flags().Changed("status")
+
+		if hasBody && hasFlags {
+			return fmt.Errorf("use either --body/--body-file or individual flags, not both")
+		}
+		if !hasBody && !hasFlags {
+			return fmt.Errorf("provide promotion data via --body/--body-file or individual flags (--title, --discount-type, --discount-value, --starts-at)")
+		}
+
+		var req api.PromotionUpdateRequest
+		if hasBody {
+			if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+				return err
+			}
+		} else {
+			if cmd.Flags().Changed("title") {
+				v, _ := cmd.Flags().GetString("title")
+				req.Title = &v
+			}
+			if cmd.Flags().Changed("discount-type") {
+				v, _ := cmd.Flags().GetString("discount-type")
+				req.DiscountType = &v
+			}
+			if cmd.Flags().Changed("discount-value") {
+				v, _ := cmd.Flags().GetFloat64("discount-value")
+				req.DiscountValue = &v
+			}
+			if cmd.Flags().Changed("usage-limit") {
+				v, _ := cmd.Flags().GetInt("usage-limit")
+				req.UsageLimit = &v
+			}
+			if cmd.Flags().Changed("status") {
+				v, _ := cmd.Flags().GetString("status")
+				req.Type = &v
+			}
+			if cmd.Flags().Changed("starts-at") {
+				v, _ := cmd.Flags().GetString("starts-at")
+				t, err := parsePromotionTime(v, "starts-at")
+				if err != nil {
+					return err
+				}
+				req.StartsAt = &t
+			}
+			if cmd.Flags().Changed("ends-at") {
+				v, _ := cmd.Flags().GetString("ends-at")
+				t, err := parsePromotionTime(v, "ends-at")
+				if err != nil {
+					return err
+				}
+				req.EndsAt = &t
+			}
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		promotion, err := client.UpdatePromotion(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update promotion: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(promotion)
+		}
+
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated promotion %s (status: %s)\n", promotion.ID, promotion.Status)
+		return nil
+	},
+}
+
+var promotionsSearchCmd = &cobra.Command{
+	Use:   "search",
+	Short: "Search promotions",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		query, _ := cmd.Flags().GetString("query")
+		status, _ := cmd.Flags().GetString("status")
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+
+		opts := &api.PromotionSearchOptions{
+			Query:    query,
+			Status:   status,
+			Page:     page,
+			PageSize: pageSize,
+		}
+
+		resp, err := client.SearchPromotions(cmd.Context(), opts)
+		if err != nil {
+			return fmt.Errorf("failed to search promotions: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		headers := []string{"ID", "TITLE", "TYPE", "STATUS", "DISCOUNT", "USAGE", "STARTS", "ENDS"}
+		var rows [][]string
+		for _, p := range resp.Items {
+			discount := fmt.Sprintf("%.0f", p.DiscountValue)
+			if p.DiscountType == "percentage" {
+				discount += "%"
+			}
+			usage := fmt.Sprintf("%d", p.UsageCount)
+			if p.UsageLimit > 0 {
+				usage = fmt.Sprintf("%d/%d", p.UsageCount, p.UsageLimit)
+			}
+			startsAt := "-"
+			if !p.StartsAt.IsZero() {
+				startsAt = p.StartsAt.Format("2006-01-02")
+			}
+			endsAt := "-"
+			if !p.EndsAt.IsZero() {
+				endsAt = p.EndsAt.Format("2006-01-02")
+			}
+			rows = append(rows, []string{
+				outfmt.FormatID("promotion", p.ID),
+				p.Title,
+				p.Type,
+				p.Status,
+				discount,
+				usage,
+				startsAt,
+				endsAt,
+			})
+		}
+
+		formatter.Table(headers, rows)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d promotions\n", len(resp.Items), resp.TotalCount)
+		return nil
+	},
+}
+
 var promotionsCouponCenterCmd = &cobra.Command{
 	Use:   "coupon-center",
 	Short: "Get coupon center promotions (documented endpoint; raw JSON)",
@@ -245,6 +494,18 @@ var promotionsCouponCenterCmd = &cobra.Command{
 	},
 }
 
+// parsePromotionTime parses a time string in RFC3339 or YYYY-MM-DD format.
+func parsePromotionTime(value, label string) (time.Time, error) {
+	t, err := time.Parse(time.RFC3339, value)
+	if err != nil {
+		t, err = time.Parse("2006-01-02", value)
+		if err != nil {
+			return time.Time{}, fmt.Errorf("invalid --%s format, use RFC3339 or YYYY-MM-DD: %w", label, err)
+		}
+	}
+	return t, nil
+}
+
 func init() {
 	rootCmd.AddCommand(promotionsCmd)
 
@@ -255,10 +516,43 @@ func init() {
 	promotionsListCmd.Flags().Int("page-size", 20, "Results per page")
 
 	promotionsCmd.AddCommand(promotionsGetCmd)
+	promotionsGetCmd.Flags().String("by", "", "Find promotion by title instead of ID")
+
 	promotionsCmd.AddCommand(promotionsCreateCmd)
 	addJSONBodyFlags(promotionsCreateCmd)
+	promotionsCreateCmd.Flags().String("title", "", "Promotion title")
+	promotionsCreateCmd.Flags().String("discount-type", "", "Discount type: percentage or fixed_amount")
+	promotionsCreateCmd.Flags().Float64("discount-value", 0, "Discount amount")
+	promotionsCreateCmd.Flags().String("starts-at", "", "Start date (RFC3339 or YYYY-MM-DD)")
+	promotionsCreateCmd.Flags().String("ends-at", "", "End date (RFC3339 or YYYY-MM-DD)")
+	promotionsCreateCmd.Flags().Int("usage-limit", 0, "Max uses (0 = unlimited)")
+	promotionsCreateCmd.Flags().String("status", "", "Promotion status: active, inactive")
+
+	promotionsCmd.AddCommand(promotionsUpdateCmd)
+	addJSONBodyFlags(promotionsUpdateCmd)
+	promotionsUpdateCmd.Flags().String("title", "", "Promotion title")
+	promotionsUpdateCmd.Flags().String("discount-type", "", "Discount type: percentage or fixed_amount")
+	promotionsUpdateCmd.Flags().Float64("discount-value", 0, "Discount amount")
+	promotionsUpdateCmd.Flags().String("starts-at", "", "Start date (RFC3339 or YYYY-MM-DD)")
+	promotionsUpdateCmd.Flags().String("ends-at", "", "End date (RFC3339 or YYYY-MM-DD)")
+	promotionsUpdateCmd.Flags().Int("usage-limit", 0, "Max uses (0 = unlimited)")
+	promotionsUpdateCmd.Flags().String("status", "", "Promotion status: active, inactive")
+
+	promotionsCmd.AddCommand(promotionsSearchCmd)
+	promotionsSearchCmd.Flags().String("query", "", "Search query")
+	promotionsSearchCmd.Flags().String("status", "", "Filter by status (active, scheduled, expired, inactive)")
+	promotionsSearchCmd.Flags().Int("page", 1, "Page number")
+	promotionsSearchCmd.Flags().Int("page-size", 20, "Results per page")
+
 	promotionsCmd.AddCommand(promotionsActivateCmd)
 	promotionsCmd.AddCommand(promotionsDeactivateCmd)
 	promotionsCmd.AddCommand(promotionsDeleteCmd)
 	promotionsCmd.AddCommand(promotionsCouponCenterCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "promotions",
+		Description: "Manage promotions",
+		Commands:    []string{"list", "get", "create", "update", "search", "activate", "deactivate", "delete", "coupon-center"},
+		IDPrefix:    "promotion",
+	})
 }

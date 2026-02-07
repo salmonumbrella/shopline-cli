@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/outfmt"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -44,51 +46,42 @@ var giftsListCmd = &cobra.Command{
 			return formatter.JSON(resp)
 		}
 
-		headers := []string{"ID", "TITLE", "GIFT PRODUCT", "TRIGGER", "USED", "STATUS", "STARTS", "ENDS"}
-		var rows [][]string
-		for _, g := range resp.Items {
-			trigger := fmt.Sprintf("%s: %.2f", g.TriggerType, g.TriggerValue)
-			used := fmt.Sprintf("%d", g.QuantityUsed)
-			if g.Quantity > 0 {
-				used = fmt.Sprintf("%d/%d", g.QuantityUsed, g.Quantity)
-			}
-			startsAt := "-"
-			if !g.StartsAt.IsZero() {
-				startsAt = g.StartsAt.Format("2006-01-02")
-			}
-			endsAt := "-"
-			if !g.EndsAt.IsZero() {
-				endsAt = g.EndsAt.Format("2006-01-02")
-			}
-			rows = append(rows, []string{
-				g.ID,
-				g.Title,
-				g.GiftProductName,
-				trigger,
-				used,
-				g.Status,
-				startsAt,
-				endsAt,
-			})
-		}
-
-		formatter.Table(headers, rows)
+		renderGiftsTable(formatter, resp.Items, "")
 		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d gifts\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
 
 var giftsGetCmd = &cobra.Command{
-	Use:   "get <id>",
+	Use:   "get [id]",
 	Short: "Get gift details",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
 		}
 
-		gift, err := client.GetGift(cmd.Context(), args[0])
+		giftID, err := resolveOrArg(cmd, args, func(query string) (string, error) {
+			resp, err := client.SearchGifts(cmd.Context(), &api.GiftSearchOptions{
+				Query: query, PageSize: 1,
+			})
+			if err != nil {
+				return "", fmt.Errorf("search failed: %w", err)
+			}
+			if len(resp.Items) == 0 {
+				return "", fmt.Errorf("no gift found matching %q", query)
+			}
+			if len(resp.Items) > 1 {
+				_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Warning: %d matches found, using first\n", len(resp.Items))
+			}
+			return resp.Items[0].ID, nil
+		})
+		if err != nil {
+			return err
+		}
+
+		gift, err := client.GetGift(cmd.Context(), giftID)
 		if err != nil {
 			return fmt.Errorf("failed to get gift: %w", err)
 		}
@@ -136,6 +129,11 @@ var giftsCreateCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create gift\n")
+			return nil
 		}
 
 		title, _ := cmd.Flags().GetString("title")
@@ -202,6 +200,11 @@ var giftsActivateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would activate gift %s\n", args[0])
+			return nil
+		}
 
 		gift, err := client.ActivateGift(cmd.Context(), args[0])
 		if err != nil {
@@ -222,6 +225,11 @@ var giftsDeactivateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would deactivate gift %s\n", args[0])
+			return nil
+		}
 
 		gift, err := client.DeactivateGift(cmd.Context(), args[0])
 		if err != nil {
@@ -241,6 +249,11 @@ var giftsDeleteCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete gift %s\n", args[0])
+			return nil
 		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
@@ -414,6 +427,82 @@ var giftsUpdateQuantityBySKUCmd = &cobra.Command{
 	},
 }
 
+var giftsSearchCmd = &cobra.Command{
+	Use:   "search",
+	Short: "Search gift promotions",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		query, _ := cmd.Flags().GetString("query")
+		status, _ := cmd.Flags().GetString("status")
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+
+		opts := &api.GiftSearchOptions{
+			Query:    query,
+			Status:   status,
+			Page:     page,
+			PageSize: pageSize,
+		}
+
+		resp, err := client.SearchGifts(cmd.Context(), opts)
+		if err != nil {
+			return fmt.Errorf("failed to search gifts: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		renderGiftsTable(formatter, resp.Items, "gift")
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d gifts\n", len(resp.Items), resp.TotalCount)
+		return nil
+	},
+}
+
+// renderGiftsTable renders a table of gift promotions using the given formatter.
+// idPrefix is used for FormatID on search commands; pass "" for list commands (auto-prefix handles it).
+func renderGiftsTable(formatter *outfmt.Formatter, gifts []api.Gift, idPrefix string) {
+	headers := []string{"ID", "TITLE", "GIFT PRODUCT", "TRIGGER", "USED", "STATUS", "STARTS", "ENDS"}
+	var rows [][]string
+	for _, g := range gifts {
+		trigger := fmt.Sprintf("%s: %.2f", g.TriggerType, g.TriggerValue)
+		used := fmt.Sprintf("%d", g.QuantityUsed)
+		if g.Quantity > 0 {
+			used = fmt.Sprintf("%d/%d", g.QuantityUsed, g.Quantity)
+		}
+		startsAt := "-"
+		if !g.StartsAt.IsZero() {
+			startsAt = g.StartsAt.Format("2006-01-02")
+		}
+		endsAt := "-"
+		if !g.EndsAt.IsZero() {
+			endsAt = g.EndsAt.Format("2006-01-02")
+		}
+		id := g.ID
+		if idPrefix != "" {
+			id = outfmt.FormatID(idPrefix, g.ID)
+		}
+		rows = append(rows, []string{
+			id,
+			g.Title,
+			g.GiftProductName,
+			trigger,
+			used,
+			g.Status,
+			startsAt,
+			endsAt,
+		})
+	}
+	formatter.Table(headers, rows)
+}
+
 var giftsStocksCmd = &cobra.Command{
 	Use:   "stocks",
 	Short: "Manage gift stocks (documented endpoints)",
@@ -475,6 +564,7 @@ func init() {
 	giftsListCmd.Flags().String("status", "", "Filter by status (active, scheduled, expired, inactive)")
 
 	giftsCmd.AddCommand(giftsGetCmd)
+	giftsGetCmd.Flags().String("by", "", "Find gift by title instead of ID")
 
 	giftsCmd.AddCommand(giftsCreateCmd)
 	giftsCreateCmd.Flags().String("title", "", "Gift title (required)")
@@ -491,6 +581,12 @@ func init() {
 	_ = giftsCreateCmd.MarkFlagRequired("gift-product-id")
 	_ = giftsCreateCmd.MarkFlagRequired("trigger-type")
 	_ = giftsCreateCmd.MarkFlagRequired("trigger-value")
+
+	giftsCmd.AddCommand(giftsSearchCmd)
+	giftsSearchCmd.Flags().String("query", "", "Search query")
+	giftsSearchCmd.Flags().String("status", "", "Filter by status (active, scheduled, expired, inactive)")
+	giftsSearchCmd.Flags().Int("page", 1, "Page number")
+	giftsSearchCmd.Flags().Int("page-size", 20, "Results per page")
 
 	giftsCmd.AddCommand(giftsActivateCmd)
 	giftsCmd.AddCommand(giftsDeactivateCmd)
@@ -524,4 +620,11 @@ func init() {
 	giftsStocksCmd.AddCommand(giftsStocksGetCmd)
 	giftsStocksCmd.AddCommand(giftsStocksUpdateCmd)
 	addJSONBodyFlags(giftsStocksUpdateCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "gifts",
+		Description: "Manage gift promotions",
+		Commands:    []string{"list", "get", "search", "create", "update", "activate", "deactivate", "delete", "update-quantity", "update-quantity-by-sku", "stocks"},
+		IDPrefix:    "gift",
+	})
 }

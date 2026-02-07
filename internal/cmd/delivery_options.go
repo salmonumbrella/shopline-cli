@@ -171,6 +171,11 @@ var deliveryOptionsUpdatePickupCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update delivery option pickup store\n")
+			return nil
+		}
 
 		storeID, _ := cmd.Flags().GetString("store-id")
 		storeName, _ := cmd.Flags().GetString("store-name")

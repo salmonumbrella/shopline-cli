@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/outfmt"
 	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
@@ -47,39 +48,42 @@ var customerGroupsListCmd = &cobra.Command{
 			return formatter.JSON(resp)
 		}
 
-		headers := []string{"ID", "NAME", "DESCRIPTION", "CUSTOMERS", "CREATED"}
-		var rows [][]string
-		for _, g := range resp.Items {
-			desc := g.Description
-			if len(desc) > 30 {
-				desc = desc[:27] + "..."
-			}
-			rows = append(rows, []string{
-				g.ID,
-				g.Name,
-				desc,
-				fmt.Sprintf("%d", g.CustomerCount),
-				g.CreatedAt.Format("2006-01-02 15:04"),
-			})
-		}
-
-		formatter.Table(headers, rows)
+		renderCustomerGroupsTable(formatter, resp.Items, "")
 		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d customer groups\n", len(resp.Items), resp.TotalCount)
 		return nil
 	},
 }
 
 var customerGroupsGetCmd = &cobra.Command{
-	Use:   "get <id>",
+	Use:   "get [id]",
 	Short: "Get customer group details",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
 		}
 
-		group, err := client.GetCustomerGroup(cmd.Context(), args[0])
+		groupID, err := resolveOrArg(cmd, args, func(query string) (string, error) {
+			resp, err := client.SearchCustomerGroups(cmd.Context(), &api.CustomerGroupSearchOptions{
+				Query: query, PageSize: 1,
+			})
+			if err != nil {
+				return "", fmt.Errorf("search failed: %w", err)
+			}
+			if len(resp.Items) == 0 {
+				return "", fmt.Errorf("no customer group found matching %q", query)
+			}
+			if len(resp.Items) > 1 {
+				_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Warning: %d matches found, using first\n", len(resp.Items))
+			}
+			return resp.Items[0].ID, nil
+		})
+		if err != nil {
+			return err
+		}
+
+		group, err := client.GetCustomerGroup(cmd.Context(), groupID)
 		if err != nil {
 			return fmt.Errorf("failed to get customer group: %w", err)
 		}
@@ -108,6 +112,11 @@ var customerGroupsCreateCmd = &cobra.Command{
 		client, err := getClient(cmd)
 		if err != nil {
 			return err
+		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would create customer group\n")
+			return nil
 		}
 
 		name, _ := cmd.Flags().GetString("name")
@@ -182,6 +191,11 @@ var customerGroupsDeleteCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would delete customer group %s\n", args[0])
+			return nil
+		}
 
 		yes, _ := cmd.Flags().GetBool("yes")
 		if !yes {
@@ -201,6 +215,68 @@ var customerGroupsDeleteCmd = &cobra.Command{
 		_, _ = fmt.Fprintf(outWriter(cmd), "Deleted customer group %s\n", args[0])
 		return nil
 	},
+}
+
+var customerGroupsSearchCmd = &cobra.Command{
+	Use:   "search",
+	Short: "Search customer groups",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		query, _ := cmd.Flags().GetString("query")
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+
+		opts := &api.CustomerGroupSearchOptions{
+			Query:    query,
+			Page:     page,
+			PageSize: pageSize,
+		}
+
+		resp, err := client.SearchCustomerGroups(cmd.Context(), opts)
+		if err != nil {
+			return fmt.Errorf("failed to search customer groups: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		renderCustomerGroupsTable(formatter, resp.Items, "customer_group")
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d customer groups\n", len(resp.Items), resp.TotalCount)
+		return nil
+	},
+}
+
+// renderCustomerGroupsTable renders a table of customer groups.
+// idPrefix is used for FormatID on search commands; pass "" for list commands (auto-prefix handles it).
+func renderCustomerGroupsTable(formatter *outfmt.Formatter, groups []api.CustomerGroup, idPrefix string) {
+	headers := []string{"ID", "NAME", "DESCRIPTION", "CUSTOMERS", "CREATED"}
+	var rows [][]string
+	for _, g := range groups {
+		desc := g.Description
+		if len(desc) > 30 {
+			desc = desc[:27] + "..."
+		}
+		id := g.ID
+		if idPrefix != "" {
+			id = outfmt.FormatID(idPrefix, g.ID)
+		}
+		rows = append(rows, []string{
+			id,
+			g.Name,
+			desc,
+			fmt.Sprintf("%d", g.CustomerCount),
+			g.CreatedAt.Format("2006-01-02 15:04"),
+		})
+	}
+	formatter.Table(headers, rows)
 }
 
 var customerGroupsChildrenCmd = &cobra.Command{
@@ -266,6 +342,7 @@ func init() {
 	customerGroupsListCmd.Flags().Int("page-size", 20, "Results per page")
 
 	customerGroupsCmd.AddCommand(customerGroupsGetCmd)
+	customerGroupsGetCmd.Flags().String("by", "", "Find customer group by name instead of ID")
 
 	customerGroupsCmd.AddCommand(customerGroupsCreateCmd)
 	customerGroupsCreateCmd.Flags().String("name", "", "Group name")
@@ -277,6 +354,11 @@ func init() {
 
 	customerGroupsCmd.AddCommand(customerGroupsDeleteCmd)
 
+	customerGroupsCmd.AddCommand(customerGroupsSearchCmd)
+	customerGroupsSearchCmd.Flags().String("query", "", "Search query")
+	customerGroupsSearchCmd.Flags().Int("page", 1, "Page number")
+	customerGroupsSearchCmd.Flags().Int("page-size", 20, "Results per page")
+
 	customerGroupsCmd.AddCommand(customerGroupsChildrenCmd)
 	customerGroupsChildrenCmd.AddCommand(customerGroupsChildrenListCmd)
 	customerGroupsChildrenCmd.AddCommand(customerGroupsChildrenCustomerIDsCmd)
@@ -284,7 +366,7 @@ func init() {
 	schema.Register(schema.Resource{
 		Name:        "customer-groups",
 		Description: "Manage customer groups",
-		Commands:    []string{"list", "get", "create", "update", "delete", "children"},
+		Commands:    []string{"list", "get", "search", "create", "update", "delete", "children"},
 		IDPrefix:    "customer_group",
 	})
 }

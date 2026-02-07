@@ -36,6 +36,18 @@ type mockAPIClient struct {
 	getOrderIDs  []string
 
 	cancelOrderErr error
+
+	createOrderResp *api.Order
+	createOrderErr  error
+	createOrderReq  *api.OrderCreateRequest
+
+	updateOrderResp *api.Order
+	updateOrderErr  error
+	updateOrderReq  *api.OrderUpdateRequest
+	updateOrderID   string
+
+	searchOrdersResp *api.OrdersListResponse
+	searchOrdersErr  error
 }
 
 func (m *mockAPIClient) ListOrders(ctx context.Context, opts *api.OrdersListOptions) (*api.OrdersListResponse, error) {
@@ -65,6 +77,21 @@ func (m *mockAPIClient) GetOrder(ctx context.Context, id string) (*api.Order, er
 
 func (m *mockAPIClient) CancelOrder(ctx context.Context, id string) error {
 	return m.cancelOrderErr
+}
+
+func (m *mockAPIClient) CreateOrder(ctx context.Context, req *api.OrderCreateRequest) (*api.Order, error) {
+	m.createOrderReq = req
+	return m.createOrderResp, m.createOrderErr
+}
+
+func (m *mockAPIClient) UpdateOrder(ctx context.Context, id string, req *api.OrderUpdateRequest) (*api.Order, error) {
+	m.updateOrderID = id
+	m.updateOrderReq = req
+	return m.updateOrderResp, m.updateOrderErr
+}
+
+func (m *mockAPIClient) SearchOrders(ctx context.Context, opts *api.OrderSearchOptions) (*api.OrdersListResponse, error) {
+	return m.searchOrdersResp, m.searchOrdersErr
 }
 
 // mockStore is a mock implementation of CredentialStore for testing.
@@ -1082,6 +1109,150 @@ func TestOrdersGetGetClientError(t *testing.T) {
 	}
 }
 
+// TestOrdersGetByFlag tests the --by flag on the orders get command.
+func TestOrdersGetByFlag(t *testing.T) {
+	t.Run("resolves order by query", func(t *testing.T) {
+		mockClient := &mockAPIClient{
+			searchOrdersResp: &api.OrdersListResponse{
+				Items: []api.OrderSummary{
+					{ID: "ord_found", OrderNumber: "1001", CustomerEmail: "alice@example.com"},
+				},
+				TotalCount: 1,
+			},
+			getOrderResp: &api.Order{
+				ID:          "ord_found",
+				OrderNumber: "1001",
+			},
+		}
+		cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+		defer cleanup()
+
+		var buf bytes.Buffer
+		formatterWriter = &buf
+
+		cmd := &cobra.Command{Use: "test"}
+		cmd.SetContext(context.Background())
+		cmd.Flags().String("store", "", "")
+		cmd.Flags().String("output", "json", "")
+		cmd.Flags().String("color", "never", "")
+		cmd.Flags().String("query", "", "")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "1001")
+
+		if err := ordersGetCmd.RunE(cmd, nil); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "ord_found") {
+			t.Errorf("expected output to contain 'ord_found', got: %s", buf.String())
+		}
+	})
+
+	t.Run("errors when no match", func(t *testing.T) {
+		mockClient := &mockAPIClient{
+			searchOrdersResp: &api.OrdersListResponse{
+				Items:      []api.OrderSummary{},
+				TotalCount: 0,
+			},
+		}
+		cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+		defer cleanup()
+
+		cmd := &cobra.Command{Use: "test"}
+		cmd.SetContext(context.Background())
+		cmd.Flags().String("store", "", "")
+		cmd.Flags().String("output", "", "")
+		cmd.Flags().String("color", "never", "")
+		cmd.Flags().String("query", "", "")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "nonexistent")
+
+		err := ordersGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error when no order found")
+		}
+		if !strings.Contains(err.Error(), "no order found") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("errors when search fails", func(t *testing.T) {
+		mockClient := &mockAPIClient{
+			searchOrdersErr: errors.New("API error"),
+		}
+		cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+		defer cleanup()
+
+		cmd := &cobra.Command{Use: "test"}
+		cmd.SetContext(context.Background())
+		cmd.Flags().String("store", "", "")
+		cmd.Flags().String("output", "", "")
+		cmd.Flags().String("color", "never", "")
+		cmd.Flags().String("query", "", "")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "1001")
+
+		err := ordersGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error when search fails")
+		}
+		if !strings.Contains(err.Error(), "search failed") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("positional arg takes precedence over --by", func(t *testing.T) {
+		mockClient := &mockAPIClient{
+			getOrderResp: &api.Order{
+				ID:          "ord_direct",
+				OrderNumber: "999",
+			},
+		}
+		cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+		defer cleanup()
+
+		var buf bytes.Buffer
+		formatterWriter = &buf
+
+		cmd := &cobra.Command{Use: "test"}
+		cmd.SetContext(context.Background())
+		cmd.Flags().String("store", "", "")
+		cmd.Flags().String("output", "json", "")
+		cmd.Flags().String("color", "never", "")
+		cmd.Flags().String("query", "", "")
+		cmd.Flags().String("by", "", "")
+		_ = cmd.Flags().Set("by", "should-not-be-used")
+
+		if err := ordersGetCmd.RunE(cmd, []string{"ord_direct"}); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "ord_direct") {
+			t.Errorf("expected output to contain 'ord_direct', got: %s", buf.String())
+		}
+	})
+
+	t.Run("errors with no arg and no --by", func(t *testing.T) {
+		mockClient := &mockAPIClient{}
+		cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+		defer cleanup()
+
+		cmd := &cobra.Command{Use: "test"}
+		cmd.SetContext(context.Background())
+		cmd.Flags().String("store", "", "")
+		cmd.Flags().String("output", "", "")
+		cmd.Flags().String("color", "never", "")
+		cmd.Flags().String("query", "", "")
+		cmd.Flags().String("by", "", "")
+
+		err := ordersGetCmd.RunE(cmd, nil)
+		if err == nil {
+			t.Fatal("expected error with no arg and no --by")
+		}
+		if !strings.Contains(err.Error(), "provide a resource ID") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
+}
+
 // TestOrdersCancelRunE tests the orders cancel command execution.
 func TestOrdersCancelRunE(t *testing.T) {
 	tests := []struct {
@@ -1489,4 +1660,389 @@ func TestOrdersGetRichError(t *testing.T) {
 	if !strings.Contains(output, "Suggestions:") {
 		t.Errorf("stderr should contain suggestions, got: %q", output)
 	}
+}
+
+// TestOrdersCreateShorthandFlags tests the create command with shorthand flags.
+func TestOrdersCreateShorthandFlags(t *testing.T) {
+	tests := []struct {
+		name       string
+		flags      map[string]string
+		wantEmail  string
+		wantNote   string
+		wantTags   []string
+		wantErr    bool
+		wantErrMsg string
+	}{
+		{
+			name:      "all flags",
+			flags:     map[string]string{"email": "user@example.com", "note": "Test order", "tags": "vip,rush"},
+			wantEmail: "user@example.com",
+			wantNote:  "Test order",
+			wantTags:  []string{"vip", "rush"},
+		},
+		{
+			name:      "email only",
+			flags:     map[string]string{"email": "user@example.com"},
+			wantEmail: "user@example.com",
+		},
+		{
+			name:     "note only",
+			flags:    map[string]string{"note": "Just a note"},
+			wantNote: "Just a note",
+		},
+		{
+			name:     "tags only",
+			flags:    map[string]string{"tags": "a, b, c"},
+			wantTags: []string{"a", "b", "c"},
+		},
+		{
+			name:       "body and flags conflict",
+			flags:      map[string]string{"body": `{"note":"x"}`, "email": "user@example.com"},
+			wantErr:    true,
+			wantErrMsg: "use either --body/--body-file or individual flags, not both",
+		},
+		{
+			name:       "no input at all",
+			flags:      map[string]string{},
+			wantErr:    true,
+			wantErrMsg: "provide order data via --body/--body-file or individual flags",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockClient := &mockAPIClient{
+				createOrderResp: &api.Order{
+					ID:          "ord_new",
+					OrderNumber: "2001",
+				},
+			}
+			cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+			defer cleanup()
+
+			var buf bytes.Buffer
+			formatterWriter = &buf
+
+			cmd := &cobra.Command{Use: "test"}
+			cmd.SetContext(context.Background())
+			cmd.Flags().String("store", "", "")
+			cmd.Flags().String("output", "text", "")
+			cmd.Flags().String("color", "never", "")
+			cmd.Flags().String("query", "", "")
+			cmd.Flags().Bool("items-only", false, "")
+			cmd.Flags().Bool("dry-run", false, "")
+			addJSONBodyFlags(cmd)
+			cmd.Flags().String("email", "", "Customer email")
+			cmd.Flags().String("note", "", "Order note")
+			cmd.Flags().String("tags", "", "Comma-separated tags")
+
+			for k, v := range tt.flags {
+				_ = cmd.Flags().Set(k, v)
+			}
+
+			err := ordersCreateCmd.RunE(cmd, []string{})
+
+			if tt.wantErr {
+				if err == nil {
+					t.Fatal("expected error, got nil")
+				}
+				if !strings.Contains(err.Error(), tt.wantErrMsg) {
+					t.Errorf("expected error containing %q, got %q", tt.wantErrMsg, err.Error())
+				}
+				return
+			}
+
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			req := mockClient.createOrderReq
+			if req == nil {
+				t.Fatal("expected CreateOrder to be called with a request")
+			}
+			if req.CustomerEmail != tt.wantEmail {
+				t.Errorf("email = %q, want %q", req.CustomerEmail, tt.wantEmail)
+			}
+			if req.Note != tt.wantNote {
+				t.Errorf("note = %q, want %q", req.Note, tt.wantNote)
+			}
+			if len(tt.wantTags) > 0 {
+				if len(req.Tags) != len(tt.wantTags) {
+					t.Fatalf("tags count = %d, want %d", len(req.Tags), len(tt.wantTags))
+				}
+				for i, tag := range tt.wantTags {
+					if req.Tags[i] != tag {
+						t.Errorf("tags[%d] = %q, want %q", i, req.Tags[i], tag)
+					}
+				}
+			}
+		})
+	}
+}
+
+// TestOrdersCreateWithBody tests that --body still works for create.
+func TestOrdersCreateWithBody(t *testing.T) {
+	mockClient := &mockAPIClient{
+		createOrderResp: &api.Order{
+			ID:          "ord_body",
+			OrderNumber: "3001",
+		},
+	}
+	cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+	defer cleanup()
+
+	var buf bytes.Buffer
+	formatterWriter = &buf
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "json", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+	cmd.Flags().Bool("items-only", false, "")
+	cmd.Flags().Bool("dry-run", false, "")
+	addJSONBodyFlags(cmd)
+	cmd.Flags().String("email", "", "")
+	cmd.Flags().String("note", "", "")
+	cmd.Flags().String("tags", "", "")
+
+	_ = cmd.Flags().Set("body", `{"customer_email":"body@example.com","note":"from body"}`)
+
+	err := ordersCreateCmd.RunE(cmd, []string{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	req := mockClient.createOrderReq
+	if req == nil {
+		t.Fatal("expected CreateOrder to be called")
+	}
+	if req.CustomerEmail != "body@example.com" {
+		t.Errorf("email = %q, want %q", req.CustomerEmail, "body@example.com")
+	}
+	if req.Note != "from body" {
+		t.Errorf("note = %q, want %q", req.Note, "from body")
+	}
+}
+
+// TestOrdersCreateDryRun tests that dry-run skips shorthand flag validation.
+func TestOrdersCreateDryRun(t *testing.T) {
+	mockClient := &mockAPIClient{}
+	cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+	defer cleanup()
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "text", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+	cmd.Flags().Bool("items-only", false, "")
+	cmd.Flags().Bool("dry-run", false, "")
+	addJSONBodyFlags(cmd)
+	cmd.Flags().String("email", "", "")
+	cmd.Flags().String("note", "", "")
+	cmd.Flags().String("tags", "", "")
+
+	_ = cmd.Flags().Set("dry-run", "true")
+
+	err := ordersCreateCmd.RunE(cmd, []string{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if mockClient.createOrderReq != nil {
+		t.Error("expected CreateOrder NOT to be called in dry-run mode")
+	}
+}
+
+// TestOrdersUpdateShorthandFlags tests the update command with shorthand flags.
+func TestOrdersUpdateShorthandFlags(t *testing.T) {
+	tests := []struct {
+		name       string
+		flags      map[string]string
+		wantNote   *string
+		wantTags   []string
+		wantErr    bool
+		wantErrMsg string
+	}{
+		{
+			name:     "note and tags",
+			flags:    map[string]string{"note": "Updated note", "tags": "vip,rush"},
+			wantNote: strPtr("Updated note"),
+			wantTags: []string{"vip", "rush"},
+		},
+		{
+			name:     "note only",
+			flags:    map[string]string{"note": "Just a note"},
+			wantNote: strPtr("Just a note"),
+		},
+		{
+			name:     "tags only",
+			flags:    map[string]string{"tags": "a,b"},
+			wantTags: []string{"a", "b"},
+		},
+		{
+			name:     "empty note (clear)",
+			flags:    map[string]string{"note": ""},
+			wantNote: strPtr(""),
+		},
+		{
+			name:       "body and flags conflict",
+			flags:      map[string]string{"body": `{"note":"x"}`, "note": "y"},
+			wantErr:    true,
+			wantErrMsg: "use either --body/--body-file or individual flags, not both",
+		},
+		{
+			name:       "no input at all",
+			flags:      map[string]string{},
+			wantErr:    true,
+			wantErrMsg: "provide order data via --body/--body-file or individual flags",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockClient := &mockAPIClient{
+				updateOrderResp: &api.Order{
+					ID:          "ord_upd",
+					OrderNumber: "4001",
+				},
+			}
+			cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+			defer cleanup()
+
+			var buf bytes.Buffer
+			formatterWriter = &buf
+
+			cmd := &cobra.Command{Use: "test"}
+			cmd.SetContext(context.Background())
+			cmd.Flags().String("store", "", "")
+			cmd.Flags().String("output", "text", "")
+			cmd.Flags().String("color", "never", "")
+			cmd.Flags().String("query", "", "")
+			cmd.Flags().Bool("items-only", false, "")
+			cmd.Flags().Bool("dry-run", false, "")
+			addJSONBodyFlags(cmd)
+			cmd.Flags().String("note", "", "Order note")
+			cmd.Flags().String("tags", "", "Comma-separated tags")
+
+			for k, v := range tt.flags {
+				_ = cmd.Flags().Set(k, v)
+			}
+
+			err := ordersUpdateCmd.RunE(cmd, []string{"ord_123"})
+
+			if tt.wantErr {
+				if err == nil {
+					t.Fatal("expected error, got nil")
+				}
+				if !strings.Contains(err.Error(), tt.wantErrMsg) {
+					t.Errorf("expected error containing %q, got %q", tt.wantErrMsg, err.Error())
+				}
+				return
+			}
+
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			if mockClient.updateOrderID != "ord_123" {
+				t.Errorf("update order ID = %q, want %q", mockClient.updateOrderID, "ord_123")
+			}
+
+			req := mockClient.updateOrderReq
+			if req == nil {
+				t.Fatal("expected UpdateOrder to be called with a request")
+			}
+			if tt.wantNote != nil {
+				if req.Note == nil {
+					t.Fatal("expected Note to be set")
+				}
+				if *req.Note != *tt.wantNote {
+					t.Errorf("note = %q, want %q", *req.Note, *tt.wantNote)
+				}
+			} else {
+				if req.Note != nil {
+					t.Errorf("expected Note to be nil, got %q", *req.Note)
+				}
+			}
+			if len(tt.wantTags) > 0 {
+				if len(req.Tags) != len(tt.wantTags) {
+					t.Fatalf("tags count = %d, want %d", len(req.Tags), len(tt.wantTags))
+				}
+				for i, tag := range tt.wantTags {
+					if req.Tags[i] != tag {
+						t.Errorf("tags[%d] = %q, want %q", i, req.Tags[i], tag)
+					}
+				}
+			}
+		})
+	}
+}
+
+// TestOrdersUpdateDryRun tests that dry-run skips shorthand flag validation for update.
+func TestOrdersUpdateDryRun(t *testing.T) {
+	mockClient := &mockAPIClient{}
+	cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+	defer cleanup()
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "text", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+	cmd.Flags().Bool("items-only", false, "")
+	cmd.Flags().Bool("dry-run", false, "")
+	addJSONBodyFlags(cmd)
+	cmd.Flags().String("note", "", "")
+	cmd.Flags().String("tags", "", "")
+
+	_ = cmd.Flags().Set("dry-run", "true")
+
+	err := ordersUpdateCmd.RunE(cmd, []string{"ord_123"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if mockClient.updateOrderReq != nil {
+		t.Error("expected UpdateOrder NOT to be called in dry-run mode")
+	}
+}
+
+// TestSplitTags tests the splitTags helper.
+func TestSplitTags(t *testing.T) {
+	tests := []struct {
+		input string
+		want  []string
+	}{
+		{"vip,rush", []string{"vip", "rush"}},
+		{"a, b, c", []string{"a", "b", "c"}},
+		{"single", []string{"single"}},
+		{" , , ", nil},
+		{"", nil},
+		{"  spaces  , around  ", []string{"spaces", "around"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			got := splitTags(tt.input)
+			if len(got) == 0 && len(tt.want) == 0 {
+				return
+			}
+			if len(got) != len(tt.want) {
+				t.Fatalf("splitTags(%q) = %v, want %v", tt.input, got, tt.want)
+			}
+			for i := range got {
+				if got[i] != tt.want[i] {
+					t.Errorf("splitTags(%q)[%d] = %q, want %q", tt.input, i, got[i], tt.want[i])
+				}
+			}
+		})
+	}
+}
+
+func strPtr(s string) *string {
+	return &s
 }
