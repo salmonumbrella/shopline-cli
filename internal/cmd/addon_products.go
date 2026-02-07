@@ -6,6 +6,7 @@ import (
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
 	"github.com/salmonumbrella/shopline-cli/internal/outfmt"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -488,4 +489,11 @@ func init() {
 	addonProductsStocksCmd.AddCommand(addonProductsStocksGetCmd)
 	addonProductsStocksCmd.AddCommand(addonProductsStocksUpdateCmd)
 	addJSONBodyFlags(addonProductsStocksUpdateCmd)
+
+	schema.Register(schema.Resource{
+		Name:        "addon-products",
+		Description: "Manage add-on product bundles",
+		Commands:    []string{"list", "get", "search", "create", "delete", "update", "update-quantity", "update-quantity-by-sku", "stocks"},
+		IDPrefix:    "addon_product",
+	})
 }
