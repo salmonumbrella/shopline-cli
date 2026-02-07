@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
 
@@ -290,6 +291,152 @@ var salesDeleteProductsCmd = &cobra.Command{
 	},
 }
 
+// -- Sale products sub-commands --
+
+var salesProductsCmd = &cobra.Command{
+	Use:   "products",
+	Short: "Manage products in a live sale",
+}
+
+var salesProductsListCmd = &cobra.Command{
+	Use:   "list <sale-id>",
+	Short: "List products in a sale",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+
+		resp, err := client.GetSaleProducts(cmd.Context(), args[0], &api.SaleProductsListOptions{
+			Page:     page,
+			PageSize: pageSize,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to list sale products: %w", err)
+		}
+
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var salesProductsAddCmd = &cobra.Command{
+	Use:   "add <sale-id>",
+	Short: "Add products to a sale (raw JSON body)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		var req api.SaleAddProductsRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would add products to sale %s\n", args[0])
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.AddSaleProducts(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to add sale products: %w", err)
+		}
+
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var salesProductsUpdateCmd = &cobra.Command{
+	Use:   "update <sale-id>",
+	Short: "Update products in a sale (raw JSON body)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		var req api.SaleUpdateProductsRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		dryRun, _ := cmd.Flags().GetBool("dry-run")
+		if dryRun {
+			_, _ = fmt.Fprintf(outWriter(cmd), "[DRY-RUN] Would update products in sale %s\n", args[0])
+			return nil
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.UpdateSaleProducts(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update sale products: %w", err)
+		}
+
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+// -- Sale comments sub-command --
+
+var salesCommentsCmd = &cobra.Command{
+	Use:   "comments <sale-id>",
+	Short: "List comments from a live stream sale",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+
+		resp, err := client.GetSaleComments(cmd.Context(), args[0], &api.SaleCommentsListOptions{
+			Page:     page,
+			PageSize: pageSize,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to list sale comments: %w", err)
+		}
+
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+// -- Sale customers sub-command --
+
+var salesCustomersCmd = &cobra.Command{
+	Use:   "customers <sale-id>",
+	Short: "List customers who commented in a live stream sale",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+
+		resp, err := client.GetSaleCustomers(cmd.Context(), args[0], &api.SaleCustomersListOptions{
+			Page:     page,
+			PageSize: pageSize,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to list sale customers: %w", err)
+		}
+
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(salesCmd)
 
@@ -323,4 +470,38 @@ func init() {
 	salesCmd.AddCommand(salesDeleteProductsCmd)
 	salesDeleteProductsCmd.Flags().StringSlice("product-ids", nil, "Product IDs (comma-separated) (required)")
 	_ = salesDeleteProductsCmd.MarkFlagRequired("product-ids")
+
+	// Products sub-commands
+	salesCmd.AddCommand(salesProductsCmd)
+	salesProductsCmd.AddCommand(salesProductsListCmd)
+	salesProductsListCmd.Flags().Int("page", 1, "Page number")
+	salesProductsListCmd.Flags().Int("page-size", 20, "Results per page")
+
+	salesProductsCmd.AddCommand(salesProductsAddCmd)
+	addJSONBodyFlags(salesProductsAddCmd)
+
+	salesProductsCmd.AddCommand(salesProductsUpdateCmd)
+	addJSONBodyFlags(salesProductsUpdateCmd)
+
+	// Comments sub-command
+	salesCmd.AddCommand(salesCommentsCmd)
+	salesCommentsCmd.Flags().Int("page", 1, "Page number")
+	salesCommentsCmd.Flags().Int("page-size", 20, "Results per page")
+
+	// Customers sub-command
+	salesCmd.AddCommand(salesCustomersCmd)
+	salesCustomersCmd.Flags().Int("page", 1, "Page number")
+	salesCustomersCmd.Flags().Int("page-size", 20, "Results per page")
+
+	schema.Register(schema.Resource{
+		Name:        "sales",
+		Description: "Manage sale campaigns",
+		Commands: []string{
+			"list", "get", "create", "delete", "activate", "deactivate",
+			"delete-products",
+			"products list", "products add", "products update",
+			"comments", "customers",
+		},
+		IDPrefix: "sale",
+	})
 }

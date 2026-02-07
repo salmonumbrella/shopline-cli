@@ -2733,6 +2733,41 @@ func (m *MockClient) DeleteSaleProducts(ctx context.Context, saleID string, req 
 	return m.notImplemented("DeleteSaleProducts")
 }
 
+func (m *MockClient) GetSaleProducts(ctx context.Context, saleID string, opts *SaleProductsListOptions) (*SaleProductsListResponse, error) {
+	if h, ok := m.handlers["GetSaleProducts"]; ok {
+		return h.(func(context.Context, string, *SaleProductsListOptions) (*SaleProductsListResponse, error))(ctx, saleID, opts)
+	}
+	return nil, m.notImplemented("GetSaleProducts")
+}
+
+func (m *MockClient) AddSaleProducts(ctx context.Context, saleID string, req *SaleAddProductsRequest) (*SaleProductsListResponse, error) {
+	if h, ok := m.handlers["AddSaleProducts"]; ok {
+		return h.(func(context.Context, string, *SaleAddProductsRequest) (*SaleProductsListResponse, error))(ctx, saleID, req)
+	}
+	return nil, m.notImplemented("AddSaleProducts")
+}
+
+func (m *MockClient) UpdateSaleProducts(ctx context.Context, saleID string, req *SaleUpdateProductsRequest) (*SaleProductsListResponse, error) {
+	if h, ok := m.handlers["UpdateSaleProducts"]; ok {
+		return h.(func(context.Context, string, *SaleUpdateProductsRequest) (*SaleProductsListResponse, error))(ctx, saleID, req)
+	}
+	return nil, m.notImplemented("UpdateSaleProducts")
+}
+
+func (m *MockClient) GetSaleComments(ctx context.Context, saleID string, opts *SaleCommentsListOptions) (*SaleCommentsListResponse, error) {
+	if h, ok := m.handlers["GetSaleComments"]; ok {
+		return h.(func(context.Context, string, *SaleCommentsListOptions) (*SaleCommentsListResponse, error))(ctx, saleID, opts)
+	}
+	return nil, m.notImplemented("GetSaleComments")
+}
+
+func (m *MockClient) GetSaleCustomers(ctx context.Context, saleID string, opts *SaleCustomersListOptions) (*SaleCustomersListResponse, error) {
+	if h, ok := m.handlers["GetSaleCustomers"]; ok {
+		return h.(func(context.Context, string, *SaleCustomersListOptions) (*SaleCustomersListResponse, error))(ctx, saleID, opts)
+	}
+	return nil, m.notImplemented("GetSaleCustomers")
+}
+
 func (m *MockClient) SearchOrders(ctx context.Context, opts *OrderSearchOptions) (*OrdersListResponse, error) {
 	return nil, m.notImplemented("SearchOrders")
 }
