@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/outfmt"
 	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
@@ -316,7 +317,7 @@ var promotionsSearchCmd = &cobra.Command{
 				endsAt = p.EndsAt.Format("2006-01-02")
 			}
 			rows = append(rows, []string{
-				p.ID,
+				outfmt.FormatID("promotion", p.ID),
 				p.Title,
 				p.Type,
 				p.Status,

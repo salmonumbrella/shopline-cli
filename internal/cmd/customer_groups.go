@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/outfmt"
 	"github.com/salmonumbrella/shopline-cli/internal/schema"
 	"github.com/spf13/cobra"
 )
@@ -242,7 +243,7 @@ var customerGroupsSearchCmd = &cobra.Command{
 				desc = desc[:27] + "..."
 			}
 			rows = append(rows, []string{
-				g.ID,
+				outfmt.FormatID("customer_group", g.ID),
 				g.Name,
 				desc,
 				fmt.Sprintf("%d", g.CustomerCount),

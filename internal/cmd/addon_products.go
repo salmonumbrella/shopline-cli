@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/salmonumbrella/shopline-cli/internal/api"
+	"github.com/salmonumbrella/shopline-cli/internal/outfmt"
 	"github.com/spf13/cobra"
 )
 
@@ -228,7 +229,7 @@ var addonProductsSearchCmd = &cobra.Command{
 				price = ap.Price + " " + ap.Currency
 			}
 			rows = append(rows, []string{
-				ap.ID,
+				outfmt.FormatID("addon_product", ap.ID),
 				ap.Title,
 				ap.ProductID,
 				price,
