@@ -524,6 +524,624 @@ func cancelOrdersBatch(cmd *cobra.Command, filename string) error {
 	return batch.WriteResults(os.Stdout, results)
 }
 
+// --- Create / Update ---
+
+var ordersCreateCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create an order (raw JSON body)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		var req api.OrderCreateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		order, err := client.CreateOrder(cmd.Context(), &req)
+		if err != nil {
+			return fmt.Errorf("failed to create order: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(order)
+		}
+		_, _ = fmt.Fprintf(outWriter(cmd), "Created order %s\n", order.ID)
+		return nil
+	},
+}
+
+var ordersUpdateCmd = &cobra.Command{
+	Use:   "update <id>",
+	Short: "Update an order (raw JSON body)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		var req api.OrderUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		order, err := client.UpdateOrder(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update order: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(order)
+		}
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated order %s\n", order.ID)
+		return nil
+	},
+}
+
+// --- Search ---
+
+var ordersSearchCmd = &cobra.Command{
+	Use:   "search",
+	Short: "Search orders",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		query, _ := cmd.Flags().GetString("query")
+		status, _ := cmd.Flags().GetString("status")
+		from, _ := cmd.Flags().GetString("from")
+		to, _ := cmd.Flags().GetString("to")
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+
+		opts := &api.OrderSearchOptions{
+			Query:    query,
+			Status:   status,
+			Page:     page,
+			PageSize: pageSize,
+		}
+		if from != "" {
+			since, err := parseTimeFlag(from, "from")
+			if err != nil {
+				return err
+			}
+			opts.Since = since
+		}
+		if to != "" {
+			until, err := parseTimeFlag(to, "to")
+			if err != nil {
+				return err
+			}
+			opts.Until = until
+		}
+
+		resp, err := client.SearchOrders(cmd.Context(), opts)
+		if err != nil {
+			return fmt.Errorf("failed to search orders: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		headers := []string{"ORDER", "NUMBER", "STATUS", "TOTAL", "CUSTOMER", "CREATED"}
+		var rows [][]string
+		for _, o := range resp.Items {
+			rows = append(rows, []string{
+				outfmt.FormatID("order", o.ID),
+				o.OrderNumber,
+				o.Status,
+				o.TotalPrice + " " + o.Currency,
+				o.CustomerEmail,
+				o.CreatedAt.Format("2006-01-02 15:04"),
+			})
+		}
+		formatter.Table(headers, rows)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d orders\n", len(resp.Items), resp.TotalCount)
+		return nil
+	},
+}
+
+// --- Split ---
+
+var ordersSplitCmd = &cobra.Command{
+	Use:   "split <id>",
+	Short: "Split an order into two orders",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		lineItemIDsStr, _ := cmd.Flags().GetString("line-item-ids")
+		lineItemIDs := strings.Split(lineItemIDsStr, ",")
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.SplitOrder(cmd.Context(), args[0], lineItemIDs)
+		if err != nil {
+			return fmt.Errorf("failed to split order: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+		_, _ = fmt.Fprintf(outWriter(cmd), "Split order %s into new order %s\n", resp.OriginalOrder.ID, resp.NewOrder.ID)
+		return nil
+	},
+}
+
+// --- Status update commands ---
+
+var ordersUpdateStatusCmd = &cobra.Command{
+	Use:   "update-status <id>",
+	Short: "Update order status",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		status, _ := cmd.Flags().GetString("status")
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		order, err := client.UpdateOrderStatus(cmd.Context(), args[0], status)
+		if err != nil {
+			return fmt.Errorf("failed to update order status: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(order)
+		}
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated order %s status to %s\n", order.ID, order.Status)
+		return nil
+	},
+}
+
+var ordersUpdateDeliveryStatusCmd = &cobra.Command{
+	Use:   "update-delivery-status <id>",
+	Short: "Update order delivery status",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		status, _ := cmd.Flags().GetString("status")
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		order, err := client.UpdateOrderDeliveryStatus(cmd.Context(), args[0], status)
+		if err != nil {
+			return fmt.Errorf("failed to update order delivery status: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(order)
+		}
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated order %s delivery status\n", order.ID)
+		return nil
+	},
+}
+
+var ordersUpdatePaymentStatusCmd = &cobra.Command{
+	Use:   "update-payment-status <id>",
+	Short: "Update order payment status",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		status, _ := cmd.Flags().GetString("status")
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		order, err := client.UpdateOrderPaymentStatus(cmd.Context(), args[0], status)
+		if err != nil {
+			return fmt.Errorf("failed to update order payment status: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(order)
+		}
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated order %s payment status\n", order.ID)
+		return nil
+	},
+}
+
+// --- Shipment commands ---
+
+var ordersExecuteShipmentCmd = &cobra.Command{
+	Use:   "execute-shipment <id>",
+	Short: "Execute shipment for an order (raw JSON body)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.ExecuteShipment(cmd.Context(), args[0], body)
+		if err != nil {
+			return fmt.Errorf("failed to execute shipment: %w", err)
+		}
+
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var ordersBulkExecuteShipmentCmd = &cobra.Command{
+	Use:   "bulk-execute-shipment",
+	Short: "Execute shipments for multiple orders",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		idsStr, _ := cmd.Flags().GetString("order-ids")
+		orderIDs := strings.Split(idsStr, ",")
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.BulkExecuteShipment(cmd.Context(), orderIDs)
+		if err != nil {
+			return fmt.Errorf("failed to bulk execute shipments: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+		_, _ = fmt.Fprintf(outWriter(cmd), "Executed shipments: %d successful, %d failed\n",
+			len(resp.Successful), len(resp.Failed))
+		return nil
+	},
+}
+
+// --- Tags subcommands ---
+
+var ordersTagsCmd = &cobra.Command{
+	Use:   "tags",
+	Short: "Manage order tags",
+}
+
+var ordersTagsListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List all order tags",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.ListOrderTags(cmd.Context())
+		if err != nil {
+			return fmt.Errorf("failed to list order tags: %w", err)
+		}
+
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var ordersTagsGetCmd = &cobra.Command{
+	Use:   "get <order-id>",
+	Short: "Get tags for an order",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.GetOrderTags(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to get order tags: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+		_, _ = fmt.Fprintf(outWriter(cmd), "Tags: %s\n", strings.Join(resp.Tags, ", "))
+		return nil
+	},
+}
+
+var ordersTagsUpdateCmd = &cobra.Command{
+	Use:   "update <order-id>",
+	Short: "Update tags for an order",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		tagsStr, _ := cmd.Flags().GetString("tags")
+		tags := strings.Split(tagsStr, ",")
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		order, err := client.UpdateOrderTags(cmd.Context(), args[0], tags)
+		if err != nil {
+			return fmt.Errorf("failed to update order tags: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(order)
+		}
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated tags for order %s\n", order.ID)
+		return nil
+	},
+}
+
+// --- Transactions / Action Logs / Labels / Messages ---
+
+var ordersTransactionsCmd = &cobra.Command{
+	Use:   "transactions",
+	Short: "Get order transactions (raw JSON)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.GetOrderTransactions(cmd.Context(), nil)
+		if err != nil {
+			return fmt.Errorf("failed to get order transactions: %w", err)
+		}
+
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var ordersActionLogsCmd = &cobra.Command{
+	Use:   "action-logs <id>",
+	Short: "Get action logs for an order (raw JSON)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.GetOrderActionLogs(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to get order action logs: %w", err)
+		}
+
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var ordersLabelsCmd = &cobra.Command{
+	Use:   "labels",
+	Short: "Get order delivery labels (raw JSON)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.GetOrderLabels(cmd.Context(), nil)
+		if err != nil {
+			return fmt.Errorf("failed to get order labels: %w", err)
+		}
+
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+var ordersCreateMessageCmd = &cobra.Command{
+	Use:   "create-message <id>",
+	Short: "Create a message on an order (raw JSON body)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.PostOrderMessage(cmd.Context(), args[0], body)
+		if err != nil {
+			return fmt.Errorf("failed to create order message: %w", err)
+		}
+
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+// --- Archived orders ---
+
+var ordersArchivedCmd = &cobra.Command{
+	Use:   "archived-orders",
+	Short: "Manage archived orders",
+}
+
+var ordersArchivedListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List archived orders",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		page, _ := cmd.Flags().GetInt("page")
+		pageSize, _ := cmd.Flags().GetInt("page-size")
+		from, _ := cmd.Flags().GetString("from")
+		to, _ := cmd.Flags().GetString("to")
+
+		opts := &api.ArchivedOrdersListOptions{
+			Page:     page,
+			PageSize: pageSize,
+		}
+		if from != "" {
+			since, err := parseTimeFlag(from, "from")
+			if err != nil {
+				return err
+			}
+			opts.Since = since
+		}
+		if to != "" {
+			until, err := parseTimeFlag(to, "to")
+			if err != nil {
+				return err
+			}
+			opts.Until = until
+		}
+
+		resp, err := client.ListArchivedOrders(cmd.Context(), opts)
+		if err != nil {
+			return fmt.Errorf("failed to list archived orders: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(resp)
+		}
+
+		headers := []string{"ORDER", "NUMBER", "STATUS", "TOTAL", "CUSTOMER", "CREATED"}
+		var rows [][]string
+		for _, o := range resp.Items {
+			rows = append(rows, []string{
+				outfmt.FormatID("order", o.ID),
+				o.OrderNumber,
+				o.Status,
+				o.TotalPrice + " " + o.Currency,
+				o.CustomerEmail,
+				o.CreatedAt.Format("2006-01-02 15:04"),
+			})
+		}
+		formatter.Table(headers, rows)
+		_, _ = fmt.Fprintf(outWriter(cmd), "\nShowing %d of %d archived orders\n", len(resp.Items), resp.TotalCount)
+		return nil
+	},
+}
+
+var ordersArchivedCreateCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create an archived orders report (raw JSON body)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		body, err := readJSONBodyFlags(cmd)
+		if err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		resp, err := client.CreateArchivedOrdersReport(cmd.Context(), body)
+		if err != nil {
+			return fmt.Errorf("failed to create archived orders report: %w", err)
+		}
+
+		return getFormatter(cmd).JSON(resp)
+	},
+}
+
+// --- Delivery subcommands ---
+
+var ordersDeliveryCmd = &cobra.Command{
+	Use:   "delivery",
+	Short: "Manage order delivery",
+}
+
+var ordersDeliveryGetCmd = &cobra.Command{
+	Use:   "get <order-id>",
+	Short: "Get delivery information for an order",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		delivery, err := client.GetOrderDelivery(cmd.Context(), args[0])
+		if err != nil {
+			return fmt.Errorf("failed to get order delivery: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(delivery)
+		}
+
+		out := outWriter(cmd)
+		_, _ = fmt.Fprintf(out, "Delivery ID:      %s\n", delivery.ID)
+		_, _ = fmt.Fprintf(out, "Order ID:         %s\n", delivery.OrderID)
+		_, _ = fmt.Fprintf(out, "Status:           %s\n", delivery.Status)
+		_, _ = fmt.Fprintf(out, "Carrier:          %s\n", delivery.Carrier)
+		_, _ = fmt.Fprintf(out, "Tracking Number:  %s\n", delivery.TrackingNumber)
+		if delivery.TrackingURL != "" {
+			_, _ = fmt.Fprintf(out, "Tracking URL:     %s\n", delivery.TrackingURL)
+		}
+		return nil
+	},
+}
+
+var ordersDeliveryUpdateCmd = &cobra.Command{
+	Use:   "update <order-id>",
+	Short: "Update delivery information for an order (raw JSON body)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		var req api.OrderDeliveryUpdateRequest
+		if err := readJSONBodyFlagsInto(cmd, &req); err != nil {
+			return err
+		}
+
+		client, err := getClient(cmd)
+		if err != nil {
+			return err
+		}
+
+		delivery, err := client.UpdateOrderDelivery(cmd.Context(), args[0], &req)
+		if err != nil {
+			return fmt.Errorf("failed to update order delivery: %w", err)
+		}
+
+		formatter := getFormatter(cmd)
+		outputFormat, _ := cmd.Flags().GetString("output")
+		if outputFormat == "json" {
+			return formatter.JSON(delivery)
+		}
+		_, _ = fmt.Fprintf(outWriter(cmd), "Updated delivery for order %s\n", delivery.OrderID)
+		return nil
+	},
+}
+
 func getClient(cmd *cobra.Command) (api.APIClient, error) {
 	storeName, _ := cmd.Flags().GetString("store")
 	if storeName == "" {
@@ -606,10 +1224,93 @@ func init() {
 	ordersCmd.AddCommand(ordersCancelCmd)
 	ordersCancelCmd.Flags().String("batch", "", "Batch input file (JSON array or NDJSON)")
 
+	// Create / Update
+	ordersCmd.AddCommand(ordersCreateCmd)
+	addJSONBodyFlags(ordersCreateCmd)
+
+	ordersCmd.AddCommand(ordersUpdateCmd)
+	addJSONBodyFlags(ordersUpdateCmd)
+
+	// Search
+	ordersCmd.AddCommand(ordersSearchCmd)
+	ordersSearchCmd.Flags().String("query", "", "Search query")
+	ordersSearchCmd.Flags().String("status", "", "Filter by status")
+	ordersSearchCmd.Flags().String("from", "", "Filter by created date from (YYYY-MM-DD or RFC3339)")
+	ordersSearchCmd.Flags().String("to", "", "Filter by created date to (YYYY-MM-DD or RFC3339)")
+	ordersSearchCmd.Flags().Int("page", 1, "Page number")
+	ordersSearchCmd.Flags().Int("page-size", 20, "Results per page")
+
+	// Split
+	ordersCmd.AddCommand(ordersSplitCmd)
+	ordersSplitCmd.Flags().String("line-item-ids", "", "Comma-separated line item IDs to split (required)")
+	_ = ordersSplitCmd.MarkFlagRequired("line-item-ids")
+
+	// Status updates
+	ordersCmd.AddCommand(ordersUpdateStatusCmd)
+	ordersUpdateStatusCmd.Flags().String("status", "", "New status (required)")
+	_ = ordersUpdateStatusCmd.MarkFlagRequired("status")
+
+	ordersCmd.AddCommand(ordersUpdateDeliveryStatusCmd)
+	ordersUpdateDeliveryStatusCmd.Flags().String("status", "", "New delivery status (required)")
+	_ = ordersUpdateDeliveryStatusCmd.MarkFlagRequired("status")
+
+	ordersCmd.AddCommand(ordersUpdatePaymentStatusCmd)
+	ordersUpdatePaymentStatusCmd.Flags().String("status", "", "New payment status (required)")
+	_ = ordersUpdatePaymentStatusCmd.MarkFlagRequired("status")
+
+	// Shipment
+	ordersCmd.AddCommand(ordersExecuteShipmentCmd)
+	addJSONBodyFlags(ordersExecuteShipmentCmd)
+
+	ordersCmd.AddCommand(ordersBulkExecuteShipmentCmd)
+	ordersBulkExecuteShipmentCmd.Flags().String("order-ids", "", "Comma-separated order IDs (required)")
+	_ = ordersBulkExecuteShipmentCmd.MarkFlagRequired("order-ids")
+
+	// Tags subcommands
+	ordersCmd.AddCommand(ordersTagsCmd)
+	ordersTagsCmd.AddCommand(ordersTagsListCmd)
+	ordersTagsCmd.AddCommand(ordersTagsGetCmd)
+	ordersTagsCmd.AddCommand(ordersTagsUpdateCmd)
+	ordersTagsUpdateCmd.Flags().String("tags", "", "Comma-separated tags (required)")
+	_ = ordersTagsUpdateCmd.MarkFlagRequired("tags")
+
+	// Transactions / Action Logs / Labels / Messages
+	ordersCmd.AddCommand(ordersTransactionsCmd)
+	ordersCmd.AddCommand(ordersActionLogsCmd)
+	ordersCmd.AddCommand(ordersLabelsCmd)
+	ordersCmd.AddCommand(ordersCreateMessageCmd)
+	addJSONBodyFlags(ordersCreateMessageCmd)
+
+	// Archived orders
+	ordersCmd.AddCommand(ordersArchivedCmd)
+	ordersArchivedCmd.AddCommand(ordersArchivedListCmd)
+	ordersArchivedListCmd.Flags().Int("page", 1, "Page number")
+	ordersArchivedListCmd.Flags().Int("page-size", 20, "Results per page")
+	ordersArchivedListCmd.Flags().String("from", "", "Filter by created date from (YYYY-MM-DD or RFC3339)")
+	ordersArchivedListCmd.Flags().String("to", "", "Filter by created date to (YYYY-MM-DD or RFC3339)")
+
+	ordersArchivedCmd.AddCommand(ordersArchivedCreateCmd)
+	addJSONBodyFlags(ordersArchivedCreateCmd)
+
+	// Delivery subcommands
+	ordersCmd.AddCommand(ordersDeliveryCmd)
+	ordersDeliveryCmd.AddCommand(ordersDeliveryGetCmd)
+	ordersDeliveryCmd.AddCommand(ordersDeliveryUpdateCmd)
+	addJSONBodyFlags(ordersDeliveryUpdateCmd)
+
 	schema.Register(schema.Resource{
 		Name:        "orders",
 		Description: "Manage customer orders",
-		Commands:    []string{"list", "get", "cancel", "metafields", "app-metafields", "item-metafields", "item-app-metafields"},
-		IDPrefix:    "order",
+		Commands: []string{
+			"list", "get", "create", "update", "cancel", "search", "split",
+			"update-status", "update-delivery-status", "update-payment-status",
+			"execute-shipment", "bulk-execute-shipment",
+			"tags list", "tags get", "tags update",
+			"transactions", "action-logs", "labels", "create-message",
+			"archived-orders list", "archived-orders create",
+			"delivery get", "delivery update",
+			"metafields", "app-metafields", "item-metafields", "item-app-metafields",
+		},
+		IDPrefix: "order",
 	})
 }

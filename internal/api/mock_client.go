@@ -2708,3 +2708,83 @@ func (m *MockClient) GetPromotionsCouponCenter(ctx context.Context) (json.RawMes
 func (m *MockClient) DeleteSaleProducts(ctx context.Context, saleID string, req *SaleDeleteProductsRequest) error {
 	return m.notImplemented("DeleteSaleProducts")
 }
+
+func (m *MockClient) SearchOrders(ctx context.Context, opts *OrderSearchOptions) (*OrdersListResponse, error) {
+	return nil, m.notImplemented("SearchOrders")
+}
+
+func (m *MockClient) CreateOrder(ctx context.Context, req *OrderCreateRequest) (*Order, error) {
+	return nil, m.notImplemented("CreateOrder")
+}
+
+func (m *MockClient) UpdateOrder(ctx context.Context, id string, req *OrderUpdateRequest) (*Order, error) {
+	return nil, m.notImplemented("UpdateOrder")
+}
+
+func (m *MockClient) UpdateOrderStatus(ctx context.Context, id string, status string) (*Order, error) {
+	return nil, m.notImplemented("UpdateOrderStatus")
+}
+
+func (m *MockClient) UpdateOrderDeliveryStatus(ctx context.Context, id string, status string) (*Order, error) {
+	return nil, m.notImplemented("UpdateOrderDeliveryStatus")
+}
+
+func (m *MockClient) UpdateOrderPaymentStatus(ctx context.Context, id string, status string) (*Order, error) {
+	return nil, m.notImplemented("UpdateOrderPaymentStatus")
+}
+
+func (m *MockClient) GetOrderTags(ctx context.Context, id string) (*OrderTagsResponse, error) {
+	return nil, m.notImplemented("GetOrderTags")
+}
+
+func (m *MockClient) UpdateOrderTags(ctx context.Context, id string, tags []string) (*Order, error) {
+	return nil, m.notImplemented("UpdateOrderTags")
+}
+
+func (m *MockClient) ListOrderTags(ctx context.Context) (json.RawMessage, error) {
+	return nil, m.notImplemented("ListOrderTags")
+}
+
+func (m *MockClient) SplitOrder(ctx context.Context, id string, lineItemIDs []string) (*OrderSplitResponse, error) {
+	return nil, m.notImplemented("SplitOrder")
+}
+
+func (m *MockClient) BulkExecuteShipment(ctx context.Context, orderIDs []string) (*BulkShipmentResponse, error) {
+	return nil, m.notImplemented("BulkExecuteShipment")
+}
+
+func (m *MockClient) ExecuteShipment(ctx context.Context, id string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("ExecuteShipment")
+}
+
+func (m *MockClient) GetOrderLabels(ctx context.Context, opts any) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetOrderLabels")
+}
+
+func (m *MockClient) GetOrderTransactions(ctx context.Context, opts any) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetOrderTransactions")
+}
+
+func (m *MockClient) GetOrderActionLogs(ctx context.Context, id string) (json.RawMessage, error) {
+	return nil, m.notImplemented("GetOrderActionLogs")
+}
+
+func (m *MockClient) PostOrderMessage(ctx context.Context, id string, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("PostOrderMessage")
+}
+
+func (m *MockClient) CreateArchivedOrdersReport(ctx context.Context, body any) (json.RawMessage, error) {
+	return nil, m.notImplemented("CreateArchivedOrdersReport")
+}
+
+func (m *MockClient) ListArchivedOrders(ctx context.Context, opts *ArchivedOrdersListOptions) (*OrdersListResponse, error) {
+	return nil, m.notImplemented("ListArchivedOrders")
+}
+
+func (m *MockClient) GetOrderDelivery(ctx context.Context, orderID string) (*OrderDelivery, error) {
+	return nil, m.notImplemented("GetOrderDelivery")
+}
+
+func (m *MockClient) UpdateOrderDelivery(ctx context.Context, orderID string, req *OrderDeliveryUpdateRequest) (*OrderDelivery, error) {
+	return nil, m.notImplemented("UpdateOrderDelivery")
+}
