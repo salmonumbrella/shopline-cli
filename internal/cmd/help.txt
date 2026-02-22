@@ -1,0 +1,263 @@
+spl - CLI for Shopline e-commerce platform
+
+IMPORTANT: Always use the shortest alias. Full names waste tokens.
+
+Aliases (resource -> shortest):
+  orders=o  products=p  customers=cu  refunds=rf  collections=col
+  draft-orders=do  fulfillments=ff  payments=pay  transactions=tx
+  shipments=shp  shipping=sh  inventory=inv  coupons=cpn  promotions=pm
+  abandoned-checkouts=ac  categories=cat  channels=ch  webhooks=hk
+  gift-cards=gc  labels=lb  locations=loc  tags=tg  domains=dm
+  warehouses=wh  return-orders=ro  discount-codes=dc  price-rules=pr
+  inventory-levels=il  store-credits=scr  member-points=mp
+  carrier-services=cs  delivery-options=dop  local-delivery=ld
+  pickup=pu  shipping-zones=sz  disputes=dis  payouts=po
+  balance=bal  taxes=tax  currencies=cur  themes=th  assets=as
+  pages=pg  blogs=bl  articles=art  redirects=rd  files=fi
+  script-tags=st  size-charts=sc  smart-collections=smc
+  social-posts=sop  staffs=sf  merchants=mr  multipass=mup
+  operation-logs=ol  order-attribution=oa  order-risks=ork
+  metafields=mf  metafield-definitions=mfd  custom-fields=cf
+  selling-plans=sp  sales=sl  flash-price=flp  catalog-pricing=cp
+  company-catalogs=cc  company-credits=ccr  tokens=tok  token=tk
+  subscriptions=sub  product-reviews=prv  product-listings=pl
+  product-subscriptions=psu  media=md  medias=mds
+  addon-products=ap  affiliate-campaigns=afc  bulk-operations=bo
+  wish-lists=wl  wish-list-items=wli  user-coupons=uc  user-credits=ucr
+  storefront-products=sfpr  storefront-carts=sfc
+  storefront-promotions=sfpm  storefront-tokens=sft
+  storefront-oauth=sfo  storefront-oauth-applications=sfoa
+  customer-addresses=ca  customer-groups=cg  customer-blacklist=cbl
+  customer-saved-searches=css  checkout-settings=cos
+  marketing-events=me  markets=mk  channel-products=chp  countries=cnt
+  taxonomies=txn  conversations=cv  express-links=el  schema=sch
+  shoplytics=sly  auth=au  livestreams=lv  message-center=mc
+  gifts=gi  carts=ct  membership=mem  purchase-orders=pur
+  fulfillment-orders=fo  fulfillment-services=fs
+  pos-purchase-orders=ppo  product-review-comments=prc
+
+Aliases (subcommand -> shortest):
+  list=l  get=g  create=mk  update=up  delete=rm  search=q
+  count=cnt  cancel=void  close=cl  reopen=re  complete=cpl
+  publish=pub  adjust=adj  send-recovery=sr  info=i  settings=cfg
+  status=stat  comments=cmt  stocks=stk  variations=var  images=img
+  items=itm  tracking=trk  execute=ex  children=chi  events=ev
+  profiles=prf  segments=seg  metafields=mf  order=ord  domains=dom
+  action-logs=al  receive=rcv  send-invoice=si  history=his
+  summary=sum  activate=on  deactivate=off  assign=asg  exchange=xch
+  capture=cap  send=snd  start=go  end=fin  hide=hid  unpublish=unp
+  enable=ena
+
+Orders:
+  spl o l                           List orders
+  spl o l --status open             Filter by status
+  spl o l --from "2d ago"           Orders since time
+  spl o l --email user@test.com     By customer email
+  spl o g ORDER_ID                  Order detail (with line items)
+  spl o g ORDER_ID --li             Light: id, number, status, total
+  spl o q "query"                   Search orders
+  spl o mk --body-file order.json   Create order
+  spl o up ORDER_ID --note "text"   Update order
+  spl o void ORDER_ID               Cancel order
+  spl o tg ORDER_ID                 List order tags
+  spl o cmt ORDER_ID                List order comments
+
+Products:
+  spl p l                           List products
+  spl p l --status active           Filter by status
+  spl p g PRODUCT_ID                Product detail
+  spl p g PRODUCT_ID --li           Light: id, title, status, price
+  spl p q "query"                   Search products
+  spl p mk --body-file p.json      Create product
+  spl p up PRODUCT_ID --title T     Update product
+  spl p rm PRODUCT_ID               Delete product
+  spl p pub PRODUCT_ID              Publish product
+  spl p stk PRODUCT_ID              View stock levels
+  spl p var PRODUCT_ID              List variants
+  spl p img PRODUCT_ID              List product images
+
+Customers:
+  spl cu l                          List customers
+  spl cu l --email user@test.com    Filter by email
+  spl cu g CUSTOMER_ID              Customer detail
+  spl cu g CUSTOMER_ID --li         Light: id, name, email, orders
+  spl cu q "query"                  Search customers
+  spl cu mk --email e --fn "F"      Create customer
+  spl cu up CUSTOMER_ID --note N    Update customer
+  spl cu tg CUSTOMER_ID             Customer tags
+  spl cu sub CUSTOMER_ID            Subscriptions
+
+Fulfillment & shipping:
+  spl ff l --order-id ORDER_ID      List fulfillments
+  spl ff g FULFILLMENT_ID           Get fulfillment
+  spl shp l --order-id ORDER_ID     List shipments
+  spl shp mk --order-id O --tn NUM  Create shipment
+  spl sh ex --order-id O            Execute shipment
+  spl sh stat --order-id O          Shipment status
+  spl sh trk --order-id O           Tracking info
+
+Refunds & returns:
+  spl rf l --order-id ORDER_ID      List refunds
+  spl rf g REFUND_ID                Get refund
+  spl rf mk --order-id O --amt 10   Create refund
+  spl ro l                          List return orders
+  spl ro g RETURN_ID                Get return order
+  spl ro mk --order-id O            Create return
+  spl ro rcv RETURN_ID              Mark received
+  spl ro cpl RETURN_ID              Complete return
+
+Draft orders:
+  spl do l                          List drafts
+  spl do g DRAFT_ID                 Get draft detail
+  spl do mk --body-file d.json      Create draft
+  spl do cpl DRAFT_ID               Complete draft -> order
+  spl do si DRAFT_ID                Email invoice
+
+Inventory & warehouses:
+  spl inv l --location-id LOC       List inventory
+  spl inv adj --iid ITEM --delta 5  Adjust inventory
+  spl il l --iid ITEM               Inventory levels
+  spl il set --iid ITEM --avl 100   Set level
+  spl wh l                          List warehouses
+  spl loc l                         List locations
+
+Discounts & promotions:
+  spl cpn l                         List coupons
+  spl cpn g COUPON_ID               Get coupon
+  spl cpn mk --code CODE --title T  Create coupon
+  spl dc l --price-rule-id PR       List discount codes
+  spl pr l                          List price rules
+  spl pm l                          List promotions
+  spl pm q "query"                  Search promotions
+
+Collections & categories:
+  spl col l                         List collections
+  spl col g COLLECTION_ID           Get collection
+  spl col mk --title T              Create collection
+  spl cat l                         List categories
+  spl cat g CATEGORY_ID             Get category
+
+Content & pages:
+  spl pg l                          List pages
+  spl pg mk --title T --body B      Create page
+  spl bl l                          List blogs
+  spl art l --blog-id BLOG          List articles
+
+Gift cards & credits:
+  spl gc l                          List gift cards
+  spl gc mk --iv 100 --code CODE    Create gift card
+  spl scr l --customer-id CID       Store credits
+  spl mp g --customer-id CID        Member points
+
+Webhooks & integrations:
+  spl hk l                          List webhooks
+  spl hk mk --topic T --addr URL    Create webhook
+  spl hk rm WEBHOOK_ID              Delete webhook
+  spl st l                          List script tags
+
+Analytics & conversations:
+  spl sly l                         Shoplytics reports
+  spl cv l                          List conversations
+  spl el l                          List express links
+  spl sch g                         Get schema
+
+Settings & shop:
+  spl shop i                        Shop information
+  spl set g                         Get settings
+  spl set checkout                  Checkout settings
+  spl set payments                  Payment settings
+
+Storefront:
+  spl sfpr l                        Storefront products
+  spl sfc l                         Storefront carts
+  spl sfpm l                        Storefront promotions
+  spl sft l                         Storefront tokens
+
+Output formats:
+  -o json / -j  Full JSON output
+  -o jsonl      Newline-delimited JSON (streaming)
+  -o text       Human-readable table (default)
+  -q EXPR       JQ expression filter
+  --jq EXPR     Alias for --query
+  -F FIELDS     Field selection (CSV or preset)
+  --items-only  Output only the items array
+  --li          Light mode: minimal JSON payload (use with -o json)
+
+Common flags:
+  -s STORE      Store profile name (or SHOPLINE_STORE env)
+  -l LIMIT      Limit results (sets page size)
+  --page N      Page number
+  --page-size N Page size
+  --sort-by F   Sort by field
+  -D            Sort descending
+  -y / --yes    Skip confirmations
+  --dry-run     Preview without executing
+  --no-input    Disable interactive prompts
+
+Flag aliases (long -> short):
+ IDs:
+  --assignee-id=--aid    --delivery-option-id=--doi  --fulfillment-id=--fid
+  --gift-product-id=--gpi  --gift-variant-id=--gvi  --order-ids=--ois
+  --order-number=--on    --page-id=--pgi    --per-page=--pp
+  --performer-id=--pfi   --product-ids=--pis  --promotion-id=--pmi
+  --reference-id=--rfi   --resource-id=--rid  --resource-type=--rt
+  --selling-plan-id=--spi  --store-id=--sid   --supplier-id=--sui
+ Filtering:
+  --action=--act   --archived=--arc  --campaign=--cmp  --category=--cgy
+  --channel=--chn  --collection=--col  --deep=--dp     --default=--def
+  --discount=--dst --display=--dsp  --enabled=--enb   --event=--evt
+  --event-name=--en  --event-type=--etp  --format=--fmt  --gateway=--gw
+  --image=--img    --kind=--kd     --level=--lv      --locale=--loc
+  --medium=--med   --owner=--own   --primary=--pri   --private=--pvt
+  --public=--pbl   --role=--rl     --rules=--rul     --scopes=--scp
+  --search-query=--sq  --search-type=--sty  --searchable=--sbl  --segment=--seg
+  --sort-order=--so  --source-type=--srt  --state=--stt  --tag=--ta
+  --target=--tgt   --text=--txt    --topic=--top     --value-type=--vtp
+  --visible=--vis
+ Time:
+  --after=--af     --before=--bfr  --create-time=--ctm  --end-time=--etm
+  --since=--snc    --start-time=--stm  --until=--utl
+ Content:
+  --author=--atr   --body-html=--bh  --filename=--fil  --instructions=--ins
+  --notes=--nts    --subject=--sbj
+ Amounts:
+  --budget=--bgt   --credit-limit=--crl  --exchange-rate=--xr
+  --limit-per-user=--lpu  --max-quantity=--mxq  --min-purchase=--mnp
+  --min-quantity=--mnq  --rate=--ra   --score=--scr    --trial-days=--td
+  --unit=--un      --usage-limit=--ul
+ Misc:
+  --batch=--bat    --by-code=--bc  --by-handle=--bhd  --compound=--cpd
+  --disjunctive=--dj  --host=--ho  --interval=--itv  --options=--opt
+  --path=--pa      --priority=--pio  --province=--pv  --rating=--rat
+  --recommendation=--rec  --required=--req  --route=--rte
+  --sandbox=--sbx  --upsert=--ups  --zip-code=--zc
+
+Exit codes:
+  0  Success
+  1  General error
+  2  Authentication error
+  3  Validation error (invalid flags or arguments)
+  4  Not found (404)
+  5  Rate limited (429)
+
+Environment:
+  ~/.openclaw/.env           Auto-loaded when present (existing env vars win)
+  SHOPLINE_STORE             Default store profile
+  SHOPLINE_ACCESS_TOKEN      API access token
+  SHOPLINE_CREDENTIALS_DIR   Override credential storage directory
+  CW_CREDENTIALS_DIR         OpenClaw shared credentials root
+  SHOPLINE_OUTPUT            Default output format (json|jsonl|text)
+  SHOPLINE_ADMIN_TOKEN       Admin API token
+  SHOPLINE_ADMIN_MERCHANT_ID Admin merchant ID
+
+Auth:
+  spl au login              Browser-based store setup
+  spl au l                  List configured stores
+  spl au stat               Show current auth status
+  spl au rm STORE           Remove store profile
+
+Discovery:
+  spl help --json --deep    Full command tree as JSON (for agent discovery)
+  spl CMD --help            Detailed help for any command
+
+Use "spl CMD --help" for detailed help on any command.

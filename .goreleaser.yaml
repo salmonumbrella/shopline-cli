@@ -1,0 +1,72 @@
+version: 2
+
+project_name: shopline-cli
+
+builds:
+  - id: shopline
+    main: ./cmd/spl
+    binary: spl
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+archives:
+  - id: default
+    formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - README.md
+      - LICENSE
+
+checksum:
+  name_template: 'checksums.txt'
+  algorithm: sha256
+
+brews:
+  - name: shopline-cli
+    repository:
+      owner: salmonumbrella
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    directory: Formula
+    homepage: "https://github.com/salmonumbrella/shopline-cli"
+    description: "CLI for Shopline e-commerce platform"
+    license: "MIT"
+    install: |
+      bin.install "spl"
+    test: |
+      system "#{bin}/spl", "--help"
+
+release:
+  github:
+    owner: salmonumbrella
+    name: shopline-cli
+  draft: false
+  prerelease: auto
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'

@@ -1,0 +1,54 @@
+# Secrets
+.env
+
+# Binaries
+bin/
+/shopline
+/spl
+*.exe
+
+# IDE & AI
+.vscode/
+.claude/
+.cursor/
+.specstory/
+CLAUDE.md
+*.swp
+*.swo
+*~
+.idea/
+
+# Agent artifacts
+.dm/
+.private-journal/
+
+# Documentation (plans/drafts)
+docs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+*.out
+*.test
+
+# Build
+dist/
+
+# Generated
+man/
+
+# Dev scripts
+scripts/*
+!scripts/download_shopline_openapi_docs.py
+!scripts/extract_shopline_openapi_urls.py
+!scripts/download_shopline_reference_md.py
+!scripts/smoke_shopline.sh
+
+# Internal planning
+.plan/
+.tmp/
+.goreleaser.yaml.tmp
+digest.txt
+coverage-gaps.md
