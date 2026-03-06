@@ -49,6 +49,11 @@ type mockAPIClient struct {
 	searchOrdersResp  *api.OrdersListResponse
 	searchOrdersErr   error
 	searchOrdersCalls []*api.OrderSearchOptions
+
+	getOrderActionLogsResp json.RawMessage
+	getOrderActionLogsErr  error
+	getOrderActionLogsByID map[string]json.RawMessage
+	getOrderActionLogIDs   []string
 }
 
 func (m *mockAPIClient) ListOrders(ctx context.Context, opts *api.OrdersListOptions) (*api.OrdersListResponse, error) {
@@ -97,6 +102,16 @@ func (m *mockAPIClient) SearchOrders(ctx context.Context, opts *api.OrderSearchO
 		m.searchOrdersCalls = append(m.searchOrdersCalls, &cp)
 	}
 	return m.searchOrdersResp, m.searchOrdersErr
+}
+
+func (m *mockAPIClient) GetOrderActionLogs(ctx context.Context, id string) (json.RawMessage, error) {
+	m.getOrderActionLogIDs = append(m.getOrderActionLogIDs, id)
+	if m.getOrderActionLogsByID != nil {
+		if raw, ok := m.getOrderActionLogsByID[id]; ok {
+			return raw, m.getOrderActionLogsErr
+		}
+	}
+	return m.getOrderActionLogsResp, m.getOrderActionLogsErr
 }
 
 // mockStore is a mock implementation of CredentialStore for testing.
@@ -1203,6 +1218,186 @@ func TestOrdersListRunEJSONExpandDetails(t *testing.T) {
 	}
 	if len(resp.Items[0].LineItems) != 1 || len(resp.Items[1].LineItems) != 1 {
 		t.Fatalf("expected line items on expanded orders, got %+v", resp.Items)
+	}
+}
+
+func TestOrdersListRunEJSONEnrichesCompatFields(t *testing.T) {
+	mockClient := &mockAPIClient{
+		listOrdersResp: &api.OrdersListResponse{
+			Items: []api.OrderSummary{
+				{
+					ID:            "ord_1",
+					OrderNumber:   "1001",
+					Status:        "confirmed",
+					CustomerEmail: "customer@example.com",
+					CustomerName:  "Test Customer",
+					CreatedAt:     time.Date(2026, 3, 1, 12, 0, 0, 0, time.UTC),
+					UpdatedAt:     time.Date(2026, 3, 1, 12, 5, 0, 0, time.UTC),
+				},
+			},
+			TotalCount: 1,
+		},
+		getOrderByID: map[string]*api.Order{
+			"ord_1": {
+				ID:          "ord_1",
+				OrderNumber: "1001",
+				SubtotalItems: []api.OrderSubtotalItem{
+					{
+						Quantity:  1,
+						ItemPrice: &api.Price{Cents: 1999, CurrencyISO: "TWD"},
+					},
+				},
+			},
+		},
+		getOrderActionLogsByID: map[string]json.RawMessage{
+			"ord_1": json.RawMessage(`{"items":[
+				{"key":"updated_delivery_status","data":{"updated_delivery_status":"shipped"},"created_at":"2026-03-01T12:03:00Z"},
+				{"key":"updated_payment_status","data":{"updated_payment_status":"completed"},"created_at":"2026-03-01T12:04:00Z"}
+			]}`),
+		},
+	}
+	cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+	defer cleanup()
+
+	var buf bytes.Buffer
+	formatterWriter = &buf
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "json", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+	cmd.Flags().String("status", "", "")
+	cmd.Flags().Int("page", 1, "")
+	cmd.Flags().Int("page-size", 20, "")
+	cmd.Flags().Int("jobs", 2, "")
+
+	if err := ordersListCmd.RunE(cmd, []string{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	var resp struct {
+		Items []struct {
+			Status         string `json:"status"`
+			OrderStatus    string `json:"order_status"`
+			PaymentStatus  string `json:"payment_status"`
+			FulfillStatus  string `json:"fulfill_status"`
+			DeliveryStatus string `json:"delivery_status"`
+			TotalPrice     string `json:"total_price"`
+			TotalAmount    string `json:"total_amount"`
+			Currency       string `json:"currency"`
+		} `json:"items"`
+	}
+	if err := json.Unmarshal(buf.Bytes(), &resp); err != nil {
+		t.Fatalf("unmarshal output: %v", err)
+	}
+	if len(resp.Items) != 1 {
+		t.Fatalf("expected 1 item, got %d", len(resp.Items))
+	}
+	item := resp.Items[0]
+	if item.Status != "confirmed" || item.OrderStatus != "confirmed" {
+		t.Fatalf("expected confirmed status fields, got status=%q order_status=%q", item.Status, item.OrderStatus)
+	}
+	if item.PaymentStatus != "completed" {
+		t.Fatalf("expected payment_status=completed, got %q", item.PaymentStatus)
+	}
+	if item.FulfillStatus != "shipped" || item.DeliveryStatus != "shipped" {
+		t.Fatalf("expected shipped fulfillment fields, got fulfill_status=%q delivery_status=%q", item.FulfillStatus, item.DeliveryStatus)
+	}
+	if item.TotalPrice != "1999" || item.TotalAmount != "1999" {
+		t.Fatalf("expected total fields to be derived as 1999, got total_price=%q total_amount=%q", item.TotalPrice, item.TotalAmount)
+	}
+	if item.Currency != "TWD" {
+		t.Fatalf("expected currency=TWD, got %q", item.Currency)
+	}
+}
+
+func TestOrdersSearchRunEJSONEnrichesCompatFields(t *testing.T) {
+	mockClient := &mockAPIClient{
+		searchOrdersResp: &api.OrdersListResponse{
+			Items: []api.OrderSummary{
+				{
+					ID:          "ord_search",
+					OrderNumber: "2002",
+					Status:      "completed",
+				},
+			},
+			TotalCount: 1,
+		},
+		getOrderByID: map[string]*api.Order{
+			"ord_search": {
+				ID:          "ord_search",
+				OrderNumber: "2002",
+				SubtotalItems: []api.OrderSubtotalItem{
+					{
+						Quantity:  2,
+						ItemPrice: &api.Price{Cents: 1050, CurrencyISO: "USD"},
+					},
+				},
+			},
+		},
+		getOrderActionLogsByID: map[string]json.RawMessage{
+			"ord_search": json.RawMessage(`{"items":[
+				{"key":"updated_delivery_status","data":{"updated_delivery_status":"delivered"},"created_at":"2026-03-01T12:03:00Z"},
+				{"key":"updated_payment_status","data":{"updated_payment_status":"paid"},"created_at":"2026-03-01T12:04:00Z"}
+			]}`),
+		},
+	}
+	cleanup := setupOrdersTest(t, mockClient, defaultMockStore())
+	defer cleanup()
+
+	var buf bytes.Buffer
+	formatterWriter = &buf
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.SetContext(context.Background())
+	cmd.Flags().String("store", "", "")
+	cmd.Flags().String("output", "json", "")
+	cmd.Flags().String("color", "never", "")
+	cmd.Flags().String("query", "", "")
+	cmd.Flags().String("status", "", "")
+	cmd.Flags().String("q", "", "")
+	cmd.Flags().String("from", "", "")
+	cmd.Flags().String("to", "", "")
+	cmd.Flags().Int("page", 1, "")
+	cmd.Flags().Int("page-size", 20, "")
+	cmd.Flags().Int("jobs", 2, "")
+
+	if err := ordersSearchCmd.RunE(cmd, []string{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	var resp struct {
+		Items []struct {
+			OrderStatus    string `json:"order_status"`
+			PaymentStatus  string `json:"payment_status"`
+			DeliveryStatus string `json:"delivery_status"`
+			TotalAmount    string `json:"total_amount"`
+			Currency       string `json:"currency"`
+		} `json:"items"`
+	}
+	if err := json.Unmarshal(buf.Bytes(), &resp); err != nil {
+		t.Fatalf("unmarshal output: %v", err)
+	}
+	if len(resp.Items) != 1 {
+		t.Fatalf("expected 1 item, got %d", len(resp.Items))
+	}
+	item := resp.Items[0]
+	if item.OrderStatus != "completed" {
+		t.Fatalf("expected order_status=completed, got %q", item.OrderStatus)
+	}
+	if item.PaymentStatus != "paid" {
+		t.Fatalf("expected payment_status=paid, got %q", item.PaymentStatus)
+	}
+	if item.DeliveryStatus != "delivered" {
+		t.Fatalf("expected delivery_status=delivered, got %q", item.DeliveryStatus)
+	}
+	if item.TotalAmount != "21.00" {
+		t.Fatalf("expected total_amount=21.00, got %q", item.TotalAmount)
+	}
+	if item.Currency != "USD" {
+		t.Fatalf("expected currency=USD, got %q", item.Currency)
 	}
 }
 

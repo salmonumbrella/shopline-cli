@@ -48,8 +48,11 @@ var entries = []Entry{
 	// Order fields
 	{Alias: "on", Canonical: "order_number"},
 	{Alias: "oi", Canonical: "order_id"},
+	{Alias: "ost", Canonical: "order_status"},
 	{Alias: "pst", Canonical: "payment_status"},
+	{Alias: "dst", Canonical: "delivery_status"},
 	{Alias: "fst", Canonical: "fulfill_status"},
+	{Alias: "ta", Canonical: "total_amount"},
 	{Alias: "tp", Canonical: "total_price"},
 	{Alias: "li", Canonical: "line_items"},
 	{Alias: "si", Canonical: "subtotal_items"},

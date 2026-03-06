@@ -279,18 +279,20 @@ var ordersListCmd = &cobra.Command{
 
 		light, _ := cmd.Flags().GetBool("light")
 		if outputFormat == "json" {
+			jobs, _ := cmd.Flags().GetInt("jobs")
+			enriched := buildOrderSummaryOutputResponse(cmd.Context(), client, resp, jobs)
 			if light {
-				lightItems := toLightSlice(resp.Items, toLightOrderSummary)
+				lightItems := toLightSlice(enriched.Items, toLightOrderSummaryOutput)
 				return formatter.JSON(api.ListResponse[lightOrderSummary]{
 					Items:      lightItems,
-					Pagination: resp.Pagination,
-					Page:       resp.Page,
-					PageSize:   resp.PageSize,
-					TotalCount: resp.TotalCount,
-					HasMore:    resp.HasMore,
+					Pagination: enriched.Pagination,
+					Page:       enriched.Page,
+					PageSize:   enriched.PageSize,
+					TotalCount: enriched.TotalCount,
+					HasMore:    enriched.HasMore,
 				})
 			}
-			return formatter.JSON(resp)
+			return formatter.JSON(enriched)
 		}
 
 		headers := []string{"ORDER", "NUMBER", "STATUS", "TOTAL", "CUSTOMER", "CREATED"}
@@ -724,7 +726,9 @@ var ordersSearchCmd = &cobra.Command{
 		formatter := getFormatter(cmd)
 		outputFormat, _ := cmd.Flags().GetString("output")
 		if outputFormat == "json" {
-			return formatter.JSON(resp)
+			jobs, _ := cmd.Flags().GetInt("jobs")
+			enriched := buildOrderSummaryOutputResponse(cmd.Context(), client, resp, jobs)
+			return formatter.JSON(enriched)
 		}
 
 		headers := []string{"ORDER", "NUMBER", "STATUS", "TOTAL", "CUSTOMER", "CREATED"}
@@ -1440,7 +1444,7 @@ func init() {
 	ordersListCmd.Flags().Int("page", 1, "Page number")
 	ordersListCmd.Flags().Int("page-size", 20, "Results per page")
 	ordersListCmd.Flags().StringSlice("expand", nil, "Expand related resources: details, customer, products (adds API calls)")
-	ordersListCmd.Flags().Int("jobs", 4, "Max concurrent API calls for --expand details")
+	ordersListCmd.Flags().Int("jobs", 4, "Max concurrent API calls for JSON enrichment and --expand details")
 	ordersListCmd.Flags().Bool("light", false, "Minimal payload (saves tokens)")
 	flagAlias(ordersListCmd.Flags(), "light", "li")
 
@@ -1472,6 +1476,7 @@ func init() {
 	ordersSearchCmd.Flags().String("to", "", "Filter by created date to (YYYY-MM-DD or RFC3339)")
 	ordersSearchCmd.Flags().Int("page", 1, "Page number")
 	ordersSearchCmd.Flags().Int("page-size", 20, "Results per page")
+	ordersSearchCmd.Flags().Int("jobs", 4, "Max concurrent API calls for JSON enrichment")
 
 	// Split
 	ordersCmd.AddCommand(ordersSplitCmd)
