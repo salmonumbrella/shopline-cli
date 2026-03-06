@@ -32,6 +32,12 @@ func TestToLightOrder(t *testing.T) {
 	if light.CustomerName != "Test User" {
 		t.Errorf("CustomerName = %q, want %q", light.CustomerName, "Test User")
 	}
+	if light.OrderStatus != "open" {
+		t.Errorf("OrderStatus = %q, want %q", light.OrderStatus, "open")
+	}
+	if light.DeliveryStatus != "" {
+		t.Errorf("DeliveryStatus = %q, want empty string when no explicit delivery status exists", light.DeliveryStatus)
+	}
 
 	// Verify light output has fewer JSON lines than full order
 	lightJSON, _ := json.MarshalIndent(light, "", "  ")

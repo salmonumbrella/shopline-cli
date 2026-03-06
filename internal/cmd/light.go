@@ -26,48 +26,70 @@ func truncateRunes(s string, max int) string {
 // Each keeps 3-7 essential fields, targeting <10 JSON lines per item.
 
 type lightOrder struct {
-	ID            string `json:"id"`
-	OrderNumber   string `json:"order_number"`
-	Status        string `json:"status"`
-	PaymentStatus string `json:"payment_status"`
-	FulfillStatus string `json:"fulfill_status"`
-	TotalPrice    string `json:"total_price"`
-	Currency      string `json:"currency"`
-	CustomerName  string `json:"customer_name"`
+	ID             string `json:"id"`
+	OrderNumber    string `json:"order_number"`
+	Status         string `json:"status"`
+	OrderStatus    string `json:"order_status"`
+	PaymentStatus  string `json:"payment_status"`
+	FulfillStatus  string `json:"fulfill_status"`
+	DeliveryStatus string `json:"delivery_status"`
+	TotalPrice     string `json:"total_price"`
+	Currency       string `json:"currency"`
+	CustomerName   string `json:"customer_name"`
 }
 
 func toLightOrder(o *api.Order) lightOrder {
 	return lightOrder{
-		ID:            o.ID,
-		OrderNumber:   o.OrderNumber,
-		Status:        o.Status,
-		PaymentStatus: o.PaymentStatus,
-		FulfillStatus: o.FulfillStatus,
-		TotalPrice:    o.TotalPrice,
-		Currency:      o.Currency,
-		CustomerName:  truncateRunes(o.CustomerName, 50),
+		ID:             o.ID,
+		OrderNumber:    o.OrderNumber,
+		Status:         o.Status,
+		OrderStatus:    o.Status,
+		PaymentStatus:  o.PaymentStatus,
+		FulfillStatus:  o.FulfillStatus,
+		DeliveryStatus: "",
+		TotalPrice:     o.TotalPrice,
+		Currency:       o.Currency,
+		CustomerName:   truncateRunes(o.CustomerName, 50),
 	}
 }
 
 type lightOrderSummary struct {
-	ID            string `json:"id"`
-	OrderNumber   string `json:"order_number"`
-	Status        string `json:"status"`
-	PaymentStatus string `json:"payment_status"`
-	TotalPrice    string `json:"total_price"`
-	Currency      string `json:"currency"`
-	CustomerName  string `json:"customer_name"`
+	ID             string `json:"id"`
+	OrderNumber    string `json:"order_number"`
+	Status         string `json:"status"`
+	OrderStatus    string `json:"order_status"`
+	PaymentStatus  string `json:"payment_status"`
+	DeliveryStatus string `json:"delivery_status"`
+	TotalPrice     string `json:"total_price"`
+	Currency       string `json:"currency"`
+	CustomerName   string `json:"customer_name"`
 }
 
 func toLightOrderSummary(o *api.OrderSummary) lightOrderSummary {
 	return lightOrderSummary{
-		ID:            o.ID,
-		OrderNumber:   o.OrderNumber,
-		Status:        o.Status,
-		PaymentStatus: o.PaymentStatus,
-		TotalPrice:    o.TotalPrice,
-		Currency:      o.Currency,
-		CustomerName:  truncateRunes(o.CustomerName, 50),
+		ID:             o.ID,
+		OrderNumber:    o.OrderNumber,
+		Status:         o.Status,
+		OrderStatus:    o.Status,
+		PaymentStatus:  o.PaymentStatus,
+		DeliveryStatus: "",
+		TotalPrice:     o.TotalPrice,
+		Currency:       o.Currency,
+		CustomerName:   truncateRunes(o.CustomerName, 50),
+	}
+}
+
+func toLightOrderSummaryOutput(o *orderSummaryOutput) lightOrderSummary {
+	return lightOrderSummary{
+		ID:             o.ID,
+		OrderNumber:    o.OrderNumber,
+		Status:         o.Status,
+		OrderStatus:    o.OrderStatus,
+		PaymentStatus:  o.PaymentStatus,
+		DeliveryStatus: o.DeliveryStatus,
+		TotalPrice:     o.TotalPrice,
+		Currency:       o.Currency,
+		CustomerName:   truncateRunes(o.CustomerName, 50),
 	}
 }
 
