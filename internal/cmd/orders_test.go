@@ -1285,7 +1285,6 @@ func TestOrdersListRunEJSONEnrichesCompatFields(t *testing.T) {
 			FulfillStatus  string `json:"fulfill_status"`
 			DeliveryStatus string `json:"delivery_status"`
 			TotalPrice     string `json:"total_price"`
-			TotalAmount    string `json:"total_amount"`
 			Currency       string `json:"currency"`
 		} `json:"items"`
 	}
@@ -1305,8 +1304,8 @@ func TestOrdersListRunEJSONEnrichesCompatFields(t *testing.T) {
 	if item.FulfillStatus != "shipped" || item.DeliveryStatus != "shipped" {
 		t.Fatalf("expected shipped fulfillment fields, got fulfill_status=%q delivery_status=%q", item.FulfillStatus, item.DeliveryStatus)
 	}
-	if item.TotalPrice != "1999" || item.TotalAmount != "1999" {
-		t.Fatalf("expected total fields to be derived as 1999, got total_price=%q total_amount=%q", item.TotalPrice, item.TotalAmount)
+	if item.TotalPrice != "1999" {
+		t.Fatalf("expected total_price to be derived as 1999, got %q", item.TotalPrice)
 	}
 	if item.Currency != "TWD" {
 		t.Fatalf("expected currency=TWD, got %q", item.Currency)
@@ -1373,7 +1372,7 @@ func TestOrdersSearchRunEJSONEnrichesCompatFields(t *testing.T) {
 			OrderStatus    string `json:"order_status"`
 			PaymentStatus  string `json:"payment_status"`
 			DeliveryStatus string `json:"delivery_status"`
-			TotalAmount    string `json:"total_amount"`
+			TotalPrice     string `json:"total_price"`
 			Currency       string `json:"currency"`
 		} `json:"items"`
 	}
@@ -1393,8 +1392,8 @@ func TestOrdersSearchRunEJSONEnrichesCompatFields(t *testing.T) {
 	if item.DeliveryStatus != "delivered" {
 		t.Fatalf("expected delivery_status=delivered, got %q", item.DeliveryStatus)
 	}
-	if item.TotalAmount != "21.00" {
-		t.Fatalf("expected total_amount=21.00, got %q", item.TotalAmount)
+	if item.TotalPrice != "21.00" {
+		t.Fatalf("expected total_price=21.00, got %q", item.TotalPrice)
 	}
 	if item.Currency != "USD" {
 		t.Fatalf("expected currency=USD, got %q", item.Currency)

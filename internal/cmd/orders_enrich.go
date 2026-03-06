@@ -22,7 +22,6 @@ type orderSummaryOutput struct {
 	FulfillStatus  string    `json:"fulfill_status"`
 	DeliveryStatus string    `json:"delivery_status"`
 	TotalPrice     string    `json:"total_price"`
-	TotalAmount    string    `json:"total_amount"`
 	Currency       string    `json:"currency"`
 	CustomerEmail  string    `json:"customer_email"`
 	CustomerName   string    `json:"customer_name"`
@@ -83,7 +82,6 @@ func enrichOrderSummary(ctx context.Context, client api.APIClient, summary api.O
 		FulfillStatus:  summary.FulfillStatus,
 		DeliveryStatus: summary.FulfillStatus,
 		TotalPrice:     summary.TotalPrice,
-		TotalAmount:    summary.TotalPrice,
 		Currency:       summary.Currency,
 		CustomerEmail:  summary.CustomerEmail,
 		CustomerName:   summary.CustomerName,
@@ -115,7 +113,7 @@ func enrichOrderSummary(ctx context.Context, client api.APIClient, summary api.O
 }
 
 func needsOrderDetailEnrichment(out orderSummaryOutput) bool {
-	return out.TotalAmount == "" || out.TotalPrice == "" || out.Currency == ""
+	return out.TotalPrice == "" || out.Currency == ""
 }
 
 func needsOrderActionLogEnrichment(out orderSummaryOutput) bool {
@@ -136,7 +134,6 @@ func applyOrderDetailEnrichment(out *orderSummaryOutput, detail *api.Order) {
 	out.CustomerName = firstNonEmpty(out.CustomerName, detail.CustomerName)
 
 	totalAmount, currency := deriveOrderTotal(detail)
-	out.TotalAmount = firstNonEmpty(out.TotalAmount, detail.TotalPrice, totalAmount)
 	out.TotalPrice = firstNonEmpty(out.TotalPrice, detail.TotalPrice, totalAmount)
 	out.Currency = firstNonEmpty(out.Currency, detail.Currency, currency)
 }
@@ -415,7 +412,4 @@ func normalizeOrderSummaryOutput(out *orderSummaryOutput) {
 
 	out.DeliveryStatus = firstNonEmpty(out.DeliveryStatus, out.FulfillStatus)
 	out.FulfillStatus = firstNonEmpty(out.FulfillStatus, out.DeliveryStatus)
-
-	out.TotalAmount = firstNonEmpty(out.TotalAmount, out.TotalPrice)
-	out.TotalPrice = firstNonEmpty(out.TotalPrice, out.TotalAmount)
 }

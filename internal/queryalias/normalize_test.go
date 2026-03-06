@@ -47,7 +47,6 @@ func TestCanonical(t *testing.T) {
 		{alias: "on", want: "order_number", ok: true},
 		{alias: "ost", want: "order_status", ok: true},
 		{alias: "dst", want: "delivery_status", ok: true},
-		{alias: "ta", want: "total_amount", ok: true},
 		{alias: "ci", want: "customer_id", ok: true},
 		{alias: "qty", want: "quantity", ok: true},
 		{alias: "tt", want: "title_translations", ok: true},
@@ -76,7 +75,7 @@ func TestNormalizePath(t *testing.T) {
 		{name: "single alias", in: "st", want: "status"},
 		{name: "nested path", in: "sa.cy", want: "shipping_address.city"},
 		{name: "order aliases", in: "on.pst", want: "order_number.payment_status"},
-		{name: "compat order aliases", in: "ost.dst.ta", want: "order_status.delivery_status.total_amount"},
+		{name: "compat order aliases", in: "ost.dst.tp", want: "order_status.delivery_status.total_price"},
 		{name: "product title translations", in: "tt", want: "title_translations"},
 		{name: "multiple aliases", in: "ci.fn", want: "customer_id.first_name"},
 		{name: "long form unchanged", in: "order_number", want: "order_number"},
@@ -118,8 +117,8 @@ func TestNormalizeQuery(t *testing.T) {
 		},
 		{
 			name: "compat order field aliases",
-			in:   `.it[] | {ost, dst, ta}`,
-			want: `.items[] | {order_status, delivery_status, total_amount}`,
+			in:   `.it[] | {ost, dst, tp}`,
+			want: `.items[] | {order_status, delivery_status, total_price}`,
 		},
 		{
 			name: "address aliases",

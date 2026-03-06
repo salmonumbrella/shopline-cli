@@ -34,7 +34,6 @@ type lightOrder struct {
 	FulfillStatus  string `json:"fulfill_status"`
 	DeliveryStatus string `json:"delivery_status"`
 	TotalPrice     string `json:"total_price"`
-	TotalAmount    string `json:"total_amount"`
 	Currency       string `json:"currency"`
 	CustomerName   string `json:"customer_name"`
 }
@@ -49,7 +48,6 @@ func toLightOrder(o *api.Order) lightOrder {
 		FulfillStatus:  o.FulfillStatus,
 		DeliveryStatus: "",
 		TotalPrice:     o.TotalPrice,
-		TotalAmount:    o.TotalPrice,
 		Currency:       o.Currency,
 		CustomerName:   truncateRunes(o.CustomerName, 50),
 	}
@@ -63,7 +61,6 @@ type lightOrderSummary struct {
 	PaymentStatus  string `json:"payment_status"`
 	DeliveryStatus string `json:"delivery_status"`
 	TotalPrice     string `json:"total_price"`
-	TotalAmount    string `json:"total_amount"`
 	Currency       string `json:"currency"`
 	CustomerName   string `json:"customer_name"`
 }
@@ -77,7 +74,6 @@ func toLightOrderSummary(o *api.OrderSummary) lightOrderSummary {
 		PaymentStatus:  o.PaymentStatus,
 		DeliveryStatus: "",
 		TotalPrice:     o.TotalPrice,
-		TotalAmount:    o.TotalPrice,
 		Currency:       o.Currency,
 		CustomerName:   truncateRunes(o.CustomerName, 50),
 	}
@@ -92,7 +88,6 @@ func toLightOrderSummaryOutput(o *orderSummaryOutput) lightOrderSummary {
 		PaymentStatus:  o.PaymentStatus,
 		DeliveryStatus: o.DeliveryStatus,
 		TotalPrice:     o.TotalPrice,
-		TotalAmount:    o.TotalAmount,
 		Currency:       o.Currency,
 		CustomerName:   truncateRunes(o.CustomerName, 50),
 	}

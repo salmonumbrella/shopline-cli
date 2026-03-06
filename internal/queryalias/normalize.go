@@ -52,7 +52,6 @@ var entries = []Entry{
 	{Alias: "pst", Canonical: "payment_status"},
 	{Alias: "dst", Canonical: "delivery_status"},
 	{Alias: "fst", Canonical: "fulfill_status"},
-	{Alias: "ta", Canonical: "total_amount"},
 	{Alias: "tp", Canonical: "total_price"},
 	{Alias: "li", Canonical: "line_items"},
 	{Alias: "si", Canonical: "subtotal_items"},
